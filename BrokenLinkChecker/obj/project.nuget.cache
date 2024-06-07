@@ -1,0 +1,10 @@
+{
+  "version": 2,
+  "dgSpecHash": "fcl36EcKrpA6TMB15QzfP2g6ZN1n8E2GSG1iftBL+Z6UTWIbQvg+q/9DJ9rAETsV4oerfEzR5se/JuMzeaIw5g==",
+  "success": true,
+  "projectFilePath": "/home/casper/GitHub/BrokenLinkChecker/BrokenLinkChecker/BrokenLinkChecker.csproj",
+  "expectedPackageFiles": [
+    "/home/casper/.nuget/packages/htmlagilitypack/1.11.61/htmlagilitypack.1.11.61.nupkg.sha512"
+  ],
+  "logs": []
+}
