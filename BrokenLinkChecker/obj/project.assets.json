@@ -78,11 +78,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "/home/casper/GitHub/BrokenLinkChecker/BrokenLinkChecker/BrokenLinkChecker.csproj",
+      "projectUniqueName": "/home/casper/GitHub/Broken-Link-Checker/BrokenLinkChecker/BrokenLinkChecker.csproj",
       "projectName": "BrokenLinkChecker",
-      "projectPath": "/home/casper/GitHub/BrokenLinkChecker/BrokenLinkChecker/BrokenLinkChecker.csproj",
+      "projectPath": "/home/casper/GitHub/Broken-Link-Checker/BrokenLinkChecker/BrokenLinkChecker.csproj",
       "packagesPath": "/home/casper/.nuget/packages/",
-      "outputPath": "/home/casper/GitHub/BrokenLinkChecker/BrokenLinkChecker/obj/",
+      "outputPath": "/home/casper/GitHub/Broken-Link-Checker/BrokenLinkChecker/obj/",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "/home/casper/.nuget/NuGet/NuGet.Config"

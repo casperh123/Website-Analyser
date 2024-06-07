@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "fcl36EcKrpA6TMB15QzfP2g6ZN1n8E2GSG1iftBL+Z6UTWIbQvg+q/9DJ9rAETsV4oerfEzR5se/JuMzeaIw5g==",
+  "dgSpecHash": "ALMOcIMCJzx4pUUveJ37w6x7l6IMWX0kNU0TuFe3PpLzLjTPFM6CBxbX4tNx7ctPsa1Cu35Re8DjuhssCqwVDA==",
   "success": true,
-  "projectFilePath": "/home/casper/GitHub/BrokenLinkChecker/BrokenLinkChecker/BrokenLinkChecker.csproj",
+  "projectFilePath": "/home/casper/GitHub/Broken-Link-Checker/BrokenLinkChecker/BrokenLinkChecker.csproj",
   "expectedPackageFiles": [
     "/home/casper/.nuget/packages/htmlagilitypack/1.11.61/htmlagilitypack.1.11.61.nupkg.sha512"
   ],
