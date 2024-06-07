@@ -4,6 +4,7 @@ using System.Net;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
+using BrokenLinkChecker;
 using HtmlAgilityPack;
 
 class Program
@@ -11,15 +12,19 @@ class Program
     private static HttpClient httpClient = new HttpClient(
         new HttpClientHandler()
         {
-            UseCookies = false
+            UseCookies = false,
+            AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate | DecompressionMethods.Brotli,
+            SslProtocols = System.Security.Authentication.SslProtocols.Tls12 | System.Security.Authentication.SslProtocols.Tls13,
+            
         });
     private static HashSet<string> visitedLinks = new HashSet<string>();
-    private static List<string> notFoundLinks = new List<string>();
-    private static SemaphoreSlim semaphore = new SemaphoreSlim(4); // Control concurrency, 10 tasks at a time
+    private static List<BrokenLink> notFoundLinks = new List<BrokenLink>();
+    private static SemaphoreSlim semaphore = new SemaphoreSlim(8); // Control concurrency, 10 tasks at a time
 
     static async Task Main(string[] args)
     {
-        ServicePointManager.DefaultConnectionLimit = 100;   
+        ServicePointManager.DefaultConnectionLimit = 1000; // Increase the concurrent connections limit
+        ServicePointManager.Expect100Continue = false; // This can enhance performance when you know that your POST requests don't need to expect a 100-Continue response from the server.
         httpClient.DefaultRequestHeaders.ConnectionClose = false;
         var baseUrl = "https://skadedyrsexperten.dk/";
         Console.WriteLine("Starting comprehensive link check at: " + baseUrl);
@@ -42,19 +47,23 @@ class Program
 
     static async Task TraverseSite(string baseUrl)
     {
-        Queue<string> linkQueue = new Queue<string>();
-        linkQueue.Enqueue(baseUrl);
+        Queue<LinkNode> linkQueue = new Queue<LinkNode>();
+        linkQueue.Enqueue(new LinkNode("", baseUrl, "", 0));
         List<Task> ongoingTasks = new List<Task>();
 
         while (linkQueue.Count > 0 || ongoingTasks.Count > 0)
         {
-            while (linkQueue.Count > 0 && ongoingTasks.Count < 100) // Ensure not to overload with too many tasks
+            while (linkQueue.Count > 0 && ongoingTasks.Count < 80) // Ensure not to overload with too many tasks
             {
-                string currentUrl = linkQueue.Dequeue();
-                if (!visitedLinks.Contains(currentUrl))
+                LinkNode currentLink = linkQueue.Dequeue();
+                if (currentLink == null)
                 {
-                    visitedLinks.Add(currentUrl);
-                    var task = ProcessLink(currentUrl, linkQueue);
+                    continue;
+                }
+                if (!visitedLinks.Contains(currentLink.Target))
+                {
+                    visitedLinks.Add(currentLink.Target);
+                    var task = ProcessLink(currentLink, linkQueue);
                     ongoingTasks.Add(task);
                 }
             }
@@ -64,7 +73,7 @@ class Program
         }
     }
 
-    static async Task ProcessLink(string url, Queue<string> linkQueue)
+    static async Task ProcessLink(LinkNode url, Queue<LinkNode> linkQueue)
     {
         await semaphore.WaitAsync(); // Wait for the semaphore
         try
@@ -72,7 +81,7 @@ class Program
             var links = await FetchAndParseLinks(url);
             foreach (var link in links)
             {
-                if (!visitedLinks.Contains(link))
+                if (!visitedLinks.Contains(link.Target))
                 {
                     linkQueue.Enqueue(link);
                 }
@@ -88,80 +97,77 @@ class Program
         }
     }
 
-    static async Task<List<string>> FetchAndParseLinks(string url)
+    public static async Task<List<LinkNode>> FetchAndParseLinks(LinkNode url)
     {
-        var linkList = new List<string>();
-        var response = await httpClient.GetAsync(url);
-        Console.WriteLine($"Checked {url}, Status Code: {response.StatusCode}");
+        var stopwatch = System.Diagnostics.Stopwatch.StartNew(); // Start timing
+        var linkList = new List<LinkNode>();
+        HttpResponseMessage response = await httpClient.GetAsync(url.Target, HttpCompletionOption.ResponseHeadersRead);
 
-        if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
+        if (response.IsSuccessStatusCode)
         {
-            notFoundLinks.Add(url);
-            Console.WriteLine($"Added to 404 list: {url}");
-        }
-        else if (response.IsSuccessStatusCode)
-        {
-            var content = await response.Content.ReadAsStringAsync();
-            var doc = new HtmlDocument();
-            doc.LoadHtml(content);
-
-            var links = doc.DocumentNode.SelectNodes("//a[@href]");
-            if (links != null)
+            await using (Stream contentStream = await response.Content.ReadAsStreamAsync())
             {
-                Uri baseUri = new Uri(url);
-                foreach (var link in links)
+                var doc = new HtmlDocument();
+                doc.Load(contentStream);
+
+                var links = doc.DocumentNode.SelectNodes("//a[@href]");
+                if (links != null)
                 {
-                    var href = link.Attributes["href"].Value;
-                    Uri fullUri;
-                    if (Uri.TryCreate(href, UriKind.Absolute, out fullUri))
+                    foreach (var link in links)
                     {
+                        var href = link.GetAttributeValue("href", string.Empty);
+                        var resolvedUrl = Utilities.GetUrl(url.Target, href);
+                        Uri fullUri = new Uri(resolvedUrl);
+
                         // Only add links from the same domain
-                        if (fullUri.Host == baseUri.Host)
+                        if (fullUri.Host == new Uri(url.Target).Host)
                         {
-                            linkList.Add(fullUri.ToString());
-                        }
-                    }
-                    else
-                    {
-                        // Resolve relative links
-                        var resolvedUri = new Uri(baseUri, href);
-                        if (resolvedUri.Host == baseUri.Host)
-                        {
-                            linkList.Add(resolvedUri.ToString());
+                            linkList.Add(new LinkNode(url.Target, fullUri.ToString(), link.InnerText, link.Line));
                         }
                     }
                 }
             }
+            
         }
+        else {
+            notFoundLinks.Add(new BrokenLink(url.Target, url.Referrer, url.AnchorText, url.Line));
+            Console.WriteLine($"Added to 404 list: {url.Target}");
+        }
+        stopwatch.Stop();
+        Console.WriteLine($"Checked {url.Target}, Status Code: {response.StatusCode}, Response Time: {stopwatch.ElapsedMilliseconds} ms");
 
         return linkList;
     }
 }
 
-public class LinkNode(string referrer, string target, HtmlNode referringNode)
+public class LinkNode
 {
-    public string Referrer { get; set; } = referrer;
+    public string Referrer { get; set; }
+    public string Target { get; set; }
+    public string AnchorText { get; set; }
+    public int Line { get; set; }
 
-    public string Target { get; set; } = target;
-
-    public HtmlNode ReferringNode = referringNode;
+    public LinkNode(string referrer, string target, string anchorText, int line)
+    {
+        Referrer = referrer ?? "";
+        Target = target ?? "";
+        AnchorText = anchorText ?? "";
+        Line = line;
+    }
 }
 
-public class BrokenLink
+public class BrokenLink(string url, string referringPage, string anchorText, int line)
 {
-    public string Url { get; set; }
-    public string ReferringPage { get; set; }
-    public string AnchorText { get; set; }
+    public string Url { get; set; } = url;
 
-    public BrokenLink(string url, string referringPage, string anchorText)
-    {
-        Url = url;
-        ReferringPage = referringPage;
-        AnchorText = anchorText;
-    }
+    public string ReferringPage { get; set; } = referringPage;
+
+    public string AnchorText { get; set; } = anchorText;
+
+    public int Line { get; set; } = line;
 
     public override string ToString()
     {
-        return $"Broken Link Found: URL={Url}, Anchor Text='{AnchorText}', Found on Page={ReferringPage}";
+        return $"Broken Link Found: TARGET={Url}, ANCHOR TEXT='{AnchorText}', REFERRER={ReferringPage}, LINE:{Line}";
     }
 }
