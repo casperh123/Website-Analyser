@@ -33,3 +33,4 @@
 /home/casper/GitHub/Broken-Link-Checker/BrokenLinkChecker/obj/Debug/net8.0/BrokenLinkChecker.pdb
 /home/casper/GitHub/Broken-Link-Checker/BrokenLinkChecker/obj/Debug/net8.0/BrokenLinkChecker.genruntimeconfig.cache
 /home/casper/GitHub/Broken-Link-Checker/BrokenLinkChecker/obj/Debug/net8.0/ref/BrokenLinkChecker.dll
+/home/casper/GitHub/Broken-Link-Checker/BrokenLinkChecker/bin/Debug/net8.0/Serilog.dll

@@ -1,10 +1,11 @@
 {
   "version": 2,
-  "dgSpecHash": "ALMOcIMCJzx4pUUveJ37w6x7l6IMWX0kNU0TuFe3PpLzLjTPFM6CBxbX4tNx7ctPsa1Cu35Re8DjuhssCqwVDA==",
+  "dgSpecHash": "jqXMgHWooP98jxisLsVVBbNiEeWXLHf+EkYHF1La5n5xjfhcm2EaM3xtAHZsNVR9Hm9YiWKtINTgsYFar3nqHA==",
   "success": true,
   "projectFilePath": "/home/casper/GitHub/Broken-Link-Checker/BrokenLinkChecker/BrokenLinkChecker.csproj",
   "expectedPackageFiles": [
-    "/home/casper/.nuget/packages/htmlagilitypack/1.11.61/htmlagilitypack.1.11.61.nupkg.sha512"
+    "/home/casper/.nuget/packages/htmlagilitypack/1.11.61/htmlagilitypack.1.11.61.nupkg.sha512",
+    "/home/casper/.nuget/packages/serilog/4.0.0/serilog.4.0.0.nupkg.sha512"
   ],
   "logs": []
 }
