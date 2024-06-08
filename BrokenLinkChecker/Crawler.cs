@@ -25,7 +25,7 @@ namespace BrokenLinkChecker
 
             while (linkQueue.Count > 0 || ongoingTasks.Count > 0)
             {
-                while (linkQueue.Count > 0 && ongoingTasks.Count < 10000) // Ensure not to overload with too many tasks
+                while (linkQueue.Count > 0 && ongoingTasks.Count < 500) // Ensure not to overload with too many tasks
                 {
                     var currentLink = linkQueue.Dequeue();
                     if (currentLink == null || !CrawlerState.VisitedLinks.Add(currentLink.Target))
