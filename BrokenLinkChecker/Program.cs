@@ -1,16 +1,15 @@
 ﻿using System.Diagnostics;
 using System.Net;
 using BrokenLinkChecker;
+using BrokenLinkChecker.crawler;
+using BrokenLinkChecker.Utility;
 using HtmlAgilityPack;
 
-Crawler crawler = new Crawler("https://adidas.dk", HttpClientSingleton.Instance, new CrawlerState(8));
-       
-ServicePointManager.DefaultConnectionLimit = 1000; // Increase the concurrent connections limit
-ServicePointManager.Expect100Continue = false; // Enhance performance for POST requests
-        
-const string baseUrl = "https://adidas.dk";
-        
-Console.WriteLine("Starting comprehensive link check at: " + baseUrl);
+string url = "https://skadedyrsexperten.dk";
+
+Crawler crawler = new Crawler(url, HttpClientSingleton.Instance, new CrawlerState(16));
+
+Console.WriteLine("Starting comprehensive link check at: " + url);
 
 await crawler.GetBrokenLinksAsync();
 

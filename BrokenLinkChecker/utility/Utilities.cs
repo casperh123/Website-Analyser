@@ -1,4 +1,4 @@
-namespace BrokenLinkChecker;
+namespace BrokenLinkChecker.utility;
 
 public static class Utilities
 {

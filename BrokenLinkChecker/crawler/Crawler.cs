@@ -1,7 +1,9 @@
 using System.Diagnostics;
+using BrokenLinkChecker.models;
+using BrokenLinkChecker.utility;
 using HtmlAgilityPack;
 
-namespace BrokenLinkChecker
+namespace BrokenLinkChecker.crawler
 {
     public class Crawler
     {

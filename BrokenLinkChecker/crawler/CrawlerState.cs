@@ -1,3 +1,5 @@
+using BrokenLinkChecker.models;
+
 namespace BrokenLinkChecker;
 
 public class CrawlerState(int concurrentRequests)

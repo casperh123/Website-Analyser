@@ -1,4 +1,4 @@
-namespace BrokenLinkChecker;
+namespace BrokenLinkChecker.models;
 
 public class LinkNode
 {
