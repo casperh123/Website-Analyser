@@ -7,11 +7,11 @@ using HtmlAgilityPack;
 
 string url = "https://skadedyrsexperten.dk";
 
-Crawler crawler = new Crawler(url, HttpClientSingleton.Instance, new CrawlerState(16));
+Crawler crawler = new Crawler(HttpClientSingleton.Instance, new CrawlerState(16));
 
 Console.WriteLine("Starting comprehensive link check at: " + url);
 
-await crawler.GetBrokenLinksAsync();
+await crawler.GetBrokenLinksAsync(url);
 
 Console.WriteLine("Broken Links:");
 if (crawler.CrawlerState.BrokenLinks.Count == 0)

@@ -1,0 +1,3 @@
+﻿<Project>
+  <Import Project="../buildMultiTargeting/BrokenLinkChecker.web.props" />
+</Project>

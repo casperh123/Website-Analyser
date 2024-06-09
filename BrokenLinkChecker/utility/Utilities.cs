@@ -2,11 +2,11 @@ namespace BrokenLinkChecker.utility;
 
 public static class Utilities
 {
-    public static string GetUrl(string baseUrl, string href)
+    public static Uri GetUrl(string baseUrl, string href)
     {
         // Resolve the URL relative to the base URL
-        var baseUri = new Uri(baseUrl);
-        var resolvedUri = new Uri(baseUri, href);
-        return resolvedUri.ToString();
+        Uri baseUri = new Uri(baseUrl);
+        Uri resolvedUri = new Uri(baseUri, href);
+        return resolvedUri;
     }
 }

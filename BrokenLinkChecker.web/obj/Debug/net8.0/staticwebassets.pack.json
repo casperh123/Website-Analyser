@@ -1,0 +1,41 @@
+{
+  "Files": [
+    {
+      "Id": "/home/casper/GitHub/Broken-Link-Checker/BrokenLinkChecker.web/obj/Debug/net8.0/scopedcss/projectbundle/BrokenLinkChecker.web.bundle.scp.css",
+      "PackagePath": "staticwebassets/BrokenLinkChecker.web.bundle.scp.css"
+    },
+    {
+      "Id": "/home/casper/GitHub/Broken-Link-Checker/BrokenLinkChecker.web/wwwroot/app.css",
+      "PackagePath": "staticwebassets/app.css"
+    },
+    {
+      "Id": "/home/casper/GitHub/Broken-Link-Checker/BrokenLinkChecker.web/wwwroot/bootstrap/bootstrap.min.css",
+      "PackagePath": "staticwebassets/bootstrap/bootstrap.min.css"
+    },
+    {
+      "Id": "/home/casper/GitHub/Broken-Link-Checker/BrokenLinkChecker.web/wwwroot/bootstrap/bootstrap.min.css.map",
+      "PackagePath": "staticwebassets/bootstrap/bootstrap.min.css.map"
+    },
+    {
+      "Id": "/home/casper/GitHub/Broken-Link-Checker/BrokenLinkChecker.web/wwwroot/favicon.png",
+      "PackagePath": "staticwebassets/favicon.png"
+    },
+    {
+      "Id": "obj/Debug/net8.0/staticwebassets/msbuild.BrokenLinkChecker.web.Microsoft.AspNetCore.StaticWebAssets.props",
+      "PackagePath": "build\\Microsoft.AspNetCore.StaticWebAssets.props"
+    },
+    {
+      "Id": "obj/Debug/net8.0/staticwebassets/msbuild.build.BrokenLinkChecker.web.props",
+      "PackagePath": "build\\BrokenLinkChecker.web.props"
+    },
+    {
+      "Id": "obj/Debug/net8.0/staticwebassets/msbuild.buildMultiTargeting.BrokenLinkChecker.web.props",
+      "PackagePath": "buildMultiTargeting\\BrokenLinkChecker.web.props"
+    },
+    {
+      "Id": "obj/Debug/net8.0/staticwebassets/msbuild.buildTransitive.BrokenLinkChecker.web.props",
+      "PackagePath": "buildTransitive\\BrokenLinkChecker.web.props"
+    }
+  ],
+  "ElementsToRemove": []
+}

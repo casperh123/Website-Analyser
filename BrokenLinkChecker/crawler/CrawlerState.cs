@@ -1,6 +1,6 @@
 using BrokenLinkChecker.models;
 
-namespace BrokenLinkChecker;
+namespace BrokenLinkChecker.crawler;
 
 public class CrawlerState(int concurrentRequests)
 {
