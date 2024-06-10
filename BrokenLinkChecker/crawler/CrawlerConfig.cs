@@ -2,7 +2,7 @@ using BrokenLinkChecker.models;
 
 namespace BrokenLinkChecker.crawler;
 
-public class CrawlerState(int concurrentRequests)
+public class CrawlerConfig(int concurrentRequests)
 {
     public readonly HashSet<string> VisitedLinks = new();
     public readonly List<BrokenLink> BrokenLinks = new();
