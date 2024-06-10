@@ -93,58 +93,61 @@ namespace BrokenLinkChecker.crawler
         {
             List<LinkNode> linkList = new();
 
-            // Check the page cache
+            // Check the page Cache
             if (_visitedPages.TryGetValue(url.Target, out HttpStatusCode statusCode))
             {
-                // Already visited
                 Log.Information("Cache hit for {Target}", url.Target);
-
-                // If the link is broken, add a new broken link with the current referrer details
-                if (statusCode != HttpStatusCode.OK)
+                
+                // Already being processed
+                if (statusCode is HttpStatusCode.Unused or HttpStatusCode.OK)
                 {
-                    _brokenLinks.Add(new BrokenLink(url.Target, url.Referrer, url.AnchorText, url.Line, (int)statusCode));
+                    return linkList;
                 }
 
-                return linkList;
+                // Cache Hit
+                _brokenLinks.Add(new BrokenLink(url.Target, url.Referrer, url.AnchorText, url.Line, (int)statusCode));
+                Log.Information("Cache hit for {Target}", url.Target);
             }
-
-            _visitedPages[url.Target] = HttpStatusCode.Unused;
-
-            try
+            else
             {
-                HttpResponseMessage response = await _httpClient.GetAsync(url.Target, HttpCompletionOption.ResponseHeadersRead);
+                _visitedPages[url.Target] = HttpStatusCode.Unused;
 
-                if (!response.IsSuccessStatusCode)
+                try
                 {
-                    _brokenLinks.Add(new BrokenLink(url.Target, url.Referrer, url.AnchorText, url.Line, (int)response.StatusCode));
-                }
-                else
-                {
-                    await using Stream contentStream = await response.Content.ReadAsStreamAsync();
-                    HtmlDocument doc = new HtmlDocument();
-                    await Task.Run(() => doc.Load(contentStream)); // Load document asynchronously
+                    HttpResponseMessage response = await _httpClient.GetAsync(url.Target, HttpCompletionOption.ResponseHeadersRead);
 
-                    HtmlNodeCollection links = doc.DocumentNode.SelectNodes("//a[@href]");
-
-                    if (links != null)
+                    if (!response.IsSuccessStatusCode)
                     {
-                        foreach (HtmlNode link in links)
-                        {
-                            LinkNode newLink = GenerateLinkNode(link, url.Target);
+                        _brokenLinks.Add(new BrokenLink(url.Target, url.Referrer, url.AnchorText, url.Line, (int)response.StatusCode));
+                    }
+                    else
+                    {
+                        await using Stream contentStream = await response.Content.ReadAsStreamAsync();
+                        HtmlDocument doc = new HtmlDocument();
+                        await Task.Run(() => doc.Load(contentStream)); // Load document asynchronously
 
-                            if (new Uri(newLink.Target).Host == new Uri(url.Target).Host)
+                        HtmlNodeCollection links = doc.DocumentNode.SelectNodes("//a[@href]");
+
+                        if (links != null)
+                        {
+                            foreach (HtmlNode link in links)
                             {
-                                linkList.Add(newLink);
+                                LinkNode newLink = GenerateLinkNode(link, url.Target);
+
+                                if (new Uri(newLink.Target).Host == new Uri(url.Target).Host)
+                                {
+                                    linkList.Add(newLink);
+                                }
                             }
                         }
                     }
+                    _visitedPages[url.Target] = response.StatusCode;
                 }
-                _visitedPages[url.Target] = response.StatusCode;
-            }
-            catch (Exception ex)
-            {
-                Log.Error(ex, "Error fetching link {Target}", url.Target);
-                _brokenLinks.Add(new BrokenLink(url.Target, url.Referrer, url.AnchorText, url.Line, -1, ex.Message));
+                catch (Exception ex)
+                {
+                    Log.Error(ex, "Error fetching link {Target}", url.Target);
+                    _brokenLinks.Add(new BrokenLink(url.Target, url.Referrer, url.AnchorText, url.Line, -1, ex.Message));
+                }
             }
 
             OnLinksChecked?.Invoke(LinksChecked++);
