@@ -62,7 +62,7 @@
         IsChecking = true;
         BrokenLinks.Clear();
 
-        CrawlerConfig crawlerState = new CrawlerConfig(16);
+        CrawlerConfig crawlerState = new CrawlerConfig(4);
         Crawler crawler = new Crawler(HttpClient, crawlerState)
         {
             OnLinksEnqueued = (count) =>

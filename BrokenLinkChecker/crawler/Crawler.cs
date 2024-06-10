@@ -159,9 +159,9 @@ namespace BrokenLinkChecker.crawler
         private LinkNode GenerateLinkNode(HtmlNode link, string target)
         {
             string href = link.GetAttributeValue("href", string.Empty);
-            Uri resolvedUrl = Utilities.GetUrl(target, href);
+            string resolvedUrl = Utilities.GetUrl(target, href);
 
-            return new LinkNode(target, resolvedUrl.ToString(), link.InnerText, link.Line);
+            return new LinkNode(target, resolvedUrl, link.InnerText, link.Line);
         }
     }
 }

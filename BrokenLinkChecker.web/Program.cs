@@ -1,5 +1,6 @@
 using System.Net;
 using System.Security.Authentication;
+using BrokenLinkChecker.crawler;
 using BrokenLinkChecker.web.Components;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -26,6 +27,7 @@ builder.Services.AddHttpClient("BrokenLinkChecker", client =>
         MaxConnectionsPerServer = 50,
         ServerCertificateCustomValidationCallback = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator
     });
+
 
 
 var app = builder.Build();
