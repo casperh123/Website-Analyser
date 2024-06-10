@@ -1,8 +1,6 @@
 @page "/check-links"
-@using System.Runtime.InteropServices
 @using BrokenLinkChecker.crawler
 @using BrokenLinkChecker.models
-@using BrokenLinkChecker.utility
 @inject HttpClient HttpClient
 @rendermode InteractiveServer
 
@@ -36,7 +34,7 @@
         </tr>
         </thead>
         <tbody>
-        @foreach (var link in BrokenLinks)
+        @foreach (BrokenLink link in BrokenLinks)
         {
         <tr>
             <td>@link.Url</td>
@@ -86,7 +84,7 @@
         try
         {
             Console.WriteLine($"Starting crawler for URL: {TargetUrl}");
-            await crawler.GetBrokenLinksAsync(TargetUrl);
+            await crawler.GetBrokenLinksAsync(new Uri(TargetUrl));
             Console.WriteLine("Crawler finished.");
         }
         catch (Exception e)

@@ -28,11 +28,11 @@ namespace BrokenLinkChecker.crawler
             CrawlerState = crawlerState ?? throw new ArgumentNullException(nameof(crawlerState));
         }
 
-        public async Task GetBrokenLinksAsync(string url)
+        public async Task GetBrokenLinksAsync(Uri url)
         {
             Console.WriteLine("GetBrokenLinksAsync started.");
             Queue<LinkNode> linkQueue = new Queue<LinkNode>();
-            linkQueue.Enqueue(new LinkNode("", url, "", 0));
+            linkQueue.Enqueue(new LinkNode("", url.ToString(), "", 0));
             LinksEnqueued++;  // Initial link enqueue
             OnLinksEnqueued?.Invoke(LinksEnqueued);  // Notify Blazor component
             List<Task> ongoingTasks = new List<Task>();
@@ -77,8 +77,7 @@ namespace BrokenLinkChecker.crawler
 
         private async Task<List<LinkNode>> FetchAndParseLinksAsync(LinkNode url)
         {
-            Stopwatch stopwatch = Stopwatch.StartNew(); // Start timing
-            List<LinkNode> linkList = new List<LinkNode>();
+            List<LinkNode> linkList = new ();
             HttpResponseMessage response = null;
 
             try
@@ -125,10 +124,9 @@ namespace BrokenLinkChecker.crawler
             }
             finally
             {
-                stopwatch.Stop();
                 LinksChecked++;
                 OnLinksChecked?.Invoke(LinksChecked);  // Notify Blazor component
-                LogInfo($"Checked {url.Target}, Status Code: {response?.StatusCode}, Response Time: {stopwatch.ElapsedMilliseconds} ms, Checked {LinksChecked} Links");
+                LogInfo($"Checked {url.Target}, Status Code: {response?.StatusCode} Checked {LinksChecked} Links");
             }
 
             return linkList;

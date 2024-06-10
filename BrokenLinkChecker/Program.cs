@@ -11,7 +11,7 @@ Crawler crawler = new Crawler(HttpClientSingleton.Instance, new CrawlerState(16)
 
 Console.WriteLine("Starting comprehensive link check at: " + url);
 
-await crawler.GetBrokenLinksAsync(url);
+await crawler.GetBrokenLinksAsync(new Uri(url));
 
 Console.WriteLine("Broken Links:");
 if (crawler.CrawlerState.BrokenLinks.Count == 0)
