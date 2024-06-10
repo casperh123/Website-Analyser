@@ -9,4 +9,16 @@ public static class Utilities
         Uri resolvedUri = new Uri(baseUri, href);
         return resolvedUri;
     }
+    
+    public static bool IsAsyncOrFragmentRequest(string url)
+    {
+        string[] asyncKeywords = { "ajax", "async", "action=async" };
+
+        if (asyncKeywords.Any(keyword => url.Contains(keyword, StringComparison.OrdinalIgnoreCase)))
+        {
+            return true;
+        }
+        // Check if the URL is a fragment identifier (e.g., #section)
+        return url.Contains('#') || url.Contains('?');
+    }
 }

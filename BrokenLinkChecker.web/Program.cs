@@ -1,6 +1,5 @@
 using System.Net;
 using System.Security.Authentication;
-using BrokenLinkChecker.Utility;
 using BrokenLinkChecker.web.Components;
 
 var builder = WebApplication.CreateBuilder(args);

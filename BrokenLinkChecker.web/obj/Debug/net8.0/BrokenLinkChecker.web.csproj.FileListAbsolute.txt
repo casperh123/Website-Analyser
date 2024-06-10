@@ -29,9 +29,6 @@
 /home/casper/GitHub/Broken-Link-Checker/BrokenLinkChecker.web/obj/Debug/net8.0/BrokenLinkChecker.web.genruntimeconfig.cache
 /home/casper/GitHub/Broken-Link-Checker/BrokenLinkChecker.web/obj/Debug/net8.0/ref/BrokenLinkChecker.web.dll
 /home/casper/GitHub/Broken-Link-Checker/BrokenLinkChecker.web/obj/Debug/net8.0/BrokenLinkChecker.web.csproj.AssemblyReference.cache
-/home/casper/GitHub/Broken-Link-Checker/BrokenLinkChecker.web/bin/Debug/net8.0/BrokenLinkChecker.deps.json
-/home/casper/GitHub/Broken-Link-Checker/BrokenLinkChecker.web/bin/Debug/net8.0/BrokenLinkChecker.runtimeconfig.json
-/home/casper/GitHub/Broken-Link-Checker/BrokenLinkChecker.web/bin/Debug/net8.0/BrokenLinkChecker
 /home/casper/GitHub/Broken-Link-Checker/BrokenLinkChecker.web/bin/Debug/net8.0/HtmlAgilityPack.dll
 /home/casper/GitHub/Broken-Link-Checker/BrokenLinkChecker.web/bin/Debug/net8.0/Serilog.dll
 /home/casper/GitHub/Broken-Link-Checker/BrokenLinkChecker.web/bin/Debug/net8.0/BrokenLinkChecker.dll

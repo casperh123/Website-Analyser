@@ -4,7 +4,7 @@
 @inject HttpClient HttpClient
 @rendermode InteractiveServer
 
-<h3>Broken Link Checker @clickcount</h3>
+<h3>Broken Link Checker</h3>
 
 <div>
     <label for="urlInput">Enter URL:</label>
@@ -15,8 +15,8 @@
 @if (IsChecking)
 {
     <p>Checking links, please wait...</p>
-    <p>Links enqueued: @linksEnqueued</p>
-    <p>Links checked: @linksChecked</p>
+    <p>Links enqueued: @_linksEnqueued</p>
+    <p>Links checked: @_linksChecked</p>
 }
 
 @if (BrokenLinks.Count > 0)
@@ -36,14 +36,14 @@
         <tbody>
         @foreach (BrokenLink link in BrokenLinks)
         {
-        <tr>
-            <td>@link.Url</td>
-            <td>@link.ReferringPage</td>
-            <td>@link.AnchorText</td>
-            <td>@link.Line</td>
-            <td>@link.StatusCode</td>
-            <td>@link.ErrorMessage</td>
-        </tr>
+            <tr>
+                <td><a href="@link.Url">@link.Url</a></td>
+                <td><a href="@link.ReferringPage">@link.ReferringPage</a></td>
+                <td>@link.AnchorText</td>
+                <td>@link.Line</td>
+                <td>@link.StatusCode</td>
+                <td>@link.ErrorMessage</td>
+            </tr>
         }
         </tbody>
     </table>
@@ -54,50 +54,36 @@
     private List<BrokenLink> BrokenLinks { get; set; } = new List<BrokenLink>();
     private bool IsChecking { get; set; } = false;
 
-    private int linksChecked;
-    private int linksEnqueued;
-
-    private int clickcount;
+    private int _linksChecked;
+    private int _linksEnqueued;
 
     private async Task CheckBrokenLinks()
     {
-        clickcount++;
-        Console.WriteLine("CheckBrokenLinks method started.");
         IsChecking = true;
         BrokenLinks.Clear();
 
-        var crawlerState = new CrawlerState(12);
-        var crawler = new Crawler(HttpClient, crawlerState);
+        CrawlerConfig crawlerState = new CrawlerConfig(16);
+        Crawler crawler = new Crawler(HttpClient, crawlerState)
+        {
+            OnLinksEnqueued = (count) =>
+            {
+                _linksEnqueued = count;
+                InvokeAsync(StateHasChanged);
+            },
+            OnLinksChecked = (count) =>
+            {
+                _linksChecked = count;
+                InvokeAsync(StateHasChanged);
+            },
+            OnBrokenLinks = (links) =>
+            {
+                BrokenLinks = links;
+                InvokeAsync(StateHasChanged);
+            }
+        };
         
-        // Subscribe to the OnLinksEnqueued and OnLinksChecked delegates
-        crawler.OnLinksEnqueued = (count) =>
-        {
-            linksEnqueued = count;
-            InvokeAsync(StateHasChanged); // Notify the Blazor component to update UI
-        };
-        crawler.OnLinksChecked = (count) =>
-        {
-            linksChecked = count;
-            InvokeAsync(StateHasChanged); // Notify the Blazor component to update UI
-        };
-
-        try
-        {
-            Console.WriteLine($"Starting crawler for URL: {TargetUrl}");
-            await crawler.GetBrokenLinksAsync(new Uri(TargetUrl));
-            Console.WriteLine("Crawler finished.");
-        }
-        catch (Exception e)
-        {
-            Console.WriteLine($"Exception occurred: {e.Message}");
-            throw;
-        }
-
-        linksChecked = crawler.LinksChecked;
-        linksEnqueued = crawler.LinksEnqueued;
-        BrokenLinks = crawlerState.BrokenLinks;
-
+        await crawler.GetBrokenLinksAsync(new Uri(TargetUrl));
+        
         IsChecking = false;
-        Console.WriteLine("CheckBrokenLinks method completed.");
     }
 }
