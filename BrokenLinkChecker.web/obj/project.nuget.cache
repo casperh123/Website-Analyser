@@ -1,11 +1,13 @@
 {
   "version": 2,
-  "dgSpecHash": "0p2y1lKtZ10uuhFOzDMOAMqfMgbC78Jlz2gz3jWznpWkrD767ULseMymBKq+UZT8GTDS9RjRl6bBF586k2t6kQ==",
+  "dgSpecHash": "OOWHmdL7n2OQBO4tE+hSDoaU3zpYDdnzPJdff5fz3mJO3Hj63f/qlwJCMr0yPwutWlE79YIvsrWh0FUJerBH3g==",
   "success": true,
   "projectFilePath": "/home/casper/GitHub/Broken-Link-Checker/BrokenLinkChecker.web/BrokenLinkChecker.web.csproj",
   "expectedPackageFiles": [
+    "/home/casper/.nuget/packages/anglesharp/1.1.2/anglesharp.1.1.2.nupkg.sha512",
     "/home/casper/.nuget/packages/htmlagilitypack/1.11.61/htmlagilitypack.1.11.61.nupkg.sha512",
-    "/home/casper/.nuget/packages/serilog/4.0.0/serilog.4.0.0.nupkg.sha512"
+    "/home/casper/.nuget/packages/serilog/4.0.0/serilog.4.0.0.nupkg.sha512",
+    "/home/casper/.nuget/packages/system.text.encoding.codepages/8.0.0/system.text.encoding.codepages.8.0.0.nupkg.sha512"
   ],
   "logs": []
 }

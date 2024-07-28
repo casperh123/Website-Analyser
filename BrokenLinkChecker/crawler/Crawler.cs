@@ -1,167 +1,182 @@
 using System.Collections.Concurrent;
+using System.Diagnostics;
 using System.Net;
+using AngleSharp;
+using AngleSharp.Dom;
+using AngleSharp.Html.Parser;
 using BrokenLinkChecker.models;
 using BrokenLinkChecker.utility;
-using HtmlAgilityPack;
-using Serilog;
 
 namespace BrokenLinkChecker.crawler
 {
     public class Crawler
     {
         private readonly HttpClient _httpClient;
-        private readonly ConcurrentDictionary<string, HttpStatusCode> _visitedPages;
 
+        public readonly ConcurrentDictionary<string, PageStats> VisitedPages;
         private readonly List<BrokenLink> _brokenLinks = new();
         private CrawlerConfig CrawlerConfig { get; }
 
         private int LinksChecked { get; set; }
 
-        // Delegates to notify when links are enqueued and checked
         public Action<List<BrokenLink>> OnBrokenLinks;
         public Action<int> OnLinksEnqueued;
         public Action<int> OnLinksChecked;
+        public Action<int> OnTotalRequestTime;
+
 
         public Crawler(HttpClient httpClient, CrawlerConfig crawlerConfig)
         {
             _httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
-            _visitedPages = new ConcurrentDictionary<string, HttpStatusCode>();
+            VisitedPages = new ConcurrentDictionary<string, PageStats>();
             CrawlerConfig = crawlerConfig ?? throw new ArgumentNullException(nameof(crawlerConfig));
         }
 
-        public async Task<List<BrokenLink>> GetBrokenLinksAsync(Uri url)
+        public async Task GetBrokenLinksAsync(Uri url)
         {
-            Queue<LinkNode> linkQueue = new();
-            linkQueue.Enqueue(new LinkNode("", url.ToString(), "", 0));
-            List<Task> ongoingTasks = new();
+            List<LinkNode> linkQueue = new List<LinkNode> { new LinkNode("", url.ToString(), "", 0) };
+            ConcurrentBag<LinkNode> foundLinks = new ();
 
-            while (linkQueue.Count > 0 || ongoingTasks.Count > 0)
+            do
             {
-                while (linkQueue.Count > 0 && ongoingTasks.Count < 100) // Ensure not to overload with too many tasks
-                {
-                    LinkNode currentLink = linkQueue.Dequeue();
+                var partitioner = Partitioner.Create(linkQueue);
 
-                    if (_visitedPages.ContainsKey(currentLink.Target))
-                    {
-                        continue;
-                    }
+                await Parallel.ForEachAsync(partitioner.GetDynamicPartitions(),
+                    async (link, cancellationToken) => { await ProcessLinkAsync(link, foundLinks); });
 
-                    Task task = ProcessLinkAsync(currentLink, linkQueue);
-                    ongoingTasks.Add(task);
-                }
+                OnLinksEnqueued?.Invoke(foundLinks.Count);
 
-                if (ongoingTasks.Count > 0)
-                {
-                    Task completedTask = await Task.WhenAny(ongoingTasks);
-                    ongoingTasks.Remove(completedTask);
-                }
-            }
+                linkQueue = foundLinks.ToList();
+                foundLinks = new ConcurrentBag<LinkNode>();
 
-            foreach (var key in _visitedPages)
-            {
-                Console.WriteLine($"{key}");
-            }
-
-            return _brokenLinks;
+            } while (linkQueue.Count > 0);
         }
 
-        private async Task ProcessLinkAsync(LinkNode url, Queue<LinkNode> linkQueue)
-        {
-            try
-            {
-                await CrawlerConfig.Semaphore.WaitAsync();
-                List<LinkNode> links = await FetchAndParseLinksAsync(url);
 
-                foreach (LinkNode link in links.Where(link => !Utilities.IsAsyncOrFragmentRequest(link.Target)))
-                {
-                    linkQueue.Enqueue(link);
-                    OnLinksEnqueued?.Invoke(linkQueue.Count);  // Notify Blazor component
-                }
-            }
-            catch (Exception ex)
+        private async Task ProcessLinkAsync(LinkNode url, ConcurrentBag<LinkNode> linksFound)
+        {
+            if (VisitedPages.ContainsKey(url.Target))
             {
-                Log.Error(ex, "Error processing link {Target}", url.Target);
+                return;
             }
-            finally
+
+            List<LinkNode> links = await GetLinksFromPage(url);
+
+            foreach (LinkNode link in links.Where(link => !Utilities.IsAsyncOrFragmentRequest(link.Target)))
             {
-                OnLinksChecked?.Invoke(LinksChecked++);  // Notify Blazor component
-                CrawlerConfig.Semaphore.Release(); // Release the semaphore
+                linksFound.Add(link);
             }
+
+            OnLinksChecked.Invoke(LinksChecked++); // Notify Blazor component
         }
 
-        private async Task<List<LinkNode>> FetchAndParseLinksAsync(LinkNode url)
+        private async Task<List<LinkNode>> GetLinksFromPage(LinkNode url)
         {
             List<LinkNode> linkList = new();
 
             // Check the page Cache
-            if (_visitedPages.TryGetValue(url.Target, out HttpStatusCode statusCode))
+            if (VisitedPages.TryGetValue(url.Target, out PageStats pageStats))
             {
-                Log.Information("Cache hit for {Target}", url.Target);
-                
-                // Already being processed
-                if (statusCode is HttpStatusCode.Unused or HttpStatusCode.OK)
+                if (pageStats.StatusCode is HttpStatusCode.OK or HttpStatusCode.Unused)
                 {
                     return linkList;
                 }
 
-                // Cache Hit
-                _brokenLinks.Add(new BrokenLink(url.Target, url.Referrer, url.AnchorText, url.Line, (int)statusCode));
-                Log.Information("Cache hit for {Target}", url.Target);
+                _brokenLinks.Add(new BrokenLink(url.Target, url.Referrer, url.AnchorText, url.Line, (int)pageStats.StatusCode));
             }
             else
             {
-                _visitedPages[url.Target] = HttpStatusCode.Unused;
+                PageStats stats = new PageStats(HttpStatusCode.Unused);
+                VisitedPages[url.Target] = stats;
+                
+                await CrawlerConfig.Semaphore.WaitAsync();
+                await ApplyJitterAsync();
 
-                try
+                Stopwatch responseTiming = Stopwatch.StartNew();
+
+                using HttpResponseMessage response = await _httpClient.GetAsync(url.Target, HttpCompletionOption.ResponseHeadersRead);
+
+                stats.ResponseTime = responseTiming.ElapsedMilliseconds;
+                
+                CrawlerConfig.Semaphore.Release();
+                
+                if (!response.IsSuccessStatusCode)
                 {
-                    HttpResponseMessage response = await _httpClient.GetAsync(url.Target, HttpCompletionOption.ResponseHeadersRead);
-
-                    if (!response.IsSuccessStatusCode)
-                    {
-                        _brokenLinks.Add(new BrokenLink(url.Target, url.Referrer, url.AnchorText, url.Line, (int)response.StatusCode));
-                    }
-                    else
-                    {
-                        await using Stream contentStream = await response.Content.ReadAsStreamAsync();
-                        HtmlDocument doc = new HtmlDocument();
-                        await Task.Run(() => doc.Load(contentStream)); // Load document asynchronously
-
-                        HtmlNodeCollection links = doc.DocumentNode.SelectNodes("//a[@href]");
-
-                        if (links != null)
-                        {
-                            foreach (HtmlNode link in links)
-                            {
-                                LinkNode newLink = GenerateLinkNode(link, url.Target);
-
-                                if (new Uri(newLink.Target).Host == new Uri(url.Target).Host)
-                                {
-                                    linkList.Add(newLink);
-                                }
-                            }
-                        }
-                    }
-                    _visitedPages[url.Target] = response.StatusCode;
+                    _brokenLinks.Add(new BrokenLink(
+                        url.Target, 
+                        url.Referrer, 
+                        url.AnchorText, 
+                        url.Line, 
+                        (int)response.StatusCode));
                 }
-                catch (Exception ex)
+                else
                 {
-                    Log.Error(ex, "Error fetching link {Target}", url.Target);
-                    _brokenLinks.Add(new BrokenLink(url.Target, url.Referrer, url.AnchorText, url.Line, -1, ex.Message));
+                    Stopwatch documentParseTiming = Stopwatch.StartNew();
+                    await using Stream document = await response.Content.ReadAsStreamAsync();
+
+                    linkList = await ExtractLinksFromDocumentAsync(document, url);
+                    stats.DocumentParseTime = documentParseTiming.ElapsedMilliseconds;
                 }
+
+                VisitedPages[url.Target].StatusCode = response.StatusCode;
             }
 
-            OnLinksChecked?.Invoke(LinksChecked++);
-            OnBrokenLinks?.Invoke(_brokenLinks);
+            OnLinksChecked.Invoke(LinksChecked++);
+            OnBrokenLinks.Invoke(_brokenLinks);
 
             return linkList;
         }
 
-        private LinkNode GenerateLinkNode(HtmlNode link, string target)
+        private async Task<List<LinkNode>> ExtractLinksFromDocumentAsync(Stream document, LinkNode checkingUrl)
         {
-            string href = link.GetAttributeValue("href", string.Empty);
-            string resolvedUrl = Utilities.GetUrl(target, href);
+            List<LinkNode> links = new List<LinkNode>();
+            IConfiguration config = Configuration.Default;
+            IBrowsingContext context = BrowsingContext.New(config);
+            IHtmlParser parser = context.GetService<IHtmlParser>() ?? new HtmlParser();
 
-            return new LinkNode(target, resolvedUrl, link.InnerText, link.Line);
+            IDocument doc = await parser.ParseDocumentAsync(document);
+            IHtmlCollection<IElement> documentLinks = doc.QuerySelectorAll("a[href]");
+
+            foreach (IElement link in documentLinks)
+            {
+                string href = link.GetAttribute("href");
+                if (!string.IsNullOrEmpty(href))
+                {
+                    LinkNode newLink = GenerateLinkNode(link, checkingUrl.Target);
+                    if (Uri.TryCreate(newLink.Target, UriKind.Absolute, out Uri uri) && uri.Host == new Uri(checkingUrl.Target).Host)
+                    {
+                        links.Add(newLink);
+                    }
+                }
+            }
+
+            return links;
+        }
+
+        
+        private LinkNode GenerateLinkNode(IElement link, string target)
+        {
+            string href = link.GetAttribute("href") ?? string.Empty;
+            string resolvedUrl;
+            try
+            {
+                resolvedUrl = Utilities.GetUrl(target, href);
+            }
+            catch (UriFormatException ex)
+            {
+                resolvedUrl = href; // Fall back to original href or handle as needed
+            }
+            string text = link.TextContent;
+            int line = link.SourceReference?.Position.Line ?? -1;
+
+            return new LinkNode(target, resolvedUrl, text, line);
+        }
+
+
+        private async Task ApplyJitterAsync()
+        {
+            int jitter = new Random().Next(1000); // Generate a random delay between 0 and 100 ms
+            await Task.Delay(jitter);
         }
     }
 }

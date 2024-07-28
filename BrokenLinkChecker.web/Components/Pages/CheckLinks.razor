@@ -18,6 +18,10 @@
     <p>Links enqueued: @_linksEnqueued</p>
     <p>Links checked: @_linksChecked</p>
 }
+else if (_averagePageSpeed > 0)
+{
+    <p>Average page speed: @_averagePageSpeed ms</p>
+}
 
 @if (BrokenLinks.Count > 0)
 {
@@ -56,13 +60,15 @@
 
     private int _linksChecked;
     private int _linksEnqueued;
+    private long _averagePageSpeed;
+    private PageStats slowestPage;
 
     private async Task CheckBrokenLinks()
     {
         IsChecking = true;
         BrokenLinks.Clear();
 
-        CrawlerConfig crawlerState = new CrawlerConfig(4);
+        CrawlerConfig crawlerState = new CrawlerConfig(8);
         Crawler crawler = new Crawler(HttpClient, crawlerState)
         {
             OnLinksEnqueued = (count) =>
@@ -83,6 +89,12 @@
         };
         
         await crawler.GetBrokenLinksAsync(new Uri(TargetUrl));
+
+        _averagePageSpeed = 
+            crawler.VisitedPages.Values.Aggregate(
+                0, 
+                (long acc, PageStats stats) => acc + stats.ResponseTime ) 
+            / crawler.VisitedPages.Count;
         
         IsChecking = false;
     }

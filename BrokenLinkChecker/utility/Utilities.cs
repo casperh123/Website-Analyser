@@ -4,16 +4,20 @@ public static class Utilities
 {
     public static string GetUrl(string baseUrl, string href)
     {
-        if (Uri.TryCreate(baseUrl, UriKind.Absolute, out var baseUri))
+        if (string.IsNullOrWhiteSpace(baseUrl) || string.IsNullOrWhiteSpace(href))
         {
-            if (Uri.TryCreate(baseUri, href, out var resultUri))
-            {
-                // This will ensure the URL is properly encoded
-                return new UriBuilder(resultUri).Uri.AbsoluteUri;
-            }
+            return href; // Optionally, return null or throw an exception based on your error handling strategy
         }
-        return href;
+
+        if (Uri.TryCreate(baseUrl, UriKind.Absolute, out Uri baseUri) &&
+            Uri.TryCreate(baseUri, href, out Uri resultUri))
+        {
+            // UriBuilder is used to normalize and encode the URL properly.
+            return new UriBuilder(resultUri).Uri.AbsoluteUri;
+        }
+        return href; // Consider logging this case as it indicates a potential issue with base or relative URL inputs.
     }
+
     
     public static bool IsAsyncOrFragmentRequest(string url)
     {

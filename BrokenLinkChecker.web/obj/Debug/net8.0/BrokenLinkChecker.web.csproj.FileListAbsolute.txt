@@ -34,3 +34,4 @@
 /home/casper/GitHub/Broken-Link-Checker/BrokenLinkChecker.web/bin/Debug/net8.0/BrokenLinkChecker.dll
 /home/casper/GitHub/Broken-Link-Checker/BrokenLinkChecker.web/bin/Debug/net8.0/BrokenLinkChecker.pdb
 /home/casper/GitHub/Broken-Link-Checker/BrokenLinkChecker.web/obj/Debug/net8.0/BrokenLinkChecker.web.csproj.CopyComplete
+/home/casper/GitHub/Broken-Link-Checker/BrokenLinkChecker.web/bin/Debug/net8.0/AngleSharp.dll
