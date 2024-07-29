@@ -10,4 +10,12 @@
       <ProjectReference Include="..\BrokenLinkChecker\BrokenLinkChecker.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <AdditionalFiles Include="Components\Pages\CheckLinks.razor" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="Microsoft.AspNetCore.Components.QuickGrid" Version="8.0.7" />
+    </ItemGroup>
+
 </Project>

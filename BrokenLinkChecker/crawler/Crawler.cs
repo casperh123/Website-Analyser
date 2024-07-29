@@ -32,7 +32,7 @@ namespace BrokenLinkChecker.crawler
             CrawlerConfig = crawlerConfig ?? throw new ArgumentNullException(nameof(crawlerConfig));
         }
 
-        public async Task GetBrokenLinksAsync(Uri url)
+        public async Task<List<PageStats>> CrawlWebsiteAsync(Uri url)
         {
             List<LinkNode> linkQueue = new List<LinkNode> { new LinkNode("", url.ToString(), "", 0) };
             ConcurrentBag<LinkNode> foundLinks = new ();
@@ -44,12 +44,14 @@ namespace BrokenLinkChecker.crawler
                 await Parallel.ForEachAsync(partitioner.GetDynamicPartitions(),
                     async (link, cancellationToken) => { await ProcessLinkAsync(link, foundLinks); });
 
-                OnLinksEnqueued?.Invoke(foundLinks.Count);
+                OnLinksEnqueued.Invoke(foundLinks.Count);
 
                 linkQueue = foundLinks.ToList();
                 foundLinks = new ConcurrentBag<LinkNode>();
 
             } while (linkQueue.Count > 0);
+
+            return VisitedPages.Values.ToList();
         }
 
 
@@ -73,7 +75,7 @@ namespace BrokenLinkChecker.crawler
         private async Task<List<LinkNode>> GetLinksFromPage(LinkNode url)
         {
             List<LinkNode> linkList = new();
-
+            
             // Check the page Cache
             if (VisitedPages.TryGetValue(url.Target, out PageStats pageStats))
             {
@@ -86,7 +88,7 @@ namespace BrokenLinkChecker.crawler
             }
             else
             {
-                PageStats stats = new PageStats(HttpStatusCode.Unused);
+                PageStats stats = new PageStats(url.Target, HttpStatusCode.Unused);
                 VisitedPages[url.Target] = stats;
                 
                 await CrawlerConfig.Semaphore.WaitAsync();
@@ -111,11 +113,20 @@ namespace BrokenLinkChecker.crawler
                 }
                 else
                 {
-                    Stopwatch documentParseTiming = Stopwatch.StartNew();
-                    await using Stream document = await response.Content.ReadAsStreamAsync();
-
-                    linkList = await ExtractLinksFromDocumentAsync(document, url);
-                    stats.DocumentParseTime = documentParseTiming.ElapsedMilliseconds;
+                    // Check if the Content-Type header indicates an HTML document
+                    var contentType = response.Content.Headers.ContentType?.MediaType;
+                    if (contentType != null && contentType.Equals("text/html", StringComparison.OrdinalIgnoreCase))
+                    {
+                        Stopwatch documentParseTiming = Stopwatch.StartNew();
+                        await using Stream document = await response.Content.ReadAsStreamAsync();
+                        linkList = await ExtractLinksFromDocumentAsync(document, url);
+                        stats.DocumentParseTime = documentParseTiming.ElapsedMilliseconds;
+                    }
+                    else
+                    {
+                        // Log or handle non-HTML content
+                        Console.WriteLine($"Skipped non-HTML content at {url.Target}");
+                    }
                 }
 
                 VisitedPages[url.Target].StatusCode = response.StatusCode;
@@ -171,12 +182,10 @@ namespace BrokenLinkChecker.crawler
 
             return new LinkNode(target, resolvedUrl, text, line);
         }
-
-
+        
         private async Task ApplyJitterAsync()
         {
-            int jitter = new Random().Next(1000); // Generate a random delay between 0 and 100 ms
-            await Task.Delay(jitter);
+            await Task.Delay(new Random().Next(1000));
         }
     }
 }

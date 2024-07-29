@@ -1,74 +1,63 @@
 @page "/check-links"
 @using BrokenLinkChecker.crawler
 @using BrokenLinkChecker.models
+@using BrokenLinkChecker.web.Components.WebsiteMetrics
 @inject HttpClient HttpClient
 @rendermode InteractiveServer
 
 <h3>Broken Link Checker</h3>
 
-<div>
+<div class="padding-vertical-m">
     <label for="urlInput">Enter URL:</label>
     <input id="urlInput" @bind="TargetUrl" />
-    <button @onclick="CheckBrokenLinks">Check Links</button>
+    <button @onclick="CheckBrokenLinks">Crawl Website</button>
 </div>
 
 @if (IsChecking)
 {
-    <p>Checking links, please wait...</p>
+    <p>Crawling website, please wait...</p>
     <p>Links enqueued: @_linksEnqueued</p>
-    <p>Links checked: @_linksChecked</p>
-}
-else if (_averagePageSpeed > 0)
-{
-    <p>Average page speed: @_averagePageSpeed ms</p>
 }
 
-@if (BrokenLinks.Count > 0)
+@if (_linksChecked > 0)
 {
-    <h4>Broken Links:</h4>
-    <table>
-        <thead>
-        <tr>
-            <th>URL</th>
-            <th>Referring Page</th>
-            <th>Anchor Text</th>
-            <th>Line</th>
-            <th>Status Code</th>
-            <th>Error Message</th>
-        </tr>
-        </thead>
-        <tbody>
-        @foreach (BrokenLink link in BrokenLinks)
-        {
-            <tr>
-                <td><a href="@link.Url">@link.Url</a></td>
-                <td><a href="@link.ReferringPage">@link.ReferringPage</a></td>
-                <td>@link.AnchorText</td>
-                <td>@link.Line</td>
-                <td>@link.StatusCode</td>
-                <td>@link.ErrorMessage</td>
-            </tr>
-        }
-        </tbody>
-    </table>
+    <p>Links checked: @_linksChecked</p>
+}
+
+<StateButtons PageStateChanged="ChangePageState" />
+
+@switch (_currentStatus)
+{
+    case PageStatState.DisplayPerformance:
+        <PerformanceStats VisitedPages="@VisitedPages"/>
+        break;
+    case PageStatState.DisplayBrokenLinks:
+        <BrokenLinksStats BrokenLinks="@BrokenLinks"/>
+        break;
+    case PageStatState.Error:
+        <p>Error encountered during the process. Please try again.</p>
+        break;
 }
 
 @code {
-    private string TargetUrl { get; set; }
-    private List<BrokenLink> BrokenLinks { get; set; } = new List<BrokenLink>();
-    private bool IsChecking { get; set; } = false;
+    public List<BrokenLink> BrokenLinks { get; set; } = [];
+    public List<PageStats> VisitedPages { get; set; } = [];
+
+    private string TargetUrl { get; set; } = "https://";
+    
+    private bool IsChecking { get; set; }
 
     private int _linksChecked;
     private int _linksEnqueued;
-    private long _averagePageSpeed;
-    private PageStats slowestPage;
+
+    private PageStatState _currentStatus = PageStatState.DisplayBrokenLinks;
 
     private async Task CheckBrokenLinks()
     {
         IsChecking = true;
-        BrokenLinks.Clear();
+        BrokenLinks = new List<BrokenLink>();
 
-        CrawlerConfig crawlerState = new CrawlerConfig(8);
+        CrawlerConfig crawlerState = new CrawlerConfig(16);
         Crawler crawler = new Crawler(HttpClient, crawlerState)
         {
             OnLinksEnqueued = (count) =>
@@ -87,15 +76,13 @@ else if (_averagePageSpeed > 0)
                 InvokeAsync(StateHasChanged);
             }
         };
-        
-        await crawler.GetBrokenLinksAsync(new Uri(TargetUrl));
 
-        _averagePageSpeed = 
-            crawler.VisitedPages.Values.Aggregate(
-                0, 
-                (long acc, PageStats stats) => acc + stats.ResponseTime ) 
-            / crawler.VisitedPages.Count;
-        
+        VisitedPages = await crawler.CrawlWebsiteAsync(new Uri(TargetUrl));
         IsChecking = false;
+    }
+    
+    private void ChangePageState(PageStatState newState)
+    {
+        _currentStatus = newState;
     }
 }

@@ -2,16 +2,10 @@ using System.Net;
 
 namespace BrokenLinkChecker.models;
 
-public class PageStats
+public class PageStats(string url, HttpStatusCode statusCode, long responseTime = 0, long documentParseTime = 0)
 {
-    public HttpStatusCode StatusCode;
-    public long ResponseTime;
-    public long DocumentParseTime;
-
-    public PageStats(HttpStatusCode statusCode, long responseTime = 0, long documentParseTime = 0)
-    {
-        StatusCode = statusCode;
-        ResponseTime = responseTime;
-        DocumentParseTime = documentParseTime;
-    }
+    public string Url = url;
+    public HttpStatusCode StatusCode = statusCode;
+    public long ResponseTime = responseTime;
+    public long DocumentParseTime = documentParseTime;
 }

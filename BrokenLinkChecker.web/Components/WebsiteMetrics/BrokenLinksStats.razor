@@ -1,0 +1,38 @@
+@using BrokenLinkChecker.models
+
+@rendermode InteractiveServer
+
+@if (BrokenLinks.Count > 0)
+{
+    <h4>Broken Links:</h4>
+    <table>
+        <thead>
+        <tr>
+            <th>URL</th>
+            <th>Referring Page</th>
+            <th>Anchor Text</th>
+            <th>Line</th>
+            <th>Status Code</th>
+            <th>Error Message</th>
+        </tr>
+        </thead>
+        <tbody>
+        @foreach (BrokenLink link in BrokenLinks)
+        {
+            <tr>
+                <td><a href="@link.Url">@link.Url</a></td>
+                <td><a href="@link.ReferringPage">@link.ReferringPage</a></td>
+                <td>@link.AnchorText</td>
+                <td>@link.Line</td>
+                <td>@link.StatusCode</td>
+                <td>@link.ErrorMessage</td>
+            </tr>
+        }
+        </tbody>
+    </table>
+}
+
+@code {
+    [Parameter] 
+    public List<BrokenLink> BrokenLinks { get; set; }
+}

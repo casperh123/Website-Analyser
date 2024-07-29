@@ -35,3 +35,13 @@
 /home/casper/GitHub/Broken-Link-Checker/BrokenLinkChecker.web/bin/Debug/net8.0/BrokenLinkChecker.pdb
 /home/casper/GitHub/Broken-Link-Checker/BrokenLinkChecker.web/obj/Debug/net8.0/BrokenLinkChecker.web.csproj.CopyComplete
 /home/casper/GitHub/Broken-Link-Checker/BrokenLinkChecker.web/bin/Debug/net8.0/AngleSharp.dll
+/home/casper/GitHub/Broken-Link-Checker/BrokenLinkChecker.web/bin/Debug/net8.0/Microsoft.AspNetCore.Authorization.dll
+/home/casper/GitHub/Broken-Link-Checker/BrokenLinkChecker.web/bin/Debug/net8.0/Microsoft.AspNetCore.Components.dll
+/home/casper/GitHub/Broken-Link-Checker/BrokenLinkChecker.web/bin/Debug/net8.0/Microsoft.AspNetCore.Components.Forms.dll
+/home/casper/GitHub/Broken-Link-Checker/BrokenLinkChecker.web/bin/Debug/net8.0/Microsoft.AspNetCore.Components.QuickGrid.dll
+/home/casper/GitHub/Broken-Link-Checker/BrokenLinkChecker.web/bin/Debug/net8.0/Microsoft.AspNetCore.Components.Web.dll
+/home/casper/GitHub/Broken-Link-Checker/BrokenLinkChecker.web/bin/Debug/net8.0/Microsoft.AspNetCore.Metadata.dll
+/home/casper/GitHub/Broken-Link-Checker/BrokenLinkChecker.web/bin/Debug/net8.0/Microsoft.Extensions.DependencyInjection.Abstractions.dll
+/home/casper/GitHub/Broken-Link-Checker/BrokenLinkChecker.web/bin/Debug/net8.0/Microsoft.Extensions.Logging.Abstractions.dll
+/home/casper/GitHub/Broken-Link-Checker/BrokenLinkChecker.web/bin/Debug/net8.0/Microsoft.Extensions.Options.dll
+/home/casper/GitHub/Broken-Link-Checker/BrokenLinkChecker.web/bin/Debug/net8.0/Microsoft.JSInterop.dll
