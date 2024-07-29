@@ -2,8 +2,6 @@ using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.Net;
 using AngleSharp;
-using AngleSharp.Dom;
-using AngleSharp.Html.Parser;
 using BrokenLinkChecker.models;
 using BrokenLinkChecker.utility;
 
@@ -15,6 +13,7 @@ namespace BrokenLinkChecker.crawler
 
         public readonly ConcurrentDictionary<string, PageStats> VisitedPages;
         private readonly List<BrokenLink> _brokenLinks = new();
+        private LinkExtractor _linkExtractor;
         private CrawlerConfig CrawlerConfig { get; }
 
         private int LinksChecked { get; set; }
@@ -22,14 +21,14 @@ namespace BrokenLinkChecker.crawler
         public Action<List<BrokenLink>> OnBrokenLinks;
         public Action<int> OnLinksEnqueued;
         public Action<int> OnLinksChecked;
-        public Action<int> OnTotalRequestTime;
-
 
         public Crawler(HttpClient httpClient, CrawlerConfig crawlerConfig)
         {
             _httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
             VisitedPages = new ConcurrentDictionary<string, PageStats>();
             CrawlerConfig = crawlerConfig ?? throw new ArgumentNullException(nameof(crawlerConfig));
+
+            _linkExtractor = new LinkExtractor(Configuration.Default);
         }
 
         public async Task<List<PageStats>> CrawlWebsiteAsync(Uri url)
@@ -113,20 +112,10 @@ namespace BrokenLinkChecker.crawler
                 }
                 else
                 {
+                    Stopwatch stopwatch = Stopwatch.StartNew();
                     // Check if the Content-Type header indicates an HTML document
-                    var contentType = response.Content.Headers.ContentType?.MediaType;
-                    if (contentType != null && contentType.Equals("text/html", StringComparison.OrdinalIgnoreCase))
-                    {
-                        Stopwatch documentParseTiming = Stopwatch.StartNew();
-                        await using Stream document = await response.Content.ReadAsStreamAsync();
-                        linkList = await ExtractLinksFromDocumentAsync(document, url);
-                        stats.DocumentParseTime = documentParseTiming.ElapsedMilliseconds;
-                    }
-                    else
-                    {
-                        // Log or handle non-HTML content
-                        Console.WriteLine($"Skipped non-HTML content at {url.Target}");
-                    }
+                    linkList = await _linkExtractor.GetLinksFromResponseAsync(response, url);
+                    stats.DocumentParseTime = stopwatch.ElapsedMilliseconds;
                 }
 
                 VisitedPages[url.Target].StatusCode = response.StatusCode;
@@ -136,51 +125,6 @@ namespace BrokenLinkChecker.crawler
             OnBrokenLinks.Invoke(_brokenLinks);
 
             return linkList;
-        }
-
-        private async Task<List<LinkNode>> ExtractLinksFromDocumentAsync(Stream document, LinkNode checkingUrl)
-        {
-            List<LinkNode> links = new List<LinkNode>();
-            IConfiguration config = Configuration.Default;
-            IBrowsingContext context = BrowsingContext.New(config);
-            IHtmlParser parser = context.GetService<IHtmlParser>() ?? new HtmlParser();
-
-            IDocument doc = await parser.ParseDocumentAsync(document);
-            IHtmlCollection<IElement> documentLinks = doc.QuerySelectorAll("a[href]");
-
-            foreach (IElement link in documentLinks)
-            {
-                string href = link.GetAttribute("href");
-                if (!string.IsNullOrEmpty(href))
-                {
-                    LinkNode newLink = GenerateLinkNode(link, checkingUrl.Target);
-                    if (Uri.TryCreate(newLink.Target, UriKind.Absolute, out Uri uri) && uri.Host == new Uri(checkingUrl.Target).Host)
-                    {
-                        links.Add(newLink);
-                    }
-                }
-            }
-
-            return links;
-        }
-
-        
-        private LinkNode GenerateLinkNode(IElement link, string target)
-        {
-            string href = link.GetAttribute("href") ?? string.Empty;
-            string resolvedUrl;
-            try
-            {
-                resolvedUrl = Utilities.GetUrl(target, href);
-            }
-            catch (UriFormatException ex)
-            {
-                resolvedUrl = href; // Fall back to original href or handle as needed
-            }
-            string text = link.TextContent;
-            int line = link.SourceReference?.Position.Line ?? -1;
-
-            return new LinkNode(target, resolvedUrl, text, line);
         }
         
         private async Task ApplyJitterAsync()
