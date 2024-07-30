@@ -9,14 +9,6 @@
       "PackagePath": "staticwebassets/app.css"
     },
     {
-      "Id": "/home/casper/GitHub/Broken-Link-Checker/BrokenLinkChecker.web/wwwroot/bootstrap/bootstrap.min.css",
-      "PackagePath": "staticwebassets/bootstrap/bootstrap.min.css"
-    },
-    {
-      "Id": "/home/casper/GitHub/Broken-Link-Checker/BrokenLinkChecker.web/wwwroot/bootstrap/bootstrap.min.css.map",
-      "PackagePath": "staticwebassets/bootstrap/bootstrap.min.css.map"
-    },
-    {
       "Id": "/home/casper/GitHub/Broken-Link-Checker/BrokenLinkChecker.web/wwwroot/favicon.png",
       "PackagePath": "staticwebassets/favicon.png"
     },

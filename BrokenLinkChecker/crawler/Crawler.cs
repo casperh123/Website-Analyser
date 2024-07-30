@@ -2,6 +2,7 @@ using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.Net;
 using AngleSharp;
+using BrokenLinkChecker.Linkextraction;
 using BrokenLinkChecker.models;
 using BrokenLinkChecker.utility;
 
@@ -9,11 +10,10 @@ namespace BrokenLinkChecker.crawler
 {
     public class Crawler
     {
-        private readonly HttpClient _httpClient;
-
         public readonly ConcurrentDictionary<string, PageStats> VisitedPages;
+        private readonly HttpClient _httpClient;
         private readonly List<BrokenLink> _brokenLinks = new();
-        private LinkExtractor _linkExtractor;
+        private readonly LinkExtractor _linkExtractor;
         private CrawlerConfig CrawlerConfig { get; }
 
         private int LinksChecked { get; set; }
@@ -33,8 +33,8 @@ namespace BrokenLinkChecker.crawler
 
         public async Task<List<PageStats>> CrawlWebsiteAsync(Uri url)
         {
-            List<LinkNode> linkQueue = new List<LinkNode> { new LinkNode("", url.ToString(), "", 0) };
-            ConcurrentBag<LinkNode> foundLinks = new ();
+            List<LinkNode> linkQueue = [new LinkNode("", url.ToString(), "", 0)];
+            ConcurrentBag<LinkNode> foundLinks = [];
 
             do
             {
@@ -46,7 +46,7 @@ namespace BrokenLinkChecker.crawler
                 OnLinksEnqueued.Invoke(foundLinks.Count);
 
                 linkQueue = foundLinks.ToList();
-                foundLinks = new ConcurrentBag<LinkNode>();
+                foundLinks = [];
 
             } while (linkQueue.Count > 0);
 
@@ -73,9 +73,8 @@ namespace BrokenLinkChecker.crawler
 
         private async Task<List<LinkNode>> GetLinksFromPage(LinkNode url)
         {
-            List<LinkNode> linkList = new();
+            List<LinkNode> linkList = [];
             
-            // Check the page Cache
             if (VisitedPages.TryGetValue(url.Target, out PageStats pageStats))
             {
                 if (pageStats.StatusCode is HttpStatusCode.OK or HttpStatusCode.Unused)
@@ -83,7 +82,7 @@ namespace BrokenLinkChecker.crawler
                     return linkList;
                 }
 
-                _brokenLinks.Add(new BrokenLink(url.Target, url.Referrer, url.AnchorText, url.Line, (int)pageStats.StatusCode));
+                RecordBrokenLink(url, pageStats.StatusCode);
             }
             else
             {
@@ -103,18 +102,14 @@ namespace BrokenLinkChecker.crawler
                 
                 if (!response.IsSuccessStatusCode)
                 {
-                    _brokenLinks.Add(new BrokenLink(
-                        url.Target, 
-                        url.Referrer, 
-                        url.AnchorText, 
-                        url.Line, 
-                        (int)response.StatusCode));
+                    RecordBrokenLink(url, response.StatusCode);
                 }
                 else
                 {
                     Stopwatch stopwatch = Stopwatch.StartNew();
-                    // Check if the Content-Type header indicates an HTML document
+                    
                     linkList = await _linkExtractor.GetLinksFromResponseAsync(response, url);
+                    
                     stats.DocumentParseTime = stopwatch.ElapsedMilliseconds;
                 }
 
@@ -125,6 +120,11 @@ namespace BrokenLinkChecker.crawler
             OnBrokenLinks.Invoke(_brokenLinks);
 
             return linkList;
+        }
+        
+        private void RecordBrokenLink(LinkNode url, HttpStatusCode statusCode)
+        {
+            _brokenLinks.Add(new BrokenLink(url.Target, url.Referrer, url.AnchorText, url.Line, (int)statusCode));
         }
         
         private async Task ApplyJitterAsync()

@@ -1,0 +1,42 @@
+<div class="website-input-wrapper">
+    <div class="website-input">
+        <label for="urlInput" class="margin-bottom-m center-text">Website URL</label>
+        <input type="url" id="urlInput" @bind="_targetUrl" required class="margin-bottom-m"/>
+        <button type="button" @onclick="@ChangeUri">Check Website</button>
+    </div>
+    @if (_hasError)
+    {
+        <p class="validation-message">@_errorMessage</p>
+    }
+</div>
+
+@code {
+    [Parameter]
+    public EventCallback<Uri> UriHasChanged { get; set; }
+
+    private string _targetUrl = "https://";
+    private bool _hasError;
+    private string _errorMessage = "";
+
+    private async Task ChangeUri()
+    {
+        if (string.IsNullOrWhiteSpace(_targetUrl))
+        {
+            _hasError = true;
+            _errorMessage = "Please enter a valid URL.";
+            return;
+        }
+
+        try
+        {
+            _hasError = false;
+            Uri uri = new Uri(_targetUrl, UriKind.Absolute);
+            await UriHasChanged.InvokeAsync(uri);
+        }
+        catch (UriFormatException e)
+        {
+            _hasError = true;
+            _errorMessage = "The URL entered is not in a valid format.";
+        }
+    }
+}

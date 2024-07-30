@@ -3,18 +3,23 @@
 
 @rendermode InteractiveServer
 
-<h3>Performance Stats</h3>
+<h2>Performance Stats</h2>
 
 @if (VisitedPages.Count > 0)
 {
     <p>Average page speed: @GetAveragePageSpeed() ms</p>
 
     <QuickGrid Items="@VisitedPages.AsQueryable()">
-        <PropertyColumn Property="@(page => page.Url)" Sortable="true" />
-        <PropertyColumn Property="@(page => page.StatusCode)" Sortable="true" />
-        <PropertyColumn Property="@(page => page.ResponseTime)" Sortable="true" />
-        <PropertyColumn Property="@(page => page.DocumentParseTime)" Sortable="true" />
+        <PropertyColumn Property="@(page => page.Url)" Sortable="true"/>
+        <PropertyColumn Property="@(page => page.StatusCode)" Sortable="true"/>
+        <PropertyColumn Property="@(page => page.ResponseTime)" Sortable="true"/>
+        <PropertyColumn Property="@(page => page.DocumentParseTime)" Sortable="true"/>
     </QuickGrid>
+}
+else
+{
+    <p>Performance stats are only available once the entire site has been analysed...</p>
+}
 
 
 @code {
@@ -31,5 +36,4 @@
         long totalResponseTime = VisitedPages.Sum(page => page.ResponseTime);
         return totalResponseTime / VisitedPages.Count;
     }
-}
 }

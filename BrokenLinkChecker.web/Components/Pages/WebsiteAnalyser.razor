@@ -1,17 +1,14 @@
-@page "/check-links"
+@page "/website-analyser"
 @using BrokenLinkChecker.crawler
 @using BrokenLinkChecker.models
 @using BrokenLinkChecker.web.Components.WebsiteMetrics
+@using BrokenLinkChecker.web.Components.WebsiteInputs
 @inject HttpClient HttpClient
 @rendermode InteractiveServer
 
-<h3>Broken Link Checker</h3>
+<h2>Website Analyser</h2>
 
-<div class="padding-vertical-m">
-    <label for="urlInput">Enter URL:</label>
-    <input id="urlInput" @bind="TargetUrl" />
-    <button @onclick="CheckBrokenLinks">Crawl Website</button>
-</div>
+<WebsiteInput UriHasChanged="@CheckBrokenLinks"></WebsiteInput>
 
 @if (IsChecking)
 {
@@ -42,8 +39,6 @@
 @code {
     public List<BrokenLink> BrokenLinks { get; set; } = [];
     public List<PageStats> VisitedPages { get; set; } = [];
-
-    private string TargetUrl { get; set; } = "https://";
     
     private bool IsChecking { get; set; }
 
@@ -52,7 +47,7 @@
 
     private PageStatState _currentStatus = PageStatState.DisplayBrokenLinks;
 
-    private async Task CheckBrokenLinks()
+    private async Task CheckBrokenLinks(Uri url)
     {
         IsChecking = true;
         BrokenLinks = new List<BrokenLink>();
@@ -77,7 +72,7 @@
             }
         };
 
-        VisitedPages = await crawler.CrawlWebsiteAsync(new Uri(TargetUrl));
+        VisitedPages = await crawler.CrawlWebsiteAsync(url);
         IsChecking = false;
     }
     
