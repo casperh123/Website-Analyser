@@ -1,7 +1,10 @@
 @rendermode InteractiveServer
 
-<button @onclick="() => OnStateChange(PageStatState.DisplayBrokenLinks)">Show Broken Links</button>
-<button @onclick="() => OnStateChange(PageStatState.DisplayPerformance)">Show Performance Stats</button>
+<div class="margin-bottom-m">
+    <button @onclick="() => OnStateChange(PageStatState.DisplayBrokenLinks)">Broken Links</button>
+    <button @onclick="() => OnStateChange(PageStatState.DisplayPerformance)">Performance Stats</button>
+    <button @onclick="() => OnStateChange(PageStatState.DisplayHeaders)">Page Headers</button>
+</div>
 
 @code {
     [Parameter]

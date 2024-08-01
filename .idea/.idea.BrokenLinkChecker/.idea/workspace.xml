@@ -10,23 +10,18 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="fa8b7900-3dea-4981-b703-4bb282e02527" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/BrokenLinkChecker.web/Components/Pages/LighthouseTest.razor" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/BrokenLinkChecker.web/Components/WebsiteInputs/WebsiteInput.razor" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/BrokenLinkChecker/Linkextraction/LinkExtractor.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/BrokenLinkChecker.web/Components/WebsiteMetrics/PageHeaders.razor" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/BrokenLinkChecker/models/PageHeaders.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.BrokenLinkChecker/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.BrokenLinkChecker/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/BrokenLinkChecker.web/Components/Layout/MainLayout.razor" beforeDir="false" afterPath="$PROJECT_DIR$/BrokenLinkChecker.web/Components/Layout/MainLayout.razor" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/BrokenLinkChecker.web/Components/Layout/NavMenu.razor" beforeDir="false" afterPath="$PROJECT_DIR$/BrokenLinkChecker.web/Components/Layout/NavMenu.razor" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/BrokenLinkChecker.web/Components/Pages/CheckLinks.razor" beforeDir="false" afterPath="$PROJECT_DIR$/BrokenLinkChecker.web/Components/Pages/WebsiteAnalyser.razor" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/BrokenLinkChecker.web/Components/Pages/Counter.razor" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/BrokenLinkChecker.web/Components/Pages/Home.razor" beforeDir="false" afterPath="$PROJECT_DIR$/BrokenLinkChecker.web/Components/Pages/Home.razor" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/BrokenLinkChecker.web/Components/Pages/Weather.razor" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/BrokenLinkChecker.web/Components/Pages/WebsiteAnalyser.razor" beforeDir="false" afterPath="$PROJECT_DIR$/BrokenLinkChecker.web/Components/Pages/WebsiteAnalyser.razor" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/BrokenLinkChecker.web/Components/WebsiteMetrics/BrokenLinksStats.razor" beforeDir="false" afterPath="$PROJECT_DIR$/BrokenLinkChecker.web/Components/WebsiteMetrics/BrokenLinksStats.razor" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/BrokenLinkChecker.web/Components/WebsiteMetrics/PageStatState.cs" beforeDir="false" afterPath="$PROJECT_DIR$/BrokenLinkChecker.web/Components/WebsiteMetrics/PageStatState.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/BrokenLinkChecker.web/Components/WebsiteMetrics/PerformanceStats.razor" beforeDir="false" afterPath="$PROJECT_DIR$/BrokenLinkChecker.web/Components/WebsiteMetrics/PerformanceStats.razor" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/BrokenLinkChecker.web/Components/WebsiteMetrics/StateButtons.razor" beforeDir="false" afterPath="$PROJECT_DIR$/BrokenLinkChecker.web/Components/WebsiteMetrics/StateButtons.razor" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/BrokenLinkChecker.web/bin/Debug/net8.0/BrokenLinkChecker.dll" beforeDir="false" afterPath="$PROJECT_DIR$/BrokenLinkChecker.web/bin/Debug/net8.0/BrokenLinkChecker.dll" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/BrokenLinkChecker.web/bin/Debug/net8.0/BrokenLinkChecker.pdb" beforeDir="false" afterPath="$PROJECT_DIR$/BrokenLinkChecker.web/bin/Debug/net8.0/BrokenLinkChecker.pdb" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/BrokenLinkChecker.web/bin/Debug/net8.0/BrokenLinkChecker.web.dll" beforeDir="false" afterPath="$PROJECT_DIR$/BrokenLinkChecker.web/bin/Debug/net8.0/BrokenLinkChecker.web.dll" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/BrokenLinkChecker.web/bin/Debug/net8.0/BrokenLinkChecker.web.pdb" beforeDir="false" afterPath="$PROJECT_DIR$/BrokenLinkChecker.web/bin/Debug/net8.0/BrokenLinkChecker.web.pdb" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/BrokenLinkChecker.web/bin/Debug/net8.0/BrokenLinkChecker.web.staticwebassets.runtime.json" beforeDir="false" afterPath="$PROJECT_DIR$/BrokenLinkChecker.web/bin/Debug/net8.0/BrokenLinkChecker.web.staticwebassets.runtime.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/BrokenLinkChecker.web/obj/Debug/net8.0/BrokenLinkChecker.web.AssemblyInfo.cs" beforeDir="false" afterPath="$PROJECT_DIR$/BrokenLinkChecker.web/obj/Debug/net8.0/BrokenLinkChecker.web.AssemblyInfo.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/BrokenLinkChecker.web/obj/Debug/net8.0/BrokenLinkChecker.web.AssemblyInfoInputs.cache" beforeDir="false" afterPath="$PROJECT_DIR$/BrokenLinkChecker.web/obj/Debug/net8.0/BrokenLinkChecker.web.AssemblyInfoInputs.cache" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/BrokenLinkChecker.web/obj/Debug/net8.0/BrokenLinkChecker.web.GeneratedMSBuildEditorConfig.editorconfig" beforeDir="false" afterPath="$PROJECT_DIR$/BrokenLinkChecker.web/obj/Debug/net8.0/BrokenLinkChecker.web.GeneratedMSBuildEditorConfig.editorconfig" afterDir="false" />
@@ -36,18 +31,12 @@
       <change beforePath="$PROJECT_DIR$/BrokenLinkChecker.web/obj/Debug/net8.0/BrokenLinkChecker.web.sourcelink.json" beforeDir="false" afterPath="$PROJECT_DIR$/BrokenLinkChecker.web/obj/Debug/net8.0/BrokenLinkChecker.web.sourcelink.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/BrokenLinkChecker.web/obj/Debug/net8.0/ref/BrokenLinkChecker.web.dll" beforeDir="false" afterPath="$PROJECT_DIR$/BrokenLinkChecker.web/obj/Debug/net8.0/ref/BrokenLinkChecker.web.dll" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/BrokenLinkChecker.web/obj/Debug/net8.0/refint/BrokenLinkChecker.web.dll" beforeDir="false" afterPath="$PROJECT_DIR$/BrokenLinkChecker.web/obj/Debug/net8.0/refint/BrokenLinkChecker.web.dll" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/BrokenLinkChecker.web/obj/Debug/net8.0/staticwebassets.build.json" beforeDir="false" afterPath="$PROJECT_DIR$/BrokenLinkChecker.web/obj/Debug/net8.0/staticwebassets.build.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/BrokenLinkChecker.web/obj/Debug/net8.0/staticwebassets.development.json" beforeDir="false" afterPath="$PROJECT_DIR$/BrokenLinkChecker.web/obj/Debug/net8.0/staticwebassets.development.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/BrokenLinkChecker.web/obj/Debug/net8.0/staticwebassets.pack.json" beforeDir="false" afterPath="$PROJECT_DIR$/BrokenLinkChecker.web/obj/Debug/net8.0/staticwebassets.pack.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/BrokenLinkChecker.web/obj/Debug/net8.0/staticwebassets/msbuild.BrokenLinkChecker.web.Microsoft.AspNetCore.StaticWebAssets.props" beforeDir="false" afterPath="$PROJECT_DIR$/BrokenLinkChecker.web/obj/Debug/net8.0/staticwebassets/msbuild.BrokenLinkChecker.web.Microsoft.AspNetCore.StaticWebAssets.props" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/BrokenLinkChecker.web/obj/rider.project.model.nuget.info" beforeDir="false" afterPath="$PROJECT_DIR$/BrokenLinkChecker.web/obj/rider.project.model.nuget.info" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/BrokenLinkChecker.web/wwwroot/app.css" beforeDir="false" afterPath="$PROJECT_DIR$/BrokenLinkChecker.web/wwwroot/app.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/BrokenLinkChecker.web/wwwroot/bootstrap/bootstrap.min.css" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/BrokenLinkChecker.web/wwwroot/bootstrap/bootstrap.min.css.map" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/BrokenLinkChecker/LinkExtractor/LinkExtractor.cs" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/BrokenLinkChecker/bin/Debug/net8.0/BrokenLinkChecker.dll" beforeDir="false" afterPath="$PROJECT_DIR$/BrokenLinkChecker/bin/Debug/net8.0/BrokenLinkChecker.dll" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/BrokenLinkChecker/bin/Debug/net8.0/BrokenLinkChecker.pdb" beforeDir="false" afterPath="$PROJECT_DIR$/BrokenLinkChecker/bin/Debug/net8.0/BrokenLinkChecker.pdb" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/BrokenLinkChecker/crawler/Crawler.cs" beforeDir="false" afterPath="$PROJECT_DIR$/BrokenLinkChecker/crawler/Crawler.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/BrokenLinkChecker/models/BrokenLink.cs" beforeDir="false" afterPath="$PROJECT_DIR$/BrokenLinkChecker/models/BrokenLink.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/BrokenLinkChecker/models/PageStats.cs" beforeDir="false" afterPath="$PROJECT_DIR$/BrokenLinkChecker/models/PageStats.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/BrokenLinkChecker/obj/Debug/net8.0/BrokenLinkChecker.AssemblyInfo.cs" beforeDir="false" afterPath="$PROJECT_DIR$/BrokenLinkChecker/obj/Debug/net8.0/BrokenLinkChecker.AssemblyInfo.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/BrokenLinkChecker/obj/Debug/net8.0/BrokenLinkChecker.AssemblyInfoInputs.cache" beforeDir="false" afterPath="$PROJECT_DIR$/BrokenLinkChecker/obj/Debug/net8.0/BrokenLinkChecker.AssemblyInfoInputs.cache" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/BrokenLinkChecker/obj/Debug/net8.0/BrokenLinkChecker.csproj.CoreCompileInputs.cache" beforeDir="false" afterPath="$PROJECT_DIR$/BrokenLinkChecker/obj/Debug/net8.0/BrokenLinkChecker.csproj.CoreCompileInputs.cache" afterDir="false" />
@@ -56,6 +45,8 @@
       <change beforePath="$PROJECT_DIR$/BrokenLinkChecker/obj/Debug/net8.0/BrokenLinkChecker.sourcelink.json" beforeDir="false" afterPath="$PROJECT_DIR$/BrokenLinkChecker/obj/Debug/net8.0/BrokenLinkChecker.sourcelink.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/BrokenLinkChecker/obj/Debug/net8.0/ref/BrokenLinkChecker.dll" beforeDir="false" afterPath="$PROJECT_DIR$/BrokenLinkChecker/obj/Debug/net8.0/ref/BrokenLinkChecker.dll" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/BrokenLinkChecker/obj/Debug/net8.0/refint/BrokenLinkChecker.dll" beforeDir="false" afterPath="$PROJECT_DIR$/BrokenLinkChecker/obj/Debug/net8.0/refint/BrokenLinkChecker.dll" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/BrokenLinkChecker/obj/rider.project.model.nuget.info" beforeDir="false" afterPath="$PROJECT_DIR$/BrokenLinkChecker/obj/rider.project.model.nuget.info" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/BrokenLinkChecker/utility/Utilities.cs" beforeDir="false" afterPath="$PROJECT_DIR$/BrokenLinkChecker/utility/Utilities.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -83,7 +74,7 @@
   </component>
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
-    ".NET Launch Settings Profile.BrokenLinkChecker.web: https.executor": "Run",
+    ".NET Launch Settings Profile.BrokenLinkChecker.web: https.executor": "Debug",
     ".NET Project.BrokenLinkChecker.executor": "Run",
     "Attach to Process.439174:BrokenLinkChecker.executor": "Debug",
     "Attach to Process.457031:BrokenLinkChecker.web.executor": "Debug",
@@ -173,7 +164,8 @@
       <workItem from="1720281008733" duration="1432000" />
       <workItem from="1721818513160" duration="4691000" />
       <workItem from="1722172608992" duration="16159000" />
-      <workItem from="1722263073870" duration="21192000" />
+      <workItem from="1722263073870" duration="21383000" />
+      <workItem from="1722442362278" duration="11884000" />
     </task>
     <servers />
   </component>
@@ -188,18 +180,30 @@
     <breakpoint-manager>
       <breakpoints>
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
-          <url>file://$PROJECT_DIR$/BrokenLinkChecker.web/Components/WebsiteMetrics/BrokenLinksStats.razor</url>
-          <line>6</line>
-          <properties documentPath="$PROJECT_DIR$/BrokenLinkChecker.web/Components/WebsiteMetrics/BrokenLinksStats.razor" isMultiMethodBreakpoint="true">
-            <option name="multiMethodBreakpoint" value="true" />
+          <url>file://$PROJECT_DIR$/BrokenLinkChecker/crawler/Crawler.cs</url>
+          <line>109</line>
+          <properties documentPath="$PROJECT_DIR$/BrokenLinkChecker/crawler/Crawler.cs" containingFunctionPresentation="Method 'FetchAndProcessPage'">
             <startOffsets>
-              <option value="-1" />
+              <option value="3644" />
             </startOffsets>
             <endOffsets>
-              <option value="-1" />
+              <option value="3702" />
             </endOffsets>
           </properties>
-          <option name="timeStamp" value="25" />
+          <option name="timeStamp" value="34" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DotNet Breakpoints">
+          <url>file://$PROJECT_DIR$/BrokenLinkChecker/crawler/Crawler.cs</url>
+          <line>110</line>
+          <properties documentPath="$PROJECT_DIR$/BrokenLinkChecker/crawler/Crawler.cs" containingFunctionPresentation="Method 'FetchAndProcessPage'">
+            <startOffsets>
+              <option value="3715" />
+            </startOffsets>
+            <endOffsets>
+              <option value="3752" />
+            </endOffsets>
+          </properties>
+          <option name="timeStamp" value="35" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>

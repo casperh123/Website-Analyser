@@ -36,7 +36,7 @@ input:focus-visible {
 
 th, td {
     padding: 15px;
-    word-wrap: break-word;
+    word-wrap: break-word; 
 }
 
 th {
@@ -138,10 +138,30 @@ table tr:nth-child(odd) {
     padding-bottom: 20px;
 }
 
+.padding-m {
+    padding: 20px;
+}
+
+.round-corners {
+    border-radius: 8px;
+}
+
+.margin-vertical-m {
+    margin: 20px 0;
+}
+
 .margin-bottom-m {
     margin-bottom: 20px;
 }
 
 .center-text {
     text-align: center;
+}
+
+.box-shadow {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1), 0 6px 20px rgba(0, 0, 0, 0.1);
+}
+
+.state-buttons {
+    padding: 20px;
 }

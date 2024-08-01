@@ -1,37 +1,22 @@
 @using BrokenLinkChecker.models
+@using Microsoft.AspNetCore.Components.QuickGrid
 
 @rendermode InteractiveServer
 
-<h2>Broken Links:</h2>
+<h3>Broken Links:</h3>
 
 @if (BrokenLinks.Count > 0)
 {
-    <table>
-        <thead>
-        <tr>
-            <th>URL</th>
-            <th>Referring Page</th>
-            <th>Anchor Text</th>
-            <th>Line</th>
-            <th>Status Code</th>
-        </tr>
-        </thead>
-        <tbody>
-        @foreach (BrokenLink link in BrokenLinks)
-        {
-            <tr>
-                <td><a href="@link.Url">@link.Url</a></td>
-                <td><a href="@link.ReferringPage">@link.ReferringPage</a></td>
-                <td>@link.AnchorText</td>
-                <td>@link.Line</td>
-                <td>@link.StatusCode</td>
-            </tr>
-        }
-        </tbody>
-    </table>
+    <QuickGrid Items="@BrokenLinks.AsQueryable()">
+        <PropertyColumn Property="@(link => link.Url)" Sortable="true"/>
+        <PropertyColumn Property="@(link => link.ReferringPage)" Sortable="true"/>
+        <PropertyColumn Property="@(link => link.AnchorText)" Sortable="true"/>
+        <PropertyColumn Property="@(link => link.Line)" Sortable="true"/>
+        <PropertyColumn Property="@(link => link.StatusCode)" Sortable="true"/>
+    </QuickGrid>
 }
 
 @code {
     [Parameter] 
-    public List<BrokenLink> BrokenLinks { get; set; }
+    public ICollection<BrokenLink> BrokenLinks { get; set; }
 }

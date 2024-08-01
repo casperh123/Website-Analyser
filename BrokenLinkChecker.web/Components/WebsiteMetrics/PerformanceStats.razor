@@ -3,7 +3,7 @@
 
 @rendermode InteractiveServer
 
-<h2>Performance Stats</h2>
+<h3>Performance Stats</h3>
 
 @if (VisitedPages.Count > 0)
 {
@@ -24,7 +24,7 @@ else
 
 @code {
     [Parameter]
-    public List<PageStats> VisitedPages { get; set; }
+    public ICollection<PageStats> VisitedPages { get; set; }
 
     private long GetAveragePageSpeed()
     {

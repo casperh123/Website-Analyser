@@ -1,0 +1,24 @@
+@using System.Collections.Concurrent
+@using BrokenLinkChecker.models
+@using Microsoft.AspNetCore.Mvc.RazorPages
+@using Microsoft.AspNetCore.Components.QuickGrid
+
+<h3>Page Headers</h3>
+
+@if (VisitedPages.Count > 0)
+{
+    <QuickGrid Items="@VisitedPages.AsQueryable()">
+        <PropertyColumn Property="@(page => page.Url)" Sortable="true" />
+        <PropertyColumn Property="@(page => page.Headers.ContentEncoding)" Sortable="true"/>
+        <PropertyColumn Property="@(page => page.Headers.Server)" Sortable="true"/>
+        <PropertyColumn Property="@(page => page.Headers.CacheStatus)" Sortable="true" />
+        <PropertyColumn Property="@(page => page.Headers.CacheControl)" Sortable="true"></PropertyColumn>
+        <PropertyColumn Property="@(page => page.Headers.LastModified)" Sortable="true" />
+    </QuickGrid>
+}
+
+@code {
+
+    [Parameter] 
+    public ICollection<PageStats> VisitedPages { get; set; }
+}

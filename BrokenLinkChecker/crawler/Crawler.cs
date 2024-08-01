@@ -12,13 +12,16 @@ namespace BrokenLinkChecker.crawler
     {
         public readonly ConcurrentDictionary<string, PageStats> VisitedPages;
         private readonly HttpClient _httpClient;
-        private readonly List<BrokenLink> _brokenLinks = new();
+        
+        private readonly List<BrokenLink> _brokenLinks = [];
+        
         private readonly LinkExtractor _linkExtractor;
         private CrawlerConfig CrawlerConfig { get; }
 
         private int LinksChecked { get; set; }
 
         public Action<List<BrokenLink>> OnBrokenLinks;
+        public Action<ICollection<PageStats>> OnPageVisited;
         public Action<int> OnLinksEnqueued;
         public Action<int> OnLinksChecked;
 
@@ -86,40 +89,51 @@ namespace BrokenLinkChecker.crawler
             }
             else
             {
-                PageStats stats = new PageStats(url.Target, HttpStatusCode.Unused);
-                VisitedPages[url.Target] = stats;
-                
-                await CrawlerConfig.Semaphore.WaitAsync();
-                await ApplyJitterAsync();
-
-                Stopwatch responseTiming = Stopwatch.StartNew();
-
-                using HttpResponseMessage response = await _httpClient.GetAsync(url.Target, HttpCompletionOption.ResponseHeadersRead);
-
-                stats.ResponseTime = responseTiming.ElapsedMilliseconds;
-                
-                CrawlerConfig.Semaphore.Release();
-                
-                if (!response.IsSuccessStatusCode)
-                {
-                    RecordBrokenLink(url, response.StatusCode);
-                }
-                else
-                {
-                    Stopwatch stopwatch = Stopwatch.StartNew();
-                    
-                    linkList = await _linkExtractor.GetLinksFromResponseAsync(response, url);
-                    
-                    stats.DocumentParseTime = stopwatch.ElapsedMilliseconds;
-                }
-
-                VisitedPages[url.Target].StatusCode = response.StatusCode;
+                linkList = await FetchAndProcessPage(url);
             }
 
             OnLinksChecked.Invoke(LinksChecked++);
             OnBrokenLinks.Invoke(_brokenLinks);
+            OnPageVisited.Invoke(VisitedPages.Values);
 
             return linkList;
+        }
+
+        private async Task<List<LinkNode>> FetchAndProcessPage(LinkNode url)
+        {
+            PageStats pageStats = new PageStats(url.Target, HttpStatusCode.Unused);
+            
+            VisitedPages[url.Target] = pageStats;
+
+            var (response, requestTime) = await GetPageAsync(url);
+
+            pageStats.Headers = Utilities.AddRequestHeaders(response);
+            pageStats.ResponseTime = requestTime;
+                
+            if (response.IsSuccessStatusCode)
+            {
+                var (links, time) = await Utilities.BenchmarkAsync(() => _linkExtractor.GetLinksFromResponseAsync(response, url));
+                pageStats.DocumentParseTime = time;
+                VisitedPages[url.Target].StatusCode = response.StatusCode;
+                
+                return links;
+            }
+            
+            VisitedPages[url.Target].StatusCode = response.StatusCode;
+            RecordBrokenLink(url, response.StatusCode);
+            return [];
+        }
+
+        private async Task<(HttpResponseMessage, long)> GetPageAsync(LinkNode url)
+        {
+            await CrawlerConfig.Semaphore.WaitAsync();
+            await ApplyJitterAsync();
+
+            var (response, requestTime) = await Utilities.BenchmarkAsync(() => _httpClient.GetAsync(url.Target, HttpCompletionOption.ResponseHeadersRead));
+            
+            CrawlerConfig.Semaphore.Release();
+
+            return (response, requestTime);
         }
         
         private void RecordBrokenLink(LinkNode url, HttpStatusCode statusCode)

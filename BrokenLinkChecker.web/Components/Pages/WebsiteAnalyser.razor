@@ -1,4 +1,5 @@
 @page "/website-analyser"
+@using System.Collections
 @using BrokenLinkChecker.crawler
 @using BrokenLinkChecker.models
 @using BrokenLinkChecker.web.Components.WebsiteMetrics
@@ -19,26 +20,33 @@
 @if (_linksChecked > 0)
 {
     <p>Links checked: @_linksChecked</p>
-}
+    
+    <div class="padding-m round-corners box-shadow">
+        <h2>Website metrics</h2>
 
-<StateButtons PageStateChanged="ChangePageState" />
+        <StateButtons PageStateChanged="ChangePageState" />
 
-@switch (_currentStatus)
-{
-    case PageStatState.DisplayPerformance:
-        <PerformanceStats VisitedPages="@VisitedPages"/>
-        break;
-    case PageStatState.DisplayBrokenLinks:
-        <BrokenLinksStats BrokenLinks="@BrokenLinks"/>
-        break;
-    case PageStatState.Error:
-        <p>Error encountered during the process. Please try again.</p>
-        break;
+        @switch (_currentStatus)
+        {
+            case PageStatState.DisplayPerformance:
+                <PerformanceStats VisitedPages="@VisitedPages"/>
+                break;
+            case PageStatState.DisplayBrokenLinks:
+                <BrokenLinksStats BrokenLinks="@BrokenLinks"/>
+                break;
+            case PageStatState.DisplayHeaders:
+                <PageHeaders VisitedPages="@VisitedPages" />
+                break;
+            case PageStatState.Error:
+                <p>Error encountered during the process. Please try again.</p>
+                break;
+        }
+    </div>
 }
 
 @code {
-    public List<BrokenLink> BrokenLinks { get; set; } = [];
-    public List<PageStats> VisitedPages { get; set; } = [];
+    public ICollection<BrokenLink> BrokenLinks { get; set; } = [];
+    public ICollection<PageStats> VisitedPages { get; set; } = [];
     
     private bool IsChecking { get; set; }
 
@@ -68,6 +76,11 @@
             OnBrokenLinks = (links) =>
             {
                 BrokenLinks = links;
+                InvokeAsync(StateHasChanged);
+            },
+            OnPageVisited = (links) =>
+            {
+                VisitedPages = links;
                 InvokeAsync(StateHasChanged);
             }
         };

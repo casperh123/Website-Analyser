@@ -54,6 +54,10 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9XZWJzaXRlTWV0cmljcy9Ccm9rZW5MaW5rc1N0YXRzLnJhem9y
 build_metadata.AdditionalFiles.CssScope = 
 
+[/home/casper/GitHub/Broken-Link-Checker/BrokenLinkChecker.web/Components/WebsiteMetrics/PageHeaders.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9XZWJzaXRlTWV0cmljcy9QYWdlSGVhZGVycy5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
 [/home/casper/GitHub/Broken-Link-Checker/BrokenLinkChecker.web/Components/WebsiteMetrics/PerformanceStats.razor]
 build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9XZWJzaXRlTWV0cmljcy9QZXJmb3JtYW5jZVN0YXRzLnJhem9y
 build_metadata.AdditionalFiles.CssScope = 

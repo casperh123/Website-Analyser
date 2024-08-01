@@ -1,3 +1,6 @@
+using System.Diagnostics;
+using BrokenLinkChecker.models;
+
 namespace BrokenLinkChecker.utility;
 
 public static class Utilities
@@ -29,5 +32,37 @@ public static class Utilities
         }
         // Check if the URL is a fragment identifier (e.g., #section)
         return url.Contains('#') || url.Contains('?');
+    }
+
+    public static (T, long) Benchmark<T>(Func<T> function)
+    {
+        Stopwatch stopwatch = Stopwatch.StartNew();
+
+        T result = function.Invoke();
+
+        return (result, stopwatch.ElapsedMilliseconds);
+    }
+    
+    public static async Task<(T, long)> BenchmarkAsync<T>(Func<Task<T>> function)
+    {
+        Stopwatch stopwatch = Stopwatch.StartNew();
+
+        T result = await function.Invoke();
+
+        return (result, stopwatch.ElapsedMilliseconds);
+    }
+    
+    public static PageHeaders AddRequestHeaders(HttpResponseMessage response)
+    {
+        if (response == null) throw new ArgumentNullException(nameof(response));
+
+        return new PageHeaders
+        {
+            CacheControl = response.Headers.CacheControl?.ToString() ?? "",
+            CacheStatus = response.Headers.TryGetValues("x-cache", out var cacheStatus) ? string.Join(", ", cacheStatus) : "",
+            ContentEncoding = response.Content.Headers.ContentEncoding?.FirstOrDefault() ?? "",
+            LastModified = response.Content.Headers.LastModified?.ToString() ?? "",
+            Server = response.Headers.Server?.ToString() ?? ""
+        };
     }
 }
