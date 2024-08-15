@@ -128,10 +128,7 @@ namespace BrokenLinkChecker.crawler
         {
             await CrawlerConfig.Semaphore.WaitAsync();
             
-            if (CrawlerConfig.Jitter)
-            {
-                await ApplyJitterAsync();
-            }
+            await CrawlerConfig.ApplyJitterAsync();
 
             var (response, requestTime) = await Utilities.BenchmarkAsync(() => _httpClient.GetAsync(url.Target, HttpCompletionOption.ResponseHeadersRead));
             
@@ -143,11 +140,6 @@ namespace BrokenLinkChecker.crawler
         private void RecordBrokenLink(LinkNode url, HttpStatusCode statusCode)
         {
             _brokenLinks.Add(new BrokenLink(url.Target, url.Referrer, url.AnchorText, url.Line, (int)statusCode));
-        }
-        
-        private async Task ApplyJitterAsync()
-        {
-            await Task.Delay(new Random().Next(CrawlerConfig.JitterFrequency));
         }
     }
 }
