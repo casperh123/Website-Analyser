@@ -32,6 +32,8 @@ public class LinkExtractor(IConfiguration config)
         IHtmlParser parser = context.GetService<IHtmlParser>() ?? new HtmlParser();
 
         IDocument doc = await parser.ParseDocumentAsync(document);
+
+        Uri thisUrl = new Uri(checkingUrl.Target);
         
         foreach (var link in doc.QuerySelectorAll("a[href]"))
         {

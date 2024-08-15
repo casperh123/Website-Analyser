@@ -127,7 +127,11 @@ namespace BrokenLinkChecker.crawler
         private async Task<(HttpResponseMessage, long)> GetPageAsync(LinkNode url)
         {
             await CrawlerConfig.Semaphore.WaitAsync();
-            await ApplyJitterAsync();
+            
+            if (CrawlerConfig.Jitter)
+            {
+                await ApplyJitterAsync();
+            }
 
             var (response, requestTime) = await Utilities.BenchmarkAsync(() => _httpClient.GetAsync(url.Target, HttpCompletionOption.ResponseHeadersRead));
             

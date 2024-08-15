@@ -33,7 +33,6 @@
 /home/casper/GitHub/Broken-Link-Checker/BrokenLinkChecker.web/bin/Debug/net8.0/Serilog.dll
 /home/casper/GitHub/Broken-Link-Checker/BrokenLinkChecker.web/bin/Debug/net8.0/BrokenLinkChecker.dll
 /home/casper/GitHub/Broken-Link-Checker/BrokenLinkChecker.web/bin/Debug/net8.0/BrokenLinkChecker.pdb
-/home/casper/GitHub/Broken-Link-Checker/BrokenLinkChecker.web/obj/Debug/net8.0/BrokenLinkChecker.web.csproj.CopyComplete
 /home/casper/GitHub/Broken-Link-Checker/BrokenLinkChecker.web/bin/Debug/net8.0/AngleSharp.dll
 /home/casper/GitHub/Broken-Link-Checker/BrokenLinkChecker.web/bin/Debug/net8.0/Microsoft.AspNetCore.Authorization.dll
 /home/casper/GitHub/Broken-Link-Checker/BrokenLinkChecker.web/bin/Debug/net8.0/Microsoft.AspNetCore.Components.dll
@@ -45,3 +44,4 @@
 /home/casper/GitHub/Broken-Link-Checker/BrokenLinkChecker.web/bin/Debug/net8.0/Microsoft.Extensions.Logging.Abstractions.dll
 /home/casper/GitHub/Broken-Link-Checker/BrokenLinkChecker.web/bin/Debug/net8.0/Microsoft.Extensions.Options.dll
 /home/casper/GitHub/Broken-Link-Checker/BrokenLinkChecker.web/bin/Debug/net8.0/Microsoft.JSInterop.dll
+/home/casper/GitHub/Broken-Link-Checker/BrokenLinkChecker.web/obj/Debug/net8.0/BrokenLi.AC9890E5.Up2Date

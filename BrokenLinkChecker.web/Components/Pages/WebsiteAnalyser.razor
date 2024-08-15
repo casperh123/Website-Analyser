@@ -60,7 +60,7 @@
         IsChecking = true;
         BrokenLinks = new List<BrokenLink>();
 
-        CrawlerConfig crawlerState = new CrawlerConfig(16);
+        CrawlerConfig crawlerState = new CrawlerConfig(1);
         Crawler crawler = new Crawler(HttpClient, crawlerState)
         {
             OnLinksEnqueued = (count) =>
