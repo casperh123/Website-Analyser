@@ -37,16 +37,19 @@ public class LinkExtractor
     {
         List<LinkNode> links = new List<LinkNode>();
         IDocument doc;
+        Uri thisUrl = new Uri(checkingUrl.Target);
+
         
         using (PooledHtmlParser pooledHtmlParser = await _htmlParserPool.GetParserAsync())
         {
             doc = await pooledHtmlParser.Parser.ParseDocumentAsync(document);
         }
         
-        foreach (var link in doc.QuerySelectorAll("a[href]"))
+        
+        foreach (IElement link in doc.QuerySelectorAll("a[href]"))
         {
             LinkNode newLink = GenerateLinkNode(link, checkingUrl.Target);
-            if (Uri.TryCreate(newLink.Target, UriKind.Absolute, out Uri uri) && uri.Host == new Uri(checkingUrl.Target).Host)
+            if (Uri.TryCreate(newLink.Target, UriKind.Absolute, out Uri uri) && uri.Host == thisUrl.Host)
             {
                 links.Add(newLink);
             }
