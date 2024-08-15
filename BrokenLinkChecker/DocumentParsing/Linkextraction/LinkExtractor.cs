@@ -13,7 +13,12 @@ public class LinkExtractor
 
     public LinkExtractor(CrawlerConfig crawlerConfig)
     {
-        _htmlParserPool = new HtmlParserPool(new HtmlParserOptions(), crawlerConfig.ConcurrentRequests);
+        _htmlParserPool = new HtmlParserPool(
+            new HtmlParserOptions
+            {
+                IsKeepingSourceReferences = true
+            }, 
+            crawlerConfig.ConcurrentRequests);
     }
     
     public async Task<List<LinkNode>> GetLinksFromResponseAsync(HttpResponseMessage response, LinkNode url)

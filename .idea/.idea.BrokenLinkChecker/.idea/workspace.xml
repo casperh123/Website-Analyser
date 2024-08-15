@@ -10,27 +10,12 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="fa8b7900-3dea-4981-b703-4bb282e02527" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/BrokenLinkChecker/DocumentParsing/Browsing/HtmlParserPool.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/BrokenLinkChecker/DocumentParsing/Browsing/PooledHtmlParser.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.BrokenLinkChecker/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.BrokenLinkChecker/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/BrokenLinkChecker.web/Components/Pages/WebsiteAnalyser.razor" beforeDir="false" afterPath="$PROJECT_DIR$/BrokenLinkChecker.web/Components/Pages/WebsiteAnalyser.razor" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/BrokenLinkChecker.web/bin/Debug/net8.0/BrokenLinkChecker.dll" beforeDir="false" afterPath="$PROJECT_DIR$/BrokenLinkChecker.web/bin/Debug/net8.0/BrokenLinkChecker.dll" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/BrokenLinkChecker.web/bin/Debug/net8.0/BrokenLinkChecker.pdb" beforeDir="false" afterPath="$PROJECT_DIR$/BrokenLinkChecker.web/bin/Debug/net8.0/BrokenLinkChecker.pdb" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/BrokenLinkChecker.web/bin/Debug/net8.0/BrokenLinkChecker.web.dll" beforeDir="false" afterPath="$PROJECT_DIR$/BrokenLinkChecker.web/bin/Debug/net8.0/BrokenLinkChecker.web.dll" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/BrokenLinkChecker.web/bin/Debug/net8.0/BrokenLinkChecker.web.pdb" beforeDir="false" afterPath="$PROJECT_DIR$/BrokenLinkChecker.web/bin/Debug/net8.0/BrokenLinkChecker.web.pdb" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/BrokenLinkChecker.web/obj/Debug/net8.0/BrokenLinkChecker.web.AssemblyInfo.cs" beforeDir="false" afterPath="$PROJECT_DIR$/BrokenLinkChecker.web/obj/Debug/net8.0/BrokenLinkChecker.web.AssemblyInfo.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/BrokenLinkChecker.web/obj/Debug/net8.0/BrokenLinkChecker.web.AssemblyInfoInputs.cache" beforeDir="false" afterPath="$PROJECT_DIR$/BrokenLinkChecker.web/obj/Debug/net8.0/BrokenLinkChecker.web.AssemblyInfoInputs.cache" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/BrokenLinkChecker.web/obj/Debug/net8.0/BrokenLinkChecker.web.csproj.AssemblyReference.cache" beforeDir="false" afterPath="$PROJECT_DIR$/BrokenLinkChecker.web/obj/Debug/net8.0/BrokenLinkChecker.web.csproj.AssemblyReference.cache" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/BrokenLinkChecker.web/obj/Debug/net8.0/BrokenLinkChecker.web.dll" beforeDir="false" afterPath="$PROJECT_DIR$/BrokenLinkChecker.web/obj/Debug/net8.0/BrokenLinkChecker.web.dll" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/BrokenLinkChecker.web/obj/Debug/net8.0/BrokenLinkChecker.web.pdb" beforeDir="false" afterPath="$PROJECT_DIR$/BrokenLinkChecker.web/obj/Debug/net8.0/BrokenLinkChecker.web.pdb" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/BrokenLinkChecker.web/obj/Debug/net8.0/BrokenLinkChecker.web.sourcelink.json" beforeDir="false" afterPath="$PROJECT_DIR$/BrokenLinkChecker.web/obj/Debug/net8.0/BrokenLinkChecker.web.sourcelink.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/BrokenLinkChecker.web/obj/Debug/net8.0/ref/BrokenLinkChecker.web.dll" beforeDir="false" afterPath="$PROJECT_DIR$/BrokenLinkChecker.web/obj/Debug/net8.0/ref/BrokenLinkChecker.web.dll" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/BrokenLinkChecker.web/obj/Debug/net8.0/refint/BrokenLinkChecker.web.dll" beforeDir="false" afterPath="$PROJECT_DIR$/BrokenLinkChecker.web/obj/Debug/net8.0/refint/BrokenLinkChecker.web.dll" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/BrokenLinkChecker/DocumentParsing/BrowsingContextPool.cs" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/BrokenLinkChecker/DocumentParsing/Linkextraction/LinkExtractor.cs" beforeDir="false" afterPath="$PROJECT_DIR$/BrokenLinkChecker/DocumentParsing/Linkextraction/LinkExtractor.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/BrokenLinkChecker/bin/Debug/net8.0/BrokenLinkChecker.dll" beforeDir="false" afterPath="$PROJECT_DIR$/BrokenLinkChecker/bin/Debug/net8.0/BrokenLinkChecker.dll" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/BrokenLinkChecker/bin/Debug/net8.0/BrokenLinkChecker.pdb" beforeDir="false" afterPath="$PROJECT_DIR$/BrokenLinkChecker/bin/Debug/net8.0/BrokenLinkChecker.pdb" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/BrokenLinkChecker/crawler/CrawlerConfig.cs" beforeDir="false" afterPath="$PROJECT_DIR$/BrokenLinkChecker/crawler/CrawlerConfig.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/BrokenLinkChecker/obj/Debug/net8.0/BrokenLinkChecker.AssemblyInfo.cs" beforeDir="false" afterPath="$PROJECT_DIR$/BrokenLinkChecker/obj/Debug/net8.0/BrokenLinkChecker.AssemblyInfo.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/BrokenLinkChecker/obj/Debug/net8.0/BrokenLinkChecker.AssemblyInfoInputs.cache" beforeDir="false" afterPath="$PROJECT_DIR$/BrokenLinkChecker/obj/Debug/net8.0/BrokenLinkChecker.AssemblyInfoInputs.cache" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/BrokenLinkChecker/obj/Debug/net8.0/BrokenLinkChecker.dll" beforeDir="false" afterPath="$PROJECT_DIR$/BrokenLinkChecker/obj/Debug/net8.0/BrokenLinkChecker.dll" afterDir="false" />
