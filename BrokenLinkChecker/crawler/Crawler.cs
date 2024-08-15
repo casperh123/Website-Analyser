@@ -2,7 +2,7 @@ using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.Net;
 using AngleSharp;
-using BrokenLinkChecker.Linkextraction;
+using BrokenLinkChecker.DocumentParsing.Linkextraction;
 using BrokenLinkChecker.models;
 using BrokenLinkChecker.utility;
 
@@ -31,7 +31,7 @@ namespace BrokenLinkChecker.crawler
             VisitedPages = new ConcurrentDictionary<string, PageStats>();
             CrawlerConfig = crawlerConfig ?? throw new ArgumentNullException(nameof(crawlerConfig));
 
-            _linkExtractor = new LinkExtractor(Configuration.Default);
+            _linkExtractor = new LinkExtractor(CrawlerConfig);
         }
 
         public async Task<List<PageStats>> CrawlWebsiteAsync(Uri url)
@@ -147,7 +147,7 @@ namespace BrokenLinkChecker.crawler
         
         private async Task ApplyJitterAsync()
         {
-            await Task.Delay(new Random().Next(1000));
+            await Task.Delay(new Random().Next(CrawlerConfig.JitterFrequency));
         }
     }
 }

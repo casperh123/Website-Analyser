@@ -1,13 +1,24 @@
+using System.Runtime.CompilerServices;
 using AngleSharp;
 using AngleSharp.Dom;
 using AngleSharp.Html.Parser;
+using BrokenLinkChecker.crawler;
 using BrokenLinkChecker.models;
 using BrokenLinkChecker.utility;
 
-namespace BrokenLinkChecker.Linkextraction;
+namespace BrokenLinkChecker.DocumentParsing.Linkextraction;
 
-public class LinkExtractor(IConfiguration config)
+public class LinkExtractor
 {
+    private IConfiguration _config;
+    private BrowsingContextPool _browsingContextPool;
+
+    public LinkExtractor(CrawlerConfig crawlerConfig)
+    {
+        _config = Configuration.Default;
+        _browsingContextPool = new BrowsingContextPool(_config, crawlerConfig.ConcurrentRequests);
+    }
+    
     public async Task<List<LinkNode>> GetLinksFromResponseAsync(HttpResponseMessage response, LinkNode url)
     {
         if (!IsHtmlContent(response))
@@ -28,7 +39,7 @@ public class LinkExtractor(IConfiguration config)
     private async Task<List<LinkNode>> ExtractLinksFromDocumentAsync(Stream document, LinkNode checkingUrl)
     {
         List<LinkNode> links = new List<LinkNode>();
-        IBrowsingContext context = BrowsingContext.New(config);
+        IBrowsingContext context = _browsingContextPool.GetContext();
         IHtmlParser parser = context.GetService<IHtmlParser>() ?? new HtmlParser();
 
         IDocument doc = await parser.ParseDocumentAsync(document);
@@ -43,6 +54,9 @@ public class LinkExtractor(IConfiguration config)
                 links.Add(newLink);
             }
         }
+
+        _browsingContextPool.ReturnContext(context);
+        
         return links;
     }
 
