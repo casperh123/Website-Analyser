@@ -1,8 +1,7 @@
-using System.Runtime.CompilerServices;
-using AngleSharp;
 using AngleSharp.Dom;
 using AngleSharp.Html.Parser;
 using BrokenLinkChecker.crawler;
+using BrokenLinkChecker.DocumentParsing.Browsing;
 using BrokenLinkChecker.models;
 using BrokenLinkChecker.utility;
 
@@ -10,13 +9,11 @@ namespace BrokenLinkChecker.DocumentParsing.Linkextraction;
 
 public class LinkExtractor
 {
-    private IConfiguration _config;
-    private BrowsingContextPool _browsingContextPool;
+    private HtmlParserPool _htmlParserPool;
 
     public LinkExtractor(CrawlerConfig crawlerConfig)
     {
-        _config = Configuration.Default;
-        _browsingContextPool = new BrowsingContextPool(_config, crawlerConfig.ConcurrentRequests);
+        _htmlParserPool = new HtmlParserPool(new HtmlParserOptions(), crawlerConfig.ConcurrentRequests);
     }
     
     public async Task<List<LinkNode>> GetLinksFromResponseAsync(HttpResponseMessage response, LinkNode url)
@@ -39,12 +36,12 @@ public class LinkExtractor
     private async Task<List<LinkNode>> ExtractLinksFromDocumentAsync(Stream document, LinkNode checkingUrl)
     {
         List<LinkNode> links = new List<LinkNode>();
-        IBrowsingContext context = _browsingContextPool.GetContext();
-        IHtmlParser parser = context.GetService<IHtmlParser>() ?? new HtmlParser();
-
-        IDocument doc = await parser.ParseDocumentAsync(document);
-
-        Uri thisUrl = new Uri(checkingUrl.Target);
+        IDocument doc;
+        
+        using (PooledHtmlParser pooledHtmlParser = await _htmlParserPool.GetParserAsync())
+        {
+            doc = await pooledHtmlParser.Parser.ParseDocumentAsync(document);
+        }
         
         foreach (var link in doc.QuerySelectorAll("a[href]"))
         {
@@ -54,8 +51,6 @@ public class LinkExtractor
                 links.Add(newLink);
             }
         }
-
-        _browsingContextPool.ReturnContext(context);
         
         return links;
     }
