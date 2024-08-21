@@ -8,7 +8,7 @@ public class BrokenLink
     public int Line { get; set; }
     public int StatusCode { get; set; }
 
-    public BrokenLink(string url, string referringPage, string anchorText, int line, int statusCode, string errorMessage = "")
+    public BrokenLink(string url, string referringPage, string anchorText, int line, int statusCode)
     {
         Url = url;
         ReferringPage = referringPage;
