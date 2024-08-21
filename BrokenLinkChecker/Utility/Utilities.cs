@@ -1,4 +1,8 @@
+using System;
 using System.Diagnostics;
+using System.Linq;
+using System.Net.Http;
+using System.Threading.Tasks;
 using BrokenLinkChecker.models;
 
 namespace BrokenLinkChecker.utility;
@@ -7,18 +11,12 @@ public static class Utilities
 {
     public static string GetUrl(string baseUrl, string href)
     {
-        if (string.IsNullOrWhiteSpace(baseUrl) || string.IsNullOrWhiteSpace(href))
-        {
-            return href; // Optionally, return null or throw an exception based on your error handling strategy
-        }
-
         if (Uri.TryCreate(baseUrl, UriKind.Absolute, out Uri baseUri) &&
             Uri.TryCreate(baseUri, href, out Uri resultUri))
         {
-            // UriBuilder is used to normalize and encode the URL properly.
-            return new UriBuilder(resultUri).Uri.AbsoluteUri;
+            return resultUri.ToString();
         }
-        return href; // Consider logging this case as it indicates a potential issue with base or relative URL inputs.
+        return href;
     }
 
     
@@ -30,17 +28,8 @@ public static class Utilities
         {
             return true;
         }
-        // Check if the URL is a fragment identifier (e.g., #section)
+        
         return url.Contains('#') || url.Contains('?');
-    }
-
-    public static (T, long) Benchmark<T>(Func<T> function)
-    {
-        Stopwatch stopwatch = Stopwatch.StartNew();
-
-        T result = function.Invoke();
-
-        return (result, stopwatch.ElapsedMilliseconds);
     }
     
     public static async Task<(T, long)> BenchmarkAsync<T>(Func<Task<T>> function)

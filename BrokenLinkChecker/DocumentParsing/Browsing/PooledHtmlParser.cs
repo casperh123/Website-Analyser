@@ -1,3 +1,4 @@
+using System;
 using AngleSharp.Html.Parser;
 
 namespace BrokenLinkChecker.DocumentParsing.Browsing
