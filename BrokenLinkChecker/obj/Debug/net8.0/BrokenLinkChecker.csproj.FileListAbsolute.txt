@@ -1,0 +1,13 @@
+/home/casper/GitHub/Website-Analyser/BrokenLinkChecker/bin/Debug/net8.0/BrokenLinkChecker.deps.json
+/home/casper/GitHub/Website-Analyser/BrokenLinkChecker/bin/Debug/net8.0/BrokenLinkChecker.dll
+/home/casper/GitHub/Website-Analyser/BrokenLinkChecker/bin/Debug/net8.0/BrokenLinkChecker.pdb
+/home/casper/GitHub/Website-Analyser/BrokenLinkChecker/obj/Debug/net8.0/BrokenLinkChecker.csproj.AssemblyReference.cache
+/home/casper/GitHub/Website-Analyser/BrokenLinkChecker/obj/Debug/net8.0/BrokenLinkChecker.GeneratedMSBuildEditorConfig.editorconfig
+/home/casper/GitHub/Website-Analyser/BrokenLinkChecker/obj/Debug/net8.0/BrokenLinkChecker.AssemblyInfoInputs.cache
+/home/casper/GitHub/Website-Analyser/BrokenLinkChecker/obj/Debug/net8.0/BrokenLinkChecker.AssemblyInfo.cs
+/home/casper/GitHub/Website-Analyser/BrokenLinkChecker/obj/Debug/net8.0/BrokenLinkChecker.csproj.CoreCompileInputs.cache
+/home/casper/GitHub/Website-Analyser/BrokenLinkChecker/obj/Debug/net8.0/BrokenLinkChecker.sourcelink.json
+/home/casper/GitHub/Website-Analyser/BrokenLinkChecker/obj/Debug/net8.0/BrokenLinkChecker.dll
+/home/casper/GitHub/Website-Analyser/BrokenLinkChecker/obj/Debug/net8.0/refint/BrokenLinkChecker.dll
+/home/casper/GitHub/Website-Analyser/BrokenLinkChecker/obj/Debug/net8.0/BrokenLinkChecker.pdb
+/home/casper/GitHub/Website-Analyser/BrokenLinkChecker/obj/Debug/net8.0/ref/BrokenLinkChecker.dll

@@ -13,12 +13,9 @@ public class LinkExtractor
 
     public LinkExtractor(CrawlerConfig crawlerConfig)
     {
-        _htmlParserPool = new HtmlParserPool(
-            new HtmlParserOptions
-            {
-                IsKeepingSourceReferences = true
-            }, 
-            crawlerConfig.ConcurrentRequests);
+        HtmlParserOptions htmlParsingOptions = new HtmlParserOptions { IsKeepingSourceReferences = true };
+        
+        _htmlParserPool = new HtmlParserPool(htmlParsingOptions, crawlerConfig.ConcurrentRequests);
     }
     
     public async Task<List<LinkNode>> GetLinksFromResponseAsync(HttpResponseMessage response, LinkNode url)
@@ -29,6 +26,7 @@ public class LinkExtractor
         }
 
         await using Stream document = await response.Content.ReadAsStreamAsync();
+        
         return await ExtractLinksFromDocumentAsync(document, url);
     }
 
@@ -40,16 +38,14 @@ public class LinkExtractor
 
     private async Task<List<LinkNode>> ExtractLinksFromDocumentAsync(Stream document, LinkNode checkingUrl)
     {
-        List<LinkNode> links = new List<LinkNode>();
+        List<LinkNode> links = [];
         IDocument doc;
         Uri thisUrl = new Uri(checkingUrl.Target);
-
         
         using (PooledHtmlParser pooledHtmlParser = await _htmlParserPool.GetParserAsync())
         {
             doc = await pooledHtmlParser.Parser.ParseDocumentAsync(document);
         }
-        
         
         foreach (IElement link in doc.QuerySelectorAll("a[href]"))
         {
