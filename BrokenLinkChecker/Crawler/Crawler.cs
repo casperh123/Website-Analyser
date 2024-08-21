@@ -10,16 +10,13 @@ namespace BrokenLinkChecker.crawler
 {
     public class Crawler
     {
-        public readonly ConcurrentDictionary<string, PageStats> VisitedPages;
         private readonly HttpClient _httpClient;
-        
         private readonly List<BrokenLink> _brokenLinks = [];
-        
         private readonly LinkExtractor _linkExtractor;
         private CrawlerConfig CrawlerConfig { get; }
-
         private int LinksChecked { get; set; }
-
+        
+        public readonly ConcurrentDictionary<string, PageStats> VisitedPages;
         public Action<List<BrokenLink>> OnBrokenLinks;
         public Action<ICollection<PageStats>> OnPageVisited;
         public Action<int> OnLinksEnqueued;
@@ -30,7 +27,6 @@ namespace BrokenLinkChecker.crawler
             _httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
             VisitedPages = new ConcurrentDictionary<string, PageStats>();
             CrawlerConfig = crawlerConfig ?? throw new ArgumentNullException(nameof(crawlerConfig));
-
             _linkExtractor = new LinkExtractor(CrawlerConfig);
         }
 
@@ -105,14 +101,14 @@ namespace BrokenLinkChecker.crawler
             
             VisitedPages[url.Target] = pageStats;
 
-            var (response, requestTime) = await GetPageAsync(url);
+            (HttpResponseMessage response, long requestTime) = await GetPageAsync(url);
 
             pageStats.Headers = Utilities.AddRequestHeaders(response);
             pageStats.ResponseTime = requestTime;
                 
             if (response.IsSuccessStatusCode)
             {
-                var (links, time) = await Utilities.BenchmarkAsync(() => _linkExtractor.GetLinksFromResponseAsync(response, url));
+                (List<LinkNode> links, long time) = await Utilities.BenchmarkAsync(() => _linkExtractor.GetLinksFromResponseAsync(response, url));
                 pageStats.DocumentParseTime = time;
                 VisitedPages[url.Target].StatusCode = response.StatusCode;
                 
