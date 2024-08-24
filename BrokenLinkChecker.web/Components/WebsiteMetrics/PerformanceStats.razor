@@ -14,14 +14,10 @@
         <PropertyColumn Property="@(page => page.StatusCode)" Sortable="true"/>
         <PropertyColumn Property="@(page => page.ResponseTime)" Sortable="true"/>
         <PropertyColumn Property="@(page => page.DocumentParseTime)" Sortable="true"/>
+        <PropertyColumn Property="@(page => page.CombinedTime)" Sortable="true"></PropertyColumn>
     </QuickGrid>
     
     <Paginator State="pagination" />
-    
-}
-else
-{
-    <p>Performance stats are only available once the entire site has been analysed...</p>
 }
 
 
@@ -38,7 +34,7 @@ else
             return 0;
         }
 
-        long totalResponseTime = VisitedPages.Sum(page => page.ResponseTime);
+        long totalResponseTime = VisitedPages.Sum(page => page.CombinedTime);
         return totalResponseTime / VisitedPages.Count;
     }
 }
