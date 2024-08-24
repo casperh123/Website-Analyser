@@ -1,7 +1,5 @@
 using System.Collections.Concurrent;
-using System.Diagnostics;
 using System.Net;
-using AngleSharp;
 using BrokenLinkChecker.DocumentParsing.Linkextraction;
 using BrokenLinkChecker.models;
 using BrokenLinkChecker.utility;
@@ -32,26 +30,27 @@ namespace BrokenLinkChecker.crawler
 
         public async Task<List<PageStats>> CrawlWebsiteAsync(Uri url)
         {
-            List<LinkNode> linkQueue = [new LinkNode("", url.ToString(), "", 0)];
-            ConcurrentBag<LinkNode> foundLinks = [];
+            ConcurrentBag<LinkNode> linkQueue = new () { new LinkNode("", url.ToString(), "", 0) };
 
             do
             {
-                var partitioner = Partitioner.Create(linkQueue);
+                OrderablePartitioner<LinkNode> partitioner = Partitioner.Create(linkQueue);
+                ConcurrentBag<LinkNode> foundLinks = new ConcurrentBag<LinkNode>();
 
                 await Parallel.ForEachAsync(partitioner.GetDynamicPartitions(),
-                    async (link, cancellationToken) => { await ProcessLinkAsync(link, foundLinks); });
+                    async (link, cancellationToken) =>
+                    {
+                        await ProcessLinkAsync(link, foundLinks);
+                    });
 
-                OnLinksEnqueued.Invoke(foundLinks.Count);
+                OnLinksEnqueued?.Invoke(foundLinks.Count);
 
-                linkQueue = foundLinks.ToList();
-                foundLinks = [];
+                linkQueue = foundLinks;
 
             } while (linkQueue.Count > 0);
 
             return VisitedPages.Values.ToList();
         }
-
 
         private async Task ProcessLinkAsync(LinkNode url, ConcurrentBag<LinkNode> linksFound)
         {

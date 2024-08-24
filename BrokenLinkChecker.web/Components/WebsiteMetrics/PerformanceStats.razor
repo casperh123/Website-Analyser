@@ -9,12 +9,15 @@
 {
     <p>Average page speed: @GetAveragePageSpeed() ms</p>
 
-    <QuickGrid Items="@VisitedPages.AsQueryable()">
-        <PropertyColumn Property="@(page => page.Url)" Sortable="true"/>
+    <QuickGrid Items="@VisitedPages.AsQueryable()" Pagination="pagination">
+        <PropertyColumn Property="@(page => page.Url)" Sortable="true" />
         <PropertyColumn Property="@(page => page.StatusCode)" Sortable="true"/>
         <PropertyColumn Property="@(page => page.ResponseTime)" Sortable="true"/>
         <PropertyColumn Property="@(page => page.DocumentParseTime)" Sortable="true"/>
     </QuickGrid>
+    
+    <Paginator State="pagination" />
+    
 }
 else
 {
@@ -25,6 +28,8 @@ else
 @code {
     [Parameter]
     public ICollection<PageStats> VisitedPages { get; set; }
+    
+    PaginationState pagination = new PaginationState { ItemsPerPage = 20 };
 
     private long GetAveragePageSpeed()
     {

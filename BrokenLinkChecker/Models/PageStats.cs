@@ -9,5 +9,5 @@ public class PageStats(string url, HttpStatusCode statusCode, long responseTime 
     public HttpStatusCode StatusCode = statusCode;
     public long ResponseTime = responseTime;
     public long DocumentParseTime = documentParseTime;
-    public PageHeaders? Headers = headers;
+    public PageHeaders? Headers = headers ?? new PageHeaders();
 }

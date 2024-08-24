@@ -7,7 +7,7 @@
 
 @if (VisitedPages.Count > 0)
 {
-    <QuickGrid Items="@VisitedPages.AsQueryable()">
+    <QuickGrid Items="@VisitedPages.AsQueryable()" Pagination="pagination">
         <PropertyColumn Property="@(page => page.Url)" Sortable="true" />
         <PropertyColumn Property="@(page => page.Headers.ContentEncoding)" Sortable="true"/>
         <PropertyColumn Property="@(page => page.Headers.Server)" Sortable="true"/>
@@ -15,10 +15,14 @@
         <PropertyColumn Property="@(page => page.Headers.CacheControl)" Sortable="true"></PropertyColumn>
         <PropertyColumn Property="@(page => page.Headers.LastModified)" Sortable="true" />
     </QuickGrid>
+    
+    <Paginator State="pagination"/>
 }
 
 @code {
 
     [Parameter] 
     public ICollection<PageStats> VisitedPages { get; set; }
+
+    PaginationState pagination = new () { ItemsPerPage = 20 };
 }

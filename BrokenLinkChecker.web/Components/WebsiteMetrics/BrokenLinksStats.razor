@@ -7,16 +7,20 @@
 
 @if (BrokenLinks.Count > 0)
 {
-    <QuickGrid Items="@BrokenLinks.AsQueryable()">
+    <QuickGrid Items="@BrokenLinks.AsQueryable()" Pagination="pagination">
         <PropertyColumn Property="@(link => link.Url)" Sortable="true"/>
         <PropertyColumn Property="@(link => link.ReferringPage)" Sortable="true"/>
         <PropertyColumn Property="@(link => link.AnchorText)" Sortable="true"/>
         <PropertyColumn Property="@(link => link.Line)" Sortable="true"/>
         <PropertyColumn Property="@(link => link.StatusCode)" Sortable="true"/>
     </QuickGrid>
+    
+    <Paginator State="pagination" />
 }
 
 @code {
     [Parameter] 
     public ICollection<BrokenLink> BrokenLinks { get; set; }
+
+    PaginationState pagination = new () { ItemsPerPage = 20 };
 }
