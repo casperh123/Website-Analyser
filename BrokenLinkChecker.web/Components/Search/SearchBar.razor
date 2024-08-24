@@ -1,7 +1,5 @@
 <input @bind="searchTerm" @oninput="OnSearchTermChanged" placeholder="Search" />
 
-<p>You searched for: @searchTerm</p>
-
 @code {
     [Parameter]
     public Action<string> OnSearchTermChangedCallback { get; set; }
