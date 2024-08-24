@@ -1,0 +1,16 @@
+<input @bind="searchTerm" @oninput="OnSearchTermChanged" placeholder="Search" />
+
+<p>You searched for: @searchTerm</p>
+
+@code {
+    [Parameter]
+    public Action<string> OnSearchTermChangedCallback { get; set; }
+
+    private string searchTerm = string.Empty;
+
+    private void OnSearchTermChanged(ChangeEventArgs e)
+    {
+        searchTerm = e.Value.ToString();
+        OnSearchTermChangedCallback?.Invoke(searchTerm);
+    }
+}

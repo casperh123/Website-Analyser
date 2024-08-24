@@ -35,7 +35,7 @@
         @switch (_currentStatus)
         {
             case PageStatState.DisplayPerformance:
-                <PerformanceStats VisitedPages="@VisitedPages"/>
+                <PerformanceStats VisitedPages="@VisitedPages.AsQueryable()"/>
                 break;
             case PageStatState.DisplayBrokenLinks:
                 <BrokenLinksStats BrokenLinks="@BrokenLinks"/>
