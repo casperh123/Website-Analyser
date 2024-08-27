@@ -107,12 +107,18 @@
             return;
         }
         
-        _concurrentRequests = newConcurrentRequests switch
+        if (newConcurrentRequests < 1)
         {
-            < 1 => 1,
-            > 100 => 100,
-            _ => newConcurrentRequests
-        };
+            _concurrentRequests = 1;
+        }
+        else if (newConcurrentRequests > 100)
+        {
+            _concurrentRequests = 100;
+        }
+        else
+        {
+            _concurrentRequests = newConcurrentRequests;
+        }
     }
 
 }
