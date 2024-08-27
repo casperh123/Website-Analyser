@@ -1,5 +1,4 @@
 @page "/website-analyser"
-@using System.Collections
 @using BrokenLinkChecker.crawler
 @using BrokenLinkChecker.models
 @using BrokenLinkChecker.web.Components.WebsiteMetrics
@@ -103,21 +102,17 @@
     
     private void ApplyConcurrentRequestsChange(ChangeEventArgs e)
     {
-        if (int.TryParse(e.Value?.ToString(), out int newConcurrentRequests))
+        if (!int.TryParse(e.Value?.ToString(), out int newConcurrentRequests))
         {
-            if (newConcurrentRequests < 1)
-            {
-                _concurrentRequests = 1;
-            }
-            else if (newConcurrentRequests > 100)
-            {
-                _concurrentRequests = 100;
-            }
-            else
-            {
-                _concurrentRequests = newConcurrentRequests;
-            }
+            return;
         }
+        
+        _concurrentRequests = newConcurrentRequests switch
+        {
+            < 1 => 1,
+            > 100 => 100,
+            _ => newConcurrentRequests
+        };
     }
 
 }
