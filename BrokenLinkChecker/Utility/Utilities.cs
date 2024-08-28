@@ -38,17 +38,4 @@ public static class Utilities
 
         return (result, stopwatch.ElapsedMilliseconds);
     }
-    
-    public static PageHeaders AddRequestHeaders(HttpResponseMessage response)
-    {
-        if (response == null) throw new ArgumentNullException(nameof(response));
-
-        return new PageHeaders
-        {
-
-            ContentEncoding = response.Content.Headers.ContentEncoding?.FirstOrDefault() ?? "",
-            LastModified = response.Content.Headers.LastModified?.ToString() ?? "",
-            Server = response.Headers.Server?.ToString() ?? ""
-        };
-    }
 }

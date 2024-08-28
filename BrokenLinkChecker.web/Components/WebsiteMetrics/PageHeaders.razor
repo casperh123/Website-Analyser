@@ -11,8 +11,8 @@
         <PropertyColumn Property="@(page => page.Url)" Sortable="true" />
         <PropertyColumn Property="@(page => page.Headers.ContentEncoding)" Sortable="true"/>
         <PropertyColumn Property="@(page => page.Headers.Server)" Sortable="true"/>
-        <PropertyColumn Property="@(page => page.Headers.CacheStatus)" Sortable="true" />
-        <PropertyColumn Property="@(page => page.Headers.CacheControl)" Sortable="true"></PropertyColumn>
+        <PropertyColumn Property="@(page => page.Headers.Cache.CacheStatus)" Sortable="true" />
+        <PropertyColumn Property="@(page => page.Headers.Cache.CacheControl)" Sortable="true"></PropertyColumn>
         <PropertyColumn Property="@(page => page.Headers.LastModified)" Sortable="true" />
     </QuickGrid>
     

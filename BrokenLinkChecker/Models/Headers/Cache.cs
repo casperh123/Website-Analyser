@@ -4,9 +4,9 @@ namespace BrokenLinkChecker.Models.Headers;
 
 public record Cache
 {
+    public string Age { get; set; } = "";
     public string CacheStatus = "";
     public string CacheControl = "";
-    public string Age { get; set; } = "";
     public Dictionary<string, string> CacheHeaders { get; set; }
 
     public Cache()
@@ -17,5 +17,14 @@ public record Cache
     {
         CacheControl = headers.CacheControl?.ToString() ?? "";
         CacheStatus = headers.TryGetValues("x-cache", out var cacheStatus) ? string.Join(", ", cacheStatus) : "";
+        CacheHeaders = [];
+        
+        foreach (KeyValuePair<string, IEnumerable<string>> header in headers)
+        {
+            if (header.Key.Contains("cache"))
+            {
+                
+            }
+        }
     }
 }

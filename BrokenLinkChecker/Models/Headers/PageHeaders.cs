@@ -1,22 +1,30 @@
-using System.Net;
 using System.Net.Http.Headers;
-using System.Net.Http.;
 using BrokenLinkChecker.models;
+using System.Linq;
 
-namespace BrokenLinkChecker.Models.Headers;
-
-public record PageHeaders
+namespace BrokenLinkChecker.Models.Headers
 {
-    public string ContentEncoding { get; set; } = "";
-    public string LastModified { get; set; } = "";
-    public string Server { get; set; } = "";
-    public Cache Cache { get; set; } = new Cache();
-
-    public PageHeaders(HttpResponseHeaders headers)
+    public record PageHeaders
     {
-        ContentEncoding = headers.ContentEncoding ?? "";
-        LastModified = headers.LastModified?.ToString() ?? "";
-        Server = headers?.ToString() ?? "";
-        Cache = new Cache(headers);
+        public string ContentEncoding { get; set; } = string.Empty;
+        public string ContentType { get; set; } = string.Empty;
+        public string LastModified { get; set; } = string.Empty;
+        public string Server { get; set; } = string.Empty;
+        public Cache Cache { get; set; } = new Cache();
+
+        public PageHeaders()
+        {
+        }
+
+        public PageHeaders(HttpResponseHeaders headers, HttpContentHeaders contentHeaders)
+        {
+            ContentEncoding = contentHeaders.ContentEncoding.Any()
+                ? string.Join(", ", contentHeaders.ContentEncoding)
+                : string.Empty;
+            ContentType = contentHeaders.ContentType?.MediaType ?? string.Empty;
+            LastModified = contentHeaders.LastModified?.ToString() ?? string.Empty;
+            Server = headers.Server?.ToString() ?? string.Empty; 
+            Cache = new Cache(headers);
+        }
     }
 }

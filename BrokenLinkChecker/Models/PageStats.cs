@@ -4,21 +4,28 @@ using BrokenLinkChecker.utility;
 
 namespace BrokenLinkChecker.models;
 
-public class PageStats(string url, HttpStatusCode statusCode, long responseTime = 0, long documentParseTime = 0)
+public class PageStats
 {
-    public string Url = url;
-    public HttpStatusCode StatusCode = statusCode;
-    public long ResponseTime = responseTime;
-    public long DocumentParseTime = documentParseTime;
+    public string Url;
+    public HttpStatusCode StatusCode;
+    public long ResponseTime;
+    public long DocumentParseTime;
     public long CombinedTime => ResponseTime + DocumentParseTime;
-    public PageHeaders? Headers;
-    
+    public PageHeaders Headers = new PageHeaders();
+
+    public PageStats(string url, HttpStatusCode statusCode, long responseTime = 0, long documentParseTime = 0)
+    {
+        Url = url;
+        StatusCode = statusCode;
+        ResponseTime = responseTime;
+        DocumentParseTime = documentParseTime;
+    }
     
     public void AddMetrics(HttpResponseMessage response, long requestTime = 0, long parseTime = 0)
     {
         ResponseTime = requestTime;
         DocumentParseTime = parseTime;
         StatusCode = response.StatusCode;
-        Headers = new PageHeaders(response.Headers);
+        Headers = new PageHeaders(response.Headers, response.Content.Headers);
     }
 }

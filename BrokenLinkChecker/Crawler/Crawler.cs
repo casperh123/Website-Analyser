@@ -13,8 +13,8 @@ namespace BrokenLinkChecker.crawler
         private readonly LinkExtractor _linkExtractor;
         private CrawlerConfig CrawlerConfig { get; }
         private int LinksChecked { get; set; }
+        private readonly ConcurrentDictionary<string, PageStats> _visitedPages;
         
-        public readonly ConcurrentDictionary<string, PageStats> VisitedPages;
         public Action<List<BrokenLink>> OnBrokenLinks;
         public Action<ICollection<PageStats>> OnPageVisited;
         public Action<int> OnLinksEnqueued;
@@ -23,7 +23,7 @@ namespace BrokenLinkChecker.crawler
         public Crawler(HttpClient httpClient, CrawlerConfig crawlerConfig)
         {
             _httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
-            VisitedPages = new ConcurrentDictionary<string, PageStats>();
+            _visitedPages = new ConcurrentDictionary<string, PageStats>();
             CrawlerConfig = crawlerConfig ?? throw new ArgumentNullException(nameof(crawlerConfig));
             _linkExtractor = new LinkExtractor(CrawlerConfig);
         }
@@ -49,68 +49,61 @@ namespace BrokenLinkChecker.crawler
 
             } while (linkQueue.Count > 0);
 
-            return VisitedPages.Values.ToList();
+            return _visitedPages.Values.ToList();
         }
 
         private async Task ProcessLinkAsync(Link url, ConcurrentBag<Link> linksFound)
         {
-            if (VisitedPages.ContainsKey(url.Target))
+            PageStats pageStats = new PageStats(url.Target, HttpStatusCode.Unused);
+            
+            if (!_visitedPages.TryAdd(url.Target, pageStats))
             {
+                pageStats = _visitedPages[url.Target];
+                
+                if (pageStats.StatusCode is HttpStatusCode.OK or HttpStatusCode.Unused)
+                {
+                    return;
+                }
+
+                _brokenLinks.Add(new BrokenLink(url, pageStats.StatusCode));
                 return;
             }
 
-            List<Link> links = await GetLinksFromPage(url);
+            List<Link> links = await GetLinksFromPage(url, pageStats);
 
             foreach (Link link in links.Where(link => !Utilities.IsAsyncOrFragmentRequest(link.Target)))
             {
                 linksFound.Add(link);
             }
 
-            OnLinksChecked.Invoke(LinksChecked++);
+            OnLinksChecked(LinksChecked++);
         }
 
-        private async Task<List<Link>> GetLinksFromPage(Link url)
+        private async Task<List<Link>> GetLinksFromPage(Link url, PageStats pageStats)
         {
-            List<Link> linkList = [];
-            
-            if (VisitedPages.TryGetValue(url.Target, out PageStats pageStats))
-            {
-                if (pageStats.StatusCode is HttpStatusCode.OK or HttpStatusCode.Unused)
-                {
-                    return linkList;
-                }
-
-                _brokenLinks.Add(new BrokenLink(url, pageStats.StatusCode));
-            }
-            else
-            {
-                linkList = await RequestAndProcessPage(url);
-            }
+            List<Link> linkList = await RequestAndProcessPage(url, pageStats);
 
             OnLinksChecked.Invoke(LinksChecked++);
             OnBrokenLinks.Invoke(_brokenLinks);
-            OnPageVisited.Invoke(VisitedPages.Values);
+            OnPageVisited.Invoke(_visitedPages.Values);
 
             return linkList;
         }
 
-        private async Task<List<Link>> RequestAndProcessPage(Link url)
+        private async Task<List<Link>> RequestAndProcessPage(Link url, PageStats pageStats)
         {
-            PageStats pageStats = new PageStats(url.Target, HttpStatusCode.Unused);
-            VisitedPages[url.Target] = pageStats;
-            
             (HttpResponseMessage response, long requestTime) = await RequestPageAsync(url);
                 
             if (response.IsSuccessStatusCode)
             {
                 (List<Link> links, long parseTime) = await Utilities.BenchmarkAsync(() => _linkExtractor.GetLinksFromResponseAsync(response, url));
      
-                pageStats.AddMetrics(pageStats, response, requestTime, parseTime);
+                pageStats.AddMetrics(response, requestTime, parseTime);
                 
                 return links;
             }
             
-            pageStats.AddMetrics(pageStats, response, requestTime);
+            pageStats.AddMetrics(response, requestTime);
             _brokenLinks.Add(new BrokenLink(url, response.StatusCode));
             return [];
         }
