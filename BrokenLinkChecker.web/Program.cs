@@ -1,6 +1,7 @@
 using System.Net;
 using System.Security.Authentication;
 using BrokenLinkChecker.crawler;
+using BrokenLinkChecker.HttpClients;
 using BrokenLinkChecker.web.Components;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -9,7 +10,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
-builder.Services.AddHttpClient("BrokenLinkChecker", client =>
+builder.Services.AddHttpClient("WebsiteAnalyser", client =>
     {
         client.DefaultRequestVersion = HttpVersion.Version30;
         client.DefaultVersionPolicy = HttpVersionPolicy.RequestVersionOrLower;
@@ -19,16 +20,13 @@ builder.Services.AddHttpClient("BrokenLinkChecker", client =>
         client.DefaultRequestHeaders.Accept.ParseAdd("text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8");
         client.DefaultRequestHeaders.AcceptEncoding.ParseAdd("gzip, deflate, br");
     })
-    .ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler
+    .ConfigurePrimaryHttpMessageHandler(() => new CustomHttpClientHandler()
     {
         UseCookies = false,
-        AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate | DecompressionMethods.Brotli,
         SslProtocols = SslProtocols.Tls12 | SslProtocols.Tls13,
         MaxConnectionsPerServer = 50,
         ServerCertificateCustomValidationCallback = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator
     });
-
-
 
 var app = builder.Build();
 

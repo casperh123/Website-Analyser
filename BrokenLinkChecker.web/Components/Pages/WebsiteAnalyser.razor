@@ -3,7 +3,6 @@
 @using BrokenLinkChecker.models
 @using BrokenLinkChecker.web.Components.WebsiteMetrics
 @using BrokenLinkChecker.web.Components.WebsiteInputs
-@inject HttpClient HttpClient
 @rendermode InteractiveServer
 
 <h2>Website Analyser</h2>
@@ -50,14 +49,15 @@
 }
 
 @code {
-    public ICollection<BrokenLink> BrokenLinks { get; set; } = [];
-    public ICollection<PageStats> VisitedPages { get; set; } = [];
-    
+    [Inject] 
+    private IHttpClientFactory HttpClientFactory { get; set; }
     private bool IsChecking { get; set; }
-
     private int _linksChecked;
     private int _linksEnqueued;
     private int _concurrentRequests = 1;
+    
+    public ICollection<BrokenLink> BrokenLinks { get; set; } = [];
+    public ICollection<PageStats> VisitedPages { get; set; } = [];
 
     private PageStatState _currentStatus = PageStatState.DisplayBrokenLinks;
 
@@ -67,7 +67,7 @@
         BrokenLinks = new List<BrokenLink>();
 
         CrawlerConfig crawlerState = new CrawlerConfig(_concurrentRequests);
-        Crawler crawler = new Crawler(HttpClient, crawlerState)
+        Crawler crawler = new Crawler(HttpClientFactory.CreateClient("WebsiteAnalyser"), crawlerState)
         {
             OnLinksEnqueued = (count) =>
             {
