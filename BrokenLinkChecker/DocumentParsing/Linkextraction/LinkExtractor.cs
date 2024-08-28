@@ -23,7 +23,7 @@ public class LinkExtractor
         _htmlParserPool = new HtmlParserPool(htmlParsingOptions, crawlerConfig.ConcurrentRequests);
     }
     
-    public async Task<List<LinkNode>> GetLinksFromResponseAsync(HttpResponseMessage response, LinkNode url)
+    public async Task<List<Link>> GetLinksFromResponseAsync(HttpResponseMessage response, Link url)
     {
         if (!IsHtmlContent(response))
         {
@@ -41,9 +41,9 @@ public class LinkExtractor
         return contentType != null && contentType.Equals("text/html", StringComparison.OrdinalIgnoreCase);
     }
 
-    private async Task<List<LinkNode>> ExtractLinksFromDocumentAsync(Stream document, LinkNode checkingUrl)
+    private async Task<List<Link>> ExtractLinksFromDocumentAsync(Stream document, Link checkingUrl)
     {
-        List<LinkNode> links = [];
+        List<Link> links = [];
         IDocument doc;
         Uri thisUrl = new Uri(checkingUrl.Target);
         
@@ -54,7 +54,7 @@ public class LinkExtractor
         
         foreach (IElement link in doc.QuerySelectorAll("a[href]"))
         {
-            LinkNode newLink = GenerateLinkNode(link, checkingUrl.Target);
+            Link newLink = GenerateLinkNode(link, checkingUrl.Target);
             if (Uri.TryCreate(newLink.Target, UriKind.Absolute, out Uri uri) && uri.Host == thisUrl.Host)
             {
                 links.Add(newLink);
@@ -64,13 +64,13 @@ public class LinkExtractor
         return links;
     }
 
-    private LinkNode GenerateLinkNode(IElement link, string target)
+    private Link GenerateLinkNode(IElement link, string target)
     {
         string href = link.GetAttribute("href") ?? string.Empty;
         string resolvedUrl = Utilities.GetUrl(target, href);  // Utilities.GetUrl should handle exceptions and return href as fallback
         string text = link.TextContent;
         int line = link.SourceReference?.Position.Line ?? -1;
 
-        return new LinkNode(target, resolvedUrl, text, line);
+        return new Link(target, resolvedUrl, text, line);
     }
 }

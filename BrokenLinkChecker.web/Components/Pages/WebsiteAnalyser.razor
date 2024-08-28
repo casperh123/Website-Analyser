@@ -34,7 +34,7 @@
         @switch (_currentStatus)
         {
             case PageStatState.DisplayPerformance:
-                <PerformanceStats VisitedPages="@VisitedPages.AsQueryable()"/>
+                <PerformanceStats VisitedPages="@VisitedPages"/>
                 break;
             case PageStatState.DisplayBrokenLinks:
                 <BrokenLinksStats BrokenLinks="@BrokenLinks"/>
@@ -111,14 +111,11 @@
         {
             _concurrentRequests = 1;
         }
-        else if (newConcurrentRequests > 100)
-        {
-            _concurrentRequests = 100;
-        }
         else
         {
             _concurrentRequests = newConcurrentRequests;
         }
+        
     }
 
 }

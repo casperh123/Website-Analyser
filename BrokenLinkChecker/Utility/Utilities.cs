@@ -1,9 +1,7 @@
 using System;
 using System.Diagnostics;
-using System.Linq;
-using System.Net.Http;
-using System.Threading.Tasks;
-using BrokenLinkChecker.models;
+
+using BrokenLinkChecker.Models.Headers;
 
 namespace BrokenLinkChecker.utility;
 
@@ -47,8 +45,7 @@ public static class Utilities
 
         return new PageHeaders
         {
-            CacheControl = response.Headers.CacheControl?.ToString() ?? "",
-            CacheStatus = response.Headers.TryGetValues("x-cache", out var cacheStatus) ? string.Join(", ", cacheStatus) : "",
+
             ContentEncoding = response.Content.Headers.ContentEncoding?.FirstOrDefault() ?? "",
             LastModified = response.Content.Headers.LastModified?.ToString() ?? "",
             Server = response.Headers.Server?.ToString() ?? ""

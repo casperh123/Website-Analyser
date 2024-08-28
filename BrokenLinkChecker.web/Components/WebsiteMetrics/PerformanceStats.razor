@@ -1,18 +1,17 @@
     @using BrokenLinkChecker.models
     @using Microsoft.AspNetCore.Components.QuickGrid
     @using BrokenLinkChecker.web.Components.Search
+@using Microsoft.AspNetCore.Mvc.RazorPages
 
     @rendermode InteractiveServer
 
     <h3>Performance Stats</h3>
 
-    @if (VisitedPages.Count() > 0)
+    @if (VisitedPages.Count > 0)
     {
         <p>Average page speed: @GetAveragePageSpeed() ms</p>
         
-        <SearchBar OnSearchTermChangedCallback="HandleSearchTermChanged"/>
-
-        <QuickGrid Items="@FilteredPages.AsQueryable()" Pagination="pagination">
+        <QuickGrid Items="@VisitedPages.AsQueryable()" Pagination="pagination">
             <PropertyColumn Property="@(page => page.Url)" Sortable="true" />
             <PropertyColumn Property="@(page => page.StatusCode)" Sortable="true"/>
             <PropertyColumn Property="@(page => page.ResponseTime)" Sortable="true"/>
@@ -26,39 +25,21 @@
 
     @code {
         [Parameter]
-        public IQueryable<PageStats> VisitedPages { get; set; }
+        public ICollection<PageStats> VisitedPages { get; set; }
 
-        public IQueryable<PageStats> FilteredPages;
         
         PaginationState pagination = new PaginationState { ItemsPerPage = 20 };
 
-        protected override void OnInitialized()
-        {
-            FilteredPages = VisitedPages;
-        }
 
         private long GetAveragePageSpeed()
         {
-            if (VisitedPages.Count() == 0)
+            if (VisitedPages.Count == 0)
             {
                 return 0;
             }
 
             long totalResponseTime = VisitedPages.Sum(page => page.CombinedTime);
             return totalResponseTime / VisitedPages.Count();
-        }
-
-        public void HandleSearchTermChanged(string searchTerm)
-        {
-            if (string.IsNullOrEmpty(searchTerm))
-            {
-                FilteredPages = VisitedPages;
-            }
-            else
-            {
-                FilteredPages = VisitedPages
-                    .Where(page => page.Url.Contains(searchTerm, StringComparison.OrdinalIgnoreCase));
-            }
         }
 
     }
