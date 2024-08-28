@@ -1,6 +1,7 @@
 using System.Net.Http.Headers;
 using BrokenLinkChecker.models;
 using System.Linq;
+using System.Net;
 
 namespace BrokenLinkChecker.Models.Headers
 {

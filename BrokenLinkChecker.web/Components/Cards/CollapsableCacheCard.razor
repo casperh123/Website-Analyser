@@ -1,0 +1,28 @@
+@using BrokenLinkChecker.Models.Headers
+
+<div class="cache-card" @onclick="Toggle">
+    <p>Age: @Cache.Age</p>
+
+    @if (!_collapsed)
+    {
+        <p>Cache Control: @Cache.CacheControl</p>
+        <p>Cache Status: @Cache.CacheStatus</p>
+
+        @foreach (KeyValuePair<string, string> cacheHeader in Cache.CacheHeaders)
+        {
+            <p><b>@cacheHeader.Key:</b> @cacheHeader.Value</p>
+        }
+    }
+</div>
+
+@code {
+    [Parameter]
+    public Cache Cache { get; set; }
+
+    private bool _collapsed = true;
+
+    private void Toggle()
+    {
+        _collapsed = !_collapsed;
+    }
+}

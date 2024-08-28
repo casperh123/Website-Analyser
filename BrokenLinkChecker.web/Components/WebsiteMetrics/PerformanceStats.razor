@@ -13,10 +13,11 @@
         
         <QuickGrid Items="@VisitedPages.AsQueryable()" Pagination="pagination">
             <PropertyColumn Property="@(page => page.Url)" Sortable="true" />
-            <PropertyColumn Property="@(page => page.StatusCode)" Sortable="true"/>
-            <PropertyColumn Property="@(page => page.ResponseTime)" Sortable="true"/>
-            <PropertyColumn Property="@(page => page.DocumentParseTime)" Sortable="true"/>
-            <PropertyColumn Property="@(page => page.CombinedTime)" Sortable="true"></PropertyColumn>
+            <PropertyColumn Property="@(page => page.StatusCode)" Sortable="true" Title="Status Code"/>
+            <PropertyColumn Property="@(page => page.ResponseTime)" Sortable="true" Title="TTFB"/>
+            <PropertyColumn Property="@(page => page.DocumentParseTime)" Sortable="true" Title="Document Parse Time"/>
+            <PropertyColumn Property="@(page => page.CombinedTime)" Sortable="true" Title="Total Time"/>
+            <PropertyColumn Property="@(page => page.HttpVersion)" Sortable="true" Title="Http Version" />
         </QuickGrid>
         
         <Paginator State="pagination" />

@@ -4,13 +4,14 @@ using BrokenLinkChecker.utility;
 
 namespace BrokenLinkChecker.models;
 
-public class PageStats
+public record PageStats
 {
     public string Url;
     public HttpStatusCode StatusCode;
     public long ResponseTime;
     public long DocumentParseTime;
     public long CombinedTime => ResponseTime + DocumentParseTime;
+    public string HttpVersion { get; set; }
     public PageHeaders Headers = new PageHeaders();
 
     public PageStats(string url, HttpStatusCode statusCode, long responseTime = 0, long documentParseTime = 0)
@@ -26,6 +27,7 @@ public class PageStats
         ResponseTime = requestTime;
         DocumentParseTime = parseTime;
         StatusCode = response.StatusCode;
+        HttpVersion = response.Version.ToString();
         Headers = new PageHeaders(response.Headers, response.Content.Headers);
     }
 }
