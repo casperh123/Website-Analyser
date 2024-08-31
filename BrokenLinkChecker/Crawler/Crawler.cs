@@ -92,16 +92,22 @@ namespace BrokenLinkChecker.crawler
 
         private async Task<List<Link>> RequestAndProcessPage(Link url, PageStats pageStats)
         {
+            await CrawlerConfig.Semaphore.WaitAsync();
+
             (HttpResponseMessage response, long requestTime) = await RequestPageAsync(url);
                 
             if (response.IsSuccessStatusCode)
             {
                 (List<Link> links, long parseTime) = await Utilities.BenchmarkAsync(() => _linkExtractor.GetLinksFromResponseAsync(response, url));
-     
+                
                 pageStats.AddMetrics(response, requestTime, parseTime);
+                
+                CrawlerConfig.Semaphore.Release();
                 
                 return links;
             }
+            
+            CrawlerConfig.Semaphore.Release();
             
             pageStats.AddMetrics(response, requestTime);
             _brokenLinks.Add(new BrokenLink(url, response.StatusCode));
@@ -110,13 +116,10 @@ namespace BrokenLinkChecker.crawler
 
         private async Task<(HttpResponseMessage, long)> RequestPageAsync(Link url)
         {
-            await CrawlerConfig.Semaphore.WaitAsync();
             await CrawlerConfig.ApplyJitterAsync();
 
             (HttpResponseMessage response, long requestTime) = await Utilities.BenchmarkAsync(() => _httpClient.GetAsync(url.Target, HttpCompletionOption.ResponseHeadersRead));
             
-            CrawlerConfig.Semaphore.Release();
-
             return (response, requestTime);
         }
     }
