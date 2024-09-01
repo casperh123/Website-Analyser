@@ -67,7 +67,8 @@
         BrokenLinks = new List<BrokenLink>();
 
         CrawlerConfig crawlerState = new CrawlerConfig(_concurrentRequests);
-        Crawler crawler = new Crawler(HttpClientFactory.CreateClient("WebsiteAnalyser"), crawlerState)
+        
+        CrawlResult crawlResult = new CrawlResult()
         {
             OnLinksEnqueued = (count) =>
             {
@@ -90,6 +91,8 @@
                 InvokeAsync(StateHasChanged);
             }
         };
+        
+        Crawler crawler = new Crawler(HttpClientFactory.CreateClient("WebsiteAnalyser"), crawlerState, crawlResult);
 
         VisitedPages = await crawler.CrawlWebsiteAsync(url);
         IsChecking = false;
