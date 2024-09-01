@@ -165,3 +165,9 @@ table tr:nth-child(odd) {
 .state-buttons {
     padding: 20px;
 }
+
+.horizontal-centered {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}

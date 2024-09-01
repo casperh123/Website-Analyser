@@ -1,12 +1,12 @@
 @using BrokenLinkChecker.Models.Headers
 
-<div class="cache-card" @onclick="Toggle">
-    <p>Age: @Cache.Age</p>
+<div class="cache-card horizontal-centered" @onclick="Toggle">
+    <p><b>Status:</b> @Cache.CacheStatus</p>
 
     @if (!_collapsed)
     {
-        <p>Cache Control: @Cache.CacheControl</p>
-        <p>Cache Status: @Cache.CacheStatus</p>
+        <p><b>Age:</b> @Cache.Age</p>
+        <p><b>Cache Control:</b> @Cache.CacheControl</p>
 
         @foreach (KeyValuePair<string, string> cacheHeader in Cache.CacheHeaders)
         {
