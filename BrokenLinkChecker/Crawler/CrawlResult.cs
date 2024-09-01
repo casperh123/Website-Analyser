@@ -1,3 +1,4 @@
+using System.Net;
 using BrokenLinkChecker.models;
 
 namespace BrokenLinkChecker.crawler
@@ -14,16 +15,32 @@ namespace BrokenLinkChecker.crawler
         public Action<int> OnLinksEnqueued { get; set; }
         public Action<int> OnLinksChecked { get; set; }
 
-        public void AddBrokenLink(BrokenLink brokenLink)
-        {
-            BrokenLinks.Add(brokenLink);
-            OnBrokenLinks?.Invoke(BrokenLinks);
-        }
-
         public void AddResource(PageStat pageStats)
         {
             VisitedPages.Add(pageStats);
             OnPageVisited?.Invoke(VisitedPages);
+        }
+        
+        public void HandleBrokenLink(Link url, HttpResponseMessage response)
+        {
+            if (response.StatusCode != HttpStatusCode.Forbidden)
+            {
+                AddBrokenLink(new BrokenLink(url, response.StatusCode));
+            }
+        }
+        
+        public void HandleBrokenLink(Link url, HttpStatusCode statusCode)
+        {
+            if (statusCode != HttpStatusCode.Forbidden)
+            {
+                AddBrokenLink(new BrokenLink(url, statusCode));
+            }
+        }
+        
+        private void AddBrokenLink(BrokenLink brokenLink)
+        {
+            BrokenLinks.Add(brokenLink);
+            OnBrokenLinks?.Invoke(BrokenLinks);
         }
 
         public void IncrementLinksChecked()

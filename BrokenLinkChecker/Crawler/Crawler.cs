@@ -52,24 +52,24 @@ namespace BrokenLinkChecker.crawler
         {
             if (!_visitedResources.TryAdd(url.Target, HttpStatusCode.Unused))
             {
-                if (_visitedResources[url.Target] is HttpStatusCode status && status == HttpStatusCode.NotFound || status == HttpStatusCode.InternalServerError)
+                if (_visitedResources[url.Target] is HttpStatusCode status && status != HttpStatusCode.OK)
                 {
-                    CrawlResult.AddBrokenLink(new BrokenLink(url, status));
+                    CrawlResult.HandleBrokenLink(url, status);
                 }
                 return;
             }
 
-            List<Link> links = await RequestAndProcessPage(url);
+            IEnumerable<Link> links = await RequestAndProcessPage(url);
 
-            foreach (Link link in links.Where(link => !Utilities.IsAsyncOrFragmentRequest(link.Target)))
+            foreach (Link link in links)
             {
                 linksFound.Enqueue(link);
             }
-
+            
             CrawlResult.IncrementLinksChecked();
         }
 
-        private async Task<List<Link>> RequestAndProcessPage(Link url)
+        private async Task<IEnumerable<Link>> RequestAndProcessPage(Link url)
         {
             try
             {
@@ -87,11 +87,11 @@ namespace BrokenLinkChecker.crawler
             }
         }
         
-        private async Task<List<Link>> ProcessResponse(HttpResponseMessage response, Link url, long requestTime)
+        private async Task<IEnumerable<Link>> ProcessResponse(HttpResponseMessage response, Link url, long requestTime)
         {
             if(!response.IsSuccessStatusCode)
             {
-                HandleBrokenLink(url, response);
+                CrawlResult.HandleBrokenLink(url, response);
                 return [];
             }
     
@@ -100,15 +100,7 @@ namespace BrokenLinkChecker.crawler
             PageStat pageStat = new PageStat(url.Target, response, url.Type, requestTime, parseTime);
             CrawlResult.AddResource(pageStat);
 
-            return links;
-        }
-
-        private void HandleBrokenLink(Link url, HttpResponseMessage response)
-        {
-            if (response.StatusCode != HttpStatusCode.Forbidden)
-            {
-                CrawlResult.AddBrokenLink(new BrokenLink(url, response.StatusCode));
-            }
+            return links.Where(link => !Utilities.IsAsyncOrFragmentRequest(link.Target));
         }
 
         private async Task<(HttpResponseMessage, long)> RequestPageAsync(Link url)
