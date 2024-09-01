@@ -13,6 +13,8 @@ public record PageStats
     public long CombinedTime => ResponseTime + DocumentParseTime;
     public string HttpVersion { get; set; }
     public PageHeaders Headers = new PageHeaders();
+    public List<string> Scripts = [];
+    public List<string> Images = [];
 
     public PageStats(string url, HttpStatusCode statusCode, long responseTime = 0, long documentParseTime = 0)
     {

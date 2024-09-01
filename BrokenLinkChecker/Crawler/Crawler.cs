@@ -9,13 +9,14 @@ namespace BrokenLinkChecker.crawler
     public class Crawler
     {
         private readonly HttpClient _httpClient;
-        private readonly List<BrokenLink> _brokenLinks = [];
         private readonly LinkExtractor _linkExtractor;
+        private readonly List<BrokenLink> _brokenLinks = [];
+        private readonly ConcurrentDictionary<string, PageStats> _visitedPages = [];
+        
         private CrawlerConfig CrawlerConfig { get; }
         private int LinksChecked { get; set; }
-        private readonly ConcurrentDictionary<string, PageStats> _visitedPages;
-        
-        public Action<List<BrokenLink>> OnBrokenLinks;
+
+        public Action<ICollection<BrokenLink>> OnBrokenLinks;
         public Action<ICollection<PageStats>> OnPageVisited;
         public Action<int> OnLinksEnqueued;
         public Action<int> OnLinksChecked;
@@ -23,7 +24,6 @@ namespace BrokenLinkChecker.crawler
         public Crawler(HttpClient httpClient, CrawlerConfig crawlerConfig)
         {
             _httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
-            _visitedPages = new ConcurrentDictionary<string, PageStats>();
             CrawlerConfig = crawlerConfig ?? throw new ArgumentNullException(nameof(crawlerConfig));
             _linkExtractor = new LinkExtractor(CrawlerConfig);
         }
