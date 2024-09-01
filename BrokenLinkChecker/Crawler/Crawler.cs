@@ -11,7 +11,7 @@ namespace BrokenLinkChecker.crawler
         private readonly HttpClient _httpClient;
         private readonly LinkExtractor _linkExtractor;
         private readonly List<BrokenLink> _brokenLinks = [];
-        private readonly ConcurrentDictionary<string, PageStats> _visitedPages = [];
+        private readonly ConcurrentDictionary<string, PageStats> _visitedResources = [];
         
         private CrawlerConfig CrawlerConfig { get; }
         private int LinksChecked { get; set; }
@@ -49,16 +49,16 @@ namespace BrokenLinkChecker.crawler
 
             } while (linkQueue.Count > 0);
 
-            return _visitedPages.Values.ToList();
+            return _visitedResources.Values.ToList();
         }
 
         private async Task ProcessLinkAsync(Link url, ConcurrentBag<Link> linksFound)
         {
             PageStats pageStats = new PageStats(url.Target, HttpStatusCode.Unused);
             
-            if (!_visitedPages.TryAdd(url.Target, pageStats))
+            if (!_visitedResources.TryAdd(url.Target, pageStats))
             {
-                pageStats = _visitedPages[url.Target];
+                pageStats = _visitedResources[url.Target];
                 
                 if (pageStats.StatusCode is HttpStatusCode.OK or HttpStatusCode.Unused)
                 {
@@ -85,7 +85,7 @@ namespace BrokenLinkChecker.crawler
 
             OnLinksChecked.Invoke(LinksChecked++);
             OnBrokenLinks.Invoke(_brokenLinks);
-            OnPageVisited.Invoke(_visitedPages.Values);
+            OnPageVisited.Invoke(_visitedResources.Values);
 
             return linkList;
         }

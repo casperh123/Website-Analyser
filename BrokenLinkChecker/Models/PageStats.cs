@@ -13,8 +13,7 @@ public record PageStats
     public long CombinedTime => ResponseTime + DocumentParseTime;
     public string HttpVersion { get; set; }
     public PageHeaders Headers = new PageHeaders();
-    public List<string> Scripts = [];
-    public List<string> Images = [];
+    public ResourceType Type { get; set; }
 
     public PageStats(string url, HttpStatusCode statusCode, long responseTime = 0, long documentParseTime = 0)
     {
@@ -31,5 +30,31 @@ public record PageStats
         StatusCode = response.StatusCode;
         HttpVersion = response.Version.ToString();
         Headers = new PageHeaders(response.Headers, response.Content.Headers);
+        Type = DetermineResourceType(response.Content.Headers.ContentType?.MediaType);
+    }
+
+    private ResourceType DetermineResourceType(string? mediaType)
+    {
+        if (string.IsNullOrEmpty(mediaType))
+        {
+            return ResourceType.Resource; // Default to general resource if content type is unknown
+        }
+
+        if (mediaType.StartsWith("text/html", StringComparison.OrdinalIgnoreCase))
+        {
+            return ResourceType.Page;
+        }
+        if (mediaType.StartsWith("image/", StringComparison.OrdinalIgnoreCase))
+        {
+            return ResourceType.Image;
+        }
+        if (mediaType.StartsWith("application/javascript", StringComparison.OrdinalIgnoreCase) ||
+            mediaType.StartsWith("text/javascript", StringComparison.OrdinalIgnoreCase))
+        {
+            return ResourceType.Script;
+        }
+
+        // Add more content types as needed
+        return ResourceType.Resource; // Fallback to generic resource
     }
 }
