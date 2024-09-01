@@ -1,6 +1,6 @@
 @using BrokenLinkChecker.Models.Headers
 
-<div class="cache-card horizontal-centered" @onclick="Toggle">
+<div class="cache-card" @onclick="Toggle">
     <p><b>Status:</b> @Cache.CacheStatus</p>
 
     @if (!_collapsed)
