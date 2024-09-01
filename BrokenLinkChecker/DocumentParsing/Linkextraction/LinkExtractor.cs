@@ -1,9 +1,5 @@
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Net.Http;
-using System.Threading.Tasks;
 using AngleSharp.Dom;
+using AngleSharp.Html.Dom;
 using AngleSharp.Html.Parser;
 using BrokenLinkChecker.crawler;
 using BrokenLinkChecker.DocumentParsing.Browsing;
@@ -21,7 +17,7 @@ namespace BrokenLinkChecker.DocumentParsing.Linkextraction
             HtmlParserOptions htmlParsingOptions = new HtmlParserOptions { IsKeepingSourceReferences = true };
             _htmlParserPool = new HtmlParserPool(htmlParsingOptions, crawlerConfig.ConcurrentRequests);
         }
-        
+
         public async Task<List<Link>> GetLinksFromResponseAsync(HttpResponseMessage response, Link url)
         {
             if (!IsHtmlContent(response))
@@ -30,7 +26,7 @@ namespace BrokenLinkChecker.DocumentParsing.Linkextraction
             }
 
             await using Stream document = await response.Content.ReadAsStreamAsync();
-            
+
             return await ExtractLinksFromDocumentAsync(document, url);
         }
 
@@ -45,30 +41,58 @@ namespace BrokenLinkChecker.DocumentParsing.Linkextraction
             List<Link> links = new List<Link>();
             IDocument doc;
             Uri thisUrl = new Uri(checkingUrl.Target);
-            
+
             using (PooledHtmlParser pooledHtmlParser = await _htmlParserPool.GetParserAsync())
             {
                 doc = await pooledHtmlParser.Parser.ParseDocumentAsync(document);
             }
-
-            // Select all elements that could contain links
-            var linkElements = doc.QuerySelectorAll("a[href], script[src], img[src], link[href], video[src], source[src]");
             
-            foreach (IElement element in linkElements)
+            // Extract links from stylesheets
+            foreach (var stylesheet in doc.StyleSheets)
             {
-                string attribute = element.HasAttribute("href") ? "href" :
-                                   element.HasAttribute("src") ? "src" :
-                                   element.HasAttribute("data") ? "data" : null;
-
-                if (attribute != null)
+                string href = stylesheet.Href;
+                if (!string.IsNullOrEmpty(href))
                 {
-                    Link newLink = GenerateLinkNode(element, checkingUrl.Target, attribute);
-                    if (Uri.TryCreate(newLink.Target, UriKind.Absolute, out Uri uri) && uri.Host == thisUrl.Host)
-                    {
-                        links.Add(newLink);
-                    }
+                    Link newLink = GenerateLinkNode(stylesheet.OwnerNode, checkingUrl.Target, "href");
+                    links.Add(newLink);
                 }
             }
+
+            // Extract links from scripts
+            foreach (var script in doc.Scripts)
+            {
+                string? src = script.Source;
+                if (!string.IsNullOrEmpty(src))
+                {
+                    Link newLink = GenerateLinkNode(script, checkingUrl.Target, "src");
+                    links.Add(newLink);
+                }
+            }
+
+            // Extract links from images
+            foreach (IHtmlImageElement image in doc.Images)
+            {
+                string? src = image.Source;
+                if (!string.IsNullOrEmpty(src))
+                {
+                    Link newLink = GenerateLinkNode(image, checkingUrl.Target, "src");
+                    links.Add(newLink);
+                }
+            }
+
+            // Extract anchor links
+            foreach (IElement link in doc.Links)
+            {
+                string? href = link.GetAttribute("href");
+                if (!string.IsNullOrEmpty(href))
+                {
+                    Link newLink = GenerateLinkNode(link, checkingUrl.Target, "href");
+                    links.Add(newLink);
+                }
+            }
+
+            // Optionally, filter out links that are external to the host
+            links = links.Where(link => Uri.TryCreate(link.Target, UriKind.Absolute, out Uri uri) && uri.Host == thisUrl.Host).ToList();
 
             return links;
         }
@@ -76,7 +100,7 @@ namespace BrokenLinkChecker.DocumentParsing.Linkextraction
         private Link GenerateLinkNode(IElement element, string target, string attribute)
         {
             string href = element.GetAttribute(attribute) ?? string.Empty;
-            string resolvedUrl = Utilities.GetUrl(target, href);  // Utilities.GetUrl should handle exceptions and return href as fallback
+            string resolvedUrl = Utilities.GetUrl(target, href);
             string text = element.TextContent;
             int line = element.SourceReference?.Position.Line ?? -1;
 

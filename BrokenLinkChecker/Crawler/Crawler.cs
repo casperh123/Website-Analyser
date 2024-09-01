@@ -82,7 +82,7 @@ namespace BrokenLinkChecker.crawler
         private async Task<List<Link>> GetLinksFromPage(Link url, PageStats pageStats)
         {
             List<Link> linkList = await RequestAndProcessPage(url, pageStats);
-
+            
             OnLinksChecked.Invoke(LinksChecked++);
             OnBrokenLinks.Invoke(_brokenLinks);
             OnPageVisited.Invoke(_visitedResources.Values);
@@ -110,7 +110,12 @@ namespace BrokenLinkChecker.crawler
             CrawlerConfig.Semaphore.Release();
             
             pageStats.AddMetrics(response, requestTime);
-            _brokenLinks.Add(new BrokenLink(url, response.StatusCode));
+
+            if (response.StatusCode is not HttpStatusCode.Forbidden)
+            {
+                _brokenLinks.Add(new BrokenLink(url, response.StatusCode));
+            }
+            
             return [];
         }
 

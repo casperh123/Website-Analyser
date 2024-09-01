@@ -1,39 +1,27 @@
 @using BrokenLinkChecker.models
 @using Microsoft.AspNetCore.Components.QuickGrid
+<label for="resourceFilter">Filter by Resource Type:</label>
+<select id="resourceFilter" @bind="SelectedResourceType">
+    <option value="All">All</option>
+    @foreach (var resourceType in GetAvailableResourceTypes())
+    {
+        <option value="@resourceType.ToString()">@resourceType.ToString()</option>
+    }
+</select>
 
-<h3>Performance Stats</h3>
+<p>Average page speed: @GetAveragePageSpeed() ms</p>
 
-@if (VisitedPages.Count > 0)
-{
-    <p>Average page speed: @GetAveragePageSpeed() ms</p>
+<QuickGrid Items="@FilteredAndSearchedPages.AsQueryable()" Pagination="pagination">
+    <PropertyColumn Property="@(page => page.Url)" Sortable="true" />
+    <PropertyColumn Property="@(page => page.StatusCode)" Sortable="true" Title="Status Code" />
+    <PropertyColumn Property="@(page => page.ResponseTime)" Sortable="true" Title="TTFB" />
+    <PropertyColumn Property="@(page => page.DocumentParseTime)" Sortable="true" Title="Document Parse Time" />
+    <PropertyColumn Property="@(page => page.CombinedTime)" Sortable="true" Title="Total Time" />
+    <PropertyColumn Property="@(page => page.HttpVersion)" Sortable="true" Title="Http Version" />
+    <PropertyColumn Property="@(page => page.Type)" Sortable="true" Title="Resource Type"></PropertyColumn>
+</QuickGrid>
 
-    <label for="resourceFilter">Filter by Resource Type:</label>
-    <select id="resourceFilter" @bind="SelectedResourceType">
-        <option value="All">All</option>
-        <option value="Page">Page</option>
-        <option value="Script">Script</option>
-        <option value="Image">Image</option>
-        <option value="Resource">Resource</option>
-    </select>
-
-    <label for="searchInput">Search by URL:</label>
-    <input id="searchInput" type="text" @bind="SearchTerm" placeholder="Enter search term..." />
-
-    <QuickGrid Items="@FilteredAndSearchedPages.AsQueryable()" Pagination="pagination">
-        <PropertyColumn Property="@(page => page.Url)" Sortable="true" />
-        <TemplateColumn Title="Url">
-            <a href="@context.Url" target="_blank">@context.Url</a>
-        </TemplateColumn>
-        <PropertyColumn Property="@(page => page.StatusCode)" Sortable="true" Title="Status Code" />
-        <PropertyColumn Property="@(page => page.ResponseTime)" Sortable="true" Title="TTFB" />
-        <PropertyColumn Property="@(page => page.DocumentParseTime)" Sortable="true" Title="Document Parse Time" />
-        <PropertyColumn Property="@(page => page.CombinedTime)" Sortable="true" Title="Total Time" />
-        <PropertyColumn Property="@(page => page.HttpVersion)" Sortable="true" Title="Http Version" />
-        <PropertyColumn Property="@(page => page.Type)" Sortable="true" Title="Resource Type"></PropertyColumn>
-    </QuickGrid>
-
-    <Paginator State="pagination" />
-}
+<Paginator State="pagination" />
 
 @code {
     [Parameter]
@@ -63,6 +51,13 @@
         }
 
         return filteredPages;
+    }
+
+    private IEnumerable<ResourceType> GetAvailableResourceTypes()
+    {
+        return VisitedPages
+            .Select(page => page.Type)
+            .Distinct();
     }
 
     private long GetAveragePageSpeed()

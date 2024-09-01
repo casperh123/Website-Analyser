@@ -11,6 +11,7 @@ public record PageStats
     public long ResponseTime;
     public long DocumentParseTime;
     public long CombinedTime => ResponseTime + DocumentParseTime;
+    public int Size;
     public string HttpVersion { get; set; }
     public PageHeaders Headers = new PageHeaders();
     public ResourceType Type { get; set; }
@@ -52,6 +53,10 @@ public record PageStats
             mediaType.StartsWith("text/javascript", StringComparison.OrdinalIgnoreCase))
         {
             return ResourceType.Script;
+        }
+        if (mediaType.StartsWith("text/css", StringComparison.OrdinalIgnoreCase))
+        {
+            return ResourceType.Stylesheet;
         }
 
         // Add more content types as needed
