@@ -19,8 +19,8 @@ namespace BrokenLinkChecker.crawler
         {
             _httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
             CrawlerConfig = crawlerConfig ?? throw new ArgumentNullException(nameof(crawlerConfig));
-            _linkExtractor = new LinkExtractor(CrawlerConfig);
             CrawlResult = crawlResult ?? throw new ArgumentNullException(nameof(crawlResult));
+            _linkExtractor = new LinkExtractor(CrawlerConfig);
         }
 
         public async Task<List<PageStat>> CrawlWebsiteAsync(Uri url)
@@ -59,11 +59,9 @@ namespace BrokenLinkChecker.crawler
                 return;
             }
 
-            // Process the page if it hasn't been fully processed yet.
             List<Link> links = await GetLinksFromPage(url);
 
-            // Enqueue the found links for further processing.
-            foreach (var link in links.Where(link => !Utilities.IsAsyncOrFragmentRequest(link.Target)))
+            foreach (Link link in links.Where(link => !Utilities.IsAsyncOrFragmentRequest(link.Target)))
             {
                 linksFound.Enqueue(link);
             }
@@ -101,9 +99,9 @@ namespace BrokenLinkChecker.crawler
         {
             if (response.IsSuccessStatusCode)
             {
-                var (links, parseTime) = await Utilities.BenchmarkAsync(() => _linkExtractor.GetLinksFromResponseAsync(response, url));
+                (List<Link> links, long parseTime) = await Utilities.BenchmarkAsync(() => _linkExtractor.GetLinksFromResponseAsync(response, url));
 
-                var pageStat = new PageStat(url.Target, response, requestTime, parseTime);
+                PageStat pageStat = new PageStat(url.Target, response, url.Type, requestTime, parseTime);
                 CrawlResult.AddVisitedPage(pageStat);
 
                 return links;
@@ -111,7 +109,7 @@ namespace BrokenLinkChecker.crawler
 
             HandleBrokenLink(url, response);
 
-            return new List<Link>();
+            return [];
         }
 
         private void HandleBrokenLink(Link url, HttpResponseMessage response)

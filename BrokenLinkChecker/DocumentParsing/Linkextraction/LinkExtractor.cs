@@ -22,7 +22,7 @@ namespace BrokenLinkChecker.DocumentParsing.Linkextraction
         {
             if (!IsHtmlContent(response))
             {
-                return new List<Link>();
+                return [];
             }
 
             await using Stream document = await response.Content.ReadAsStreamAsync();
@@ -38,7 +38,7 @@ namespace BrokenLinkChecker.DocumentParsing.Linkextraction
 
         private async Task<List<Link>> ExtractLinksFromDocumentAsync(Stream document, Link checkingUrl)
         {
-            List<Link> links = new List<Link>();
+            List<Link> links = [];
             IDocument doc;
             Uri thisUrl = new Uri(checkingUrl.Target);
 
@@ -47,7 +47,7 @@ namespace BrokenLinkChecker.DocumentParsing.Linkextraction
                 doc = await pooledHtmlParser.Parser.ParseDocumentAsync(document);
             }
             
-            foreach (var stylesheet in doc.StyleSheets)
+            foreach (IStyleSheet stylesheet in doc.StyleSheets)
             {
                 string href = stylesheet.Href;
                 if (!string.IsNullOrEmpty(href))

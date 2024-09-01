@@ -25,7 +25,7 @@ public record PageStat
         DocumentParseTime = documentParseTime;
     }
     
-    public PageStat(string url, HttpResponseMessage response, long requestTime = 0, long parseTime = 0)
+    public PageStat(string url, HttpResponseMessage response, ResourceType type, long requestTime = 0, long parseTime = 0)
     {
         Url = url;
         ResponseTime = requestTime;
@@ -35,35 +35,6 @@ public record PageStat
         StatusCode = response.StatusCode;
         HttpVersion = response.Version.ToString();
         Headers = new PageHeaders(response.Headers, response.Content.Headers);
-        Type = DetermineResourceType(response.Content.Headers.ContentType?.MediaType);
-    }
-
-    public void AddMetrics(HttpResponseMessage response, long requestTime = 0, long parseTime = 0)
-    {
-        ResponseTime = requestTime;
-        DocumentParseTime = parseTime;
-        Size = response.Content.Headers.ContentLength ?? 0;
-        SizeKb = Size / 1024f;
-        StatusCode = response.StatusCode;
-        HttpVersion = response.Version.ToString();
-        Headers = new PageHeaders(response.Headers, response.Content.Headers);
-        Type = DetermineResourceType(response.Content.Headers.ContentType?.MediaType);
-    }
-
-    private static ResourceType DetermineResourceType(string? mediaType)
-    {
-        if (string.IsNullOrEmpty(mediaType))
-        {
-            return ResourceType.Resource;
-        }
-
-        return mediaType.ToLowerInvariant() switch
-        {
-            { } m when m.StartsWith("text/html") => ResourceType.Page,
-            { } m when m.StartsWith("image/") => ResourceType.Image,
-            { } m when m.StartsWith("application/javascript") || m.StartsWith("text/javascript") => ResourceType.Script,
-            { } m when m.StartsWith("text/css") => ResourceType.Stylesheet,
-            _ => ResourceType.Resource
-        };
+        Type = type;
     }
 }
