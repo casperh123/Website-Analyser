@@ -1,7 +1,6 @@
-@using System.Collections.Concurrent
 @using BrokenLinkChecker.models
-@using Microsoft.AspNetCore.Mvc.RazorPages
 @using Microsoft.AspNetCore.Components.QuickGrid
+@using BrokenLinkChecker.web.Components.Cards
 
 <h3>Page Headers</h3>
 
@@ -9,20 +8,20 @@
 {
     <QuickGrid Items="@VisitedPages.AsQueryable()" Pagination="pagination">
         <PropertyColumn Property="@(page => page.Url)" Sortable="true" />
-        <PropertyColumn Property="@(page => page.Headers.ContentEncoding)" Sortable="true"/>
-        <PropertyColumn Property="@(page => page.Headers.Server)" Sortable="true"/>
-        <PropertyColumn Property="@(page => page.Headers.CacheStatus)" Sortable="true" />
-        <PropertyColumn Property="@(page => page.Headers.CacheControl)" Sortable="true"></PropertyColumn>
+        <PropertyColumn Property="@(page => page.Headers.ContentEncoding)" Sortable="true" />
+        <PropertyColumn Property="@(page => page.Headers.Server)" Sortable="true" />
+        <TemplateColumn Title="Cache" Sortable="true">
+            <CollapsableCacheCard Cache="context.Headers.Cache"></CollapsableCacheCard>
+        </TemplateColumn>
         <PropertyColumn Property="@(page => page.Headers.LastModified)" Sortable="true" />
     </QuickGrid>
-    
+
     <Paginator State="pagination"/>
 }
 
 @code {
-
-    [Parameter] 
+    [Parameter]
     public ICollection<PageStats> VisitedPages { get; set; }
 
-    PaginationState pagination = new () { ItemsPerPage = 20 };
+    PaginationState pagination = new() { ItemsPerPage = 20 };
 }

@@ -3,7 +3,6 @@
 @using BrokenLinkChecker.models
 @using BrokenLinkChecker.web.Components.WebsiteMetrics
 @using BrokenLinkChecker.web.Components.WebsiteInputs
-@inject HttpClient HttpClient
 @rendermode InteractiveServer
 
 <h2>Website Analyser</h2>
@@ -34,7 +33,7 @@
         @switch (_currentStatus)
         {
             case PageStatState.DisplayPerformance:
-                <PerformanceStats VisitedPages="@VisitedPages.AsQueryable()"/>
+                <PerformanceStats VisitedPages="@VisitedPages"/>
                 break;
             case PageStatState.DisplayBrokenLinks:
                 <BrokenLinksStats BrokenLinks="@BrokenLinks"/>
@@ -50,14 +49,15 @@
 }
 
 @code {
-    public ICollection<BrokenLink> BrokenLinks { get; set; } = [];
-    public ICollection<PageStats> VisitedPages { get; set; } = [];
-    
+    [Inject] 
+    private IHttpClientFactory HttpClientFactory { get; set; }
     private bool IsChecking { get; set; }
-
     private int _linksChecked;
     private int _linksEnqueued;
     private int _concurrentRequests = 1;
+    
+    public ICollection<BrokenLink> BrokenLinks { get; set; } = [];
+    public ICollection<PageStats> VisitedPages { get; set; } = [];
 
     private PageStatState _currentStatus = PageStatState.DisplayBrokenLinks;
 
@@ -67,7 +67,8 @@
         BrokenLinks = new List<BrokenLink>();
 
         CrawlerConfig crawlerState = new CrawlerConfig(_concurrentRequests);
-        Crawler crawler = new Crawler(HttpClient, crawlerState)
+        
+        CrawlResult crawlResult = new CrawlResult()
         {
             OnLinksEnqueued = (count) =>
             {
@@ -90,6 +91,8 @@
                 InvokeAsync(StateHasChanged);
             }
         };
+        
+        Crawler crawler = new Crawler(HttpClientFactory.CreateClient("WebsiteAnalyser"), crawlerState, crawlResult);
 
         VisitedPages = await crawler.CrawlWebsiteAsync(url);
         IsChecking = false;
@@ -111,14 +114,11 @@
         {
             _concurrentRequests = 1;
         }
-        else if (newConcurrentRequests > 100)
-        {
-            _concurrentRequests = 100;
-        }
         else
         {
             _concurrentRequests = newConcurrentRequests;
         }
+        
     }
 
 }

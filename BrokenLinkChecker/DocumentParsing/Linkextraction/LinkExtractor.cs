@@ -1,76 +1,110 @@
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Net.Http;
-using System.Threading.Tasks;
 using AngleSharp.Dom;
+using AngleSharp.Html.Dom;
 using AngleSharp.Html.Parser;
 using BrokenLinkChecker.crawler;
 using BrokenLinkChecker.DocumentParsing.Browsing;
 using BrokenLinkChecker.models;
 using BrokenLinkChecker.utility;
 
-namespace BrokenLinkChecker.DocumentParsing.Linkextraction;
-
-public class LinkExtractor
+namespace BrokenLinkChecker.DocumentParsing.Linkextraction
 {
-    private HtmlParserPool _htmlParserPool;
+    public class LinkExtractor
+    {
+        private HtmlParserPool _htmlParserPool;
 
-    public LinkExtractor(CrawlerConfig crawlerConfig)
-    {
-        HtmlParserOptions htmlParsingOptions = new HtmlParserOptions { IsKeepingSourceReferences = true };
-        
-        _htmlParserPool = new HtmlParserPool(htmlParsingOptions, crawlerConfig.ConcurrentRequests);
-    }
-    
-    public async Task<List<LinkNode>> GetLinksFromResponseAsync(HttpResponseMessage response, LinkNode url)
-    {
-        if (!IsHtmlContent(response))
+        public LinkExtractor(CrawlerConfig crawlerConfig)
         {
-            return [];
+            HtmlParserOptions htmlParsingOptions = new HtmlParserOptions { IsKeepingSourceReferences = true };
+            _htmlParserPool = new HtmlParserPool(htmlParsingOptions, crawlerConfig.ConcurrentRequests);
         }
 
-        await using Stream document = await response.Content.ReadAsStreamAsync();
-        
-        return await ExtractLinksFromDocumentAsync(document, url);
-    }
-
-    private bool IsHtmlContent(HttpResponseMessage response)
-    {
-        string? contentType = response.Content.Headers.ContentType?.MediaType;
-        return contentType != null && contentType.Equals("text/html", StringComparison.OrdinalIgnoreCase);
-    }
-
-    private async Task<List<LinkNode>> ExtractLinksFromDocumentAsync(Stream document, LinkNode checkingUrl)
-    {
-        List<LinkNode> links = [];
-        IDocument doc;
-        Uri thisUrl = new Uri(checkingUrl.Target);
-        
-        using (PooledHtmlParser pooledHtmlParser = await _htmlParserPool.GetParserAsync())
+        public async Task<List<Link>> GetLinksFromResponseAsync(HttpResponseMessage response, Link url)
         {
-            doc = await pooledHtmlParser.Parser.ParseDocumentAsync(document);
-        }
-        
-        foreach (IElement link in doc.QuerySelectorAll("a[href]"))
-        {
-            LinkNode newLink = GenerateLinkNode(link, checkingUrl.Target);
-            if (Uri.TryCreate(newLink.Target, UriKind.Absolute, out Uri uri) && uri.Host == thisUrl.Host)
+            if (!IsHtmlContent(response))
             {
-                links.Add(newLink);
+                return new List<Link>();
             }
+
+            await using Stream document = await response.Content.ReadAsStreamAsync();
+
+            return await ExtractLinksFromDocumentAsync(document, url);
         }
-        
-        return links;
-    }
 
-    private LinkNode GenerateLinkNode(IElement link, string target)
-    {
-        string href = link.GetAttribute("href") ?? string.Empty;
-        string resolvedUrl = Utilities.GetUrl(target, href);  // Utilities.GetUrl should handle exceptions and return href as fallback
-        string text = link.TextContent;
-        int line = link.SourceReference?.Position.Line ?? -1;
+        private bool IsHtmlContent(HttpResponseMessage response)
+        {
+            string? contentType = response.Content.Headers.ContentType?.MediaType;
+            return contentType != null && contentType.Equals("text/html", StringComparison.OrdinalIgnoreCase);
+        }
 
-        return new LinkNode(target, resolvedUrl, text, line);
+        private async Task<List<Link>> ExtractLinksFromDocumentAsync(Stream document, Link checkingUrl)
+        {
+            List<Link> links = new List<Link>();
+            IDocument doc;
+            Uri thisUrl = new Uri(checkingUrl.Target);
+
+            using (PooledHtmlParser pooledHtmlParser = await _htmlParserPool.GetParserAsync())
+            {
+                doc = await pooledHtmlParser.Parser.ParseDocumentAsync(document);
+            }
+            
+            // Extract links from stylesheets
+            foreach (var stylesheet in doc.StyleSheets)
+            {
+                string href = stylesheet.Href;
+                if (!string.IsNullOrEmpty(href))
+                {
+                    Link newLink = GenerateLinkNode(stylesheet.OwnerNode, checkingUrl.Target, "href");
+                    links.Add(newLink);
+                }
+            }
+
+            // Extract links from scripts
+            foreach (var script in doc.Scripts)
+            {
+                string? src = script.Source;
+                if (!string.IsNullOrEmpty(src))
+                {
+                    Link newLink = GenerateLinkNode(script, checkingUrl.Target, "src");
+                    links.Add(newLink);
+                }
+            }
+
+            // Extract links from images
+            foreach (IHtmlImageElement image in doc.Images)
+            {
+                string? src = image.Source;
+                if (!string.IsNullOrEmpty(src))
+                {
+                    Link newLink = GenerateLinkNode(image, checkingUrl.Target, "src");
+                    links.Add(newLink);
+                }
+            }
+
+            // Extract anchor links
+            foreach (IElement link in doc.Links)
+            {
+                string? href = link.GetAttribute("href");
+                if (!string.IsNullOrEmpty(href))
+                {
+                    Link newLink = GenerateLinkNode(link, checkingUrl.Target, "href");
+                    links.Add(newLink);
+                }
+            }
+
+            // Optionally, filter out links that are external to the host
+            links = links.Where(link => Uri.TryCreate(link.Target, UriKind.Absolute, out Uri uri) && uri.Host == thisUrl.Host).ToList();
+
+            return links;
+        }
+
+        private Link GenerateLinkNode(IElement element, string target, string attribute)
+        {
+            string href = element.GetAttribute(attribute) ?? string.Empty;
+            string resolvedUrl = Utilities.GetUrl(target, href);
+            string text = element.TextContent;
+            int line = element.SourceReference?.Position.Line ?? -1;
+
+            return new Link(target, resolvedUrl, text, line);
+        }
     }
 }

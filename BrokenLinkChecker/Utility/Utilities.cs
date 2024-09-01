@@ -1,9 +1,7 @@
 using System;
 using System.Diagnostics;
-using System.Linq;
-using System.Net.Http;
-using System.Threading.Tasks;
-using BrokenLinkChecker.models;
+
+using BrokenLinkChecker.Models.Headers;
 
 namespace BrokenLinkChecker.utility;
 
@@ -22,13 +20,28 @@ public static class Utilities
     
     public static bool IsAsyncOrFragmentRequest(string url)
     {
-        string[] asyncKeywords = { "ajax", "async", "action=async" };
+        // File extensions that should not be classified as async or fragment
+        string[] excludedExtensions = { ".js", ".css" };
 
+        // Parse the URL to extract the path without query parameters
+        if (Uri.TryCreate(url, UriKind.Absolute, out Uri uri))
+        {
+            string path = uri.LocalPath;
+
+            // Check if the path ends with any of the excluded extensions
+            if (excludedExtensions.Any(extension => path.EndsWith(extension, StringComparison.OrdinalIgnoreCase)))
+            {
+                return false;
+            }
+        }
+
+        // Check for async-related keywords or fragment/query parts in the URL
+        string[] asyncKeywords = { "ajax", "async", "action=async" };
         if (asyncKeywords.Any(keyword => url.Contains(keyword, StringComparison.OrdinalIgnoreCase)))
         {
             return true;
         }
-        
+            
         return url.Contains('#') || url.Contains('?');
     }
     
@@ -39,19 +52,5 @@ public static class Utilities
         T result = await function.Invoke();
 
         return (result, stopwatch.ElapsedMilliseconds);
-    }
-    
-    public static PageHeaders AddRequestHeaders(HttpResponseMessage response)
-    {
-        if (response == null) throw new ArgumentNullException(nameof(response));
-
-        return new PageHeaders
-        {
-            CacheControl = response.Headers.CacheControl?.ToString() ?? "",
-            CacheStatus = response.Headers.TryGetValues("x-cache", out var cacheStatus) ? string.Join(", ", cacheStatus) : "",
-            ContentEncoding = response.Content.Headers.ContentEncoding?.FirstOrDefault() ?? "",
-            LastModified = response.Content.Headers.LastModified?.ToString() ?? "",
-            Server = response.Headers.Server?.ToString() ?? ""
-        };
     }
 }
