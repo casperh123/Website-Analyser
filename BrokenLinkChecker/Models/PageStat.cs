@@ -4,7 +4,7 @@ using BrokenLinkChecker.utility;
 
 namespace BrokenLinkChecker.models;
 
-public record PageStats
+public record PageStat
 {
     public string Url { get; init; }
     public HttpStatusCode StatusCode { get; private set; }
@@ -17,12 +17,25 @@ public record PageStats
     public PageHeaders Headers { get; private set; } = new PageHeaders();
     public ResourceType Type { get; private set; }
 
-    public PageStats(string url, HttpStatusCode statusCode, long responseTime = 0, long documentParseTime = 0)
+    public PageStat(string url, HttpStatusCode statusCode, long responseTime = 0, long documentParseTime = 0)
     {
         Url = url;
         StatusCode = statusCode;
         ResponseTime = responseTime;
         DocumentParseTime = documentParseTime;
+    }
+    
+    public PageStat(string url, HttpResponseMessage response, long requestTime = 0, long parseTime = 0)
+    {
+        Url = url;
+        ResponseTime = requestTime;
+        DocumentParseTime = parseTime;
+        Size = response.Content.Headers.ContentLength ?? 0;
+        SizeKb = Size / 1024f;
+        StatusCode = response.StatusCode;
+        HttpVersion = response.Version.ToString();
+        Headers = new PageHeaders(response.Headers, response.Content.Headers);
+        Type = DetermineResourceType(response.Content.Headers.ContentType?.MediaType);
     }
 
     public void AddMetrics(HttpResponseMessage response, long requestTime = 0, long parseTime = 0)

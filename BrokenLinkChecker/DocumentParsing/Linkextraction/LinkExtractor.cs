@@ -47,13 +47,12 @@ namespace BrokenLinkChecker.DocumentParsing.Linkextraction
                 doc = await pooledHtmlParser.Parser.ParseDocumentAsync(document);
             }
             
-            // Extract links from stylesheets
             foreach (var stylesheet in doc.StyleSheets)
             {
                 string href = stylesheet.Href;
                 if (!string.IsNullOrEmpty(href))
                 {
-                    Link newLink = GenerateLinkNode(stylesheet.OwnerNode, checkingUrl.Target, "href");
+                    Link newLink = GenerateLinkNode(stylesheet.OwnerNode, checkingUrl.Target, "href", ResourceType.Stylesheet);
                     links.Add(newLink);
                 }
             }
@@ -64,7 +63,7 @@ namespace BrokenLinkChecker.DocumentParsing.Linkextraction
                 string? src = script.Source;
                 if (!string.IsNullOrEmpty(src))
                 {
-                    Link newLink = GenerateLinkNode(script, checkingUrl.Target, "src");
+                    Link newLink = GenerateLinkNode(script, checkingUrl.Target, "src", ResourceType.Script);
                     links.Add(newLink);
                 }
             }
@@ -75,7 +74,7 @@ namespace BrokenLinkChecker.DocumentParsing.Linkextraction
                 string? src = image.Source;
                 if (!string.IsNullOrEmpty(src))
                 {
-                    Link newLink = GenerateLinkNode(image, checkingUrl.Target, "src");
+                    Link newLink = GenerateLinkNode(image, checkingUrl.Target, "src", ResourceType.Image);
                     links.Add(newLink);
                 }
             }
@@ -86,7 +85,7 @@ namespace BrokenLinkChecker.DocumentParsing.Linkextraction
                 string? href = link.GetAttribute("href");
                 if (!string.IsNullOrEmpty(href))
                 {
-                    Link newLink = GenerateLinkNode(link, checkingUrl.Target, "href");
+                    Link newLink = GenerateLinkNode(link, checkingUrl.Target, "href", ResourceType.Page);
                     links.Add(newLink);
                 }
             }
@@ -97,14 +96,14 @@ namespace BrokenLinkChecker.DocumentParsing.Linkextraction
             return links;
         }
 
-        private Link GenerateLinkNode(IElement element, string target, string attribute)
+        private Link GenerateLinkNode(IElement element, string target, string attribute, ResourceType resourceType = ResourceType.Resource)
         {
             string href = element.GetAttribute(attribute) ?? string.Empty;
             string resolvedUrl = Utilities.GetUrl(target, href);
             string text = element.TextContent;
             int line = element.SourceReference?.Position.Line ?? -1;
 
-            return new Link(target, resolvedUrl, text, line);
+            return new Link(target, resolvedUrl, text, line, resourceType);
         }
     }
 }

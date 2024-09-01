@@ -57,7 +57,7 @@
     private int _concurrentRequests = 1;
     
     public ICollection<BrokenLink> BrokenLinks { get; set; } = [];
-    public ICollection<PageStats> VisitedPages { get; set; } = [];
+    public ICollection<PageStat> VisitedPages { get; set; } = [];
 
     private PageStatState _currentStatus = PageStatState.DisplayBrokenLinks;
 
