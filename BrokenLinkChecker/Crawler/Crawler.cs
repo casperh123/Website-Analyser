@@ -59,7 +59,7 @@ namespace BrokenLinkChecker.crawler
                 return;
             }
 
-            List<Link> links = await GetLinksFromPage(url);
+            List<Link> links = await RequestAndProcessPage(url);
 
             foreach (Link link in links.Where(link => !Utilities.IsAsyncOrFragmentRequest(link.Target)))
             {
@@ -67,14 +67,6 @@ namespace BrokenLinkChecker.crawler
             }
 
             CrawlResult.IncrementLinksChecked();
-        }
-
-
-
-        private async Task<List<Link>> GetLinksFromPage(Link url)
-        {
-            List<Link> linkList = await RequestAndProcessPage(url);
-            return linkList;
         }
 
         private async Task<List<Link>> RequestAndProcessPage(Link url)
@@ -97,19 +89,18 @@ namespace BrokenLinkChecker.crawler
         
         private async Task<List<Link>> ProcessResponse(HttpResponseMessage response, Link url, long requestTime)
         {
-            if (response.IsSuccessStatusCode)
+            if(!response.IsSuccessStatusCode)
             {
-                (List<Link> links, long parseTime) = await Utilities.BenchmarkAsync(() => _linkExtractor.GetLinksFromResponseAsync(response, url));
-
-                PageStat pageStat = new PageStat(url.Target, response, url.Type, requestTime, parseTime);
-                CrawlResult.AddResource(pageStat);
-
-                return links;
+                HandleBrokenLink(url, response);
+                return [];
             }
+    
+            (List<Link> links, long parseTime) = await Utilities.BenchmarkAsync(() => _linkExtractor.GetLinksFromResponseAsync(response, url));
 
-            HandleBrokenLink(url, response);
+            PageStat pageStat = new PageStat(url.Target, response, url.Type, requestTime, parseTime);
+            CrawlResult.AddResource(pageStat);
 
-            return [];
+            return links;
         }
 
         private void HandleBrokenLink(Link url, HttpResponseMessage response)
