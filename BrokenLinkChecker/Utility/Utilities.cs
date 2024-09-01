@@ -42,7 +42,7 @@ public static class Utilities
             return true;
         }
             
-        return url.Contains('#') || url.Contains('?');
+        return url.Contains('#') || url.Contains('?') || url.Contains("mailto");
     }
     
     public static async Task<(T, long)> BenchmarkAsync<T>(Func<Task<T>> function)

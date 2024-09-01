@@ -13,9 +13,7 @@
             <a href="@context.ReferringPage" target="_blank">@context.ReferringPage</a>
         </TemplateColumn>
         <PropertyColumn Property="@(link => link.AnchorText)" Title="Anchor Text" Sortable="true"/>
-        <TemplateColumn Title="Line">
-            <a href="view-source:@context.Url"></a>
-        </TemplateColumn>
+        <PropertyColumn Property="@(link => link.Line)"/>
         <PropertyColumn Property="@(link => link.StatusCode)" Title="Status Code" Sortable="true"/>
     </QuickGrid>
     

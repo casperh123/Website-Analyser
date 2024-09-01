@@ -10,7 +10,7 @@ namespace BrokenLinkChecker.DocumentParsing.Linkextraction
 {
     public class LinkExtractor
     {
-        private HtmlParserPool _htmlParserPool;
+        private readonly HtmlParserPool _htmlParserPool;
 
         public LinkExtractor(CrawlerConfig crawlerConfig)
         {
@@ -20,7 +20,7 @@ namespace BrokenLinkChecker.DocumentParsing.Linkextraction
 
         public async Task<List<Link>> GetLinksFromResponseAsync(HttpResponseMessage response, Link url)
         {
-            if (!IsHtmlContent(response))
+            if (url.Type is not ResourceType.Page)
             {
                 return [];
             }
@@ -28,12 +28,6 @@ namespace BrokenLinkChecker.DocumentParsing.Linkextraction
             await using Stream document = await response.Content.ReadAsStreamAsync();
 
             return await ExtractLinksFromDocumentAsync(document, url);
-        }
-
-        private bool IsHtmlContent(HttpResponseMessage response)
-        {
-            string? contentType = response.Content.Headers.ContentType?.MediaType;
-            return contentType != null && contentType.Equals("text/html", StringComparison.OrdinalIgnoreCase);
         }
 
         private async Task<List<Link>> ExtractLinksFromDocumentAsync(Stream document, Link checkingUrl)
@@ -90,7 +84,6 @@ namespace BrokenLinkChecker.DocumentParsing.Linkextraction
                 }
             }
 
-            // Optionally, filter out links that are external to the host
             links = links.Where(link => Uri.TryCreate(link.Target, UriKind.Absolute, out Uri uri) && uri.Host == thisUrl.Host).ToList();
 
             return links;
