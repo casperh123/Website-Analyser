@@ -20,7 +20,7 @@ namespace BrokenLinkChecker.crawler
             OnBrokenLinks?.Invoke(BrokenLinks);
         }
 
-        public void AddVisitedPage(PageStat pageStats)
+        public void AddResource(PageStat pageStats)
         {
             VisitedPages.Add(pageStats);
             OnPageVisited?.Invoke(VisitedPages);

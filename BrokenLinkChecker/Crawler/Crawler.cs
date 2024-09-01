@@ -52,7 +52,7 @@ namespace BrokenLinkChecker.crawler
         {
             if (!_visitedResources.TryAdd(url.Target, HttpStatusCode.Unused))
             {
-                if (_visitedResources[url.Target] is HttpStatusCode status && status != HttpStatusCode.OK && status != HttpStatusCode.Forbidden)
+                if (_visitedResources[url.Target] is HttpStatusCode status && status == HttpStatusCode.NotFound || status == HttpStatusCode.InternalServerError)
                 {
                     CrawlResult.AddBrokenLink(new BrokenLink(url, status));
                 }
@@ -102,7 +102,7 @@ namespace BrokenLinkChecker.crawler
                 (List<Link> links, long parseTime) = await Utilities.BenchmarkAsync(() => _linkExtractor.GetLinksFromResponseAsync(response, url));
 
                 PageStat pageStat = new PageStat(url.Target, response, url.Type, requestTime, parseTime);
-                CrawlResult.AddVisitedPage(pageStat);
+                CrawlResult.AddResource(pageStat);
 
                 return links;
             }
