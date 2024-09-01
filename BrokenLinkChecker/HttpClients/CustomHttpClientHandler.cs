@@ -34,15 +34,25 @@ public class CustomHttpClientHandler : HttpClientHandler
             decompressedStream = new BrotliStream(originalStream, CompressionMode.Decompress);
         }
 
-        StreamContent newContent = new StreamContent(decompressedStream);
+        // Copy the decompressed stream into a MemoryStream to calculate its length
+        MemoryStream memoryStream = new MemoryStream();
+        await decompressedStream.CopyToAsync(memoryStream, cancellationToken);
+
+        // Reset the memoryStream position to the beginning
+        memoryStream.Position = 0;
+
+        StreamContent newContent = new StreamContent(memoryStream);
         
+        // Copy the headers from the original content
         foreach (var header in response.Content.Headers)
         {
             newContent.Headers.TryAddWithoutValidation(header.Key, header.Value);
         }
-
-        response.Content = newContent;
         
+        newContent.Headers.ContentLength = memoryStream.Length;
+        
+        response.Content = newContent;
+
         return response;
     }
 }

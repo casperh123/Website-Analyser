@@ -4,20 +4,11 @@ namespace BrokenLinkChecker.models;
 
 public class BrokenLink
 {
-    public string Url { get; set; }
-    public string ReferringPage { get; set; }
-    public string AnchorText { get; set; }
-    public int Line { get; set; }
-    public int StatusCode { get; set; }
-
-    public BrokenLink(string url, string referringPage, string anchorText, int line, int statusCode)
-    {
-        Url = url;
-        ReferringPage = referringPage;
-        AnchorText = anchorText;
-        Line = line;
-        StatusCode = statusCode;
-    }
+    public string Url { get; }
+    public string ReferringPage { get; }
+    public string AnchorText { get; }
+    public int Line { get; }
+    public int StatusCode { get; }
 
     public BrokenLink(Link url, HttpStatusCode statuscode)
     {

@@ -6,15 +6,16 @@ namespace BrokenLinkChecker.models;
 
 public record PageStats
 {
-    public string Url;
-    public HttpStatusCode StatusCode;
-    public long ResponseTime;
-    public long DocumentParseTime;
+    public string Url { get; init; }
+    public HttpStatusCode StatusCode { get; private set; }
+    public long ResponseTime { get; private set; }
+    public long DocumentParseTime { get; private set; }
     public long CombinedTime => ResponseTime + DocumentParseTime;
-    public int Size;
-    public string HttpVersion { get; set; }
-    public PageHeaders Headers = new PageHeaders();
-    public ResourceType Type { get; set; }
+    public long Size { get; private set; }
+    public float SizeKb { get; private set; }
+    public string HttpVersion { get; private set; } = string.Empty;
+    public PageHeaders Headers { get; private set; } = new PageHeaders();
+    public ResourceType Type { get; private set; }
 
     public PageStats(string url, HttpStatusCode statusCode, long responseTime = 0, long documentParseTime = 0)
     {
@@ -23,43 +24,33 @@ public record PageStats
         ResponseTime = responseTime;
         DocumentParseTime = documentParseTime;
     }
-    
+
     public void AddMetrics(HttpResponseMessage response, long requestTime = 0, long parseTime = 0)
     {
         ResponseTime = requestTime;
         DocumentParseTime = parseTime;
+        Size = response.Content.Headers.ContentLength ?? 0;
+        SizeKb = Size / 1024f;
         StatusCode = response.StatusCode;
         HttpVersion = response.Version.ToString();
         Headers = new PageHeaders(response.Headers, response.Content.Headers);
         Type = DetermineResourceType(response.Content.Headers.ContentType?.MediaType);
     }
 
-    private ResourceType DetermineResourceType(string? mediaType)
+    private static ResourceType DetermineResourceType(string? mediaType)
     {
         if (string.IsNullOrEmpty(mediaType))
         {
-            return ResourceType.Resource; // Default to general resource if content type is unknown
+            return ResourceType.Resource;
         }
 
-        if (mediaType.StartsWith("text/html", StringComparison.OrdinalIgnoreCase))
+        return mediaType.ToLowerInvariant() switch
         {
-            return ResourceType.Page;
-        }
-        if (mediaType.StartsWith("image/", StringComparison.OrdinalIgnoreCase))
-        {
-            return ResourceType.Image;
-        }
-        if (mediaType.StartsWith("application/javascript", StringComparison.OrdinalIgnoreCase) ||
-            mediaType.StartsWith("text/javascript", StringComparison.OrdinalIgnoreCase))
-        {
-            return ResourceType.Script;
-        }
-        if (mediaType.StartsWith("text/css", StringComparison.OrdinalIgnoreCase))
-        {
-            return ResourceType.Stylesheet;
-        }
-
-        // Add more content types as needed
-        return ResourceType.Resource; // Fallback to generic resource
+            { } m when m.StartsWith("text/html") => ResourceType.Page,
+            { } m when m.StartsWith("image/") => ResourceType.Image,
+            { } m when m.StartsWith("application/javascript") || m.StartsWith("text/javascript") => ResourceType.Script,
+            { } m when m.StartsWith("text/css") => ResourceType.Stylesheet,
+            _ => ResourceType.Resource
+        };
     }
 }
