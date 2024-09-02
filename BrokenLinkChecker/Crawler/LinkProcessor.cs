@@ -5,12 +5,11 @@ using BrokenLinkChecker.utility;
 
 namespace BrokenLinkChecker.crawler;
 
-public class LinkProcessor(LinkExtractor linkExtractor, CrawlerConfig _crawlerConfig)
+public class LinkProcessor(CrawlerConfig crawlerConfig)
 {
-    private LinkExtractor _linkExtractor;
-    private CrawlerConfig _crawlerConfig;
+    private LinkExtractor _linkExtractor = new LinkExtractor(crawlerConfig);
         
-    private async Task<IEnumerable<Link>> GetLinksFromResponse(HttpResponseMessage response, Link url, long requestTime)
+    public async Task<IEnumerable<Link>> GetLinksFromResponse(HttpResponseMessage response, Link url)
     {
         if(!response.IsSuccessStatusCode)
         {
@@ -19,10 +18,10 @@ public class LinkProcessor(LinkExtractor linkExtractor, CrawlerConfig _crawlerCo
     
         List<Link> links = await _linkExtractor.GetLinksFromResponseAsync(response, url);
         
-        return links.Where(link => ShouldScrapeLink(link.Target));
+        return links.Where(link => !IsExcluded(link.Target));
     }
     
-    public static bool ShouldScrapeLink(string url)
+    private static bool IsExcluded(string url)
     {
         string[] excludedExtensions = { ".js", ".css" };
 

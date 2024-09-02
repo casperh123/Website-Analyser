@@ -22,6 +22,7 @@ namespace BrokenLinkChecker.DocumentParsing.Linkextraction
         {
             if (url.Type is not ResourceType.Page)
             {
+                byte[] responseContent = await response.Content.ReadAsByteArrayAsync();
                 return [];
             }
 

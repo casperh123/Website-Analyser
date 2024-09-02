@@ -1,6 +1,5 @@
 using System.Collections.Concurrent;
 using System.Net;
-using BrokenLinkChecker.DocumentParsing.Linkextraction;
 using BrokenLinkChecker.models;
 using BrokenLinkChecker.Networking;
 using BrokenLinkChecker.utility;
@@ -10,7 +9,7 @@ namespace BrokenLinkChecker.crawler
     public class Crawler
     {
         private readonly HttpRequestHandler _requestHandler;
-        private readonly LinkExtractor _linkExtractor;
+        private readonly LinkProcessor _linkProcessor;
         private readonly ConcurrentDictionary<string, HttpStatusCode> _visitedResources = new();
         
         private CrawlerConfig CrawlerConfig { get; }
@@ -19,9 +18,9 @@ namespace BrokenLinkChecker.crawler
         public Crawler(HttpClient httpClient, CrawlerConfig crawlerConfig, CrawlResult crawlResult)
         { 
             _requestHandler = new HttpRequestHandler(httpClient, crawlerConfig);
-            CrawlerConfig = crawlerConfig ?? throw new ArgumentNullException(nameof(crawlerConfig));
-            CrawlResult = crawlResult ?? throw new ArgumentNullException(nameof(crawlResult));
-            _linkExtractor = new LinkExtractor(CrawlerConfig);
+            CrawlerConfig = crawlerConfig;
+            CrawlResult = crawlResult;
+            _linkProcessor = new LinkProcessor(CrawlerConfig);
         }
 
         public async Task<List<PageStat>> CrawlWebsiteAsync(Uri url)
@@ -72,13 +71,12 @@ namespace BrokenLinkChecker.crawler
 
         private async Task<IEnumerable<Link>> RequestAndProcessPage(Link url)
         {
-            
             try
             {
                 await CrawlerConfig.Semaphore.WaitAsync();
 
                 (HttpResponseMessage response, long requestTime) = await Utilities.BenchmarkAsync(() => _requestHandler.RequestPageAsync(url));
-
+                
                 _visitedResources[url.Target] = response.StatusCode;
 
                 return await ProcessResponse(response, url, requestTime);
@@ -91,18 +89,12 @@ namespace BrokenLinkChecker.crawler
         
         private async Task<IEnumerable<Link>> ProcessResponse(HttpResponseMessage response, Link url, long requestTime)
         {
-            if(!response.IsSuccessStatusCode)
-            {
-                CrawlResult.HandleBrokenLink(url, response);
-                return [];
-            }
-    
-            (List<Link> links, long parseTime) = await Utilities.BenchmarkAsync(() => _linkExtractor.GetLinksFromResponseAsync(response, url));
+            (IEnumerable<Link> links, long parseTime) = await Utilities.BenchmarkAsync(() => _linkProcessor.GetLinksFromResponse(response, url));
 
             PageStat pageStat = new PageStat(url.Target, response, url.Type, requestTime, parseTime);
             CrawlResult.AddResource(pageStat);
 
-            return links.Where(link => !Utilities.IsAsyncOrFragmentRequest(link.Target));
+            return links;
         }
     }
 }
