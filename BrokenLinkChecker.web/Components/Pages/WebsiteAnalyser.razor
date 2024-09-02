@@ -7,12 +7,12 @@
 
 <h2>Website Analyser</h2>
 
-<WebsiteInput UriHasChanged="@CheckBrokenLinks"></WebsiteInput>
+<WebsiteInput UriHasChanged="CheckBrokenLinks"></WebsiteInput>
 
 <div class="concurrency-input">
     <label for="concurrencyInput" class="margin-bottom-m center-text">Concurrent Requests:</label>
-    <input type="number" id="concurrencyInput" @bind="_concurrentRequests" @oninput="ApplyConcurrentRequestsChange" required class="margin-bottom-m" min="1" max="100"/>
-    <p>Concurrency:  @_concurrentRequests</p>
+    <input type="number" id="concurrencyInput" @bind="_concurrentRequests" required class="margin-bottom-m" min="1" max="100" />
+    <p>Concurrency: @_concurrentRequests</p>
 </div>
 
 @if (IsChecking)
@@ -33,13 +33,13 @@
         @switch (_currentStatus)
         {
             case PageStatState.DisplayPerformance:
-                <PerformanceStats VisitedPages="@VisitedPages"/>
+                <PerformanceStats VisitedPages="VisitedPages" />
                 break;
             case PageStatState.DisplayBrokenLinks:
-                <BrokenLinksStats BrokenLinks="@BrokenLinks"/>
+                <BrokenLinksStats BrokenLinks="BrokenLinks" />
                 break;
             case PageStatState.DisplayHeaders:
-                <PageHeaders VisitedPages="@VisitedPages" />
+                <PageHeaders VisitedPages="VisitedPages" />
                 break;
             case PageStatState.Error:
                 <p>Error encountered during the process. Please try again.</p>
@@ -51,74 +51,90 @@
 @code {
     [Inject] 
     private IHttpClientFactory HttpClientFactory { get; set; }
+    
     private bool IsChecking { get; set; }
     private int _linksChecked;
     private int _linksEnqueued;
     private int _concurrentRequests = 1;
     
-    public ICollection<BrokenLink> BrokenLinks { get; set; } = [];
-    public ICollection<PageStat> VisitedPages { get; set; } = [];
+    public ICollection<BrokenLink> BrokenLinks { get; set; } = new List<BrokenLink>();
+    public ICollection<PageStat> VisitedPages { get; set; } = new List<PageStat>();
 
     private PageStatState _currentStatus = PageStatState.DisplayBrokenLinks;
 
     private async Task CheckBrokenLinks(Uri url)
     {
-        IsChecking = true;
-        BrokenLinks = new List<BrokenLink>();
-
-        CrawlerConfig crawlerState = new CrawlerConfig(_concurrentRequests);
-        
-        CrawlResult crawlResult = new CrawlResult()
+        try
         {
-            OnLinksEnqueued = (count) =>
-            {
-                _linksEnqueued = count;
-                InvokeAsync(StateHasChanged);
-            },
-            OnLinksChecked = (count) =>
-            {
-                _linksChecked = count;
-                InvokeAsync(StateHasChanged);
-            },
-            OnBrokenLinks = (links) =>
-            {
-                BrokenLinks = links;
-                InvokeAsync(StateHasChanged);
-            },
-            OnPageVisited = (links) =>
-            {
-                VisitedPages = links;
-                InvokeAsync(StateHasChanged);
-            }
-        };
-        
-        Crawler crawler = new Crawler(HttpClientFactory.CreateClient("WebsiteAnalyser"), crawlerState, crawlResult);
+            IsChecking = true;
+            ResetResults();
 
-        VisitedPages = await crawler.CrawlWebsiteAsync(url);
-        IsChecking = false;
+            var crawlerState = new CrawlerConfig(_concurrentRequests);
+            var crawlResult = InitializeCrawlResult();
+
+            var crawler = new Crawler(HttpClientFactory.CreateClient("WebsiteAnalyser"), crawlerState, crawlResult);
+
+            VisitedPages = await crawler.CrawlWebsiteAsync(url);
+        }
+        catch (Exception ex)
+        {
+            // Handle the exception and set the error state
+            _currentStatus = PageStatState.Error;
+        }
+        finally
+        {
+            IsChecking = false;
+            StateHasChanged();
+        }
     }
-    
-    private void ChangePageState(PageStatState newState)
+
+    private void ResetResults()
     {
+        BrokenLinks.Clear();
+        VisitedPages.Clear();
+        _linksChecked = 0;
+        _linksEnqueued = 0;
+    }
+
+    private CrawlResult InitializeCrawlResult()
+    {
+        var crawlResult = new CrawlResult();
+
+        crawlResult.OnLinksEnqueued += UpdateLinksEnqueued;
+        crawlResult.OnLinksChecked += UpdateLinksChecked;
+        crawlResult.OnBrokenLinks += UpdateBrokenLinks;
+        crawlResult.OnPageVisited += UpdateVisitedPages;
+
+        return crawlResult;
+    }
+
+
+    private void UpdateLinksEnqueued(int count)
+    {
+        _linksEnqueued = count;
+        InvokeAsync(StateHasChanged);
+    }
+
+    private void UpdateLinksChecked(int count)
+    {
+        _linksChecked = count;
+        InvokeAsync(StateHasChanged);
+    }
+
+    private void UpdateBrokenLinks(BrokenLink link)
+    {
+        BrokenLinks.Add(link);
+        InvokeAsync(StateHasChanged);
+    }
+
+    private void UpdateVisitedPages(PageStat page)
+    {
+        VisitedPages.Add(page);
+        InvokeAsync(StateHasChanged);
+    }
+
+    private void ChangePageState(PageStatState newState)
+    {   
         _currentStatus = newState;
     }
-    
-    private void ApplyConcurrentRequestsChange(ChangeEventArgs e)
-    {
-        if (!int.TryParse(e.Value?.ToString(), out int newConcurrentRequests))
-        {
-            return;
-        }
-        
-        if (newConcurrentRequests < 1)
-        {
-            _concurrentRequests = 1;
-        }
-        else
-        {
-            _concurrentRequests = newConcurrentRequests;
-        }
-        
-    }
-
 }

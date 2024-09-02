@@ -29,58 +29,49 @@ namespace BrokenLinkChecker.crawler
 
             linkQueue.Enqueue(new Link(string.Empty, url.ToString(), string.Empty, 0, ResourceType.Page));
 
-            do
+            while (!linkQueue.IsEmpty)
             {
-                OrderablePartitioner<Link> partitioner = Partitioner.Create(linkQueue);
                 ConcurrentQueue<Link> foundLinks = new ConcurrentQueue<Link>();
 
-                await Parallel.ForEachAsync(partitioner.GetDynamicPartitions(),
-                    async (link, cancellationToken) =>
-                    {
-                        await ProcessLinkAsync(link, foundLinks);
-                    });
+                await Parallel.ForEachAsync(linkQueue, async (link, cancellationToken) =>
+                {
+                    await ProcessLinkAsync(link, foundLinks);
+                });
 
                 CrawlResult.SetLinksEnqueued(foundLinks.Count);
-                linkQueue = foundLinks;
 
-            } while (linkQueue.Count > 0);
+                linkQueue = foundLinks;
+            }
 
             return CrawlResult.VisitedPages.ToList();
         }
 
         private async Task ProcessLinkAsync(Link url, ConcurrentQueue<Link> linksFound)
         {
-            if (!_visitedResources.TryAdd(url.Target, HttpStatusCode.Unused))
+            if (_visitedResources.TryAdd(url.Target, HttpStatusCode.Unused))
             {
-                if (_visitedResources[url.Target] is HttpStatusCode status && status != HttpStatusCode.OK)
+                IEnumerable<Link> links = await RequestAndProcessPage(url);
+                foreach (Link link in links)
                 {
-                    CrawlResult.AddResource(url, status);
+                    linksFound.Enqueue(link);
                 }
-                return;
+                CrawlResult.IncrementLinksChecked();
             }
-
-            IEnumerable<Link> links = await RequestAndProcessPage(url);
-
-            foreach (Link link in links)
+            else if (_visitedResources[url.Target] != HttpStatusCode.OK)
             {
-                linksFound.Enqueue(link);
+                CrawlResult.AddResource(url, _visitedResources[url.Target]);
             }
-            
-            CrawlResult.IncrementLinksChecked();
         }
 
         private async Task<IEnumerable<Link>> RequestAndProcessPage(Link url)
         {
+            await CrawlerConfig.Semaphore.WaitAsync();
             try
             {
-                await CrawlerConfig.Semaphore.WaitAsync();
-
                 (HttpResponseMessage response, long requestTime) = await Utilities.BenchmarkAsync(() => _requestHandler.RequestPageAsync(url));
-                
                 _visitedResources[url.Target] = response.StatusCode;
-                
-                (IEnumerable<Link> links, long parseTime) = await Utilities.BenchmarkAsync(() => _linkProcessor.GetLinksFromResponse(response, url));
 
+                (IEnumerable<Link> links, long parseTime) = await Utilities.BenchmarkAsync(() => _linkProcessor.GetLinksFromResponse(response, url));
                 CrawlResult.AddResource(url, response, requestTime, parseTime);
 
                 return links;

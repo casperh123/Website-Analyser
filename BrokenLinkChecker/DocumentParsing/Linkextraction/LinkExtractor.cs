@@ -78,7 +78,7 @@ namespace BrokenLinkChecker.DocumentParsing.Linkextraction
             foreach (IElement link in doc.Links)
             {
                 string? href = link.GetAttribute("href");
-                if (!string.IsNullOrEmpty(href))
+                if (!string.IsNullOrEmpty(href) && !IsExcluded(href))
                 {
                     Link newLink = GenerateLinkNode(link, checkingUrl.Target, "href", ResourceType.Page);
                     links.Add(newLink);
@@ -98,6 +98,22 @@ namespace BrokenLinkChecker.DocumentParsing.Linkextraction
             int line = element.SourceReference?.Position.Line ?? -1;
 
             return new Link(target, resolvedUrl, text, line, resourceType);
+        }
+        
+        private static bool IsExcluded(string url)
+        {
+            HashSet<string> excludedExtensions = new HashSet<string>(StringComparer.OrdinalIgnoreCase) { ".js", ".css" };
+            HashSet<string> asyncKeywords = new HashSet<string>(StringComparer.OrdinalIgnoreCase) { "ajax", "async", "action=async" };
+
+            if (Uri.TryCreate(url, UriKind.Absolute, out Uri uri))
+            {
+                if (excludedExtensions.Contains(Path.GetExtension(uri.LocalPath)))
+                {
+                    return false;
+                }
+            }
+
+            return asyncKeywords.Any(url.Contains) || url.Contains('#') || url.Contains('?') || url.Contains("mailto");
         }
     }
 }
