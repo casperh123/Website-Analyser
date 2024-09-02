@@ -1,3 +1,4 @@
+using System.Collections.Concurrent;
 using System.Net;
 using BrokenLinkChecker.models;
 
@@ -5,31 +6,36 @@ namespace BrokenLinkChecker.crawler
 {
     public class CrawlResult
     {
-        public ICollection<BrokenLink> BrokenLinks { get; } = new List<BrokenLink>();
-        public ICollection<PageStat> VisitedPages { get; } = new List<PageStat>();
+        public ConcurrentBag<BrokenLink> BrokenLinks { get; } = new ConcurrentBag<BrokenLink>();
+        public ConcurrentBag<PageStat> VisitedPages { get; } = new ConcurrentBag<PageStat>();
         public int LinksChecked { get; private set; }
         public int LinksEnqueued { get; private set; }
 
-        public Action<ICollection<BrokenLink>> OnBrokenLinks { get; set; }
-        public Action<ICollection<PageStat>> OnPageVisited { get; set; }
-        public Action<int> OnLinksEnqueued { get; set; }
-        public Action<int> OnLinksChecked { get; set; }
+        public event Action<BrokenLink> OnBrokenLinks;
+        public event Action<PageStat> OnPageVisited;
+        public event Action<int> OnLinksEnqueued;
+        public event Action<int> OnLinksChecked;
 
-        public void AddResource(PageStat pageStats)
+        public void AddResource(Link url, HttpResponseMessage response, long requestTime, long parseTime)
         {
-            VisitedPages.Add(pageStats);
-            OnPageVisited?.Invoke(VisitedPages);
-        }
-        
-        public void HandleBrokenLink(Link url, HttpResponseMessage response)
-        {
-            if (response.StatusCode != HttpStatusCode.Forbidden)
+            PageStat pageStat = new PageStat(url.Target, response, url.Type, requestTime, parseTime);
+            
+            OnPageVisited.Invoke(pageStat);
+
+            if (response.StatusCode == HttpStatusCode.NotFound)
             {
-                AddBrokenLink(new BrokenLink(url, response.StatusCode));
+                HandleBrokenLink(url, response.StatusCode);
             }
         }
         
-        public void HandleBrokenLink(Link url, HttpStatusCode statusCode)
+        public void AddResource(Link url, HttpStatusCode statusCode) {
+            if (statusCode == HttpStatusCode.NotFound)
+            {
+                HandleBrokenLink(url, statusCode);
+            }
+        }
+
+        private void HandleBrokenLink(Link url, HttpStatusCode statusCode)
         {
             if (statusCode != HttpStatusCode.Forbidden)
             {
@@ -40,7 +46,7 @@ namespace BrokenLinkChecker.crawler
         private void AddBrokenLink(BrokenLink brokenLink)
         {
             BrokenLinks.Add(brokenLink);
-            OnBrokenLinks?.Invoke(BrokenLinks);
+            OnBrokenLinks?.Invoke(brokenLink);
         }
 
         public void IncrementLinksChecked()
