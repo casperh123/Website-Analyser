@@ -9,7 +9,6 @@ namespace BrokenLinkChecker.crawler
 {
     public class Crawler
     {
-        private readonly HttpClient _httpClient;
         private readonly HttpRequestHandler _requestHandler;
         private readonly LinkExtractor _linkExtractor;
         private readonly ConcurrentDictionary<string, HttpStatusCode> _visitedResources = new();
@@ -73,11 +72,12 @@ namespace BrokenLinkChecker.crawler
 
         private async Task<IEnumerable<Link>> RequestAndProcessPage(Link url)
         {
+            
             try
             {
                 await CrawlerConfig.Semaphore.WaitAsync();
 
-                (HttpResponseMessage response, long requestTime) = await _requestHandler.RequestPageWithBenchmarkAsync(url);
+                (HttpResponseMessage response, long requestTime) = await Utilities.BenchmarkAsync(() => _requestHandler.RequestPageAsync(url));
 
                 _visitedResources[url.Target] = response.StatusCode;
 
