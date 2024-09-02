@@ -2,6 +2,7 @@ using System.Collections.Concurrent;
 using System.Net;
 using BrokenLinkChecker.DocumentParsing.Linkextraction;
 using BrokenLinkChecker.models;
+using BrokenLinkChecker.Networking;
 using BrokenLinkChecker.utility;
 
 namespace BrokenLinkChecker.crawler
@@ -9,6 +10,7 @@ namespace BrokenLinkChecker.crawler
     public class Crawler
     {
         private readonly HttpClient _httpClient;
+        private readonly HttpRequestHandler _requestHandler;
         private readonly LinkExtractor _linkExtractor;
         private readonly ConcurrentDictionary<string, HttpStatusCode> _visitedResources = new();
         
@@ -16,8 +18,8 @@ namespace BrokenLinkChecker.crawler
         private CrawlResult CrawlResult { get; }
 
         public Crawler(HttpClient httpClient, CrawlerConfig crawlerConfig, CrawlResult crawlResult)
-        {
-            _httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
+        { 
+            _requestHandler = new HttpRequestHandler(httpClient, crawlerConfig);
             CrawlerConfig = crawlerConfig ?? throw new ArgumentNullException(nameof(crawlerConfig));
             CrawlResult = crawlResult ?? throw new ArgumentNullException(nameof(crawlResult));
             _linkExtractor = new LinkExtractor(CrawlerConfig);
@@ -75,7 +77,7 @@ namespace BrokenLinkChecker.crawler
             {
                 await CrawlerConfig.Semaphore.WaitAsync();
 
-                (HttpResponseMessage response, long requestTime) = await RequestPageAsync(url);
+                (HttpResponseMessage response, long requestTime) = await _requestHandler.RequestPageWithBenchmarkAsync(url);
 
                 _visitedResources[url.Target] = response.StatusCode;
 
@@ -101,12 +103,6 @@ namespace BrokenLinkChecker.crawler
             CrawlResult.AddResource(pageStat);
 
             return links.Where(link => !Utilities.IsAsyncOrFragmentRequest(link.Target));
-        }
-
-        private async Task<(HttpResponseMessage, long)> RequestPageAsync(Link url)
-        {
-            await CrawlerConfig.ApplyJitterAsync();
-            return await Utilities.BenchmarkAsync(() => _httpClient.GetAsync(url.Target, HttpCompletionOption.ResponseHeadersRead));
         }
     }
 }
