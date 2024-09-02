@@ -11,14 +11,7 @@ public class HttpRequestHandler(HttpClient httpClient, CrawlerConfig crawlerConf
     
     public async Task<HttpResponseMessage> RequestPageAsync(Link url)
     {
-        try
-        {
-            await _crawlerConfig.ApplyJitterAsync();
-            return await _httpClient.GetAsync(url.Target, HttpCompletionOption.ResponseHeadersRead);
-        }
-        finally
-        {
-            _crawlerConfig.Semaphore.Release();
-        }
+        await _crawlerConfig.ApplyJitterAsync();
+        return await _httpClient.GetAsync(url.Target, HttpCompletionOption.ResponseHeadersRead);
     }
 }

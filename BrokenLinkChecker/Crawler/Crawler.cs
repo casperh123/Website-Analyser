@@ -54,7 +54,7 @@ namespace BrokenLinkChecker.crawler
             {
                 if (_visitedResources[url.Target] is HttpStatusCode status && status != HttpStatusCode.OK)
                 {
-                    CrawlResult.HandleBrokenLink(url, status);
+                    CrawlResult.AddResource(url, status);
                 }
                 return;
             }
@@ -78,23 +78,17 @@ namespace BrokenLinkChecker.crawler
                 (HttpResponseMessage response, long requestTime) = await Utilities.BenchmarkAsync(() => _requestHandler.RequestPageAsync(url));
                 
                 _visitedResources[url.Target] = response.StatusCode;
+                
+                (IEnumerable<Link> links, long parseTime) = await Utilities.BenchmarkAsync(() => _linkProcessor.GetLinksFromResponse(response, url));
 
-                return await ProcessResponse(response, url, requestTime);
+                CrawlResult.AddResource(url, response, requestTime, parseTime);
+
+                return links;
             }
             finally
             {
                 CrawlerConfig.Semaphore.Release();
             }
-        }
-        
-        private async Task<IEnumerable<Link>> ProcessResponse(HttpResponseMessage response, Link url, long requestTime)
-        {
-            (IEnumerable<Link> links, long parseTime) = await Utilities.BenchmarkAsync(() => _linkProcessor.GetLinksFromResponse(response, url));
-
-            PageStat pageStat = new PageStat(url.Target, response, url.Type, requestTime, parseTime);
-            CrawlResult.AddResource(pageStat);
-
-            return links;
         }
     }
 }

@@ -15,21 +15,25 @@ namespace BrokenLinkChecker.crawler
         public Action<int> OnLinksEnqueued { get; set; }
         public Action<int> OnLinksChecked { get; set; }
 
-        public void AddResource(PageStat pageStats)
+        public void AddResource(Link url, HttpResponseMessage response, long requestTime, long parseTime)
         {
-            VisitedPages.Add(pageStats);
+            VisitedPages.Add(new PageStat(url.Target, response, url.Type, requestTime, parseTime));
             OnPageVisited?.Invoke(VisitedPages);
-        }
-        
-        public void HandleBrokenLink(Link url, HttpResponseMessage response)
-        {
-            if (response.StatusCode != HttpStatusCode.Forbidden)
+
+            if (response.StatusCode == HttpStatusCode.NotFound)
             {
-                AddBrokenLink(new BrokenLink(url, response.StatusCode));
+                HandleBrokenLink(url, response.StatusCode);
             }
         }
         
-        public void HandleBrokenLink(Link url, HttpStatusCode statusCode)
+        public void AddResource(Link url, HttpStatusCode statusCode) {
+            if (statusCode == HttpStatusCode.NotFound)
+            {
+                HandleBrokenLink(url, statusCode);
+            }
+        }
+
+        private void HandleBrokenLink(Link url, HttpStatusCode statusCode)
         {
             if (statusCode != HttpStatusCode.Forbidden)
             {
