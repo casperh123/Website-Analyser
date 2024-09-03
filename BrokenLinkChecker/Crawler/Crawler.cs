@@ -1,5 +1,6 @@
 using System.Collections.Concurrent;
 using System.Net;
+using BrokenLinkChecker.DocumentParsing.Linkextraction;
 using BrokenLinkChecker.models;
 using BrokenLinkChecker.Networking;
 using BrokenLinkChecker.utility;
@@ -9,7 +10,7 @@ namespace BrokenLinkChecker.crawler
     public class Crawler
     {
         private readonly HttpRequestHandler _requestHandler;
-        private readonly LinkProcessor _linkProcessor;
+        private readonly LinkExtractor _linkProcessor;
         private readonly ConcurrentDictionary<string, HttpStatusCode> _visitedResources = new();
         
         private CrawlerConfig CrawlerConfig { get; }
@@ -20,10 +21,10 @@ namespace BrokenLinkChecker.crawler
             _requestHandler = new HttpRequestHandler(httpClient, crawlerConfig);
             CrawlerConfig = crawlerConfig;
             CrawlResult = crawlResult;
-            _linkProcessor = new LinkProcessor(CrawlerConfig);
+            _linkProcessor = new LinkExtractor(CrawlerConfig);
         }
 
-        public async Task<List<PageStat>> CrawlWebsiteAsync(Uri url)
+        public async Task CrawlWebsiteAsync(Uri url)
         {
             ConcurrentQueue<Link> linkQueue = new ConcurrentQueue<Link>();
 
@@ -42,8 +43,6 @@ namespace BrokenLinkChecker.crawler
 
                 linkQueue = foundLinks;
             }
-
-            return CrawlResult.VisitedPages.ToList();
         }
 
         private async Task ProcessLinkAsync(Link url, ConcurrentQueue<Link> linksFound)
@@ -57,7 +56,7 @@ namespace BrokenLinkChecker.crawler
                 }
                 CrawlResult.IncrementLinksChecked();
             }
-            else if (_visitedResources[url.Target] != HttpStatusCode.OK)
+            else
             {
                 CrawlResult.AddResource(url, _visitedResources[url.Target]);
             }
@@ -71,7 +70,7 @@ namespace BrokenLinkChecker.crawler
                 (HttpResponseMessage response, long requestTime) = await Utilities.BenchmarkAsync(() => _requestHandler.RequestPageAsync(url));
                 _visitedResources[url.Target] = response.StatusCode;
 
-                (IEnumerable<Link> links, long parseTime) = await Utilities.BenchmarkAsync(() => _linkProcessor.GetLinksFromResponse(response, url));
+                (IEnumerable<Link> links, long parseTime) = await Utilities.BenchmarkAsync(() => _linkProcessor.GetLinksFromResponseAsync(response, url));
                 CrawlResult.AddResource(url, response, requestTime, parseTime);
 
                 return links;

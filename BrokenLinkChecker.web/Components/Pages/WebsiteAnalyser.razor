@@ -69,12 +69,12 @@
             IsChecking = true;
             ResetResults();
 
-            var crawlerState = new CrawlerConfig(_concurrentRequests);
-            var crawlResult = InitializeCrawlResult();
+            CrawlerConfig crawlerState = new CrawlerConfig(_concurrentRequests);
+            CrawlResult crawlResult = InitializeCrawlResult();
 
-            var crawler = new Crawler(HttpClientFactory.CreateClient("WebsiteAnalyser"), crawlerState, crawlResult);
+            Crawler crawler = new Crawler(HttpClientFactory.CreateClient("WebsiteAnalyser"), crawlerState, crawlResult);
 
-            VisitedPages = await crawler.CrawlWebsiteAsync(url);
+            await crawler.CrawlWebsiteAsync(url);
         }
         catch (Exception ex)
         {

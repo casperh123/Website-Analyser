@@ -1,3 +1,4 @@
+using System.Net;
 using AngleSharp.Dom;
 using AngleSharp.Html.Dom;
 using AngleSharp.Html.Parser;
@@ -20,11 +21,15 @@ namespace BrokenLinkChecker.DocumentParsing.Linkextraction
 
         public async Task<List<Link>> GetLinksFromResponseAsync(HttpResponseMessage response, Link url)
         {
+            if (!response.IsSuccessStatusCode)
+            {
+                return [];
+            }
             if (url.Type is not ResourceType.Page)
             {
                 byte[] responseContent = await response.Content.ReadAsByteArrayAsync();
                 return [];
-            }
+            } 
 
             await using Stream document = await response.Content.ReadAsStreamAsync();
 
@@ -53,7 +58,7 @@ namespace BrokenLinkChecker.DocumentParsing.Linkextraction
             }
 
             // Extract links from scripts
-            foreach (var script in doc.Scripts)
+            foreach (IHtmlScriptElement script in doc.Scripts)
             {
                 string? src = script.Source;
                 if (!string.IsNullOrEmpty(src))
