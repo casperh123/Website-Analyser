@@ -58,7 +58,7 @@ namespace BrokenLinkChecker.DocumentParsing.Linkextraction
             }
 
             // Extract links from scripts
-            foreach (var script in doc.Scripts)
+            foreach (IHtmlScriptElement script in doc.Scripts)
             {
                 string? src = script.Source;
                 if (!string.IsNullOrEmpty(src))

@@ -24,7 +24,7 @@ namespace BrokenLinkChecker.crawler
             _linkProcessor = new LinkExtractor(CrawlerConfig);
         }
 
-        public async Task<List<PageStat>> CrawlWebsiteAsync(Uri url)
+        public async Task CrawlWebsiteAsync(Uri url)
         {
             ConcurrentQueue<Link> linkQueue = new ConcurrentQueue<Link>();
 
@@ -43,8 +43,6 @@ namespace BrokenLinkChecker.crawler
 
                 linkQueue = foundLinks;
             }
-
-            return CrawlResult.VisitedPages.ToList();
         }
 
         private async Task ProcessLinkAsync(Link url, ConcurrentQueue<Link> linksFound)
@@ -58,7 +56,7 @@ namespace BrokenLinkChecker.crawler
                 }
                 CrawlResult.IncrementLinksChecked();
             }
-            else if (_visitedResources[url.Target] != HttpStatusCode.OK)
+            else
             {
                 CrawlResult.AddResource(url, _visitedResources[url.Target]);
             }

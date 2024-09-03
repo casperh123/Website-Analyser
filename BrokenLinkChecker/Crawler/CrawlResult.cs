@@ -6,8 +6,6 @@ namespace BrokenLinkChecker.crawler
 {
     public class CrawlResult
     {
-        public ConcurrentBag<BrokenLink> BrokenLinks { get; } = new ConcurrentBag<BrokenLink>();
-        public ConcurrentBag<PageStat> VisitedPages { get; } = new ConcurrentBag<PageStat>();
         public int LinksChecked { get; private set; }
         public int LinksEnqueued { get; private set; }
 
@@ -45,8 +43,7 @@ namespace BrokenLinkChecker.crawler
         
         private void AddBrokenLink(BrokenLink brokenLink)
         {
-            BrokenLinks.Add(brokenLink);
-            OnBrokenLinks?.Invoke(brokenLink);
+            OnBrokenLinks.Invoke(brokenLink);
         }
 
         public void IncrementLinksChecked()
