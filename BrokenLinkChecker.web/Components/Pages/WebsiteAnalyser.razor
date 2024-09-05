@@ -7,7 +7,9 @@
 
 <h2>Website Analyser</h2>
 
-<WebsiteInput UriHasChanged="CheckBrokenLinks"></WebsiteInput>
+<WebsiteInput UriHasChanged="CheckBrokenLinks" 
+              SelectedCrawlMode="@CrawlMode"
+              SelectedCrawlModeChanged="@OnCrawlModeChanged"></WebsiteInput>
 
 <div class="concurrency-input">
     <label for="concurrencyInput" class="margin-bottom-m center-text">Concurrent Requests:</label>
@@ -62,6 +64,8 @@
 
     private PageStatState _currentStatus = PageStatState.DisplayBrokenLinks;
 
+    public CrawlMode CrawlMode { get; set; } = CrawlMode.SiteStats;  // Initialize default crawl mode
+
     private async Task CheckBrokenLinks(Uri url)
     {
         try
@@ -69,16 +73,15 @@
             IsChecking = true;
             ResetResults();
 
-            CrawlerConfig crawlerState = new CrawlerConfig(_concurrentRequests);
+            CrawlerConfig crawlerState = new CrawlerConfig(_concurrentRequests, CrawlMode);
             CrawlResult crawlResult = InitializeCrawlResult();
 
             Crawler crawler = new Crawler(HttpClientFactory.CreateClient("WebsiteAnalyser"), crawlerState, crawlResult);
 
             await crawler.CrawlWebsiteAsync(url);
         }
-        catch (Exception ex)
+        catch (Exception)
         {
-            // Handle the exception and set the error state
             _currentStatus = PageStatState.Error;
         }
         finally
@@ -86,6 +89,11 @@
             IsChecking = false;
             StateHasChanged();
         }
+    }
+
+    private void OnCrawlModeChanged(CrawlMode newMode)
+    {
+        CrawlMode = newMode;
     }
 
     private void ResetResults()
@@ -98,7 +106,7 @@
 
     private CrawlResult InitializeCrawlResult()
     {
-        var crawlResult = new CrawlResult();
+        CrawlResult crawlResult = new CrawlResult();
 
         crawlResult.OnLinksEnqueued += UpdateLinksEnqueued;
         crawlResult.OnLinksChecked += UpdateLinksChecked;
@@ -107,7 +115,6 @@
 
         return crawlResult;
     }
-
 
     private void UpdateLinksEnqueued(int count)
     {

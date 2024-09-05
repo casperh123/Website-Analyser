@@ -12,9 +12,11 @@ namespace BrokenLinkChecker.DocumentParsing.Linkextraction
     public class LinkExtractor
     {
         private readonly HtmlParserPool _htmlParserPool;
+        private readonly CrawlerConfig _crawlerConfig;
 
         public LinkExtractor(CrawlerConfig crawlerConfig)
         {
+            _crawlerConfig = crawlerConfig;
             HtmlParserOptions htmlParsingOptions = new HtmlParserOptions { IsKeepingSourceReferences = true };
             _htmlParserPool = new HtmlParserPool(htmlParsingOptions, crawlerConfig.ConcurrentRequests);
         }
@@ -32,55 +34,27 @@ namespace BrokenLinkChecker.DocumentParsing.Linkextraction
             } 
 
             await using Stream document = await response.Content.ReadAsStreamAsync();
-
             return await ExtractLinksFromDocumentAsync(document, url);
         }
 
         private async Task<List<Link>> ExtractLinksFromDocumentAsync(Stream document, Link checkingUrl)
         {
-            List<Link> links = [];
             IDocument doc;
-            Uri thisUrl = new Uri(checkingUrl.Target);
 
             using (PooledHtmlParser pooledHtmlParser = await _htmlParserPool.GetParserAsync())
             {
                 doc = await pooledHtmlParser.Parser.ParseDocumentAsync(document);
             }
+
+            return GetLinksFromDocument(doc, checkingUrl);
+        }
+
+        private List<Link> GetLinksFromDocument(IDocument document, Link checkingUrl)
+        {
+            List<Link> links = [];
+            Uri thisUrl = new Uri(checkingUrl.Target);
             
-            foreach (IStyleSheet stylesheet in doc.StyleSheets)
-            {
-                string href = stylesheet.Href;
-                if (!string.IsNullOrEmpty(href))
-                {
-                    Link newLink = GenerateLinkNode(stylesheet.OwnerNode, checkingUrl.Target, "href", ResourceType.Stylesheet);
-                    links.Add(newLink);
-                }
-            }
-
-            // Extract links from scripts
-            foreach (IHtmlScriptElement script in doc.Scripts)
-            {
-                string? src = script.Source;
-                if (!string.IsNullOrEmpty(src))
-                {
-                    Link newLink = GenerateLinkNode(script, checkingUrl.Target, "src", ResourceType.Script);
-                    links.Add(newLink);
-                }
-            }
-
-            // Extract links from images
-            foreach (IHtmlImageElement image in doc.Images)
-            {
-                string? src = image.Source;
-                if (!string.IsNullOrEmpty(src))
-                {
-                    Link newLink = GenerateLinkNode(image, checkingUrl.Target, "src", ResourceType.Image);
-                    links.Add(newLink);
-                }
-            }
-
-            // Extract anchor links
-            foreach (IElement link in doc.Links)
+            foreach (IElement link in document.Links)
             {
                 string? href = link.GetAttribute("href");
                 if (!string.IsNullOrEmpty(href) && !IsExcluded(href))
@@ -90,9 +64,42 @@ namespace BrokenLinkChecker.DocumentParsing.Linkextraction
                 }
             }
 
-            links = links.Where(link => Uri.TryCreate(link.Target, UriKind.Absolute, out Uri uri) && uri.Host == thisUrl.Host).ToList();
+            if (_crawlerConfig.CrawlMode is CrawlMode.CacheWarm)
+            {
+                return links.Where(link => Uri.TryCreate(link.Target, UriKind.Absolute, out Uri uri) && uri.Host == thisUrl.Host).ToList();
+            }
+            
+            foreach (IStyleSheet stylesheet in document.StyleSheets)
+            {
+                string href = stylesheet.Href;
+                if (!string.IsNullOrEmpty(href))
+                {
+                    Link newLink = GenerateLinkNode(stylesheet.OwnerNode, checkingUrl.Target, "href", ResourceType.Stylesheet);
+                    links.Add(newLink);
+                }
+            }
 
-            return links;
+            foreach (IHtmlScriptElement script in document.Scripts)
+            {
+                string? src = script.Source;
+                if (!string.IsNullOrEmpty(src))
+                {
+                    Link newLink = GenerateLinkNode(script, checkingUrl.Target, "src", ResourceType.Script);
+                    links.Add(newLink);
+                }
+            }
+
+            foreach (IHtmlImageElement image in document.Images)
+            {
+                string? src = image.Source;
+                if (!string.IsNullOrEmpty(src))
+                {
+                    Link newLink = GenerateLinkNode(image, checkingUrl.Target, "src", ResourceType.Image);
+                    links.Add(newLink);
+                }
+            }
+
+            return links.Where(link => Uri.TryCreate(link.Target, UriKind.Absolute, out Uri uri) && uri.Host == thisUrl.Host).ToList();
         }
 
         private Link GenerateLinkNode(IElement element, string target, string attribute, ResourceType resourceType = ResourceType.Resource)
