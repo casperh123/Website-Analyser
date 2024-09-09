@@ -1,6 +1,6 @@
 @page "/website-analyser-modular"
-@using BrokenLinkChecker.crawler
-@using BrokenLinkChecker.models
+@using BrokenLinkChecker.Crawler.ExtendedCrawlers
+@using BrokenLinkChecker.DocumentParsing.LinkProcessors
 @using BrokenLinkChecker.Models.Links
 @using BrokenLinkChecker.web.Components.WebsiteMetrics
 @using BrokenLinkChecker.web.Components.WebsiteInputs
@@ -8,15 +8,7 @@
 
 <h2>Website Analyser</h2>
 
-<WebsiteInput UriHasChanged="CheckBrokenLinks" 
-              SelectedCrawlMode="@CrawlMode"
-              SelectedCrawlModeChanged="@OnCrawlModeChanged"></WebsiteInput>
-
-<div class="concurrency-input">
-    <label for="concurrencyInput" class="margin-bottom-m center-text">Concurrent Requests:</label>
-    <input type="number" id="concurrencyInput" @bind="_concurrentRequests" required class="margin-bottom-m" min="1" max="100" />
-    <p>Concurrency: @_concurrentRequests</p>
-</div>
+<WebsiteInput UriHasChanged="CheckBrokenLinks"></WebsiteInput>
 
 @if (IsChecking)
 {
@@ -29,25 +21,8 @@
     <p>Links checked: @_linksChecked</p>
     
     <div class="padding-m round-corners box-shadow">
-        <h2>Website metrics</h2>
-
-        <StateButtons PageStateChanged="ChangePageState" />
-
-        @switch (_currentStatus)
-        {
-            case PageStatState.DisplayPerformance:
-                <PerformanceStats VisitedPages="VisitedPages" />
-                break;
-            case PageStatState.DisplayBrokenLinks:
-                <BrokenLinksStats BrokenLinks="BrokenLinks" />
-                break;
-            case PageStatState.DisplayHeaders:
-                <PageHeaders VisitedPages="VisitedPages" />
-                break;
-            case PageStatState.Error:
-                <p>Error encountered during the process. Please try again.</p>
-                break;
-        }
+        <h2>Broken Links</h2>
+        <BrokenLinksStats BrokenLinks="BrokenLinks" />
     </div>
 }
 
@@ -58,14 +33,8 @@
     private bool IsChecking { get; set; }
     private int _linksChecked;
     private int _linksEnqueued;
-    private int _concurrentRequests = 1;
-    
-    public ICollection<IndexedLink> BrokenLinks { get; set; } = new List<IndexedLink>();
-    public ICollection<PageStat> VisitedPages { get; set; } = new List<PageStat>();
 
-    private PageStatState _currentStatus = PageStatState.DisplayBrokenLinks;
-
-    public CrawlMode CrawlMode { get; set; } = CrawlMode.SiteStats;  // Initialize default crawl mode
+    public ICollection<IndexedLink> BrokenLinks = [];
 
     private async Task CheckBrokenLinks(Uri url)
     {
@@ -74,16 +43,11 @@
             IsChecking = true;
             ResetResults();
 
-            CrawlerConfig crawlerState = new CrawlerConfig(_concurrentRequests, CrawlMode);
-            CrawlResult crawlResult = InitializeCrawlResult();
-
-            Crawler crawler = new Crawler(HttpClientFactory.CreateClient("WebsiteAnalyser"), crawlerState, crawlResult);
-
-            await crawler.CrawlWebsiteAsync(url);
-        }
-        catch (Exception)
-        {
-            _currentStatus = PageStatState.Error;
+            ModularCrawlResult<IndexedLink> crawlResult = InitializeCrawlResult();
+            ILinkProcessor<IndexedLink> linkProcessor = new BrokenLinkProcessor(HttpClientFactory.CreateClient("WebsiteAnalyser"));
+            ModularCrawler<IndexedLink> crawler = new ModularCrawler<IndexedLink>(crawlResult, linkProcessor);
+            
+            await crawler.CrawlWebsiteAsync(new IndexedLink(string.Empty, url.ToString(), "", 0));
         }
         finally
         {
@@ -91,28 +55,21 @@
             StateHasChanged();
         }
     }
-
-    private void OnCrawlModeChanged(CrawlMode newMode)
-    {
-        CrawlMode = newMode;
-    }
-
+    
     private void ResetResults()
     {
         BrokenLinks.Clear();
-        VisitedPages.Clear();
         _linksChecked = 0;
         _linksEnqueued = 0;
     }
 
-    private CrawlResult InitializeCrawlResult()
+    private ModularCrawlResult<IndexedLink> InitializeCrawlResult()
     {
-        CrawlResult crawlResult = new CrawlResult();
+        ModularCrawlResult<IndexedLink> crawlResult = new ModularCrawlResult<IndexedLink>();
 
         crawlResult.OnLinksEnqueued += UpdateLinksEnqueued;
         crawlResult.OnLinksChecked += UpdateLinksChecked;
-        crawlResult.OnBrokenLinks += UpdateBrokenLinks;
-        crawlResult.OnPageVisited += UpdateVisitedPages;
+        crawlResult.OnResouceVisited += UpdateBrokenLinks;
 
         return crawlResult;
     }
@@ -133,16 +90,5 @@
     {
         BrokenLinks.Add(link);
         InvokeAsync(StateHasChanged);
-    }
-
-    private void UpdateVisitedPages(PageStat page)
-    {
-        VisitedPages.Add(page);
-        InvokeAsync(StateHasChanged);
-    }
-
-    private void ChangePageState(PageStatState newState)
-    {   
-        _currentStatus = newState;
     }
 }
