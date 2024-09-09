@@ -77,7 +77,6 @@
     private void UpdateLinksEnqueued(int count)
     {
         _linksEnqueued = count;
-        InvokeAsync(StateHasChanged);
     }
 
     private void UpdateLinksChecked(int count)

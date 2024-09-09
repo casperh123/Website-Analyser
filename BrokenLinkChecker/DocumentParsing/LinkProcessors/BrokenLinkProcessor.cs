@@ -3,6 +3,7 @@ using AngleSharp.Html.Parser;
 using BrokenLinkChecker.Crawler.ExtendedCrawlers;
 using BrokenLinkChecker.DocumentParsing.ModularLinkExtraction;
 using BrokenLinkChecker.Models.Links;
+using Microsoft.Extensions.Logging;
 
 namespace BrokenLinkChecker.DocumentParsing.LinkProcessors;
 
@@ -26,28 +27,37 @@ public class BrokenLinkProcessor : ILinkProcessor<IndexedLink>
     
     public async Task<IEnumerable<IndexedLink>> ProcessLinkAsync(IndexedLink link, ModularCrawlResult<IndexedLink> crawlResult)
     {
-        IEnumerable<IndexedLink> links = [];
-        
-        if (_visitedResources.TryGetValue(link.Target, out HttpStatusCode statusCode))
+        IEnumerable<IndexedLink> links = Enumerable.Empty<IndexedLink>();
+
+        if (!_visitedResources.TryGetValue(link.Target, out HttpStatusCode statusCode))
         {
-            link.StatusCode = statusCode;
+            try
+            {
+                using HttpResponseMessage response = await _httpClient.GetAsync(link.Target, HttpCompletionOption.ResponseHeadersRead);
+                statusCode = response.StatusCode;
+                _visitedResources[link.Target] = statusCode;
+
+                if (response.IsSuccessStatusCode)
+                {
+                    links = await _linkExtractor.GetLinksFromDocument(response, link);
+                }
+            }
+            catch (Exception e)
+            {
+                statusCode = HttpStatusCode.InternalServerError;
+                _visitedResources[link.Target] = statusCode;
+            }
         }
-        else
-        {
-            HttpResponseMessage response = await _httpClient.GetAsync(link.Target);
-            _visitedResources[link.Target] = response.StatusCode;
-            link.StatusCode = response.StatusCode;
-            
-            links = await _linkExtractor.GetLinksFromDocument(response, link);
-        }
-        
+
+        link.StatusCode = statusCode;
         crawlResult.IncrementLinksChecked();
 
-        if (link.StatusCode is not HttpStatusCode.OK)
+        if (link.StatusCode != HttpStatusCode.OK)
         {
             crawlResult.AddResource(link);
         }
 
         return links;
     }
+
 }
