@@ -13,7 +13,7 @@ namespace BrokenLinkChecker.Crawler.ExtendedCrawlers;
 public class ModularCrawler<T> where T : NavigationLink
 {
     private readonly HttpRequestHandler _requestHandler;
-    private readonly LinkExtractor _linkProcessor;
+    private readonly ModularLinkExtractor<T> _linkProcessor;
     private readonly ConcurrentDictionary<string, HttpStatusCode> _visitedResources = new();
     private CrawlerConfig CrawlerConfig { get; }
     private ModularCrawlResult<T> CrawlResult { get; }
@@ -41,23 +41,22 @@ public class ModularCrawler<T> where T : NavigationLink
     }
 
     private async Task ProcessLinkAsync(NavigationLink url)
-    {
-        if (_visitedResources.TryAdd(url.Target, HttpStatusCode.Unused))
-        {
-            IEnumerable<Link> links = await RequestAndProcessPage(url);
-            foreach (Link link in links)
+    {   
+        
+            IEnumerable<T> links = await RequestAndProcessPage(url);
+            
+            foreach (T link in links)
             {
                 LinkQueue.Enqueue(link);
             }
             CrawlResult.IncrementLinksChecked();
-        }
-        else
-        {
+        
+      
             CrawlResult.AddResource(url, _visitedResources[url.Target]);
-        }
+        
     }
 
-    private async Task<IEnumerable<Link>> RequestAndProcessPage(NavigationLink url)
+    private async Task<IEnumerable<T>> RequestAndProcessPage(NavigationLink url)
     {
  
         (HttpResponseMessage response, long requestTime) = await Utilities.BenchmarkAsync(() => _requestHandler.RequestPageAsync(url));
