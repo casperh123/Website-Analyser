@@ -1,9 +1,8 @@
 using System.Net;
-using AngleSharp.Dom;
+using AngleSharp.Html.Parser;
 using BrokenLinkChecker.crawler;
 using BrokenLinkChecker.Crawler.ExtendedCrawlers;
 using BrokenLinkChecker.DocumentParsing.ModularLinkExtraction;
-using BrokenLinkChecker.models.Links;
 using BrokenLinkChecker.Models.Links;
 using BrokenLinkChecker.utility;
 
@@ -13,12 +12,18 @@ public class BrokenLinkProcessor : ILinkProcessor<IndexedLink>
 {
     private readonly Dictionary<string, HttpStatusCode> _visitedResources = new();
     private readonly HttpClient _httpClient;
-    private AbstractLinkExtrator<IndexedLink> _linkExtrator; 
+    private AbstractLinkExtractor<IndexedLink> _linkExtractor; 
     
-    public BrokenLinkProcessor(HttpClient httpClient, AbstractLinkExtrator<IndexedLink> linkExtrator)
+    public BrokenLinkProcessor(HttpClient httpClient)
     {
         _httpClient = httpClient;
-        _linkExtrator = linkExtrator;
+        _linkExtractor = new IndexedLinkExtractor(new HtmlParser(
+                new HtmlParserOptions
+                {
+                    IsKeepingSourceReferences = true
+                }
+            )
+        );
     } 
     
     public async Task<IEnumerable<IndexedLink>> ProcessLinkAsync(IndexedLink link, ModularCrawlResult<IndexedLink> crawlResult)
@@ -27,32 +32,23 @@ public class BrokenLinkProcessor : ILinkProcessor<IndexedLink>
         
         if (_visitedResources.TryGetValue(link.Target, out HttpStatusCode statusCode))
         {
-            if (statusCode != HttpStatusCode.OK)
-            {
-                
-            }
+            link.StatusCode = statusCode;
         }
         else
         {
-            links = await RequestAndProcessPage(link.Target);
-        }
+            HttpResponseMessage response = await _httpClient.GetAsync(link.Target);
+            _visitedResources[link.Target] = response.StatusCode;
+            link.StatusCode = response.StatusCode;
             
+            links = await _linkExtractor.GetLinksFromDocument(response, link);
+        }
+        
         crawlResult.IncrementLinksChecked();
-        crawlResult.AddResource(url, _visitedResources[url.Target]);
 
-        return links;
-    }
-
-    private async Task<IEnumerable<IndexedLink>> RequestAndProcessPage(string url)
-    {
-        (HttpResponseMessage response, long requestTime) =
-            await Utilities.BenchmarkAsync(() => _httpClient.GetAsync(url));
-        _visitedResources[url] = response.StatusCode;
-
-        (IEnumerable<Index> links, long parseTime) =
-            await Utilities.BenchmarkAsync(() => _linkExtrator.GetLinksFromResponseAsync(response, url));
-
-        CrawlResult.AddResource();
+        if (link.StatusCode is not HttpStatusCode.OK)
+        {
+            crawlResult.AddResource(link);
+        }
 
         return links;
     }

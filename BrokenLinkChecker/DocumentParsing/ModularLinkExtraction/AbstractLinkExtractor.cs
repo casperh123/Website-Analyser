@@ -4,16 +4,16 @@ using BrokenLinkChecker.models.Links;
 
 namespace BrokenLinkChecker.DocumentParsing.ModularLinkExtraction;
 
-public abstract class AbstractLinkExtrator<T> where T : NavigationLink
+public abstract class AbstractLinkExtractor<T> where T : NavigationLink
 {
     protected readonly HtmlParser Parser;
 
-    public AbstractLinkExtrator(HtmlParser parser)
+    public AbstractLinkExtractor(HtmlParser parser)
     {
         Parser = parser;
     }
 
-    public async Task<IEnumerable<T>> GetLinksFromResponseAsync(HttpResponseMessage response, T link)
+    public async Task<IEnumerable<T>> GetLinksFromDocument(HttpResponseMessage response, T referringUrl)
     {
         if (!response.IsSuccessStatusCode)
         {
@@ -22,8 +22,38 @@ public abstract class AbstractLinkExtrator<T> where T : NavigationLink
 
         await using Stream document = await response.Content.ReadAsStreamAsync();
         
-        return ExtractLinksFromDocument(Parser.ParseDocument(document), link);
+        return GetLinksFromDocument(Parser.ParseDocument(document), referringUrl);
     }
     
-    protected abstract List<T> ExtractLinksFromDocument(IDocument document, T link);
+    protected abstract IEnumerable<T> GetLinksFromDocument(IDocument document, T referringUrl);
+    
+    protected static bool IsPage(string url)
+    {
+        if (!Uri.TryCreate(url, UriKind.Absolute, out Uri uri))
+        {
+            return false;
+        }
+
+        if (IsResourceFile(uri))
+        {
+            return false;
+        }
+
+        return !ContainsExcludableElements(url);
+    }
+
+    protected static bool IsResourceFile(Uri uri)
+    {
+        HashSet<string> excludedExtensions = new HashSet<string>(StringComparer.OrdinalIgnoreCase) 
+        {
+            ".js", ".css", ".png", ".jpg", ".jpeg", ".pdf", ".svg"
+        };
+        return excludedExtensions.Contains(Path.GetExtension(uri.LocalPath));
+    }
+
+    protected static bool ContainsExcludableElements(string url)
+    {
+        return url.Contains('#') || url.Contains('?') || url.Contains("mailto:");
+    }
+
 }
