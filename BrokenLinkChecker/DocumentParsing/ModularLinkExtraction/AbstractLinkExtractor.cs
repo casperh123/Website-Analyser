@@ -27,47 +27,32 @@ public abstract class AbstractLinkExtractor<T> where T : NavigationLink
     
     protected abstract IEnumerable<T> GetLinksFromDocument(IDocument document, T referringUrl);
     
-    protected bool IsPage(string url)
+    protected static bool IsPage(string url)
     {
-        // Try to create a Uri object from the URL string.
         if (!Uri.TryCreate(url, UriKind.Absolute, out Uri uri))
         {
-            return false;  // Not a valid absolute URL
+            return false;
         }
 
-        // Check if the URI's path ends with a common file extension for resources.
         if (IsResourceFile(uri))
         {
-            return false;  // It's a resource file, not a web page
+            return false;
         }
 
-        // Check for URL elements that typically do not correspond to web pages.
         return !ContainsExcludableElements(url);
     }
 
-    protected bool IsResourceFile(Uri uri)
+    protected static bool IsResourceFile(Uri uri)
     {
         HashSet<string> excludedExtensions = new HashSet<string>(StringComparer.OrdinalIgnoreCase) 
         {
-            ".js", ".css", ".png", ".jpg", ".jpeg", ".gif", ".pdf", ".svg", ".webp", ".mp4", ".mp3"
+            ".js", ".css", ".png", ".jpg", ".jpeg", ".pdf", ".svg"
         };
-
-        return excludedExtensions.Contains(Path.GetExtension(uri.AbsolutePath));
+        return excludedExtensions.Contains(Path.GetExtension(uri.LocalPath));
     }
 
-    protected bool ContainsExcludableElements(string url)
+    protected static bool ContainsExcludableElements(string url)
     {
-        string[] partsToExclude = { "#", "?", "mailto:", "ftp:", "javascript:" };
-
-        return partsToExclude.Any(part => url.Contains(part, StringComparison.OrdinalIgnoreCase));
-    }
-    
-    protected static bool IsSameDomain(Uri rootDomainUri, string url)
-    {
-        if (Uri.TryCreate(url, UriKind.Absolute, out Uri uri))
-        {
-            return uri.GetLeftPart(UriPartial.Authority).Equals(rootDomainUri.ToString(), StringComparison.OrdinalIgnoreCase);
-        }
-        return false;
+        return url.Contains('#') || url.Contains('?') || url.Contains("mailto:");
     }
 }
