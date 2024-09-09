@@ -21,16 +21,12 @@ namespace BrokenLinkChecker.DocumentParsing.Linkextraction
             _htmlParserPool = new HtmlParserPool(htmlParsingOptions, crawlerConfig.ConcurrentRequests);
         }
 
-        public async Task<List<Link>> GetLinksFromResponseAsync(HttpResponseMessage response, Link url)
+        public async Task<IEnumerable<Link>> GetLinksFromResponseAsync(HttpResponseMessage response, Link url)
         {
-            if (!response.IsSuccessStatusCode)
-            {
-                return [];
-            }
-            if (url.Type is not ResourceType.Page)
+            if (!response.IsSuccessStatusCode || url.Type is not ResourceType.Page)
             {
                 byte[] responseContent = await response.Content.ReadAsByteArrayAsync();
-                return [];
+                return Enumerable.Empty<Link>();
             } 
 
             await using Stream document = await response.Content.ReadAsStreamAsync();
