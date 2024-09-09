@@ -1,6 +1,7 @@
 using System.Collections.Concurrent;
 using System.Net;
 using BrokenLinkChecker.models;
+using BrokenLinkChecker.Models.Links;
 
 namespace BrokenLinkChecker.crawler
 {

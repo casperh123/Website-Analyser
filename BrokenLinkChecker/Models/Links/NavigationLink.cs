@@ -1,6 +1,6 @@
 namespace BrokenLinkChecker.models.Links;
 
-public class AbstractLink(string target)
+public class NavigationLink(string target)
 {
     public string Target = target;
 }
