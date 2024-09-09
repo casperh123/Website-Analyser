@@ -1,10 +1,9 @@
 using BrokenLinkChecker.Crawler.ExtendedCrawlers;
 using BrokenLinkChecker.models.Links;
-using BrokenLinkChecker.Models.Links;
 
-namespace BrokenLinkChecker.DocumentParsing;
+namespace BrokenLinkChecker.DocumentParsing.LinkProcessors;
 
 public interface ILinkProcessor<T> where T : NavigationLink
 {
-    public Task<List<T>> ProcessLinkAsync(T link, ModularCrawlResult<T> crawlResult);
+    public Task<IEnumerable<T>> ProcessLinkAsync(T link, ModularCrawlResult<T> crawlResult);
 }

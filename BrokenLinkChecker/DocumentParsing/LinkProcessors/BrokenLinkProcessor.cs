@@ -2,6 +2,7 @@ using System.Net;
 using AngleSharp.Dom;
 using BrokenLinkChecker.crawler;
 using BrokenLinkChecker.Crawler.ExtendedCrawlers;
+using BrokenLinkChecker.DocumentParsing.ModularLinkExtraction;
 using BrokenLinkChecker.models.Links;
 using BrokenLinkChecker.Models.Links;
 using BrokenLinkChecker.utility;
@@ -12,14 +13,15 @@ public class BrokenLinkProcessor : ILinkProcessor<IndexedLink>
 {
     private readonly Dictionary<string, HttpStatusCode> _visitedResources = new();
     private readonly HttpClient _httpClient;
+    private AbstractLinkExtrator<IndexedLink> _linkExtrator; 
     
-    
-    public BrokenLinkProcessor(HttpClient httpClient)
+    public BrokenLinkProcessor(HttpClient httpClient, AbstractLinkExtrator<IndexedLink> linkExtrator)
     {
         _httpClient = httpClient;
+        _linkExtrator = linkExtrator;
     } 
     
-    public async Task<List<IndexedLink>> ProcessLinkAsync(IndexedLink link, ModularCrawlResult<IndexedLink> crawlResult)
+    public async Task<IEnumerable<IndexedLink>> ProcessLinkAsync(IndexedLink link, ModularCrawlResult<IndexedLink> crawlResult)
     {
         IEnumerable<IndexedLink> links = [];
         
@@ -29,17 +31,16 @@ public class BrokenLinkProcessor : ILinkProcessor<IndexedLink>
             {
                 
             }
-
-            return [];
         }
         else
         {
             links = await RequestAndProcessPage(link.Target);
         }
             
-            crawlResult.IncrementLinksChecked();
-            crawlResult.AddResource(url, _visitedResources[url.Target]);
-            return
+        crawlResult.IncrementLinksChecked();
+        crawlResult.AddResource(url, _visitedResources[url.Target]);
+
+        return links;
     }
 
     private async Task<IEnumerable<IndexedLink>> RequestAndProcessPage(string url)
