@@ -1,9 +1,11 @@
-namespace BrokenLinkChecker.models;
+using BrokenLinkChecker.models;
+using BrokenLinkChecker.models.Links;
 
-public struct Link(string referrer, string target, string anchorText, int line, ResourceType type)
+namespace BrokenLinkChecker.Models.Links;
+
+public class Link(string referrer, string target, string anchorText, int line, ResourceType type) : NavigationLink(target)
 {
     public string Referrer { get; } = referrer;
-    public string Target { get; } = target;
     public string AnchorText { get; } = anchorText;
     public int Line { get; } = line;
     public ResourceType Type { get; } = type;

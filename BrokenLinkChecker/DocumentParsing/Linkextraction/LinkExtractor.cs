@@ -5,6 +5,7 @@ using AngleSharp.Html.Parser;
 using BrokenLinkChecker.crawler;
 using BrokenLinkChecker.DocumentParsing.Browsing;
 using BrokenLinkChecker.models;
+using BrokenLinkChecker.Models.Links;
 using BrokenLinkChecker.utility;
 
 namespace BrokenLinkChecker.DocumentParsing.Linkextraction

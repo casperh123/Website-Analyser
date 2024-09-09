@@ -1,5 +1,6 @@
 using BrokenLinkChecker.crawler;
 using BrokenLinkChecker.models;
+using BrokenLinkChecker.Models.Links;
 using BrokenLinkChecker.utility;
 
 namespace BrokenLinkChecker.Networking;
