@@ -21,7 +21,7 @@ public class ModularCrawler<T> where T : NavigationLink
         LinkQueue = [];
         LinkQueue.Enqueue(startPage);
 
-        while (!LinkQueue.TryDequeue(out T link))
+        while (LinkQueue.TryDequeue(out T link))
         {
             IEnumerable<T> foundLinks = await _linkProcessor.ProcessLinkAsync(link, CrawlResult);
 

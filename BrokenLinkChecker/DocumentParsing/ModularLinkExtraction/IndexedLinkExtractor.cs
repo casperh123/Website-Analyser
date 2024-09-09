@@ -14,19 +14,24 @@ public class IndexedLinkExtractor(HtmlParser parser) : AbstractLinkExtractor<Ind
             
         foreach (IElement link in document.Links)
         {
-            links.Add(GenerateIndexedLink(link, referringUrl.Target));
+            string href = link.GetAttribute("href") ?? string.Empty;
+
+            if (IsPage(href))
+            {
+                links.Add(GenerateIndexedLink(link, referringUrl.Target, href));
+            }
         }
 
         return links.Where(link => Uri.TryCreate(link.Target, UriKind.Absolute, out Uri uri) && uri.Host == thisUrl.Host).ToList();
     }
     
-    private IndexedLink GenerateIndexedLink(IElement element, string target)
+    private IndexedLink GenerateIndexedLink(IElement element, string referringPage, string target)
     {
-        string href = element.GetAttribute("href") ?? string.Empty;
+        string href = target;
         string resolvedUrl = Utilities.GetUrl(target, href);
         string text = element.TextContent;
         int line = element.SourceReference?.Position.Line ?? -1;
 
-        return new IndexedLink(target, resolvedUrl, text, line);
+        return new IndexedLink(referringPage, resolvedUrl, text, line);
     }
 }

@@ -1,10 +1,8 @@
 using System.Net;
 using AngleSharp.Html.Parser;
-using BrokenLinkChecker.crawler;
 using BrokenLinkChecker.Crawler.ExtendedCrawlers;
 using BrokenLinkChecker.DocumentParsing.ModularLinkExtraction;
 using BrokenLinkChecker.Models.Links;
-using BrokenLinkChecker.utility;
 
 namespace BrokenLinkChecker.DocumentParsing.LinkProcessors;
 
