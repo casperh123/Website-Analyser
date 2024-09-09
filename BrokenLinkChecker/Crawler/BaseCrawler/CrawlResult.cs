@@ -10,7 +10,7 @@ namespace BrokenLinkChecker.crawler
         public int LinksChecked { get; private set; }
         public int LinksEnqueued { get; private set; }
 
-        public event Action<BrokenLink> OnBrokenLinks;
+        public event Action<IndexedLink> OnBrokenLinks;
         public event Action<PageStat> OnPageVisited;
         public event Action<int> OnLinksEnqueued;
         public event Action<int> OnLinksChecked;
@@ -38,13 +38,13 @@ namespace BrokenLinkChecker.crawler
         {
             if (statusCode != HttpStatusCode.Forbidden)
             {
-                AddBrokenLink(new BrokenLink(url, statusCode));
+                AddBrokenLink(new IndexedLink(url, statusCode));
             }
         }
         
-        private void AddBrokenLink(BrokenLink brokenLink)
+        private void AddBrokenLink(IndexedLink indexedLink)
         {
-            OnBrokenLinks.Invoke(brokenLink);
+            OnBrokenLinks.Invoke(indexedLink);
         }
 
         public void IncrementLinksChecked()

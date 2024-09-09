@@ -60,7 +60,7 @@
     private int _linksEnqueued;
     private int _concurrentRequests = 1;
     
-    public ICollection<BrokenLink> BrokenLinks { get; set; } = new List<BrokenLink>();
+    public ICollection<IndexedLink> BrokenLinks { get; set; } = new List<IndexedLink>();
     public ICollection<PageStat> VisitedPages { get; set; } = new List<PageStat>();
 
     private PageStatState _currentStatus = PageStatState.DisplayBrokenLinks;
@@ -129,7 +129,7 @@
         InvokeAsync(StateHasChanged);
     }
 
-    private void UpdateBrokenLinks(BrokenLink link)
+    private void UpdateBrokenLinks(IndexedLink link)
     {
         BrokenLinks.Add(link);
         InvokeAsync(StateHasChanged);

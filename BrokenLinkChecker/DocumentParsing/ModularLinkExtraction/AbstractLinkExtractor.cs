@@ -1,11 +1,6 @@
 using AngleSharp.Dom;
-using AngleSharp.Html.Dom;
 using AngleSharp.Html.Parser;
-using BrokenLinkChecker.crawler;
-using BrokenLinkChecker.models;
 using BrokenLinkChecker.models.Links;
-using BrokenLinkChecker.Models.Links;
-using BrokenLinkChecker.utility;
 
 namespace BrokenLinkChecker.DocumentParsing.ModularLinkExtraction;
 

@@ -1,70 +1,30 @@
-using System.Collections.Concurrent;
-using System.Net;
-using BrokenLinkChecker.crawler;
-using BrokenLinkChecker.DocumentParsing.Linkextraction;
-using BrokenLinkChecker.models;
+using BrokenLinkChecker.DocumentParsing;
 using BrokenLinkChecker.models.Links;
-using BrokenLinkChecker.Models.Links;
-using BrokenLinkChecker.Networking;
-using BrokenLinkChecker.utility;
 
 namespace BrokenLinkChecker.Crawler.ExtendedCrawlers;
 
 public class ModularCrawler<T> where T : NavigationLink
 {
-    private readonly HttpRequestHandler _requestHandler;
-    private readonly ModularLinkExtractor<T> _linkProcessor;
-    private readonly ConcurrentDictionary<string, HttpStatusCode> _visitedResources = new();
-    private CrawlerConfig CrawlerConfig { get; }
+    private readonly ILinkProcessor<T> _linkProcessor;
     private ModularCrawlResult<T> CrawlResult { get; }
     private Queue<NavigationLink> LinkQueue { get; set; }
 
-    public ModularCrawler(HttpClient httpClient, CrawlerConfig crawlerConfig, ModularCrawlResult<T> crawlResult)
+    public ModularCrawler(ModularCrawlResult<T> crawlResult, ILinkProcessor<T> linkProcessor)
     { 
-        _requestHandler = new HttpRequestHandler(httpClient, crawlerConfig);
-        CrawlerConfig = crawlerConfig;
         CrawlResult = crawlResult;
-        _linkProcessor = new LinkExtractor(CrawlerConfig);
+        _linkProcessor = linkProcessor;
     }
 
     public async Task CrawlWebsiteAsync(Uri url)
     {
         LinkQueue = [];
-        LinkQueue.Enqueue(new NavigationLink(url.ToString()));
+        LinkQueue.Enqueue(new(url.ToString()));
 
         while (!LinkQueue.TryDequeue(out NavigationLink link))
         {
-            await ProcessLinkAsync(link);
+            await _linkProcessor.ProcessLinkAsync(link, CrawlResult);
 
             CrawlResult.SetLinksEnqueued(LinkQueue.Count);
         }
-    }
-
-    private async Task ProcessLinkAsync(NavigationLink url)
-    {   
-        
-            IEnumerable<T> links = await RequestAndProcessPage(url);
-            
-            foreach (T link in links)
-            {
-                LinkQueue.Enqueue(link);
-            }
-            CrawlResult.IncrementLinksChecked();
-        
-      
-            CrawlResult.AddResource(url, _visitedResources[url.Target]);
-        
-    }
-
-    private async Task<IEnumerable<T>> RequestAndProcessPage(NavigationLink url)
-    {
- 
-        (HttpResponseMessage response, long requestTime) = await Utilities.BenchmarkAsync(() => _requestHandler.RequestPageAsync(url));
-        _visitedResources[url.Target] = response.StatusCode;
-
-        (IEnumerable<Link> links, long parseTime) = await Utilities.BenchmarkAsync(() => _linkProcessor.GetLinksFromResponseAsync(response, url));
-        CrawlResult.AddResource(url, response, requestTime, parseTime);
-
-        return links;
     }
 }
