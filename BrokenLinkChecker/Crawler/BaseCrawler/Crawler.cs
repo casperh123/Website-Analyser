@@ -2,6 +2,7 @@ using System.Collections.Concurrent;
 using System.Net;
 using BrokenLinkChecker.DocumentParsing.Linkextraction;
 using BrokenLinkChecker.models;
+using BrokenLinkChecker.Models.Links;
 using BrokenLinkChecker.Networking;
 using BrokenLinkChecker.utility;
 
