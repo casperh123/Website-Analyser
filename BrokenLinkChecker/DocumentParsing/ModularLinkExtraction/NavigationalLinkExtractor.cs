@@ -1,4 +1,5 @@
 using AngleSharp.Dom;
+using AngleSharp.Html.Dom;
 using AngleSharp.Html.Parser;
 using BrokenLinkChecker.models.Links;
 
@@ -14,13 +15,23 @@ public class TargetLinkExtractor() : AbstractLinkExtractor<TargetLink>(new HtmlP
         foreach (IElement link in document.Links)
         {
             string? href = link.GetAttribute("href");
-            if (!string.IsNullOrEmpty(href) && IsPage(href))
+            if (!string.IsNullOrEmpty(href))
             {
                 TargetLink newLink = new (href);
                 links.Add(newLink);
             }
         }
-
+        
+        foreach (IHtmlImageElement image in document.Images)
+        {
+            string href = image.Source ?? "";
+            if (!string.IsNullOrEmpty(href))
+            {
+                TargetLink newLink = new (href);
+                links.Add(newLink);
+            }
+        }
+        
         return links.Where(link => Uri.TryCreate(link.Target, UriKind.Absolute, out Uri uri) && uri.Host == thisUrl.Host).ToList();
     }
 }

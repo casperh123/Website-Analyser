@@ -17,7 +17,7 @@ public class IndexedLinkExtractor(HtmlParser parser) : AbstractLinkExtractor<Ind
             string href = link.GetAttribute("href") ?? string.Empty;
             links.Add(GenerateIndexedLink(link, referringUrl.Target, href));
         }
-
+        
         return links.Where(link => Uri.TryCreate(link.Target, UriKind.Absolute, out Uri uri) && uri.Host == thisUrl.Host).ToList();
     }
     
