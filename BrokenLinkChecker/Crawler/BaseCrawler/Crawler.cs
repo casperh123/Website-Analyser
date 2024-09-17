@@ -48,7 +48,7 @@ namespace BrokenLinkChecker.crawler
 
         private async Task ProcessLinkAsync(Link url, ConcurrentQueue<Link> linksFound)
         {
-            if (_visitedResources.TryAdd(url.Target, HttpStatusCode.Unused))
+            if (_visitedResources.TryAdd(url.target, HttpStatusCode.Unused))
             {
                 IEnumerable<Link> links = await RequestAndProcessPage(url);
                 foreach (Link link in links)
@@ -59,7 +59,7 @@ namespace BrokenLinkChecker.crawler
             }
             else
             {
-                CrawlResult.AddResource(url, _visitedResources[url.Target]);
+                CrawlResult.AddResource(url, _visitedResources[url.target]);
             }
         }
 
@@ -69,7 +69,7 @@ namespace BrokenLinkChecker.crawler
             try
             {
                 (HttpResponseMessage response, long requestTime) = await Utilities.BenchmarkAsync(() => _requestHandler.RequestPageAsync(url));
-                _visitedResources[url.Target] = response.StatusCode;
+                _visitedResources[url.target] = response.StatusCode;
 
                 (IEnumerable<Link> links, long parseTime) = await Utilities.BenchmarkAsync(() => _linkProcessor.GetLinksFromResponseAsync(response, url));
                 CrawlResult.AddResource(url, response, requestTime, parseTime);

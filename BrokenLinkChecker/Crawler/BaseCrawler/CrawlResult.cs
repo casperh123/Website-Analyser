@@ -17,7 +17,7 @@ namespace BrokenLinkChecker.crawler
 
         public void AddResource(Link url, HttpResponseMessage response, long requestTime, long parseTime)
         {
-            PageStat pageStat = new PageStat(url.Target, response, url.Type, requestTime, parseTime);
+            PageStat pageStat = new PageStat(url.target, response, url.Type, requestTime, parseTime);
             
             OnPageVisited.Invoke(pageStat);
 

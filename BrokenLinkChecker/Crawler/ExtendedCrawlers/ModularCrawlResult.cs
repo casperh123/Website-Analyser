@@ -2,7 +2,7 @@ using BrokenLinkChecker.models.Links;
 
 namespace BrokenLinkChecker.Crawler.ExtendedCrawlers;
 
-public class ModularCrawlResult<T> where T : NavigationLink 
+public class ModularCrawlResult<T> where T : TargetLink 
 {
     public int LinksChecked { get; private set; }
     public int LinksEnqueued { get; private set; }

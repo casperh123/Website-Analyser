@@ -4,7 +4,7 @@ using BrokenLinkChecker.models.Links;
 
 namespace BrokenLinkChecker.Models.Links;
 
-public class IndexedLink : NavigationLink
+public class IndexedLink : TargetLink
 {
     public string ReferringPage { get; set; }
     public string AnchorText { get; set; }

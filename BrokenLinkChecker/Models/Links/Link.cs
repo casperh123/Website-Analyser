@@ -3,7 +3,7 @@ using BrokenLinkChecker.models.Links;
 
 namespace BrokenLinkChecker.Models.Links;
 
-public class Link(string referrer, string target, string anchorText, int line, ResourceType type) : NavigationLink(target)
+public class Link(string referrer, string target, string anchorText, int line, ResourceType type) : TargetLink(target)
 {
     public string Referrer = referrer;    
     public string AnchorText { get; } = anchorText;

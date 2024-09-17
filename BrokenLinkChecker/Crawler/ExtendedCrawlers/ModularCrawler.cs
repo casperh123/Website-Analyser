@@ -4,7 +4,7 @@ using BrokenLinkChecker.models.Links;
 
 namespace BrokenLinkChecker.Crawler.ExtendedCrawlers;
 
-public class ModularCrawler<T> where T : NavigationLink
+public class ModularCrawler<T> where T : TargetLink
 {
     private readonly ILinkProcessor<T> _linkProcessor;
     private ModularCrawlResult<T> CrawlResult { get; }

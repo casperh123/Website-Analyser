@@ -4,7 +4,7 @@ using BrokenLinkChecker.models.Links;
 
 namespace BrokenLinkChecker.DocumentParsing.ModularLinkExtraction;
 
-public abstract class AbstractLinkExtractor<T> where T : NavigationLink
+public abstract class AbstractLinkExtractor<T> where T : TargetLink
 {
     protected readonly HtmlParser Parser;
 
