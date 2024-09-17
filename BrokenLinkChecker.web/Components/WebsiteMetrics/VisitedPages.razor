@@ -1,0 +1,23 @@
+@using BrokenLinkChecker.models.Links
+@using BrokenLinkChecker.Models.Links
+@using Microsoft.AspNetCore.Components.QuickGrid
+
+@rendermode InteractiveServer
+
+<h3>Broken Links:</h3>
+
+@if (Pages.Count > 0)
+{
+    <QuickGrid Items="@Pages.AsQueryable()" Pagination="_pagination">
+        <PropertyColumn Property="@(link => link.Target)" Sortable="true"/>
+    </QuickGrid>
+    
+    <Paginator State="_pagination" />
+}
+
+@code {
+    [Parameter] 
+    public ICollection<TargetLink> Pages { get; set; }
+
+    private PaginationState _pagination = new () { ItemsPerPage = 20 };
+}
