@@ -4,7 +4,7 @@ using BrokenLinkChecker.models.Links;
 
 namespace BrokenLinkChecker.DocumentParsing.ModularLinkExtraction;
 
-public class NavigationLinkExtractor() : AbstractLinkExtractor<TargetLink>(new HtmlParser(new HtmlParserOptions()))
+public class TargetLinkExtractor() : AbstractLinkExtractor<TargetLink>(new HtmlParser(new HtmlParserOptions()))
 {
     protected override IEnumerable<TargetLink> GetLinksFromDocument(IDocument document, TargetLink referringUrl)
     {

@@ -1,4 +1,4 @@
-@page "/website-analyser-modular"
+@page "/cache-warming"
 @using BrokenLinkChecker.Crawler.ExtendedCrawlers
 @using BrokenLinkChecker.DocumentParsing.LinkProcessors
 @using BrokenLinkChecker.models.Links
@@ -7,13 +7,13 @@
 @using BrokenLinkChecker.web.Components.WebsiteInputs
 @rendermode InteractiveServer
 
-<h2>Website Analyser</h2>
+<h2>Cache Warming</h2>
 
 <WebsiteInput UriHasChanged="WarmCache"></WebsiteInput>
 
 @if (IsChecking)
 {
-    <p>Crawling website, please wait...</p>
+    <p>Warming Cache, please wait...</p>
     <p>Links enqueued: @_linksEnqueued</p>
 }
 
@@ -22,8 +22,8 @@
     <p>Links checked: @_linksChecked</p>
     
     <div class="padding-m round-corners box-shadow">
-        <h2>Broken Links</h2>
-        <VisitedPages BrokenLinks="WarmedLinks" />
+        <h2>Warmed pages</h2>
+        <VisitedPages Pages="WarmedLinks" />
     </div>
 }
 
@@ -44,9 +44,9 @@
             IsChecking = true;
             ResetResults();
 
-            ModularCrawlResult<IndexedLink> crawlResult = InitializeCrawlResult();
-            ILinkProcessor<IndexedLink> linkProcessor = new BrokenLinkProcessor(HttpClientFactory.CreateClient("WebsiteAnalyser"));
-            ModularCrawler<IndexedLink> crawler = new ModularCrawler<IndexedLink>(crawlResult, linkProcessor);
+            ModularCrawlResult<TargetLink> crawlResult = InitializeCrawlResult();
+            ILinkProcessor<TargetLink> linkProcessor = new CacheWarmingLinkProcessor(HttpClientFactory.CreateClient("WebsiteAnalyser"));
+            ModularCrawler<TargetLink> crawler = new ModularCrawler<TargetLink>(crawlResult, linkProcessor);
             
             await crawler.CrawlWebsiteAsync(new IndexedLink(string.Empty, url.ToString(), "", 0));
         }
@@ -64,9 +64,9 @@
         _linksEnqueued = 0;
     }
 
-    private ModularCrawlResult<IndexedLink> InitializeCrawlResult()
+    private ModularCrawlResult<TargetLink> InitializeCrawlResult()
     {
-        ModularCrawlResult<IndexedLink> crawlResult = new ModularCrawlResult<IndexedLink>();
+        ModularCrawlResult<TargetLink> crawlResult = new ModularCrawlResult<TargetLink>();
 
         crawlResult.OnLinksEnqueued += UpdateLinksEnqueued;
         crawlResult.OnLinksChecked += UpdateLinksChecked;
@@ -86,7 +86,7 @@
         InvokeAsync(StateHasChanged);
     }
 
-    private void UpdateBrokenLinks(IndexedLink link)
+    private void UpdateBrokenLinks(TargetLink link)
     {
         WarmedLinks.Add(link);
         InvokeAsync(StateHasChanged);

@@ -14,7 +14,7 @@ public class CacheWarmingLinkProcessor : ILinkProcessor<TargetLink>
     {
         _visitedResources = new HashSet<TargetLink>();
         _httpClient = httpClient;
-        _linkExtractor = new NavigationLinkExtractor();
+        _linkExtractor = new TargetLinkExtractor();
     } 
     
     public async Task<IEnumerable<TargetLink>> ProcessLinkAsync(TargetLink link, ModularCrawlResult<TargetLink> crawlResult)
@@ -29,6 +29,7 @@ public class CacheWarmingLinkProcessor : ILinkProcessor<TargetLink>
                 
                 links = await _linkExtractor.GetLinksFromDocument(response, link);
                 
+                crawlResult.AddResource(link);
                 _visitedResources.Add(link);
             }
             catch (Exception e)
@@ -39,7 +40,7 @@ public class CacheWarmingLinkProcessor : ILinkProcessor<TargetLink>
             crawlResult.IncrementLinksChecked();
         }
 
-        return links;
+        return links.Except(_visitedResources);
     }
 
 }

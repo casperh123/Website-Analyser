@@ -11,6 +11,6 @@ public class HttpRequestHandler(HttpClient httpClient, CrawlerConfig crawlerConf
     public async Task<HttpResponseMessage> RequestPageAsync(Link url)
     {
         await _crawlerConfig.ApplyJitterAsync();
-        return await _httpClient.GetAsync(url.target, HttpCompletionOption.ResponseHeadersRead);
+        return await _httpClient.GetAsync(url.Target, HttpCompletionOption.ResponseHeadersRead);
     }
 }
