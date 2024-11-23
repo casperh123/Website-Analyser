@@ -4,7 +4,7 @@ using BrokenLinkChecker.models.Links;
 
 namespace BrokenLinkChecker.DocumentParsing.ModularLinkExtraction;
 
-public abstract class AbstractLinkExtractor<T> where T : NavigationLink
+public abstract class AbstractLinkExtractor<T> where T : Link
 {
     protected readonly HtmlParser Parser;
 
@@ -17,7 +17,7 @@ public abstract class AbstractLinkExtractor<T> where T : NavigationLink
     {
         if (!response.IsSuccessStatusCode)
         {
-            return Enumerable.Empty<T>();
+            return [];
         } 
 
         await using Stream document = await response.Content.ReadAsStreamAsync();
@@ -39,7 +39,7 @@ public abstract class AbstractLinkExtractor<T> where T : NavigationLink
             return false;
         }
 
-        return !ContainsExcludableElements(url);
+        return !IsExcluded(url);
     }
 
     protected static bool IsResourceFile(Uri uri)
@@ -51,7 +51,7 @@ public abstract class AbstractLinkExtractor<T> where T : NavigationLink
         return excludedExtensions.Contains(Path.GetExtension(uri.LocalPath));
     }
 
-    protected static bool ContainsExcludableElements(string url)
+    protected static bool IsExcluded(string url)
     {
         return url.Contains('#') || url.Contains('?') || url.Contains("mailto:");
     }

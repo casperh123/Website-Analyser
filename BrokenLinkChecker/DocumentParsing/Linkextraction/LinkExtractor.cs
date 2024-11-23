@@ -22,19 +22,19 @@ namespace BrokenLinkChecker.DocumentParsing.Linkextraction
             _htmlParserPool = new HtmlParserPool(htmlParsingOptions, crawlerConfig.ConcurrentRequests);
         }
 
-        public async Task<IEnumerable<Link>> GetLinksFromResponseAsync(HttpResponseMessage response, Link url)
+        public async Task<IEnumerable<TraceableLink>> GetLinksFromResponseAsync(HttpResponseMessage response, TraceableLink url)
         {
             if (!response.IsSuccessStatusCode || url.Type is not ResourceType.Page)
             {
                 byte[] responseContent = await response.Content.ReadAsByteArrayAsync();
-                return Enumerable.Empty<Link>();
+                return Enumerable.Empty<TraceableLink>();
             } 
 
             await using Stream document = await response.Content.ReadAsStreamAsync();
             return await ExtractLinksFromDocumentAsync(document, url);
         }
 
-        private async Task<List<Link>> ExtractLinksFromDocumentAsync(Stream document, Link checkingUrl)
+        private async Task<List<TraceableLink>> ExtractLinksFromDocumentAsync(Stream document, TraceableLink checkingUrl)
         {
             IDocument doc;
 
@@ -46,9 +46,9 @@ namespace BrokenLinkChecker.DocumentParsing.Linkextraction
             return GetLinksFromDocument(doc, checkingUrl);
         }
 
-        private List<Link> GetLinksFromDocument(IDocument document, Link checkingUrl)
+        private List<TraceableLink> GetLinksFromDocument(IDocument document, TraceableLink checkingUrl)
         {
-            List<Link> links = [];
+            List<TraceableLink> links = [];
             Uri thisUrl = new Uri(checkingUrl.Target);
             
             foreach (IElement link in document.Links)
@@ -56,8 +56,8 @@ namespace BrokenLinkChecker.DocumentParsing.Linkextraction
                 string? href = link.GetAttribute("href");
                 if (!string.IsNullOrEmpty(href) && !IsExcluded(href))
                 {
-                    Link newLink = GenerateLinkNode(link, checkingUrl.Target, "href", ResourceType.Page);
-                    links.Add(newLink);
+                    TraceableLink newTraceableLink = GenerateLinkNode(link, checkingUrl.Target, "href", ResourceType.Page);
+                    links.Add(newTraceableLink);
                 }
             }
 
@@ -71,8 +71,8 @@ namespace BrokenLinkChecker.DocumentParsing.Linkextraction
                 string href = stylesheet.Href;
                 if (!string.IsNullOrEmpty(href))
                 {
-                    Link newLink = GenerateLinkNode(stylesheet.OwnerNode, checkingUrl.Target, "href", ResourceType.Stylesheet);
-                    links.Add(newLink);
+                    TraceableLink newTraceableLink = GenerateLinkNode(stylesheet.OwnerNode, checkingUrl.Target, "href", ResourceType.Stylesheet);
+                    links.Add(newTraceableLink);
                 }
             }
 
@@ -81,8 +81,8 @@ namespace BrokenLinkChecker.DocumentParsing.Linkextraction
                 string? src = script.Source;
                 if (!string.IsNullOrEmpty(src))
                 {
-                    Link newLink = GenerateLinkNode(script, checkingUrl.Target, "src", ResourceType.Script);
-                    links.Add(newLink);
+                    TraceableLink newTraceableLink = GenerateLinkNode(script, checkingUrl.Target, "src", ResourceType.Script);
+                    links.Add(newTraceableLink);
                 }
             }
 
@@ -91,22 +91,22 @@ namespace BrokenLinkChecker.DocumentParsing.Linkextraction
                 string? src = image.Source;
                 if (!string.IsNullOrEmpty(src))
                 {
-                    Link newLink = GenerateLinkNode(image, checkingUrl.Target, "src", ResourceType.Image);
-                    links.Add(newLink);
+                    TraceableLink newTraceableLink = GenerateLinkNode(image, checkingUrl.Target, "src", ResourceType.Image);
+                    links.Add(newTraceableLink);
                 }
             }
 
             return links.Where(link => Uri.TryCreate(link.Target, UriKind.Absolute, out Uri uri) && uri.Host == thisUrl.Host).ToList();
         }
 
-        private Link GenerateLinkNode(IElement element, string target, string attribute, ResourceType resourceType = ResourceType.Resource)
+        private TraceableLink GenerateLinkNode(IElement element, string target, string attribute, ResourceType resourceType = ResourceType.Resource)
         {
             string href = element.GetAttribute(attribute) ?? string.Empty;
             string resolvedUrl = Utilities.GetUrl(target, href);
             string text = element.TextContent;
             int line = element.SourceReference?.Position.Line ?? -1;
 
-            return new Link(target, resolvedUrl, text, line, resourceType);
+            return new TraceableLink(target, resolvedUrl, text, line, resourceType);
         }
         
         private static bool IsExcluded(string url)

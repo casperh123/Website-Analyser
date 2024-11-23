@@ -3,15 +3,14 @@ using AngleSharp.Html.Parser;
 using BrokenLinkChecker.Crawler.ExtendedCrawlers;
 using BrokenLinkChecker.DocumentParsing.ModularLinkExtraction;
 using BrokenLinkChecker.Models.Links;
-using Microsoft.Extensions.Logging;
 
 namespace BrokenLinkChecker.DocumentParsing.LinkProcessors;
 
 public class BrokenLinkProcessor : ILinkProcessor<IndexedLink>
 {
-    private readonly Dictionary<string, HttpStatusCode> _visitedResources = new();
     private readonly HttpClient _httpClient;
-    private AbstractLinkExtractor<IndexedLink> _linkExtractor; 
+    private readonly Dictionary<string, HttpStatusCode> _visitedResources = new();
+    private AbstractLinkExtractor<IndexedLink> _linkExtractor;
     
     public BrokenLinkProcessor(HttpClient httpClient)
     {
@@ -33,7 +32,8 @@ public class BrokenLinkProcessor : ILinkProcessor<IndexedLink>
         {
             try
             {
-                using HttpResponseMessage response = await _httpClient.GetAsync(link.Target, HttpCompletionOption.ResponseHeadersRead);
+                using HttpResponseMessage response =
+                    await _httpClient.GetAsync(link.Target, HttpCompletionOption.ResponseHeadersRead);
                 statusCode = response.StatusCode;
                 _visitedResources[link.Target] = statusCode;
 
@@ -41,10 +41,13 @@ public class BrokenLinkProcessor : ILinkProcessor<IndexedLink>
                 {
                     links = await _linkExtractor.GetLinksFromDocument(response, link);
                 }
+                else
+                {
+                    _visitedResources[link.Target] = statusCode;
+                }
             }
-            catch (Exception e)
+            finally
             {
-                statusCode = HttpStatusCode.InternalServerError;
                 _visitedResources[link.Target] = statusCode;
             }
         }

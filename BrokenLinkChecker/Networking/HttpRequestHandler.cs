@@ -8,7 +8,7 @@ public class HttpRequestHandler(HttpClient httpClient, CrawlerConfig crawlerConf
     private HttpClient _httpClient = httpClient;
     private CrawlerConfig _crawlerConfig = crawlerConfig;
     
-    public async Task<HttpResponseMessage> RequestPageAsync(Link url)
+    public async Task<HttpResponseMessage> RequestPageAsync(TraceableLink url)
     {
         await _crawlerConfig.ApplyJitterAsync();
         return await _httpClient.GetAsync(url.Target, HttpCompletionOption.ResponseHeadersRead);

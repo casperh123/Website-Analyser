@@ -27,13 +27,13 @@ namespace BrokenLinkChecker.crawler
 
         public async Task CrawlWebsiteAsync(Uri url)
         {
-            ConcurrentQueue<Link> linkQueue = new ConcurrentQueue<Link>();
+            ConcurrentQueue<TraceableLink> linkQueue = new ConcurrentQueue<TraceableLink>();
 
-            linkQueue.Enqueue(new Link(string.Empty, url.ToString(), string.Empty, 0, ResourceType.Page));
+            linkQueue.Enqueue(new TraceableLink(string.Empty, url.ToString(), string.Empty, 0, ResourceType.Page));
 
             while (!linkQueue.IsEmpty)
             {
-                ConcurrentQueue<Link> foundLinks = new ConcurrentQueue<Link>();
+                ConcurrentQueue<TraceableLink> foundLinks = new ConcurrentQueue<TraceableLink>();
 
                 await Parallel.ForEachAsync(linkQueue, async (link, cancellationToken) =>
                 {
@@ -46,12 +46,12 @@ namespace BrokenLinkChecker.crawler
             }
         }
 
-        private async Task ProcessLinkAsync(Link url, ConcurrentQueue<Link> linksFound)
+        private async Task ProcessLinkAsync(TraceableLink url, ConcurrentQueue<TraceableLink> linksFound)
         {
             if (_visitedResources.TryAdd(url.Target, HttpStatusCode.Unused))
             {
-                IEnumerable<Link> links = await RequestAndProcessPage(url);
-                foreach (Link link in links)
+                IEnumerable<TraceableLink> links = await RequestAndProcessPage(url);
+                foreach (TraceableLink link in links)
                 {
                     linksFound.Enqueue(link);
                 }
@@ -63,7 +63,7 @@ namespace BrokenLinkChecker.crawler
             }
         }
 
-        private async Task<IEnumerable<Link>> RequestAndProcessPage(Link url)
+        private async Task<IEnumerable<TraceableLink>> RequestAndProcessPage(TraceableLink url)
         {
             await CrawlerConfig.Semaphore.WaitAsync();
             try
@@ -71,7 +71,7 @@ namespace BrokenLinkChecker.crawler
                 (HttpResponseMessage response, long requestTime) = await Utilities.BenchmarkAsync(() => _requestHandler.RequestPageAsync(url));
                 _visitedResources[url.Target] = response.StatusCode;
 
-                (IEnumerable<Link> links, long parseTime) = await Utilities.BenchmarkAsync(() => _linkProcessor.GetLinksFromResponseAsync(response, url));
+                (IEnumerable<TraceableLink> links, long parseTime) = await Utilities.BenchmarkAsync(() => _linkProcessor.GetLinksFromResponseAsync(response, url));
                 CrawlResult.AddResource(url, response, requestTime, parseTime);
 
                 return links;

@@ -15,7 +15,7 @@ namespace BrokenLinkChecker.crawler
         public event Action<int> OnLinksEnqueued;
         public event Action<int> OnLinksChecked;
 
-        public void AddResource(Link url, HttpResponseMessage response, long requestTime, long parseTime)
+        public void AddResource(TraceableLink url, HttpResponseMessage response, long requestTime, long parseTime)
         {
             PageStat pageStat = new PageStat(url.Target, response, url.Type, requestTime, parseTime);
             
@@ -27,14 +27,14 @@ namespace BrokenLinkChecker.crawler
             }
         }
         
-        public void AddResource(Link url, HttpStatusCode statusCode) {
+        public void AddResource(TraceableLink url, HttpStatusCode statusCode) {
             if (statusCode == HttpStatusCode.NotFound)
             {
                 HandleBrokenLink(url, statusCode);
             }
         }
 
-        private void HandleBrokenLink(Link url, HttpStatusCode statusCode)
+        private void HandleBrokenLink(TraceableLink url, HttpStatusCode statusCode)
         {
             if (statusCode != HttpStatusCode.Forbidden)
             {

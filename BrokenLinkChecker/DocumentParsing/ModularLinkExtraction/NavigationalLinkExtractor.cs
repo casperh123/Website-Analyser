@@ -4,11 +4,11 @@ using BrokenLinkChecker.models.Links;
 
 namespace BrokenLinkChecker.DocumentParsing.ModularLinkExtraction;
 
-public class NavigationLinkExtractor() : AbstractLinkExtractor<NavigationLink>(new HtmlParser(new HtmlParserOptions()))
+public class NavigationLinkExtractor() : AbstractLinkExtractor<Link>(new HtmlParser(new HtmlParserOptions()))
 {
-    protected override IEnumerable<NavigationLink> GetLinksFromDocument(IDocument document, NavigationLink referringUrl)
+    protected override IEnumerable<Link> GetLinksFromDocument(IDocument document, Link referringUrl)
     {
-        List<NavigationLink> links = [];
+        List<Link> links = [];
         Uri thisUrl = new Uri(referringUrl.Target);
             
         foreach (IElement link in document.Links)
@@ -16,7 +16,7 @@ public class NavigationLinkExtractor() : AbstractLinkExtractor<NavigationLink>(n
             string? href = link.GetAttribute("href");
             if (!string.IsNullOrEmpty(href) && IsPage(href))
             {
-                NavigationLink newLink = new (href);
+                Link newLink = new (href);
                 links.Add(newLink);
             }
         }

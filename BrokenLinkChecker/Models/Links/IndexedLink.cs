@@ -4,14 +4,14 @@ using BrokenLinkChecker.models.Links;
 
 namespace BrokenLinkChecker.Models.Links;
 
-public class IndexedLink : NavigationLink
+public class IndexedLink : Link
 {
     public string ReferringPage { get; set; }
     public string AnchorText { get; set; }
     public int Line { get; set; }
     public HttpStatusCode StatusCode { get; set; }
 
-    public IndexedLink(Link url, HttpStatusCode statuscode) : base(url.Target)
+    public IndexedLink(TraceableLink url, HttpStatusCode statuscode) : base(url.Target)
     {
         ReferringPage = url.Referrer;
         AnchorText = url.AnchorText;
