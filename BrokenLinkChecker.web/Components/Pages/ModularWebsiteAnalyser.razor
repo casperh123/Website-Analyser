@@ -1,9 +1,11 @@
 @page "/website-analyser-modular"
 @using BrokenLinkChecker.Crawler.ExtendedCrawlers
-@using BrokenLinkChecker.DocumentParsing.LinkProcessors
 @using BrokenLinkChecker.Models.Links
 @using BrokenLinkChecker.web.Components.WebsiteMetrics
 @using BrokenLinkChecker.web.Components.WebsiteInputs
+@using WebsiteAnalyzer.Infrastructure.Services
+@inject IBrokenLinkService BrokenLinkService
+
 @rendermode InteractiveServer
 
 <h2>Website Analyser</h2>
@@ -22,19 +24,15 @@
     
     <div class="padding-m round-corners box-shadow">
         <h2>Broken Links</h2>
-        <BrokenLinksStats BrokenLinks="BrokenLinks" />
+        <BrokenLinksStats BrokenLinks="_brokenLinks" />
     </div>
 }
 
 @code {
-    [Inject] 
-    private IHttpClientFactory HttpClientFactory { get; set; }
-    
     private bool IsChecking { get; set; }
     private int _linksChecked;
     private int _linksEnqueued;
-
-    public ICollection<IndexedLink> BrokenLinks = [];
+    private ICollection<IndexedLink> _brokenLinks = [];
 
     private async Task CheckBrokenLinks(Uri url)
     {
@@ -43,11 +41,7 @@
             IsChecking = true;
             ResetResults();
 
-            ModularCrawlResult<IndexedLink> crawlResult = InitializeCrawlResult();
-            ILinkProcessor<IndexedLink> linkProcessor = new BrokenLinkProcessor(HttpClientFactory.CreateClient("WebsiteAnalyser"));
-            ModularCrawler<IndexedLink> crawler = new ModularCrawler<IndexedLink>(linkProcessor);
-            
-            await crawler.CrawlWebsiteAsync(new IndexedLink(string.Empty, url.ToString(), "", 0), crawlResult);
+            await BrokenLinkService.FindBrokenLinks(url.ToString(), UpdateLinksEnqueued, UpdateLinksChecked, UpdateBrokenLinks);
         }
         finally
         {
@@ -58,20 +52,9 @@
     
     private void ResetResults()
     {
-        BrokenLinks.Clear();
+        _brokenLinks.Clear();
         _linksChecked = 0;
         _linksEnqueued = 0;
-    }
-
-    private ModularCrawlResult<IndexedLink> InitializeCrawlResult()
-    {
-        ModularCrawlResult<IndexedLink> crawlResult = new ModularCrawlResult<IndexedLink>();
-
-        crawlResult.OnLinksEnqueued += UpdateLinksEnqueued;
-        crawlResult.OnLinksChecked += UpdateLinksChecked;
-        crawlResult.OnResouceVisited += UpdateBrokenLinks;
-
-        return crawlResult;
     }
 
     private void UpdateLinksEnqueued(int count)
@@ -87,7 +70,7 @@
 
     private void UpdateBrokenLinks(IndexedLink link)
     {
-        BrokenLinks.Add(link);
+        _brokenLinks.Add(link);
         InvokeAsync(StateHasChanged);
     }
 }

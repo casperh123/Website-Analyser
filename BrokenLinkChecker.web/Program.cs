@@ -30,6 +30,7 @@ builder.Services.AddHttpClient("WebsiteAnalyser", client =>
     });
 
 builder.Services.AddScoped<ICacheWarmingService, CacheWarmingService>();
+builder.Services.AddScoped<IBrokenLinkService, BrokenLinkService>();
 
 var app = builder.Build();
 
