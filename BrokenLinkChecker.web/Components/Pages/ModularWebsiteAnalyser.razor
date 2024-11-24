@@ -45,9 +45,9 @@
 
             ModularCrawlResult<IndexedLink> crawlResult = InitializeCrawlResult();
             ILinkProcessor<IndexedLink> linkProcessor = new BrokenLinkProcessor(HttpClientFactory.CreateClient("WebsiteAnalyser"));
-            ModularCrawler<IndexedLink> crawler = new ModularCrawler<IndexedLink>(crawlResult, linkProcessor);
+            ModularCrawler<IndexedLink> crawler = new ModularCrawler<IndexedLink>(linkProcessor);
             
-            await crawler.CrawlWebsiteAsync(new IndexedLink(string.Empty, url.ToString(), "", 0));
+            await crawler.CrawlWebsiteAsync(new IndexedLink(string.Empty, url.ToString(), "", 0), crawlResult);
         }
         finally
         {
