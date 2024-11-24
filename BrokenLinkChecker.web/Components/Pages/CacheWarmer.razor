@@ -1,6 +1,4 @@
 @page "/cache-warmer"
-@using BrokenLinkChecker.Crawler.ExtendedCrawlers
-@using BrokenLinkChecker.models.Links
 @using BrokenLinkChecker.web.Components.WebsiteInputs
 @using WebsiteAnalyzer.Infrastructure.Services
 @inject ICacheWarmingService CacheWarmingService
@@ -29,17 +27,13 @@
     
     private async Task CheckBrokenLinks(Uri url)
     {
-        try
-        {
             IsChecking = true;
+            
             ResetResults();
             
             await CacheWarmingService.WarmCacheAsync(url.ToString(), UpdateLinksEnqueued, UpdateLinksChecked);
-        }
-        finally
-        {
+            
             IsChecking = false;
-        }
     }
     
     private void ResetResults()
