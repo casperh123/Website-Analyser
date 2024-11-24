@@ -3,6 +3,7 @@ using System.Security.Authentication;
 using BrokenLinkChecker.crawler;
 using BrokenLinkChecker.HttpClients;
 using BrokenLinkChecker.web.Components;
+using WebsiteAnalyzer.Infrastructure.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -27,6 +28,8 @@ builder.Services.AddHttpClient("WebsiteAnalyser", client =>
         MaxConnectionsPerServer = 50,
         ServerCertificateCustomValidationCallback = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator
     });
+
+builder.Services.AddScoped<ICacheWarmingService, CacheWarmingService>();
 
 var app = builder.Build();
 

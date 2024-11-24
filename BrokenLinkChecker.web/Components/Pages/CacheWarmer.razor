@@ -1,8 +1,10 @@
 @page "/cache-warmer"
 @using BrokenLinkChecker.Crawler.ExtendedCrawlers
-@using BrokenLinkChecker.DocumentParsing.LinkProcessors
 @using BrokenLinkChecker.models.Links
 @using BrokenLinkChecker.web.Components.WebsiteInputs
+@using WebsiteAnalyzer.Infrastructure.Services
+@inject ICacheWarmingService CacheWarmingService
+
 @rendermode InteractiveServer
 
 <h2>Website Analyser</h2>
@@ -21,9 +23,6 @@
 }
 
 @code {
-    [Inject] 
-    private IHttpClientFactory HttpClientFactory { get; set; }
-    
     private bool IsChecking { get; set; }
     private int _linksChecked;
     private int _linksEnqueued;
@@ -34,17 +33,12 @@
         {
             IsChecking = true;
             ResetResults();
-
-            ModularCrawlResult<Link> crawlResult = InitializeCrawlResult();
-            ILinkProcessor<Link> linkProcessor = new LinkProcessor(HttpClientFactory.CreateClient("WebsiteAnalyser"));
-            ModularCrawler<Link> crawler = new ModularCrawler<Link>(crawlResult, linkProcessor);
             
-            await crawler.CrawlWebsiteAsync(new Link(url.ToString()));
+            await CacheWarmingService.WarmCacheAsync(url.ToString(), UpdateLinksEnqueued, UpdateLinksChecked);
         }
         finally
         {
             IsChecking = false;
-            StateHasChanged();
         }
     }
     
@@ -52,16 +46,6 @@
     {
         _linksChecked = 0;
         _linksEnqueued = 0;
-    }
-
-    private ModularCrawlResult<Link> InitializeCrawlResult()
-    {
-        ModularCrawlResult<Link> crawlResult = new ModularCrawlResult<Link>();
-
-        crawlResult.OnLinksEnqueued += UpdateLinksEnqueued;
-        crawlResult.OnLinksChecked += UpdateLinksChecked;
-
-        return crawlResult;
     }
 
     private void UpdateLinksEnqueued(int count)

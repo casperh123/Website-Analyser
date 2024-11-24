@@ -8,6 +8,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\BrokenLinkChecker\BrokenLinkChecker.csproj" />
+      <ProjectReference Include="..\WebsiteAnalyzer.Infrastructure\WebsiteAnalyzer.Infrastructure.csproj" />
     </ItemGroup>
 
     <ItemGroup>
