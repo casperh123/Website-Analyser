@@ -22,12 +22,17 @@ public class LinkProcessor : ILinkProcessor<Link>
     {
         IEnumerable<Link> links = [];
 
+        if (_visitedSites.Contains(link.Target))
+        {
+            return [];
+        }
+        
         try
         {
             HttpResponseMessage response =
                 await _httpClient.GetAsync(link.Target, HttpCompletionOption.ResponseHeadersRead);
 
-            if (!response.IsSuccessStatusCode)
+            if (response.IsSuccessStatusCode)
             {
                 links = await _linkExtractor.GetLinksFromDocument(response, link);
             }
@@ -39,6 +44,7 @@ public class LinkProcessor : ILinkProcessor<Link>
         finally
         {
             _visitedSites.Add(link.Target);
+            crawlResult.IncrementLinksChecked();
         }
         
         

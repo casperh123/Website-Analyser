@@ -1,0 +1,78 @@
+@page "/cache-warmer"
+@using BrokenLinkChecker.Crawler.ExtendedCrawlers
+@using BrokenLinkChecker.DocumentParsing.LinkProcessors
+@using BrokenLinkChecker.models.Links
+@using BrokenLinkChecker.web.Components.WebsiteInputs
+@rendermode InteractiveServer
+
+<h2>Website Analyser</h2>
+
+<WebsiteInput UriHasChanged="CheckBrokenLinks"></WebsiteInput>
+
+@if (IsChecking)
+{
+    <p>Crawling website, please wait...</p>
+    <p>Links enqueued: @_linksEnqueued</p>
+}
+
+@if (_linksChecked > 0)
+{
+    <p>Links checked: @_linksChecked</p>
+}
+
+@code {
+    [Inject] 
+    private IHttpClientFactory HttpClientFactory { get; set; }
+    
+    private bool IsChecking { get; set; }
+    private int _linksChecked;
+    private int _linksEnqueued;
+    
+    private async Task CheckBrokenLinks(Uri url)
+    {
+        try
+        {
+            IsChecking = true;
+            ResetResults();
+
+            ModularCrawlResult<Link> crawlResult = InitializeCrawlResult();
+            ILinkProcessor<Link> linkProcessor = new LinkProcessor(HttpClientFactory.CreateClient("WebsiteAnalyser"));
+            ModularCrawler<Link> crawler = new ModularCrawler<Link>(crawlResult, linkProcessor);
+            
+            await crawler.CrawlWebsiteAsync(new Link(url.ToString()));
+        }
+        finally
+        {
+            IsChecking = false;
+            StateHasChanged();
+        }
+    }
+    
+    private void ResetResults()
+    {
+        _linksChecked = 0;
+        _linksEnqueued = 0;
+    }
+
+    private ModularCrawlResult<Link> InitializeCrawlResult()
+    {
+        ModularCrawlResult<Link> crawlResult = new ModularCrawlResult<Link>();
+
+        crawlResult.OnLinksEnqueued += UpdateLinksEnqueued;
+        crawlResult.OnLinksChecked += UpdateLinksChecked;
+
+        return crawlResult;
+    }
+
+    private void UpdateLinksEnqueued(int count)
+    {
+        _linksEnqueued = count;
+        InvokeAsync(StateHasChanged);
+    }
+
+    private void UpdateLinksChecked(int count)
+    {
+        _linksChecked = count;
+        InvokeAsync(StateHasChanged);
+    }
+}

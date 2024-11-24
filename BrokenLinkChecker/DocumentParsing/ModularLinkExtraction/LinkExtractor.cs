@@ -20,24 +20,6 @@ public class LinkExtractor(HtmlParser parser) : AbstractLinkExtractor<Link>(pars
                 links.Add(new Link(href));
             }
         }
-            
-        foreach (IStyleSheet stylesheet in document.StyleSheets)
-        {
-            string href = stylesheet.Href;
-            if (!string.IsNullOrEmpty(href) && !IsExcluded(href))
-            {
-                links.Add(new Link(href));
-            }
-        }
-
-        foreach (IHtmlScriptElement script in document.Scripts)
-        {
-            string? src = script.Source;
-            if (!string.IsNullOrEmpty(src) && !IsExcluded(src))
-            {
-                links.Add(new Link(src));
-            }
-        }
 
         foreach (IHtmlImageElement image in document.Images)
         {
