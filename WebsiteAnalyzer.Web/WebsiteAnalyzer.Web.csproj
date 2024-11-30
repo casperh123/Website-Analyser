@@ -1,0 +1,28 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+    <PropertyGroup>
+        <TargetFramework>net8.0</TargetFramework>
+        <Nullable>enable</Nullable>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <UserSecretsId>aspnet-WebsiteAnalyzer.Web-1ab5a958-7d8d-4b31-9aa1-f15b4b3f1494</UserSecretsId>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="8.0.10"/>
+        <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="8.0.10"/>
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="8.0.10"/>
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.10"/>
+    </ItemGroup>
+    
+    <ItemGroup>
+      <ProjectReference Include="..\BrokenLinkChecker\BrokenLinkChecker.csproj" />
+      <ProjectReference Include="..\WebsiteAnalyzer.Infrastructure\WebsiteAnalyzer.Infrastructure.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Reference Include="Microsoft.AspNetCore.Components.QuickGrid">
+        <HintPath>..\..\..\.nuget\packages\microsoft.aspnetcore.components.quickgrid\8.0.7\lib\net8.0\Microsoft.AspNetCore.Components.QuickGrid.dll</HintPath>
+      </Reference>
+    </ItemGroup>
+
+</Project>

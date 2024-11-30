@@ -1,0 +1,78 @@
+@using BrokenLinkChecker.models
+@using Microsoft.AspNetCore.Components.QuickGrid
+
+<h3>Performance Metrics</h3>
+
+<label for="resourceFilter">Filter by Resource Type:</label>
+<select id="resourceFilter" @bind="SelectedResourceType">
+    <option value="All">All</option>
+    @foreach (var resourceType in GetAvailableResourceTypes())
+    {
+        <option value="@resourceType.ToString()">@resourceType.ToString()</option>
+    }
+</select>
+
+<p>Average page speed: @GetAveragePageSpeed() ms</p>
+
+<QuickGrid Items="@FilteredAndSearchedPages.AsQueryable()" Pagination="pagination">
+    <PropertyColumn Property="@(page => page.Url)" Sortable="true" />
+    <PropertyColumn Property="@(page => page.StatusCode)" Sortable="true" Title="Status Code" />
+    <PropertyColumn Property="@(page => page.ResponseTime)" Sortable="true" Title="TTFB" />
+    <PropertyColumn Property="@(page => page.DocumentParseTime)" Sortable="true" Title="Document Parse Time" />
+    <PropertyColumn Property="@(page => page.SizeKb)" Sortable="true" Title="Size (KB)" Format="F2"/>
+    <PropertyColumn Property="@(page => page.CombinedTime)" Sortable="true" Title="Total Time" />
+    <PropertyColumn Property="@(page => page.HttpVersion)" Sortable="true" Title="Http Version" />
+    <PropertyColumn Property="@(page => page.Type)" Sortable="true" Title="Resource Type"></PropertyColumn>
+</QuickGrid>
+
+<Paginator State="pagination" />
+
+@code {
+    [Parameter]
+    public ICollection<PageStat> VisitedPages { get; set; }
+
+    private string SelectedResourceType { get; set; } = "All";
+    private string SearchTerm { get; set; } = string.Empty;
+
+    PaginationState pagination = new PaginationState { ItemsPerPage = 20 };
+
+    private IEnumerable<PageStat> FilteredAndSearchedPages => GetFilteredAndSearchedPages();
+
+    private IEnumerable<PageStat> GetFilteredAndSearchedPages()
+    {
+        IEnumerable<PageStat> filteredPages = VisitedPages;
+
+        // Apply ResourceType filter
+        if (SelectedResourceType != "All" && Enum.TryParse<ResourceType>(SelectedResourceType, out var resourceType))
+        {
+            filteredPages = filteredPages.Where(page => page.Type == resourceType);
+        }
+
+        // Apply search filter
+        if (!string.IsNullOrEmpty(SearchTerm))
+        {
+            filteredPages = filteredPages.Where(page => page.Url.Contains(SearchTerm, StringComparison.OrdinalIgnoreCase));
+        }
+
+        return filteredPages;
+    }
+
+    private IEnumerable<ResourceType> GetAvailableResourceTypes()
+    {
+        return VisitedPages
+            .Select(page => page.Type)
+            .Distinct();
+    }
+
+    private long GetAveragePageSpeed()
+    {
+        var pagesToAverage = FilteredAndSearchedPages.ToList();
+        if (pagesToAverage.Count == 0)
+        {
+            return 0;
+        }
+
+        long totalResponseTime = pagesToAverage.Sum(page => page.CombinedTime);
+        return totalResponseTime / pagesToAverage.Count();
+    }
+}
