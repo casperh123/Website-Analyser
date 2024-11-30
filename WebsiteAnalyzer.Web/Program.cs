@@ -4,8 +4,10 @@ using BrokenLinkChecker.HttpClients;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using WebsiteAnalyzer.Core.Persistence;
 using WebsiteAnalyzer.Infrastructure;
 using WebsiteAnalyzer.Infrastructure.Data;
+using WebsiteAnalyzer.Infrastructure.Repositories;
 using WebsiteAnalyzer.Infrastructure.Services;
 using WebsiteAnalyzer.Web.Components;
 using WebsiteAnalyzer.Web.Components.Account;
@@ -41,6 +43,8 @@ builder.Services.AddCascadingAuthenticationState();
 builder.Services.AddScoped<IdentityUserAccessor>();
 builder.Services.AddScoped<IdentityRedirectManager>();
 builder.Services.AddScoped<AuthenticationStateProvider, IdentityRevalidatingAuthenticationStateProvider>();
+
+builder.Services.AddScoped<ICacheWarmRunRepository, CacheWarmRunRepository>();
 
 builder.Services.AddAuthentication(options =>
     {

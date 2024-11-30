@@ -23,6 +23,6 @@ dotnet tool restore
 
 # Generate and apply migrations
 echo "Generating new migration..."
-dotnet ef migrations add MigrationName
+dotnet ef migrations add MigrationName -p 
 echo "Updating database..."
 dotnet ef database update

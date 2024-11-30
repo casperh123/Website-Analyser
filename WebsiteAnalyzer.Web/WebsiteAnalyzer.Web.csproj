@@ -26,4 +26,8 @@
       </Reference>
     </ItemGroup>
 
+    <ItemGroup>
+      <None Remove="generate-migrations.sh" />
+    </ItemGroup>
+
 </Project>
