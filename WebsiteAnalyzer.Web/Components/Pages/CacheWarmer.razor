@@ -1,4 +1,5 @@
 @page "/cache-warmer"
+@using WebsiteAnalyzer.Core.Entities
 @using WebsiteAnalyzer.Infrastructure.Services
 @using WebsiteAnalyzer.Web.Components.WebsiteInputs
 @inject ICacheWarmingService CacheWarmingService
@@ -20,18 +21,36 @@
     <p>Links checked: @_linksChecked</p>
 }
 
+@foreach (CacheWarmRun run in _cacheWarmRuns)
+{
+    <p>@run.Id</p>
+    <p>@run.Website</p>
+    <p>@run.StartTime</p>
+    <p>@run.EndTime</p>
+    <p>@run.VisitedPages</p>
+}
+
 @code {
     private bool IsChecking { get; set; }
     private int _linksChecked;
     private int _linksEnqueued;
-    
+    private IEnumerable<CacheWarmRun> _cacheWarmRuns = [];
+
+    protected async override void OnInitialized()
+    {
+        _cacheWarmRuns = await CacheWarmingService.GetCacheWarmRunsAsync();
+    }
+
     private async Task CheckBrokenLinks(Uri url)
     {
             IsChecking = true;
             
             ResetResults();
             
-            await CacheWarmingService.WarmCacheAsync(url.ToString(), UpdateLinksEnqueued, UpdateLinksChecked);
+            CacheWarmRun cacheWarmRun = 
+                await CacheWarmingService.WarmCacheAsync(url.ToString(), UpdateLinksEnqueued, UpdateLinksChecked);
+
+            _cacheWarmRuns = await CacheWarmingService.GetCacheWarmRunsAsync();
             
             IsChecking = false;
     }

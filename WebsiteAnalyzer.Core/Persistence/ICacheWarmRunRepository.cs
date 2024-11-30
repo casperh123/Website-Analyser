@@ -1,6 +1,8 @@
+using WebsiteAnalyzer.Core.Entities;
+
 namespace WebsiteAnalyzer.Core.Persistence;
 
-public class ICacheWarmRunRepository
+public interface ICacheWarmRunRepository : IBaseRepository<CacheWarmRun>
 {
     
 }

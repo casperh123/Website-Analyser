@@ -8,6 +8,17 @@
 
     <ItemGroup>
       <ProjectReference Include="..\BrokenLinkChecker\BrokenLinkChecker.csproj" />
+      <ProjectReference Include="..\WebsiteAnalyzer.Core\WebsiteAnalyzer.Core.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="8.0.10"/>
+        <Reference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore">
+        <HintPath>..\..\..\.nuget\packages\microsoft.aspnetcore.identity.entityframeworkcore\8.0.10\lib\net8.0\Microsoft.AspNetCore.Identity.EntityFrameworkCore.dll</HintPath>
+      </Reference>
+      <Reference Include="Microsoft.EntityFrameworkCore">
+        <HintPath>..\..\..\.nuget\packages\microsoft.entityframeworkcore\8.0.10\lib\net8.0\Microsoft.EntityFrameworkCore.dll</HintPath>
+      </Reference>
     </ItemGroup>
 
 </Project>

@@ -1,9 +1,13 @@
-# Remove existing migrations and database
-rm -rf ./Migrations
-rm -rf ./Data/app.db
+#!/bin/bash
 
+# Remove existing migrations and database
+rm -rf ./WebsiteAnalyzer.Infrastructure/Migrations
+rm -rf ./WebsiteAnalyzer.Web/Data/app.db
+
+# Create empty database directory if it doesn't exist
+mkdir -p ./WebsiteAnalyzer.Web/Data
 # Create empty database
-sqlite3 ./Data/app.db ".quit"
+sqlite3 ./WebsiteAnalyzer.Web/Data/app.db ".quit"
 
 # Create tool manifest (toolbox) if it doesn't exist
 if [ ! -f ".config/dotnet-tools.json" ]; then
@@ -23,6 +27,7 @@ dotnet tool restore
 
 # Generate and apply migrations
 echo "Generating new migration..."
-dotnet ef migrations add MigrationName -p 
+dotnet ef migrations add MigrationName --startup-project ./WebsiteAnalyzer.Web/WebsiteAnalyzer.Web.csproj --project ./WebsiteAnalyzer.Infrastructure/WebsiteAnalyzer.Infrastructure.csproj
+
 echo "Updating database..."
-dotnet ef database update
+dotnet ef database update --startup-project ./WebsiteAnalyzer.Web/WebsiteAnalyzer.Web.csproj --project ./WebsiteAnalyzer.Infrastructure/WebsiteAnalyzer.Infrastructure.csproj
