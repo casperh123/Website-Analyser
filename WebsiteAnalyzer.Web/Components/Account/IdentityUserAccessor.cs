@@ -1,5 +1,5 @@
 using Microsoft.AspNetCore.Identity;
-using WebsiteAnalyzer.Web.Data;
+using WebsiteAnalyzer.Infrastructure;
 
 namespace WebsiteAnalyzer.Web.Components.Account;
 

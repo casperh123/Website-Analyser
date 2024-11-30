@@ -4,11 +4,11 @@ using BrokenLinkChecker.HttpClients;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using WebsiteAnalyzer.Infrastructure;
 using WebsiteAnalyzer.Infrastructure.Data;
 using WebsiteAnalyzer.Infrastructure.Services;
 using WebsiteAnalyzer.Web.Components;
 using WebsiteAnalyzer.Web.Components.Account;
-using WebsiteAnalyzer.Web.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 

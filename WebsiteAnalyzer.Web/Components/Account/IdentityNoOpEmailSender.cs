@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
-using WebsiteAnalyzer.Web.Data;
+using WebsiteAnalyzer.Infrastructure;
 
 namespace WebsiteAnalyzer.Web.Components.Account;
 
