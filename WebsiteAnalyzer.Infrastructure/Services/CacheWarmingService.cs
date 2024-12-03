@@ -9,8 +9,8 @@ namespace WebsiteAnalyzer.Infrastructure.Services;
 
 public interface ICacheWarmingService
 {
-    Task<CacheWarmRun> WarmCacheAsync(string url, Action<int> onLinkEnqueued, Action<int> onLinkChecked);
-    Task<IEnumerable<CacheWarmRun>> GetCacheWarmRunsAsync();
+    Task<CacheWarm> WarmCacheAsync(string url, Action<int> onLinkEnqueued, Action<int> onLinkChecked);
+    Task<IEnumerable<CacheWarm>> GetCacheWarmRunsAsync();
 }
 
 public class CacheWarmingService : ICacheWarmingService
@@ -25,16 +25,16 @@ public class CacheWarmingService : ICacheWarmingService
         _cacheWarmRunRepository = cacheWarmRunRepository;
     }
 
-    public async Task<CacheWarmRun> WarmCacheAsync(string url, Action<int> onLinkEnqueued, Action<int> onLinkChecked)
+    public async Task<CacheWarm> WarmCacheAsync(string url, Action<int> onLinkEnqueued, Action<int> onLinkChecked)
     {
-        CacheWarmRun cacheWarmRun = new CacheWarmRun()
+        CacheWarm cacheWarm = new CacheWarm()
         {
             Id = Guid.NewGuid(),
             StartTime = DateTime.Now
             
         };
         
-        await _cacheWarmRunRepository.AddAsync(cacheWarmRun);
+        await _cacheWarmRunRepository.AddAsync(cacheWarm);
         
         ILinkProcessor<Link> linkProcessor = new LinkProcessor(_httpClient);
         ModularCrawlResult<Link> crawlResult = GenerateCrawlResult(onLinkEnqueued, onLinkChecked);
@@ -42,15 +42,15 @@ public class CacheWarmingService : ICacheWarmingService
             
         await crawler.CrawlWebsiteAsync(new Link(url), crawlResult);
 
-        cacheWarmRun.EndTime = DateTime.Now;
-        cacheWarmRun.VisitedPages = crawlResult.LinksChecked;
+        cacheWarm.EndTime = DateTime.Now;
+        cacheWarm.VisitedPages = crawlResult.LinksChecked;
 
-        await _cacheWarmRunRepository.UpdateAsync(cacheWarmRun);
+        await _cacheWarmRunRepository.UpdateAsync(cacheWarm);
         
-        return cacheWarmRun;
+        return cacheWarm;
     }
 
-    public async Task<IEnumerable<CacheWarmRun>>GetCacheWarmRunsAsync()
+    public async Task<IEnumerable<CacheWarm>>GetCacheWarmRunsAsync()
     {
         return await _cacheWarmRunRepository.GetAllAsync();
     }

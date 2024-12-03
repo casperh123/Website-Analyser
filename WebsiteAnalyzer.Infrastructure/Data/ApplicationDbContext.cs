@@ -13,12 +13,12 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     protected override void OnModelCreating(ModelBuilder builder)
     {
         // Configure Website and CacheWarmRun relationship
-        builder.Entity<CacheWarmRun>()
+        builder.Entity<CacheWarm>()
             .HasOne(c => c.Website)
             .WithMany(w => w.CacheWarmRuns)
             .HasForeignKey(c => c.WebsiteId);
 
-        builder.Entity<CacheWarmRun>().HasKey(c => c.Id);
+        builder.Entity<CacheWarm>().HasKey(c => c.Id);
         
         // Configure Identity entities
         builder.Entity<IdentityUserLogin<string>>()

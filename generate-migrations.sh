@@ -6,6 +6,7 @@ rm -rf ./WebsiteAnalyzer.Web/Data/app.db
 
 # Create empty database directory if it doesn't exist
 mkdir -p ./WebsiteAnalyzer.Web/Data
+
 # Create empty database
 sqlite3 ./WebsiteAnalyzer.Web/Data/app.db ".quit"
 

@@ -127,7 +127,7 @@ namespace WebsiteAnalyzer.Infrastructure.Migrations
                     b.ToTable("UserTokens");
                 });
 
-            modelBuilder.Entity("WebsiteAnalyzer.Core.Entities.CacheWarmRun", b =>
+            modelBuilder.Entity("WebsiteAnalyzer.Core.Entities.CacheWarm", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -149,7 +149,7 @@ namespace WebsiteAnalyzer.Infrastructure.Migrations
 
                     b.HasIndex("WebsiteId");
 
-                    b.ToTable("CacheWarmRun");
+                    b.ToTable("CacheWarm");
                 });
 
             modelBuilder.Entity("WebsiteAnalyzer.Core.Entities.Website", b =>
@@ -228,7 +228,7 @@ namespace WebsiteAnalyzer.Infrastructure.Migrations
                     b.ToTable("Users");
                 });
 
-            modelBuilder.Entity("WebsiteAnalyzer.Core.Entities.CacheWarmRun", b =>
+            modelBuilder.Entity("WebsiteAnalyzer.Core.Entities.CacheWarm", b =>
                 {
                     b.HasOne("WebsiteAnalyzer.Core.Entities.Website", "Website")
                         .WithMany("CacheWarmRuns")

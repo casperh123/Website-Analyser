@@ -1,6 +1,6 @@
 namespace WebsiteAnalyzer.Infrastructure.Repositories;
 
-public class WebsiteRepository
+public class WebsiteRepository : BaseRepository<Webs>
 {
     
 }

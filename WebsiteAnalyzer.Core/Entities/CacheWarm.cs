@@ -1,6 +1,6 @@
 namespace WebsiteAnalyzer.Core.Entities;
 
-public record CacheWarmRun
+public record CacheWarm
 {
     public Guid Id { get; init; }
     public int VisitedPages { get; set; }
@@ -8,4 +8,6 @@ public record CacheWarmRun
     public DateTime EndTime { get; set; }
     public Guid? WebsiteId { get; set; }
     public Website? Website { get; set; }
+    
+    public bool IsCompleted => EndTime != DateTime.MinValue;
 }

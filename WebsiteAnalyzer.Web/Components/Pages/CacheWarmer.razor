@@ -1,8 +1,14 @@
 @page "/cache-warmer"
+@using Microsoft.AspNetCore.Identity
+@using Microsoft.Extensions.Hosting.Internal
 @using WebsiteAnalyzer.Core.Entities
+@using WebsiteAnalyzer.Infrastructure
 @using WebsiteAnalyzer.Infrastructure.Services
+@using WebsiteAnalyzer.Web.Components.Account
 @using WebsiteAnalyzer.Web.Components.WebsiteInputs
 @inject ICacheWarmingService CacheWarmingService
+@inject IdentityUserAccessor UserAccessor
+@inject UserManager<ApplicationUser> UserManager
 
 @rendermode InteractiveServer
 
@@ -21,23 +27,27 @@
     <p>Links checked: @_linksChecked</p>
 }
 
-@foreach (CacheWarmRun run in _cacheWarmRuns)
+@foreach (CacheWarm run in _cacheWarmRuns)
 {
     <p>@run.Id</p>
     <p>@run.Website</p>
     <p>@run.StartTime</p>
     <p>@run.EndTime</p>
     <p>@run.VisitedPages</p>
+    <p>Is Completed: @run.IsCompleted</p>
 }
 
 @code {
     private bool IsChecking { get; set; }
     private int _linksChecked;
     private int _linksEnqueued;
-    private IEnumerable<CacheWarmRun> _cacheWarmRuns = [];
+    private IEnumerable<CacheWarm> _cacheWarmRuns = [];
+    private ApplicationUser User;
 
     protected async override void OnInitialized()
     {
+        
+        
         _cacheWarmRuns = await CacheWarmingService.GetCacheWarmRunsAsync();
     }
 
@@ -47,7 +57,7 @@
             
             ResetResults();
             
-            CacheWarmRun cacheWarmRun = 
+            CacheWarm cacheWarm = 
                 await CacheWarmingService.WarmCacheAsync(url.ToString(), UpdateLinksEnqueued, UpdateLinksChecked);
 
             _cacheWarmRuns = await CacheWarmingService.GetCacheWarmRunsAsync();

@@ -140,7 +140,7 @@ namespace WebsiteAnalyzer.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "CacheWarmRun",
+                name: "CacheWarm",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "TEXT", nullable: false),
@@ -151,17 +151,17 @@ namespace WebsiteAnalyzer.Infrastructure.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_CacheWarmRun", x => x.Id);
+                    table.PrimaryKey("PK_CacheWarm", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_CacheWarmRun_Websites_WebsiteId",
+                        name: "FK_CacheWarm_Websites_WebsiteId",
                         column: x => x.WebsiteId,
                         principalTable: "Websites",
                         principalColumn: "Id");
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_CacheWarmRun_WebsiteId",
-                table: "CacheWarmRun",
+                name: "IX_CacheWarm_WebsiteId",
+                table: "CacheWarm",
                 column: "WebsiteId");
 
             migrationBuilder.CreateIndex(
@@ -174,7 +174,7 @@ namespace WebsiteAnalyzer.Infrastructure.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "CacheWarmRun");
+                name: "CacheWarm");
 
             migrationBuilder.DropTable(
                 name: "RoleClaims");
