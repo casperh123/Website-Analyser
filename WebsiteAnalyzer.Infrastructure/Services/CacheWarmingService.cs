@@ -1,6 +1,4 @@
-using System.Collections;
 using BrokenLinkChecker.Crawler.ExtendedCrawlers;
-using BrokenLinkChecker.DocumentParsing.LinkProcessors;
 using BrokenLinkChecker.models.Links;
 using WebsiteAnalyzer.Core.Entities;
 using WebsiteAnalyzer.Core.Persistence;
@@ -10,58 +8,60 @@ namespace WebsiteAnalyzer.Infrastructure.Services;
 public interface ICacheWarmingService
 {
     Task<CacheWarm> WarmCacheAsync(string url, Action<int> onLinkEnqueued, Action<int> onLinkChecked);
-    Task<IEnumerable<CacheWarm>> GetCacheWarmRunsAsync();
+    Task<ICollection<CacheWarm>> GetCacheWarmsAsync();
 }
 
 public class CacheWarmingService : ICacheWarmingService
 {
-    private readonly HttpClient _httpClient;
-    private ModularCrawler<Link>? _crawler;
-    private ICacheWarmRunRepository _cacheWarmRunRepository;
+    private readonly ILinkCrawlerService _crawlerService;
+    private readonly IWebsiteService _websiteService;
+    private readonly ICacheWarmRepository _cacheWarmRepository;
 
-    public CacheWarmingService(HttpClient httpClient, ICacheWarmRunRepository cacheWarmRunRepository)
+    public CacheWarmingService(
+        ILinkCrawlerService crawlerService,
+        ICacheWarmRepository cacheWarmRepository,
+        IWebsiteService websiteService)
     {
-        _httpClient = httpClient;
-        _cacheWarmRunRepository = cacheWarmRunRepository;
+        _crawlerService = crawlerService;
+        _cacheWarmRepository = cacheWarmRepository;
+        _websiteService = websiteService;
     }
 
     public async Task<CacheWarm> WarmCacheAsync(string url, Action<int> onLinkEnqueued, Action<int> onLinkChecked)
     {
-        CacheWarm cacheWarm = new CacheWarm()
-        {
-            Id = Guid.NewGuid(),
-            StartTime = DateTime.Now
-            
-        };
-        
-        await _cacheWarmRunRepository.AddAsync(cacheWarm);
-        
-        ILinkProcessor<Link> linkProcessor = new LinkProcessor(_httpClient);
-        ModularCrawlResult<Link> crawlResult = GenerateCrawlResult(onLinkEnqueued, onLinkChecked);
-        ModularCrawler<Link> crawler = new(linkProcessor);
+        Website website = await _websiteService.GetOrAddWebsite(url);
+        CacheWarm cacheWarm = await CreateCacheWarmEntry(website);
 
-        await crawler.CrawlWebsiteAsync(new Link(url), crawlResult);
+        ModularCrawlResult<Link> crawlResult =
+            await _crawlerService.CrawlWebsiteAsync(url, onLinkEnqueued, onLinkChecked);
 
-        cacheWarm.EndTime = DateTime.Now;
-        cacheWarm.VisitedPages = crawlResult.LinksChecked;
-
-        await _cacheWarmRunRepository.UpdateAsync(cacheWarm);
-        
+        await UpdateCacheWarmResults(cacheWarm, crawlResult);
         return cacheWarm;
     }
 
-    public async Task<IEnumerable<CacheWarm>>GetCacheWarmRunsAsync()
+    private async Task<CacheWarm> CreateCacheWarmEntry(Website website)
     {
-        return await _cacheWarmRunRepository.GetAllAsync();
+        CacheWarm cacheWarm = new CacheWarm
+        {
+            Id = Guid.NewGuid(),
+            StartTime = DateTime.Now,
+            Website = website,
+            WebsiteUrl = website.Url,
+        };
+
+        await _cacheWarmRepository.AddAsync(cacheWarm);
+        return cacheWarm;
     }
 
-    private ModularCrawlResult<Link> GenerateCrawlResult(Action<int> onLinksEnqueued, Action<int> onLinksChecked)
+    private async Task UpdateCacheWarmResults(CacheWarm cacheWarm, ModularCrawlResult<Link> crawlResult)
     {
-        ModularCrawlResult<Link> crawlResult = new();
+        cacheWarm.EndTime = DateTime.Now;
+        cacheWarm.VisitedPages = crawlResult.LinksChecked;
+        await _cacheWarmRepository.UpdateAsync(cacheWarm);
+    }
 
-        crawlResult.OnLinksEnqueued += onLinksEnqueued;
-        crawlResult.OnLinksChecked += onLinksChecked;
-
-        return crawlResult;
+    public async Task<ICollection<CacheWarm>> GetCacheWarmsAsync()
+    {
+        return await _cacheWarmRepository.GetAllAsync();
     }
 }

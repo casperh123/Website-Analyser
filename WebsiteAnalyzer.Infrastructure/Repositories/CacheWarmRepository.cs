@@ -4,9 +4,9 @@ using WebsiteAnalyzer.Infrastructure.Data;
 
 namespace WebsiteAnalyzer.Infrastructure.Repositories;
 
-public class CacheWarmRunRepository : BaseRepository<CacheWarm>, ICacheWarmRunRepository
+public class CacheWarmRepository : BaseRepository<CacheWarm>, ICacheWarmRepository
 {
-    public CacheWarmRunRepository(ApplicationDbContext dbContext) : base(dbContext)
+    public CacheWarmRepository(ApplicationDbContext dbContext) : base(dbContext)
     {
     }
 }

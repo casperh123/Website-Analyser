@@ -11,14 +11,14 @@ using WebsiteAnalyzer.Infrastructure.Data;
 namespace WebsiteAnalyzer.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20241130203514_MigrationName")]
+    [Migration("20241204201717_MigrationName")]
     partial class MigrationName
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
-            modelBuilder.HasAnnotation("ProductVersion", "8.0.10");
+            modelBuilder.HasAnnotation("ProductVersion", "9.0.0");
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
                 {
@@ -145,41 +145,30 @@ namespace WebsiteAnalyzer.Infrastructure.Migrations
                     b.Property<int>("VisitedPages")
                         .HasColumnType("INTEGER");
 
-                    b.Property<Guid?>("WebsiteId")
+                    b.Property<string>("WebsiteUrl")
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("WebsiteId");
+                    b.HasIndex("WebsiteUrl");
 
-                    b.ToTable("CacheWarm");
+                    b.ToTable("CacheWarms");
                 });
 
             modelBuilder.Entity("WebsiteAnalyzer.Core.Entities.Website", b =>
                 {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("ApplicationUserId")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
                     b.Property<string>("Url")
-                        .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.HasKey("Id");
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("TEXT");
 
-                    b.HasIndex("ApplicationUserId");
+                    b.HasKey("Url");
 
                     b.ToTable("Websites");
                 });
 
-            modelBuilder.Entity("WebsiteAnalyzer.Infrastructure.ApplicationUser", b =>
+            modelBuilder.Entity("WebsiteAnalyzer.Infrastructure.Data.ApplicationUser", b =>
                 {
                     b.Property<string>("Id")
                         .HasColumnType("TEXT");
@@ -235,26 +224,14 @@ namespace WebsiteAnalyzer.Infrastructure.Migrations
                 {
                     b.HasOne("WebsiteAnalyzer.Core.Entities.Website", "Website")
                         .WithMany("CacheWarmRuns")
-                        .HasForeignKey("WebsiteId");
+                        .HasForeignKey("WebsiteUrl");
 
                     b.Navigation("Website");
                 });
 
             modelBuilder.Entity("WebsiteAnalyzer.Core.Entities.Website", b =>
                 {
-                    b.HasOne("WebsiteAnalyzer.Infrastructure.ApplicationUser", null)
-                        .WithMany("Websites")
-                        .HasForeignKey("ApplicationUserId");
-                });
-
-            modelBuilder.Entity("WebsiteAnalyzer.Core.Entities.Website", b =>
-                {
                     b.Navigation("CacheWarmRuns");
-                });
-
-            modelBuilder.Entity("WebsiteAnalyzer.Infrastructure.ApplicationUser", b =>
-                {
-                    b.Navigation("Websites");
                 });
 #pragma warning restore 612, 618
         }

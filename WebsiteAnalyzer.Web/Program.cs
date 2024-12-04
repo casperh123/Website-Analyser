@@ -5,10 +5,12 @@ using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Radzen;
+using WebsiteAnalyzer.Core.Persistence;
+using WebsiteAnalyzer.Infrastructure.Data;
+using WebsiteAnalyzer.Infrastructure.Repositories;
 using WebsiteAnalyzer.Infrastructure.Services;
 using WebsiteAnalyzer.Web.Components;
 using WebsiteAnalyzer.Web.Components.Account;
-using WebsiteAnalyzer.Web.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -49,6 +51,11 @@ builder.Services.AddHttpClient("WebsiteAnalyser", client =>
     });
 
 builder.Services.AddScoped<ThemeService>();
+
+builder.Services.AddScoped<IWebsiteRepository, WebsiteRepository>();
+builder.Services.AddScoped<ICacheWarmRepository, CacheWarmRepository>();
+builder.Services.AddScoped<ILinkCrawlerService, LinkCrawlerService>();
+builder.Services.AddScoped<IWebsiteService, WebsiteService>();
 builder.Services.AddScoped<ICacheWarmingService, CacheWarmingService>();
 builder.Services.AddScoped<IBrokenLinkService, BrokenLinkService>();
 

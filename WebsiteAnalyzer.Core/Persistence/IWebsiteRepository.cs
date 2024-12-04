@@ -1,6 +1,10 @@
+using WebsiteAnalyzer.Core.Entities;
+
 namespace WebsiteAnalyzer.Core.Persistence;
 
-public class IWebsiteRepository
+public interface IWebsiteRepository : IBaseRepository<Website>
 {
-    
+    Task<Website> GetWebsiteByUrlAsync(string url);
+
+    Task<bool> ExistsUrlAsync(string url);
 }

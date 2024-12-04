@@ -1,5 +1,5 @@
 @page "/website-analyser"
-@using BrokenLinkChecker.Models.Links
+@using global::BrokenLinkChecker.Models.Links
 @using WebsiteAnalyzer.Infrastructure.Services
 @using WebsiteAnalyzer.Web.Components.WebsiteInputs
 @using WebsiteAnalyzer.Web.Components.WebsiteMetrics
@@ -9,7 +9,7 @@
 
 <h2>Website Analyser</h2>
 
-<WebsiteInput UriHasChanged="CheckBrokenLinks"></WebsiteInput>
+<WebsiteInput WebsiteActionStarted="CheckBrokenLinks"></WebsiteInput>
 
 @if (IsChecking)
 {

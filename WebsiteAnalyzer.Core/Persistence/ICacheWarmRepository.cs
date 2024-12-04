@@ -2,7 +2,7 @@ using WebsiteAnalyzer.Core.Entities;
 
 namespace WebsiteAnalyzer.Core.Persistence;
 
-public interface ICacheWarmRunRepository : IBaseRepository<CacheWarm>
+public interface ICacheWarmRepository : IBaseRepository<CacheWarm>
 {
     
 }

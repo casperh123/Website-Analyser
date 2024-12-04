@@ -124,57 +124,45 @@ namespace WebsiteAnalyzer.Infrastructure.Migrations
                 name: "Websites",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "TEXT", nullable: false),
-                    Name = table.Column<string>(type: "TEXT", nullable: false),
                     Url = table.Column<string>(type: "TEXT", nullable: false),
-                    ApplicationUserId = table.Column<string>(type: "TEXT", nullable: true)
+                    UserId = table.Column<Guid>(type: "TEXT", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Websites", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Websites_Users_ApplicationUserId",
-                        column: x => x.ApplicationUserId,
-                        principalTable: "Users",
-                        principalColumn: "Id");
+                    table.PrimaryKey("PK_Websites", x => x.Url);
                 });
 
             migrationBuilder.CreateTable(
-                name: "CacheWarm",
+                name: "CacheWarms",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "TEXT", nullable: false),
                     VisitedPages = table.Column<int>(type: "INTEGER", nullable: false),
                     StartTime = table.Column<DateTime>(type: "TEXT", nullable: false),
                     EndTime = table.Column<DateTime>(type: "TEXT", nullable: false),
-                    WebsiteId = table.Column<Guid>(type: "TEXT", nullable: true)
+                    WebsiteUrl = table.Column<string>(type: "TEXT", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_CacheWarm", x => x.Id);
+                    table.PrimaryKey("PK_CacheWarms", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_CacheWarm_Websites_WebsiteId",
-                        column: x => x.WebsiteId,
+                        name: "FK_CacheWarms_Websites_WebsiteUrl",
+                        column: x => x.WebsiteUrl,
                         principalTable: "Websites",
-                        principalColumn: "Id");
+                        principalColumn: "Url");
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_CacheWarm_WebsiteId",
-                table: "CacheWarm",
-                column: "WebsiteId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Websites_ApplicationUserId",
-                table: "Websites",
-                column: "ApplicationUserId");
+                name: "IX_CacheWarms_WebsiteUrl",
+                table: "CacheWarms",
+                column: "WebsiteUrl");
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "CacheWarm");
+                name: "CacheWarms");
 
             migrationBuilder.DropTable(
                 name: "RoleClaims");
@@ -192,13 +180,13 @@ namespace WebsiteAnalyzer.Infrastructure.Migrations
                 name: "UserRoles");
 
             migrationBuilder.DropTable(
+                name: "Users");
+
+            migrationBuilder.DropTable(
                 name: "UserTokens");
 
             migrationBuilder.DropTable(
                 name: "Websites");
-
-            migrationBuilder.DropTable(
-                name: "Users");
         }
     }
 }

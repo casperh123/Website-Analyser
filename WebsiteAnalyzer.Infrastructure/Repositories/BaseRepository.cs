@@ -20,7 +20,7 @@ public class BaseRepository<T> : IBaseRepository<T> where T : class
         return await _dbSet.FindAsync(id);
     }
     
-    public async Task<IEnumerable<T>> GetAllAsync()
+    public async Task<ICollection<T>> GetAllAsync()
     {
         return await _dbSet.ToListAsync();
     }
