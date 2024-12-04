@@ -137,10 +137,10 @@ namespace WebsiteAnalyzer.Infrastructure.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "TEXT", nullable: false),
+                    WebsiteUrl = table.Column<string>(type: "TEXT", nullable: false),
                     VisitedPages = table.Column<int>(type: "INTEGER", nullable: false),
                     StartTime = table.Column<DateTime>(type: "TEXT", nullable: false),
-                    EndTime = table.Column<DateTime>(type: "TEXT", nullable: false),
-                    WebsiteUrl = table.Column<string>(type: "TEXT", nullable: true)
+                    EndTime = table.Column<DateTime>(type: "TEXT", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -149,7 +149,8 @@ namespace WebsiteAnalyzer.Infrastructure.Migrations
                         name: "FK_CacheWarms_Websites_WebsiteUrl",
                         column: x => x.WebsiteUrl,
                         principalTable: "Websites",
-                        principalColumn: "Url");
+                        principalColumn: "Url",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateIndex(

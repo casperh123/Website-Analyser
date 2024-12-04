@@ -1,0 +1,23 @@
+@using WebsiteAnalyzer.Core.Entities
+@using WebsiteAnalyzer.Web.Components.CacheWarm.Badges
+
+<RadzenCard>
+    <RadzenRow AlignItems="AlignItems.Center" JustifyContent="JustifyContent.SpaceBetween">
+        <RadzenText TextStyle="TextStyle.H6">
+            @CacheWarm.Website.Url
+        </RadzenText>
+        <CacheWarmCompletion CompletedSuccessfully="CacheWarm.IsCompleted"/>
+    </RadzenRow>
+    <RadzenText>Start Time: @CacheWarm.StartTime</RadzenText>
+    <RadzenText>Completed Successfully: @CacheWarm.IsCompleted</RadzenText>
+    @if (CacheWarm.IsCompleted)
+    {
+        <RadzenText>Time to completion: @CacheWarm.TotalTime</RadzenText>
+    }
+    <RadzenText>Visited Pages: @CacheWarm.VisitedPages</RadzenText>
+</RadzenCard>
+
+@code {
+    [Parameter]
+    public required CacheWarm CacheWarm { get; set; }
+}

@@ -3,38 +3,16 @@
 @using WebsiteAnalyzer.Core.Entities
 @using WebsiteAnalyzer.Infrastructure.Services
 @using WebsiteAnalyzer.Web.Components.WebsiteInputs
+@using WebsiteAnalyzer.Web.Components.CacheWarm.Lists
 
 @inject ICacheWarmingService CacheWarmingService
 
 <PageTitle>Cache Warmer</PageTitle>
 
-<WebsiteInput WebsiteActionStarted="CheckBrokenLinks"></WebsiteInput>
-
-@if (IsChecking)
-{
-    <RadzenText>Crawling website, please wait...</RadzenText>
-    <RadzenText>Links enqueued: @_linksEnqueued</RadzenText>
-}
-
-@if (_linksChecked > 0)
-{
-    <RadzenText>Links checked: @_linksChecked</RadzenText>
-}
-
-@foreach (CacheWarm cacheWarm in _cacheWarms)
-{
-    <RadzenCard>
-        <RadzenText>@cacheWarm.Id</RadzenText>
-        <RadzenText>@cacheWarm.Website</RadzenText>
-        <RadzenText>@cacheWarm.StartTime</RadzenText>
-        <RadzenText>@cacheWarm.EndTime</RadzenText>
-        <RadzenText>@cacheWarm.VisitedPages</RadzenText>
-        <RadzenText>@cacheWarm.IsCompleted</RadzenText>
-    </RadzenCard>
-}
+<WebsiteInput WebsiteActionStarted="CheckBrokenLinks" LinksChecked="_linksChecked" LinksEnqueued="_linksEnqueued"/>
+<CacheWarmList CacheWarms="_cacheWarms"/>
 
 @code {
-    private bool IsChecking { get; set; }
     private int _linksChecked;
     private int _linksEnqueued;
     private ICollection<CacheWarm> _cacheWarms = [];
@@ -46,15 +24,11 @@
     
     private async Task CheckBrokenLinks(Uri url)
     {
-        IsChecking = true;
-
         ResetResults();
 
         await CacheWarmingService.WarmCacheAsync(url.ToString(), UpdateLinksEnqueued, UpdateLinksChecked);
 
-        IsChecking = false;
         _cacheWarms = await CacheWarmingService.GetCacheWarmsAsync();
-
     }
 
     private void ResetResults()

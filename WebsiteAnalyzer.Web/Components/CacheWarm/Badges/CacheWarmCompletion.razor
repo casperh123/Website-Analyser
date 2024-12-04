@@ -1,0 +1,13 @@
+@if (CompletedSuccessfully)
+{
+    <RadzenBadge BadgeStyle="BadgeStyle.Success">Completed</RadzenBadge>
+}
+else
+{
+    <RadzenBadge BadgeStyle="BadgeStyle.Warning">Encountered Error</RadzenBadge>
+}
+
+@code {
+    [Parameter]
+    public bool CompletedSuccessfully { get; set; }
+}

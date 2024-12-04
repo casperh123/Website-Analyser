@@ -1,4 +1,6 @@
+@using BrokenLinkChecker.models.Links
 @using WebsiteAnalyzer.Web.Components.ErrorHandling
+@using WebsiteAnalyzer.Web.Components.Crawl.CrawlMetrics
 
 <RadzenCard>
     <RadzenStack>
@@ -7,11 +9,18 @@
         <RadzenButton Click="@OnChanged">Check Broken Links</RadzenButton>
     </RadzenStack>
     <ErrorMessage Message="@_errorMessage" />
+    <CrawlMetrics LinksChecked="LinksChecked" LinksEnqueued="LinksEnqueued" />
 </RadzenCard>
 
 @code {
     [Parameter] 
     public EventCallback<Uri> WebsiteActionStarted { get; set; }
+    
+    [Parameter]
+    public int LinksChecked { get; set; }
+    
+    [Parameter]
+    public int LinksEnqueued { get; set; }
     
     private string _targetUrl = "https://";
     private string _errorMessage = "";

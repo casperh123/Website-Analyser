@@ -11,7 +11,7 @@ using WebsiteAnalyzer.Infrastructure.Data;
 namespace WebsiteAnalyzer.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20241204201717_MigrationName")]
+    [Migration("20241204204023_MigrationName")]
     partial class MigrationName
     {
         /// <inheritdoc />
@@ -146,6 +146,7 @@ namespace WebsiteAnalyzer.Infrastructure.Migrations
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("WebsiteUrl")
+                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");
@@ -224,7 +225,9 @@ namespace WebsiteAnalyzer.Infrastructure.Migrations
                 {
                     b.HasOne("WebsiteAnalyzer.Core.Entities.Website", "Website")
                         .WithMany("CacheWarmRuns")
-                        .HasForeignKey("WebsiteUrl");
+                        .HasForeignKey("WebsiteUrl")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Website");
                 });

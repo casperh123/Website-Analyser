@@ -1,0 +1,14 @@
+@using WebsiteAnalyzer.Core.Entities
+@using WebsiteAnalyzer.Web.Components.CacheWarm.Cards
+
+<RadzenStack Gap="20px">
+    @foreach (CacheWarm cacheWarm in CacheWarms)
+    {
+        <CacheWarmCard CacheWarm="cacheWarm"/>
+    }
+</RadzenStack>
+
+@code {
+    [Parameter]
+    public IEnumerable<CacheWarm> CacheWarms { get; set; }
+}

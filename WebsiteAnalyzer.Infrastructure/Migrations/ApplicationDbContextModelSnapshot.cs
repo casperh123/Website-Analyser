@@ -143,6 +143,7 @@ namespace WebsiteAnalyzer.Infrastructure.Migrations
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("WebsiteUrl")
+                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");
@@ -221,7 +222,9 @@ namespace WebsiteAnalyzer.Infrastructure.Migrations
                 {
                     b.HasOne("WebsiteAnalyzer.Core.Entities.Website", "Website")
                         .WithMany("CacheWarmRuns")
-                        .HasForeignKey("WebsiteUrl");
+                        .HasForeignKey("WebsiteUrl")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Website");
                 });
