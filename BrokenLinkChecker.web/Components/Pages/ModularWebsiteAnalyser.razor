@@ -1,8 +1,7 @@
 @page "/website-analyser-modular"
-@using BrokenLinkChecker.Crawler.ExtendedCrawlers
 @using BrokenLinkChecker.Models.Links
-@using BrokenLinkChecker.web.Components.WebsiteMetrics
 @using BrokenLinkChecker.web.Components.WebsiteInputs
+@using BrokenLinkChecker.web.Components.WebsiteMetrics
 @using WebsiteAnalyzer.Infrastructure.Services
 @inject IBrokenLinkService BrokenLinkService
 
@@ -21,10 +20,10 @@
 @if (_linksChecked > 0)
 {
     <p>Links checked: @_linksChecked</p>
-    
+
     <div class="padding-m round-corners box-shadow">
         <h2>Broken Links</h2>
-        <BrokenLinksStats BrokenLinks="_brokenLinks" />
+        <BrokenLinksStats BrokenLinks="_brokenLinks"/>
     </div>
 }
 
@@ -32,7 +31,7 @@
     private bool IsChecking { get; set; }
     private int _linksChecked;
     private int _linksEnqueued;
-    private ICollection<IndexedLink> _brokenLinks = [];
+    private readonly ICollection<IndexedLink> _brokenLinks = [];
 
     private async Task CheckBrokenLinks(Uri url)
     {
@@ -49,7 +48,7 @@
             StateHasChanged();
         }
     }
-    
+
     private void ResetResults()
     {
         _brokenLinks.Clear();
@@ -73,4 +72,5 @@
         _brokenLinks.Add(link);
         InvokeAsync(StateHasChanged);
     }
+
 }

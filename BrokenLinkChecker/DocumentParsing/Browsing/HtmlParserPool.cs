@@ -1,37 +1,36 @@
 using System.Collections.Concurrent;
 using AngleSharp.Html.Parser;
 
-namespace BrokenLinkChecker.DocumentParsing.Browsing
+namespace BrokenLinkChecker.DocumentParsing.Browsing;
+
+public class HtmlParserPool
 {
-    public class HtmlParserPool
+    private readonly ConcurrentBag<IHtmlParser> _parserPool;
+    private readonly SemaphoreSlim _semaphore;
+
+    public HtmlParserPool(HtmlParserOptions config, int maxPoolSize = 1)
     {
-        private readonly ConcurrentBag<IHtmlParser> _parserPool;
-        private readonly SemaphoreSlim _semaphore;
+        _parserPool = [];
+        _semaphore = new SemaphoreSlim(maxPoolSize);
 
-        public HtmlParserPool(HtmlParserOptions config, int maxPoolSize = 1)
+        for (var i = 0; i < maxPoolSize; i++)
         {
-            _parserPool = [];
-            _semaphore = new SemaphoreSlim(maxPoolSize);
-            
-            for (int i = 0; i < maxPoolSize; i++)
-            {
-                HtmlParser parser = new HtmlParser(config);
-                _parserPool.Add(parser);
-            }
-        }
-
-        public async Task<PooledHtmlParser> GetParserAsync()
-        {
-            await _semaphore.WaitAsync();
-
-            _parserPool.TryTake(out IHtmlParser parser);
-            return new PooledHtmlParser(parser, this);
-        }
-
-        internal void ReturnParser(IHtmlParser parser)
-        {
+            var parser = new HtmlParser(config);
             _parserPool.Add(parser);
-            _semaphore.Release();
         }
+    }
+
+    public async Task<PooledHtmlParser> GetParserAsync()
+    {
+        await _semaphore.WaitAsync();
+
+        _parserPool.TryTake(out var parser);
+        return new PooledHtmlParser(parser, this);
+    }
+
+    internal void ReturnParser(IHtmlParser parser)
+    {
+        _parserPool.Add(parser);
+        _semaphore.Release();
     }
 }

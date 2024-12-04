@@ -15,36 +15,27 @@ public abstract class AbstractLinkExtractor<T> where T : Link
 
     public async Task<IEnumerable<T>> GetLinksFromDocument(HttpResponseMessage response, T referringUrl)
     {
-        if (!response.IsSuccessStatusCode)
-        {
-            return [];
-        } 
+        if (!response.IsSuccessStatusCode) return [];
 
-        await using Stream document = await response.Content.ReadAsStreamAsync();
-        
+        await using var document = await response.Content.ReadAsStreamAsync();
+
         return GetLinksFromDocument(Parser.ParseDocument(document), referringUrl);
     }
-    
+
     protected abstract IEnumerable<T> GetLinksFromDocument(IDocument document, T referringUrl);
-    
+
     protected static bool IsPage(string url)
     {
-        if (!Uri.TryCreate(url, UriKind.Absolute, out Uri uri))
-        {
-            return false;
-        }
+        if (!Uri.TryCreate(url, UriKind.Absolute, out var uri)) return false;
 
-        if (IsResourceFile(uri))
-        {
-            return false;
-        }
+        if (IsResourceFile(uri)) return false;
 
         return !IsExcluded(url);
     }
 
     protected static bool IsResourceFile(Uri uri)
     {
-        HashSet<string> excludedExtensions = new HashSet<string>(StringComparer.OrdinalIgnoreCase) 
+        HashSet<string> excludedExtensions = new(StringComparer.OrdinalIgnoreCase)
         {
             ".js", ".css", ".png", ".jpg", ".jpeg", ".pdf", ".svg"
         };

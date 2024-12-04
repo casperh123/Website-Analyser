@@ -11,7 +11,7 @@ public interface ICacheWarmingService
 
 public class CacheWarmingService : ICacheWarmingService
 {
-    private HttpClient _httpClient;
+    private readonly HttpClient _httpClient;
     private ModularCrawler<Link>? _crawler;
 
     public CacheWarmingService(HttpClient httpClient)
@@ -23,18 +23,18 @@ public class CacheWarmingService : ICacheWarmingService
     {
         ILinkProcessor<Link> linkProcessor = new LinkProcessor(_httpClient);
         ModularCrawlResult<Link> crawlResult = GenerateCrawlResult(onLinkEnqueued, onLinkChecked);
-        ModularCrawler<Link> crawler = new ModularCrawler<Link>(linkProcessor);
-            
+        ModularCrawler<Link> crawler = new(linkProcessor);
+
         await crawler.CrawlWebsiteAsync(new Link(url), crawlResult);
     }
 
     private ModularCrawlResult<Link> GenerateCrawlResult(Action<int> onLinksEnqueued, Action<int> onLinksChecked)
     {
-        ModularCrawlResult<Link> crawlResult = new ModularCrawlResult<Link>();
-        
+        ModularCrawlResult<Link> crawlResult = new();
+
         crawlResult.OnLinksEnqueued += onLinksEnqueued;
         crawlResult.OnLinksChecked += onLinksChecked;
-        
+
         return crawlResult;
     }
 }

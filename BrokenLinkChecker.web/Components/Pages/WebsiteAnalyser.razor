@@ -2,19 +2,20 @@
 @using BrokenLinkChecker.crawler
 @using BrokenLinkChecker.models
 @using BrokenLinkChecker.Models.Links
-@using BrokenLinkChecker.web.Components.WebsiteMetrics
 @using BrokenLinkChecker.web.Components.WebsiteInputs
+@using BrokenLinkChecker.web.Components.WebsiteMetrics
 @rendermode InteractiveServer
 
 <h2>Website Analyser</h2>
 
-<WebsiteInput UriHasChanged="CheckBrokenLinks" 
+<WebsiteInput UriHasChanged="CheckBrokenLinks"
               SelectedCrawlMode="@CrawlMode"
               SelectedCrawlModeChanged="@OnCrawlModeChanged"></WebsiteInput>
 
 <div class="concurrency-input">
     <label for="concurrencyInput" class="margin-bottom-m center-text">Concurrent Requests:</label>
-    <input type="number" id="concurrencyInput" @bind="_concurrentRequests" required class="margin-bottom-m" min="1" max="100" />
+    <input type="number" id="concurrencyInput" @bind="_concurrentRequests" required class="margin-bottom-m" min="1"
+           max="100"/>
     <p>Concurrency: @_concurrentRequests</p>
 </div>
 
@@ -27,22 +28,22 @@
 @if (_linksChecked > 0)
 {
     <p>Links checked: @_linksChecked</p>
-    
+
     <div class="padding-m round-corners box-shadow">
         <h2>Website metrics</h2>
 
-        <StateButtons PageStateChanged="ChangePageState" />
+        <StateButtons PageStateChanged="ChangePageState"/>
 
         @switch (_currentStatus)
         {
             case PageStatState.DisplayPerformance:
-                <PerformanceStats VisitedPages="VisitedPages" />
+                <PerformanceStats VisitedPages="VisitedPages"/>
                 break;
             case PageStatState.DisplayBrokenLinks:
-                <BrokenLinksStats BrokenLinks="BrokenLinks" />
+                <BrokenLinksStats BrokenLinks="BrokenLinks"/>
                 break;
             case PageStatState.DisplayHeaders:
-                <PageHeaders VisitedPages="VisitedPages" />
+                <PageHeaders VisitedPages="VisitedPages"/>
                 break;
             case PageStatState.Error:
                 <p>Error encountered during the process. Please try again.</p>
@@ -52,20 +53,19 @@
 }
 
 @code {
-    [Inject] 
-    private IHttpClientFactory HttpClientFactory { get; set; }
-    
+    [Inject] private IHttpClientFactory HttpClientFactory { get; set; }
+
     private bool IsChecking { get; set; }
     private int _linksChecked;
     private int _linksEnqueued;
     private int _concurrentRequests = 1;
-    
+
     public ICollection<IndexedLink> BrokenLinks { get; set; } = new List<IndexedLink>();
     public ICollection<PageStat> VisitedPages { get; set; } = new List<PageStat>();
 
     private PageStatState _currentStatus = PageStatState.DisplayBrokenLinks;
 
-    public CrawlMode CrawlMode { get; set; } = CrawlMode.SiteStats;  // Initialize default crawl mode
+    public CrawlMode CrawlMode { get; set; } = CrawlMode.SiteStats; // Initialize default crawl mode
 
     private async Task CheckBrokenLinks(Uri url)
     {
@@ -74,10 +74,10 @@
             IsChecking = true;
             ResetResults();
 
-            CrawlerConfig crawlerState = new CrawlerConfig(_concurrentRequests, CrawlMode);
-            CrawlResult crawlResult = InitializeCrawlResult();
+            var crawlerState = new CrawlerConfig(_concurrentRequests, CrawlMode);
+            var crawlResult = InitializeCrawlResult();
 
-            Crawler crawler = new Crawler(HttpClientFactory.CreateClient("WebsiteAnalyser"), crawlerState, crawlResult);
+            var crawler = new Crawler(HttpClientFactory.CreateClient("WebsiteAnalyser"), crawlerState, crawlResult);
 
             await crawler.CrawlWebsiteAsync(url);
         }
@@ -107,7 +107,7 @@
 
     private CrawlResult InitializeCrawlResult()
     {
-        CrawlResult crawlResult = new CrawlResult();
+        var crawlResult = new CrawlResult();
 
         crawlResult.OnLinksEnqueued += UpdateLinksEnqueued;
         crawlResult.OnLinksChecked += UpdateLinksChecked;
@@ -142,7 +142,8 @@
     }
 
     private void ChangePageState(PageStatState newState)
-    {   
+    {
         _currentStatus = newState;
     }
+
 }

@@ -1,4 +1,3 @@
-using BrokenLinkChecker.crawler;
 using BrokenLinkChecker.DocumentParsing.LinkProcessors;
 using BrokenLinkChecker.models.Links;
 
@@ -9,7 +8,7 @@ public class ModularCrawler<T> where T : Link
     private readonly ILinkProcessor<T> _linkProcessor;
 
     public ModularCrawler(ILinkProcessor<T> linkProcessor)
-    { 
+    {
         _linkProcessor = linkProcessor;
     }
 
@@ -18,14 +17,11 @@ public class ModularCrawler<T> where T : Link
         Queue<T> linkQueue = [];
         linkQueue.Enqueue(startPage);
 
-        while (linkQueue.TryDequeue(out T link))
+        while (linkQueue.TryDequeue(out var link))
         {
             IEnumerable<T> foundLinks = await _linkProcessor.ProcessLinkAsync(link, crawlResult);
 
-            foreach (T foundLink in foundLinks)
-            {
-                linkQueue.Enqueue(foundLink);
-            }
+            foreach (var foundLink in foundLinks) linkQueue.Enqueue(foundLink);
 
             crawlResult.SetLinksEnqueued(linkQueue.Count);
         }

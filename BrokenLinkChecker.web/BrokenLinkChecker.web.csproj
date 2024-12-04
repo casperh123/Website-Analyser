@@ -7,16 +7,16 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\BrokenLinkChecker\BrokenLinkChecker.csproj" />
-      <ProjectReference Include="..\WebsiteAnalyzer.Infrastructure\WebsiteAnalyzer.Infrastructure.csproj" />
+        <ProjectReference Include="..\BrokenLinkChecker\BrokenLinkChecker.csproj"/>
+        <ProjectReference Include="..\WebsiteAnalyzer.Infrastructure\WebsiteAnalyzer.Infrastructure.csproj"/>
     </ItemGroup>
 
     <ItemGroup>
-      <AdditionalFiles Include="Components\Pages\CheckLinks.razor" />
+        <AdditionalFiles Include="Components\Pages\CheckLinks.razor"/>
     </ItemGroup>
 
     <ItemGroup>
-      <PackageReference Include="Microsoft.AspNetCore.Components.QuickGrid" Version="8.0.7" />
+        <PackageReference Include="Microsoft.AspNetCore.Components.QuickGrid" Version="8.0.7"/>
     </ItemGroup>
 
     <PropertyGroup>

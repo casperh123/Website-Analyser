@@ -1,62 +1,52 @@
-using System.Collections.Concurrent;
 using System.Net;
 using BrokenLinkChecker.models;
 using BrokenLinkChecker.Models.Links;
 
-namespace BrokenLinkChecker.crawler
+namespace BrokenLinkChecker.crawler;
+
+public class CrawlResult
 {
-    public class CrawlResult
+    public int LinksChecked { get; private set; }
+    public int LinksEnqueued { get; private set; }
+
+    public event Action<IndexedLink> OnBrokenLinks;
+    public event Action<PageStat> OnPageVisited;
+    public event Action<int> OnLinksEnqueued;
+    public event Action<int> OnLinksChecked;
+
+    public void AddResource(TraceableLink url, HttpResponseMessage response, long requestTime, long parseTime)
     {
-        public int LinksChecked { get; private set; }
-        public int LinksEnqueued { get; private set; }
+        var pageStat = new PageStat(url.Target, response, url.Type, requestTime, parseTime);
 
-        public event Action<IndexedLink> OnBrokenLinks;
-        public event Action<PageStat> OnPageVisited;
-        public event Action<int> OnLinksEnqueued;
-        public event Action<int> OnLinksChecked;
+        OnPageVisited.Invoke(pageStat);
 
-        public void AddResource(TraceableLink url, HttpResponseMessage response, long requestTime, long parseTime)
-        {
-            PageStat pageStat = new PageStat(url.Target, response, url.Type, requestTime, parseTime);
-            
-            OnPageVisited.Invoke(pageStat);
+        if (response.StatusCode == HttpStatusCode.NotFound) HandleBrokenLink(url, response.StatusCode);
+    }
 
-            if (response.StatusCode == HttpStatusCode.NotFound)
-            {
-                HandleBrokenLink(url, response.StatusCode);
-            }
-        }
-        
-        public void AddResource(TraceableLink url, HttpStatusCode statusCode) {
-            if (statusCode == HttpStatusCode.NotFound)
-            {
-                HandleBrokenLink(url, statusCode);
-            }
-        }
+    public void AddResource(TraceableLink url, HttpStatusCode statusCode)
+    {
+        if (statusCode == HttpStatusCode.NotFound) HandleBrokenLink(url, statusCode);
+    }
 
-        private void HandleBrokenLink(TraceableLink url, HttpStatusCode statusCode)
-        {
-            if (statusCode != HttpStatusCode.Forbidden)
-            {
-                AddBrokenLink(new IndexedLink(url, statusCode));
-            }
-        }
-        
-        private void AddBrokenLink(IndexedLink indexedLink)
-        {
-            OnBrokenLinks.Invoke(indexedLink);
-        }
+    private void HandleBrokenLink(TraceableLink url, HttpStatusCode statusCode)
+    {
+        if (statusCode != HttpStatusCode.Forbidden) AddBrokenLink(new IndexedLink(url, statusCode));
+    }
 
-        public void IncrementLinksChecked()
-        {
-            LinksChecked++;
-            OnLinksChecked?.Invoke(LinksChecked);
-        }
+    private void AddBrokenLink(IndexedLink indexedLink)
+    {
+        OnBrokenLinks.Invoke(indexedLink);
+    }
 
-        public void SetLinksEnqueued(int count)
-        {
-            LinksEnqueued = count;
-            OnLinksEnqueued?.Invoke(LinksEnqueued);
-        }
+    public void IncrementLinksChecked()
+    {
+        LinksChecked++;
+        OnLinksChecked?.Invoke(LinksChecked);
+    }
+
+    public void SetLinksEnqueued(int count)
+    {
+        LinksEnqueued = count;
+        OnLinksEnqueued?.Invoke(LinksEnqueued);
     }
 }

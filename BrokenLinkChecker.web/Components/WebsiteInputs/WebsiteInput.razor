@@ -20,19 +20,16 @@
 </div>
 
 @code {
-    [Parameter]
-    public EventCallback<Uri> UriHasChanged { get; set; }
-    
-    [Parameter]
-    public CrawlMode SelectedCrawlMode { get; set; } = CrawlMode.SiteStats;
+    [Parameter] public EventCallback<Uri> UriHasChanged { get; set; }
 
-    [Parameter]
-    public EventCallback<CrawlMode> SelectedCrawlModeChanged { get; set; }  // EventCallback to notify parent
+    [Parameter] public CrawlMode SelectedCrawlMode { get; set; } = CrawlMode.SiteStats;
+
+    [Parameter] public EventCallback<CrawlMode> SelectedCrawlModeChanged { get; set; } // EventCallback to notify parent
 
     private string _targetUrl = "https://";
     private bool _hasError;
     private string _errorMessage = "";
-    
+
     private async Task ChangeUri()
     {
         if (string.IsNullOrWhiteSpace(_targetUrl))
@@ -45,7 +42,7 @@
         try
         {
             _hasError = false;
-            Uri uri = new Uri(_targetUrl, UriKind.Absolute);
+            var uri = new Uri(_targetUrl, UriKind.Absolute);
             await UriHasChanged.InvokeAsync(uri);
         }
         catch (UriFormatException)
@@ -60,7 +57,8 @@
         if (Enum.TryParse<CrawlMode>(e.Value.ToString(), out var mode))
         {
             SelectedCrawlMode = mode;
-            await SelectedCrawlModeChanged.InvokeAsync(mode);  // Notify parent about crawl mode change
+            await SelectedCrawlModeChanged.InvokeAsync(mode); // Notify parent about crawl mode change
         }
     }
+
 }

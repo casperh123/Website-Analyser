@@ -36,7 +36,7 @@ input:focus-visible {
 
 th, td {
     padding: 15px;
-    word-wrap: break-word; 
+    word-wrap: break-word;
 }
 
 th {
@@ -93,9 +93,9 @@ table tr:nth-child(odd) {
     color: white;
 }
 
-    .blazor-error-boundary::after {
-        content: "An error has occurred."
-    }
+.blazor-error-boundary::after {
+    content: "An error has occurred."
+}
 
 .darker-border-checkbox.form-check-input {
     border-color: #929292;

@@ -1,0 +1,76 @@
+@page "/broken-link-checker"
+@using global::BrokenLinkChecker.Models.Links
+@using WebsiteAnalyzer.Infrastructure.Services
+@using WebsiteAnalyzer.Web.Components.WebsiteInputs
+@using WebsiteAnalyzer.Web.Components.WebsiteMetrics
+@inject IBrokenLinkService BrokenLinkService
+
+@rendermode InteractiveServer
+
+<h2>Website Analyser</h2>
+
+<WebsiteInput WebsiteActionStarted="CheckBrokenLinks"></WebsiteInput>
+
+@if (IsChecking)
+{
+    <p>Crawling website, please wait...</p>
+    <p>Links enqueued: @_linksEnqueued</p>
+}
+
+@if (_linksChecked > 0)
+{
+    <p>Links checked: @_linksChecked</p>
+
+    <div class="padding-m round-corners box-shadow">
+        <h2>Broken Links</h2>
+        <BrokenLinksStats BrokenLinks="_brokenLinks"/>
+    </div>
+}
+
+@code {
+    private bool IsChecking { get; set; }
+    private int _linksChecked;
+    private int _linksEnqueued;
+    private readonly ICollection<IndexedLink> _brokenLinks = [];
+
+    private async Task CheckBrokenLinks(Uri url)
+    {
+        try
+        {
+            IsChecking = true;
+            ResetResults();
+
+            await BrokenLinkService.FindBrokenLinks(url.ToString(), UpdateLinksEnqueued, UpdateLinksChecked, UpdateBrokenLinks);
+        }
+        finally
+        {
+            IsChecking = false;
+            StateHasChanged();
+        }
+    }
+
+    private void ResetResults()
+    {
+        _brokenLinks.Clear();
+        _linksChecked = 0;
+        _linksEnqueued = 0;
+    }
+
+    private void UpdateLinksEnqueued(int count)
+    {
+        _linksEnqueued = count;
+    }
+
+    private void UpdateLinksChecked(int count)
+    {
+        _linksChecked = count;
+        InvokeAsync(StateHasChanged);
+    }
+
+    private void UpdateBrokenLinks(IndexedLink link)
+    {
+        _brokenLinks.Add(link);
+        InvokeAsync(StateHasChanged);
+    }
+
+}

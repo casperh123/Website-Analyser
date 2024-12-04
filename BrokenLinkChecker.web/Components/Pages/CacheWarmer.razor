@@ -24,18 +24,18 @@
     private bool IsChecking { get; set; }
     private int _linksChecked;
     private int _linksEnqueued;
-    
+
     private async Task CheckBrokenLinks(Uri url)
     {
-            IsChecking = true;
-            
-            ResetResults();
-            
-            await CacheWarmingService.WarmCacheAsync(url.ToString(), UpdateLinksEnqueued, UpdateLinksChecked);
-            
-            IsChecking = false;
+        IsChecking = true;
+
+        ResetResults();
+
+        await CacheWarmingService.WarmCacheAsync(url.ToString(), UpdateLinksEnqueued, UpdateLinksChecked);
+
+        IsChecking = false;
     }
-    
+
     private void ResetResults()
     {
         _linksChecked = 0;
@@ -53,4 +53,5 @@
         _linksChecked = count;
         InvokeAsync(StateHasChanged);
     }
+
 }

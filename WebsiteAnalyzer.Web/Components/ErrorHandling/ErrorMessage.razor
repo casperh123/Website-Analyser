@@ -1,0 +1,11 @@
+@if(!string.IsNullOrEmpty(Message))
+{
+    <RadzenAlert AlertStyle="AlertStyle.Danger" Text="@Message" bind-Visible="Visible" />
+}
+
+@code {
+    [Parameter]
+    public required string Message { get; set; }
+
+    private bool Visible => !string.IsNullOrEmpty(Message);
+}
