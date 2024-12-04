@@ -1,12 +1,20 @@
 @using WebsiteAnalyzer.Core.Entities
 @using WebsiteAnalyzer.Web.Components.CacheWarm.Cards
 
-<RadzenStack Gap="20px">
-    @foreach (CacheWarm cacheWarm in CacheWarms)
-    {
-        <CacheWarmCard CacheWarm="cacheWarm"/>
-    }
-</RadzenStack>
+@if (CacheWarms.Any())
+{
+    <RadzenStack class="rz-mt-12">
+
+        <RadzenText TextStyle="TextStyle.H2">Previous Cache Warms</RadzenText>
+
+        <RadzenStack Gap="20px">
+            @foreach (CacheWarm cacheWarm in CacheWarms)
+            {
+                <CacheWarmCard CacheWarm="cacheWarm"/>
+            }
+        </RadzenStack>
+    </RadzenStack>
+}
 
 @code {
     [Parameter]
