@@ -25,6 +25,7 @@ public class LinkCrawlerService : ILinkCrawlerService
         ModularCrawler<Link> crawler = new ModularCrawler<Link>(_linkProcessor);
         
         await crawler.CrawlWebsiteAsync(new Link(url), crawlResult);
+        
         return crawlResult;
     }
 

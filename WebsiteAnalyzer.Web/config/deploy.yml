@@ -1,0 +1,20 @@
+service: website-analyser
+image: clyppertechnology/website-analyzer
+
+builder:
+  arch:
+    - amd64
+
+registry: 
+  username: clyppertechnology
+  password: dckr_pat_4rW5buTORv0XYXFH-q2ssGKC1Xk
+
+servers:
+  - 5.9.58.109
+
+ssh:
+  user: websitea1
+  port: 22
+  keys:  [ "~/.ssh/id_rsa.pub" ]
+
+

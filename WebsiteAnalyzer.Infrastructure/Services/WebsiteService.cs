@@ -1,5 +1,3 @@
-using AngleSharp.Dom;
-using BrokenLinkChecker.crawler;
 using WebsiteAnalyzer.Core.Entities;
 using WebsiteAnalyzer.Core.Persistence;
 
