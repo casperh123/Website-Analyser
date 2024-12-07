@@ -1,6 +1,8 @@
 # Website Analyzer
+A robust, enterprise-grade website analysis toolkit designed for developers, SEO specialists, and website administrators. This comprehensive solution combines broken link detection, intelligent cache warming, and detailed performance metrics to optimize website maintenance and user experience.
+Overview
 
-A comprehensive website analysis tool that helps developers and website owners maintain and optimize their web presence. This all-in-one solution combines broken link checking, cache warming, and detailed website metrics to ensure your website performs at its best.
+Website Analyzer is built on .NET 8.0 with a modern Blazor interface, providing an all-in-one solution for website maintenance and optimization. The application helps maintain website health, improve performance, and ensure optimal user experience through automated monitoring and proactive maintenance.
 
 ## 🚀 Key Features
 
@@ -111,4 +113,4 @@ To generate database migrations, use the provided script:
 
 ## License
 
-[License information to be added]
+MIT License - Copyright (c) 2024 Clypper Technology

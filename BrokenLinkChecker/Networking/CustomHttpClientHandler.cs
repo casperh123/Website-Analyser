@@ -1,6 +1,6 @@
 using System.IO.Compression;
 
-namespace BrokenLinkChecker.HttpClients;
+namespace BrokenLinkChecker.Networking;
 
 public class CustomHttpClientHandler : HttpClientHandler
 {
@@ -8,40 +8,49 @@ public class CustomHttpClientHandler : HttpClientHandler
         CancellationToken cancellationToken)
     {
         var response = await base.SendAsync(request, cancellationToken);
+        
+        // If no content encoding, return as-is
+        if (!response.Content.Headers.ContentEncoding.Any())
+            return response;
 
-        // Capture the original Content-Encoding header before any decompression
-        List<string> originalContentEncoding = response.Content.Headers.ContentEncoding.ToList();
+        // Create a stream that will handle the decompression on-demand
+        var originalStream = await response.Content.ReadAsStreamAsync(cancellationToken);
+        var decompressionStream = CreateDecompressionStream(originalStream, 
+            response.Content.Headers.ContentEncoding.ToList());
 
-        if (!originalContentEncoding.Any()) return response;
+        // Create new content without loading everything into memory
+        var newContent = new StreamContent(decompressionStream);
 
-        var originalStream = await response.Content.ReadAsStreamAsync();
-        var decompressedStream = originalStream;
-
-        // Handle gzip, deflate, and br (Brotli) decompression manually
-        if (originalContentEncoding.Contains("gzip"))
-            decompressedStream = new GZipStream(originalStream, CompressionMode.Decompress);
-        else if (originalContentEncoding.Contains("deflate"))
-            decompressedStream = new DeflateStream(originalStream, CompressionMode.Decompress);
-        else if (originalContentEncoding.Contains("br"))
-            decompressedStream = new BrotliStream(originalStream, CompressionMode.Decompress);
-
-        // Copy the decompressed stream into a MemoryStream to calculate its length
-        var memoryStream = new MemoryStream();
-        await decompressedStream.CopyToAsync(memoryStream, cancellationToken);
-
-        // Reset the memoryStream position to the beginning
-        memoryStream.Position = 0;
-
-        var newContent = new StreamContent(memoryStream);
-
-        // Copy the headers from the original content
+        // Copy headers excluding content-encoding and content-length
         foreach (var header in response.Content.Headers)
+        {
+            if (header.Key.Equals("Content-Encoding", StringComparison.OrdinalIgnoreCase) ||
+                header.Key.Equals("Content-Length", StringComparison.OrdinalIgnoreCase))
+                continue;
+                
             newContent.Headers.TryAddWithoutValidation(header.Key, header.Value);
-
-        newContent.Headers.ContentLength = memoryStream.Length;
+        }
 
         response.Content = newContent;
-
         return response;
+    }
+
+    private static Stream CreateDecompressionStream(Stream originalStream, IList<string> encodings)
+    {
+        // Handle encodings in reverse order as they were applied
+        Stream currentStream = originalStream;
+
+        foreach (var encoding in encodings.Reverse())
+        {
+            currentStream = encoding.ToLowerInvariant() switch
+            {
+                "gzip" => new GZipStream(currentStream, CompressionMode.Decompress, leaveOpen: false),
+                "deflate" => new DeflateStream(currentStream, CompressionMode.Decompress, leaveOpen: false),
+                "br" => new BrotliStream(currentStream, CompressionMode.Decompress, leaveOpen: false),
+                _ => currentStream
+            };
+        }
+
+        return currentStream;
     }
 }
