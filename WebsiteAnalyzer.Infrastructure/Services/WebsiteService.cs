@@ -19,13 +19,13 @@ public class WebsiteService : IWebsiteService
 
     public async Task<Website> GetOrAddWebsite(string url)
     {
-        if (await _websiteRepository.ExistsUrlAsync(url))
+        if (await _websiteRepository.ExistsUrlAsync(url).ConfigureAwait(false))
         {
-            return await _websiteRepository.GetWebsiteByUrlAsync(url);
+            return await _websiteRepository.GetWebsiteByUrlAsync(url).ConfigureAwait(false);
         }
 
         Website website = new Website { Url = url };
-        await _websiteRepository.AddAsync(website);
+        await _websiteRepository.AddAsync(website).ConfigureAwait(false);
         return website;
     }
 }

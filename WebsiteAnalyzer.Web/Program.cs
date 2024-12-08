@@ -57,7 +57,6 @@ builder.Services.AddScoped<ThemeService>();
 
 builder.Services.AddScoped<IWebsiteRepository, WebsiteRepository>();
 builder.Services.AddScoped<ICacheWarmRepository, CacheWarmRepository>();
-builder.Services.AddScoped<ILinkCrawlerService, LinkCrawlerService>();
 builder.Services.AddScoped<IWebsiteService, WebsiteService>();
 builder.Services.AddScoped<ICacheWarmingService, CacheWarmingService>();
 builder.Services.AddScoped<IBrokenLinkService, BrokenLinkService>();

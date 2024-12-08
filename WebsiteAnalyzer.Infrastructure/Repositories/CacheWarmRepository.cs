@@ -11,10 +11,11 @@ public class CacheWarmRepository : BaseRepository<CacheWarm>, ICacheWarmReposito
     {
     }
 
-    public async Task<ICollection<CacheWarm>> GetAllAsync()
+    public new async Task<ICollection<CacheWarm>> GetAllAsync()
     {
         return await _dbContext.CacheWarms
             .Include(ch => ch.Website)
-            .ToListAsync();
+            .OrderByDescending(cw => cw.StartTime)
+            .ToListAsync().ConfigureAwait(false);
     }
 }

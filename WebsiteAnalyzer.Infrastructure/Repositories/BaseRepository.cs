@@ -17,29 +17,36 @@ public class BaseRepository<T> : IBaseRepository<T> where T : class
     
     public async Task<T?> GetByIdAsync(Guid id)
     {
-        return await _dbSet.FindAsync(id);
+        return await _dbSet
+            .FindAsync(id)
+            .ConfigureAwait(false);
     }
     
     public async Task<ICollection<T>> GetAllAsync()
     {
-        return await _dbSet.ToListAsync();
+        return await _dbSet
+            .ToListAsync()
+            .ConfigureAwait(false);
     }
     
     public async Task AddAsync(T entity)
     {
-        await _dbSet.AddAsync(entity);
-        await _dbContext.SaveChangesAsync();
+        await _dbSet.AddAsync(entity).ConfigureAwait(false);
+        await _dbContext.SaveChangesAsync().ConfigureAwait(false);
     }
     
     public async Task UpdateAsync(T entity)
     {
         _dbSet.Update(entity);
-        await _dbContext.SaveChangesAsync();
+        await _dbContext
+            .SaveChangesAsync()
+            .ConfigureAwait(false);
     }
     
     public async Task DeleteAsync(T entity)
     {
         _dbSet.Remove(entity);
-        await _dbContext.SaveChangesAsync();
+        await _dbContext.SaveChangesAsync()
+            .ConfigureAwait(false);
     }
 }

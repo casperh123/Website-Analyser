@@ -15,12 +15,14 @@ public class WebsiteRepository : BaseRepository<Website>, IWebsiteRepository
     {
         return await _dbContext.Websites
             .Where(w => w.Url == url)
-            .FirstAsync();
+            .FirstAsync()
+            .ConfigureAwait(false);
     }
 
-    public Task<bool> ExistsUrlAsync(string url)
+    public async Task<bool> ExistsUrlAsync(string url)
     {
-        return _dbContext.Websites
-            .AnyAsync(w => w.Url == url);
+        return await _dbContext.Websites
+            .AnyAsync(w => w.Url == url)
+            .ConfigureAwait(false);
     }
 }

@@ -53,7 +53,6 @@ public class ModularCrawler<T> where T : Link
             IncrementLinksChecked();
             SetResourceVisited(link);
             SetLinksEnqueued(linkQueue.Count);
-            
         }
     }
     

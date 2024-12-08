@@ -60,6 +60,7 @@ public class CacheWarmingService : ICacheWarmingService
         }
         
         await UpdateCacheWarmResults(cacheWarm, finalLinksChecked);
+        
         return cacheWarm;
     }
 

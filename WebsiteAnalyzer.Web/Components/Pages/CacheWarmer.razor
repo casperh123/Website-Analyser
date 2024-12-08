@@ -24,19 +24,9 @@
     
     private async Task CheckBrokenLinks(Uri url)
     {
-        ResetResults();
-
         await CacheWarmingService.WarmCacheAsync(url.ToString(), UpdateLinksEnqueued, UpdateLinksChecked);
 
         _cacheWarms = await CacheWarmingService.GetCacheWarmsAsync();
-        
-        ResetResults();
-    }
-
-    private void ResetResults()
-    {
-        _linksChecked = 0;
-        _linksEnqueued = 0;
     }
 
     private void UpdateLinksEnqueued(int count)
