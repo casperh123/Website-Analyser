@@ -10,7 +10,7 @@ namespace BrokenLinkChecker.crawler;
 
 public class Crawler
 {
-    private readonly LinkExtractor _linkProcessor;
+    private readonly DocumentParsing.Linkextraction.LinkExtractor _linkProcessor;
     private readonly HttpRequestHandler _requestHandler;
     private readonly ConcurrentDictionary<string, HttpStatusCode> _visitedResources = new();
 
@@ -19,7 +19,7 @@ public class Crawler
         _requestHandler = new HttpRequestHandler(httpClient, crawlerConfig);
         CrawlerConfig = crawlerConfig;
         CrawlResult = crawlResult;
-        _linkProcessor = new LinkExtractor(CrawlerConfig);
+        _linkProcessor = new DocumentParsing.Linkextraction.LinkExtractor(CrawlerConfig);
     }
 
     private CrawlerConfig CrawlerConfig { get; }

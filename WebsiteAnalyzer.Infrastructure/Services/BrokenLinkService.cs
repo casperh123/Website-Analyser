@@ -22,23 +22,14 @@ public class BrokenLinkService : IBrokenLinkService
     public async Task FindBrokenLinks(string url, Action<int> onLinkEnqueued, Action<int> onLinkChecked,
         Action<IndexedLink> onBrokenLinkFound)
     {
-        ModularCrawlResult<IndexedLink> crawlResult =
-            GenerateCrawlResult(onLinkEnqueued, onLinkChecked, onBrokenLinkFound);
+        
         ILinkProcessor<IndexedLink> linkProcessor = new BrokenLinkProcessor(_httpClient);
         ModularCrawler<IndexedLink> crawler = new(linkProcessor);
+        
+        crawler.OnLinksEnqueued += onLinkEnqueued;
+        crawler.OnLinksChecked += onLinkChecked;
+        crawler.OnResourceVisited += onBrokenLinkFound;
 
-        await crawler.CrawlWebsiteAsync(new IndexedLink(string.Empty, url, "", 0), crawlResult);
-    }
-
-    private ModularCrawlResult<IndexedLink> GenerateCrawlResult(Action<int> onLinkEnqueued, Action<int> onLinkChecked,
-        Action<IndexedLink> onBrokenLinkFound)
-    {
-        ModularCrawlResult<IndexedLink> crawlResult = new();
-
-        crawlResult.OnLinksEnqueued += onLinkEnqueued;
-        crawlResult.OnLinksChecked += onLinkChecked;
-        crawlResult.OnResouceVisited += onBrokenLinkFound;
-
-        return crawlResult;
+        await crawler.CrawlWebsiteAsync(new IndexedLink(string.Empty, url, "", 0));
     }
 }

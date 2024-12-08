@@ -29,6 +29,8 @@
         await CacheWarmingService.WarmCacheAsync(url.ToString(), UpdateLinksEnqueued, UpdateLinksChecked);
 
         _cacheWarms = await CacheWarmingService.GetCacheWarmsAsync();
+        
+        ResetResults();
     }
 
     private void ResetResults()

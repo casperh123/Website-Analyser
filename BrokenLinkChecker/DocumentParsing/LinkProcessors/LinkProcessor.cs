@@ -1,5 +1,4 @@
 using AngleSharp.Html.Parser;
-using BrokenLinkChecker.Crawler.ExtendedCrawlers;
 using BrokenLinkChecker.DocumentParsing.ModularLinkExtraction;
 using BrokenLinkChecker.models.Links;
 
@@ -9,38 +8,34 @@ public class LinkProcessor : ILinkProcessor<Link>
 {
     private readonly HttpClient _httpClient;
     private readonly AbstractLinkExtractor<Link> _linkExtractor;
-    private readonly HashSet<string> _visitedSites;
 
     public LinkProcessor(HttpClient httpClient)
     {
         _httpClient = httpClient;
-        _visitedSites = [];
         _linkExtractor = new LinkExtractor(new HtmlParser());
     }
 
-    public async Task<IEnumerable<Link>> ProcessLinkAsync(Link link, ModularCrawlResult<Link> crawlResult)
+    public async Task<IEnumerable<Link>> ProcessLinkAsync(Link link)
     {
         IEnumerable<Link> links = [];
-
-        if (_visitedSites.Contains(link.Target)) return [];
-
+        
         try
         {
-            var response =
-                await _httpClient.GetAsync(link.Target, HttpCompletionOption.ResponseHeadersRead);
+            HttpResponseMessage response = await _httpClient.GetAsync(
+                link.Target,
+                HttpCompletionOption.ResponseHeadersRead
+            )
+            .ConfigureAwait(false);
 
-            if (response.IsSuccessStatusCode) links = await _linkExtractor.GetLinksFromDocument(response, link);
+            if (response.IsSuccessStatusCode)
+            {
+                links = await _linkExtractor.GetLinksFromDocument(response, link).ConfigureAwait(false);
+            }
         }
         catch (HttpRequestException e)
         {
             links = [];
         }
-        finally
-        {
-            _visitedSites.Add(link.Target);
-            crawlResult.IncrementLinksChecked();
-        }
-
 
         return links;
     }

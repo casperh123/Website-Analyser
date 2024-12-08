@@ -24,12 +24,12 @@ public class BrokenLinkProcessor : ILinkProcessor<IndexedLink>
         );
     }
 
-    public async Task<IEnumerable<IndexedLink>> ProcessLinkAsync(IndexedLink link,
-        ModularCrawlResult<IndexedLink> crawlResult)
+    public async Task<IEnumerable<IndexedLink>> ProcessLinkAsync(IndexedLink link)
     {
-        IEnumerable<IndexedLink> links = Enumerable.Empty<IndexedLink>();
+        IEnumerable<IndexedLink> links = [];
 
         if (!_visitedResources.TryGetValue(link.Target, out var statusCode))
+        {
             try
             {
                 using var response =
@@ -46,12 +46,10 @@ public class BrokenLinkProcessor : ILinkProcessor<IndexedLink>
             {
                 _visitedResources[link.Target] = statusCode;
             }
+        }
 
         link.StatusCode = statusCode;
-        crawlResult.IncrementLinksChecked();
-
-        if (link.StatusCode != HttpStatusCode.OK) crawlResult.AddResource(link);
-
+        
         return links;
     }
 }

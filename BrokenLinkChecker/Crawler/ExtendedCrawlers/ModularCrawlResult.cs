@@ -27,4 +27,9 @@ public class ModularCrawlResult<T> where T : Link
         LinksEnqueued = count;
         OnLinksEnqueued?.Invoke(LinksEnqueued);
     }
+
+    public void SetResourceVisited(T resource)
+    {
+        OnResouceVisited.Invoke(resource);
+    }
 }

@@ -1,4 +1,6 @@
 using BrokenLinkChecker.Crawler.ExtendedCrawlers;
+using BrokenLinkChecker.DocumentParsing.LinkProcessors;
+using BrokenLinkChecker.DocumentParsing.ModularLinkExtraction;
 using BrokenLinkChecker.models.Links;
 using WebsiteAnalyzer.Core.Entities;
 using WebsiteAnalyzer.Core.Persistence;
@@ -13,29 +15,51 @@ public interface ICacheWarmingService
 
 public class CacheWarmingService : ICacheWarmingService
 {
-    private readonly ILinkCrawlerService _crawlerService;
     private readonly IWebsiteService _websiteService;
     private readonly ICacheWarmRepository _cacheWarmRepository;
+    private readonly ModularCrawler<Link> _linkCrawler;
 
     public CacheWarmingService(
-        ILinkCrawlerService crawlerService,
         ICacheWarmRepository cacheWarmRepository,
-        IWebsiteService websiteService)
+        IWebsiteService websiteService,
+        HttpClient httpClient
+        )
     {
-        _crawlerService = crawlerService;
         _cacheWarmRepository = cacheWarmRepository;
-        _websiteService = websiteService;
+        _websiteService = websiteService; 
+        
+        ILinkProcessor<Link> linkProcessor = new LinkProcessor(httpClient);
+
+        _linkCrawler = new ModularCrawler<Link>(linkProcessor);
     }
 
     public async Task<CacheWarm> WarmCacheAsync(string url, Action<int> onLinkEnqueued, Action<int> onLinkChecked)
     {
-        Website website = await _websiteService.GetOrAddWebsite(url);
-        CacheWarm cacheWarm = await CreateCacheWarmEntry(website);
+        Website website = await _websiteService.GetOrAddWebsite(url).ConfigureAwait(false);
+        CacheWarm cacheWarm = await CreateCacheWarmEntry(website).ConfigureAwait(false);
+        
+        int finalLinksChecked = 0;
+        
+        void OnLinksChecked(int count)
+        {
+            finalLinksChecked = count;
+            onLinkChecked(count);
+        }
 
-        ModularCrawlResult<Link> crawlResult =
-            await _crawlerService.CrawlWebsiteAsync(url, onLinkEnqueued, onLinkChecked);
-
-        await UpdateCacheWarmResults(cacheWarm, crawlResult);
+        try
+        {
+            _linkCrawler.OnLinksChecked += OnLinksChecked;
+            _linkCrawler.OnLinksEnqueued += onLinkEnqueued;
+            
+            await _linkCrawler.CrawlWebsiteAsync(new Link(url));
+        }
+        finally 
+        {
+            _linkCrawler.OnLinksChecked -= OnLinksChecked;
+            _linkCrawler.OnLinksEnqueued-= onLinkEnqueued;
+        }
+        
+        await UpdateCacheWarmResults(cacheWarm, finalLinksChecked);
         return cacheWarm;
     }
 
@@ -49,19 +73,19 @@ public class CacheWarmingService : ICacheWarmingService
             WebsiteUrl = website.Url,
         };
 
-        await _cacheWarmRepository.AddAsync(cacheWarm);
+        await _cacheWarmRepository.AddAsync(cacheWarm).ConfigureAwait(false);
         return cacheWarm;
     }
 
-    private async Task UpdateCacheWarmResults(CacheWarm cacheWarm, ModularCrawlResult<Link> crawlResult)
+    private async Task UpdateCacheWarmResults(CacheWarm cacheWarm, int linksChecked)
     {
         cacheWarm.EndTime = DateTime.Now;
-        cacheWarm.VisitedPages = crawlResult.LinksChecked;
-        await _cacheWarmRepository.UpdateAsync(cacheWarm);
+        cacheWarm.VisitedPages = linksChecked;
+        await _cacheWarmRepository.UpdateAsync(cacheWarm).ConfigureAwait(false);
     }
 
     public async Task<ICollection<CacheWarm>> GetCacheWarmsAsync()
     {
-        return await _cacheWarmRepository.GetAllAsync();
+        return await _cacheWarmRepository.GetAllAsync().ConfigureAwait(false);
     }
 }
