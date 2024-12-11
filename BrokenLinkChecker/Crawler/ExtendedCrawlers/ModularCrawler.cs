@@ -6,8 +6,6 @@ namespace BrokenLinkChecker.Crawler.ExtendedCrawlers;
 public class ModularCrawler<T> where T : Link
 {
     private readonly ILinkProcessor<T> _linkProcessor;
-    private HashSet<string> _visitedSites;
-    private HashSet<string> _enqueuedSites;
 
     private int LinksChecked { get; set; }
     private int LinksEnqueued { get; set; }
@@ -27,27 +25,18 @@ public class ModularCrawler<T> where T : Link
     {
         LinksChecked = 0;
         LinksEnqueued = 0;
-        _visitedSites = new(DefaultQueueSize, StringComparer.OrdinalIgnoreCase);
-        _enqueuedSites = new(DefaultQueueSize, StringComparer.OrdinalIgnoreCase);
         Queue<T> linkQueue = new(DefaultQueueSize);
         
         linkQueue.Enqueue(startPage);
-        _enqueuedSites.Add(startPage.Target);
 
         while (linkQueue.TryDequeue(out var link))
         {
       
             IEnumerable<T> foundLinks = await _linkProcessor.ProcessLinkAsync(link).ConfigureAwait(false);
-                
-            _visitedSites.Add(link.Target);
-                
+            
             foreach (T foundLink in foundLinks)
             {
-                if (!_visitedSites.Contains(foundLink.Target) && !_enqueuedSites.Contains(foundLink.Target))
-                {
-                    linkQueue.Enqueue(foundLink);
-                    _enqueuedSites.Add(foundLink.Target);
-                }
+                linkQueue.Enqueue(foundLink);
             }
 
             IncrementLinksChecked();

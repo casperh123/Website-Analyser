@@ -20,6 +20,7 @@ public class IndexedLinkExtractor(HtmlParser parser) : AbstractLinkExtractor<Ind
 
         return links
             .Where(link => Uri.TryCreate(link.Target, UriKind.Absolute, out var uri) && uri.Host == thisUrl.Host)
+            .Where(link => !IsExcluded(link.Target))
             .ToList();
     }
 

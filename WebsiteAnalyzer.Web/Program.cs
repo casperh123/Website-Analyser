@@ -48,13 +48,13 @@ builder.Services.AddHttpClient("WebsiteAnalyser", client =>
         UseCookies = false,
         SslProtocols = SslProtocols.Tls12 | SslProtocols.Tls13,
         MaxConnectionsPerServer = 50,
-
-
+        MaxAutomaticRedirections = 10,
+        AutomaticDecompression = DecompressionMethods.All,
         ServerCertificateCustomValidationCallback = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator
     });
 
 builder.Services.AddScoped<ThemeService>();
-
+ 
 builder.Services.AddScoped<IWebsiteRepository, WebsiteRepository>();
 builder.Services.AddScoped<ICacheWarmRepository, CacheWarmRepository>();
 builder.Services.AddScoped<IWebsiteService, WebsiteService>();

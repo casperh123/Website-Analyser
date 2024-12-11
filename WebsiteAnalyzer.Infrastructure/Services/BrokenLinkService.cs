@@ -7,7 +7,7 @@ namespace WebsiteAnalyzer.Infrastructure.Services;
 public interface IBrokenLinkService
 {
     Task FindBrokenLinks(string url, Action<int> onLinkEnqueued, Action<int> onLinkChecked,
-        Action<IndexedLink> onBrokenLinkFound);
+        Action<IndexedLink> onLinkFound);
 }
 
 public class BrokenLinkService : IBrokenLinkService
@@ -20,7 +20,7 @@ public class BrokenLinkService : IBrokenLinkService
     }
 
     public async Task FindBrokenLinks(string url, Action<int> onLinkEnqueued, Action<int> onLinkChecked,
-        Action<IndexedLink> onBrokenLinkFound)
+        Action<IndexedLink> onLinkFound)
     {
         
         ILinkProcessor<IndexedLink> linkProcessor = new BrokenLinkProcessor(_httpClient);
@@ -28,7 +28,7 @@ public class BrokenLinkService : IBrokenLinkService
         
         crawler.OnLinksEnqueued += onLinkEnqueued;
         crawler.OnLinksChecked += onLinkChecked;
-        crawler.OnResourceVisited += onBrokenLinkFound;
+        crawler.OnResourceVisited += onLinkFound;
 
         await crawler.CrawlWebsiteAsync(new IndexedLink(string.Empty, url, "", 0));
     }
