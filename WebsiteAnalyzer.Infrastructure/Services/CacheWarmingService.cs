@@ -9,8 +9,10 @@ namespace WebsiteAnalyzer.Infrastructure.Services;
 
 public interface ICacheWarmingService
 {
-    Task<CacheWarm> WarmCacheAsync(string url, Action<int> onLinkEnqueued, Action<int> onLinkChecked);
+    Task<CacheWarm> WarmCacheWithSaveAsync(string url, Guid userId, Action<int> onLinkEnqueued, Action<int> onLinkChecked);
+    Task WarmCache(string url, Action<int> onLinkEnqueued, Action<int> onLinkChecked);
     Task<ICollection<CacheWarm>> GetCacheWarmsAsync();
+    Task<ICollection<CacheWarm>> GetCacheWarmsByUserAsync(Guid userId);
 }
 
 public class CacheWarmingService : ICacheWarmingService
@@ -33,10 +35,27 @@ public class CacheWarmingService : ICacheWarmingService
         _linkCrawler = new ModularCrawler<Link>(linkProcessor);
     }
 
-    public async Task<CacheWarm> WarmCacheAsync(string url, Action<int> onLinkEnqueued, Action<int> onLinkChecked)
+    public async Task WarmCache(string url, Action<int> onLinkEnqueued, Action<int> onLinkChecked)
     {
-        Website website = await _websiteService.GetOrAddWebsite(url).ConfigureAwait(false);
-        CacheWarm cacheWarm = await CreateCacheWarmEntry(website).ConfigureAwait(false);
+        try
+        {
+            _linkCrawler.OnLinksChecked += onLinkChecked;
+            _linkCrawler.OnLinksEnqueued += onLinkEnqueued;
+            
+            await _linkCrawler.CrawlWebsiteAsync(new Link(url));
+        }
+        finally 
+        {
+            _linkCrawler.OnLinksChecked -= onLinkChecked;
+            _linkCrawler.OnLinksEnqueued-= onLinkEnqueued;
+        }
+    }
+
+
+    public async Task<CacheWarm> WarmCacheWithSaveAsync(string url, Guid userId, Action<int> onLinkEnqueued, Action<int> onLinkChecked)
+    {
+        Website website = await _websiteService.GetOrAddWebsite(url, userId).ConfigureAwait(false);
+        CacheWarm cacheWarm = await CreateCacheWarmEntry(website, userId).ConfigureAwait(false);
         
         int finalLinksChecked = 0;
         
@@ -64,11 +83,12 @@ public class CacheWarmingService : ICacheWarmingService
         return cacheWarm;
     }
 
-    private async Task<CacheWarm> CreateCacheWarmEntry(Website website)
+    private async Task<CacheWarm> CreateCacheWarmEntry(Website website, Guid userId)
     {
         CacheWarm cacheWarm = new CacheWarm
         {
             Id = Guid.NewGuid(),
+            UserId = userId,
             StartTime = DateTime.Now,
             Website = website,
             WebsiteUrl = website.Url,
@@ -78,15 +98,20 @@ public class CacheWarmingService : ICacheWarmingService
         return cacheWarm;
     }
 
+    public async Task<ICollection<CacheWarm>> GetCacheWarmsAsync()
+    {
+        return await _cacheWarmRepository.GetAllAsync().ConfigureAwait(false);
+    }
+
+    public async Task<ICollection<CacheWarm>> GetCacheWarmsByUserAsync(Guid userId)
+    {
+        return await _cacheWarmRepository.GetCacheWarmsByUserAsync(userId);
+    }
+    
     private async Task UpdateCacheWarmResults(CacheWarm cacheWarm, int linksChecked)
     {
         cacheWarm.EndTime = DateTime.Now;
         cacheWarm.VisitedPages = linksChecked;
         await _cacheWarmRepository.UpdateAsync(cacheWarm).ConfigureAwait(false);
-    }
-
-    public async Task<ICollection<CacheWarm>> GetCacheWarmsAsync()
-    {
-        return await _cacheWarmRepository.GetAllAsync().ConfigureAwait(false);
     }
 }

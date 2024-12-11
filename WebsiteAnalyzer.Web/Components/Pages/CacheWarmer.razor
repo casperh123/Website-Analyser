@@ -1,32 +1,50 @@
 @page "/cache-warmer"
 
 @using WebsiteAnalyzer.Core.Entities
+@using WebsiteAnalyzer.Infrastructure
 @using WebsiteAnalyzer.Infrastructure.Services
 @using WebsiteAnalyzer.Web.Components.WebsiteInputs
 @using WebsiteAnalyzer.Web.Components.CacheWarm.Lists
+@using WebsiteAnalyzer.Web.Services
 
 @inject ICacheWarmingService CacheWarmingService
+@inject IUserService UserService
 
 <PageTitle>Cache Warmer</PageTitle>
 
 <WebsiteInput WebsiteActionStarted="CheckBrokenLinks" LinksChecked="_linksChecked" LinksEnqueued="_linksEnqueued"/>
-<CacheWarmList CacheWarms="_cacheWarms"/>
+
+<AuthorizeView>
+    <CacheWarmList CacheWarms="_cacheWarms"/>
+</AuthorizeView>
 
 @code {
     private int _linksChecked;
     private int _linksEnqueued;
+    private ApplicationUser? _user;
     private ICollection<CacheWarm> _cacheWarms = [];
 
     protected override async Task OnInitializedAsync()
     {
-        _cacheWarms = await CacheWarmingService.GetCacheWarmsAsync();
+        _user = await UserService.GetCurrentUserAsync();
+
+        if (_user is not null)
+        {
+            _cacheWarms = await CacheWarmingService.GetCacheWarmsByUserAsync(_user.Id);
+        }
     }
     
     private async Task CheckBrokenLinks(Uri url)
     {
-        await CacheWarmingService.WarmCacheAsync(url.ToString(), UpdateLinksEnqueued, UpdateLinksChecked);
+        if (_user is null)
+        {
+            await CacheWarmingService.WarmCache(url.ToString(), UpdateLinksEnqueued, UpdateLinksChecked);
+            return;
+        }
+        
+        await CacheWarmingService.WarmCacheWithSaveAsync(url.ToString(), _user.Id, UpdateLinksEnqueued, UpdateLinksChecked);
 
-        _cacheWarms = await CacheWarmingService.GetCacheWarmsAsync();
+        _cacheWarms = await CacheWarmingService.GetCacheWarmsByUserAsync(_user.Id);
     }
 
     private void UpdateLinksEnqueued(int count)

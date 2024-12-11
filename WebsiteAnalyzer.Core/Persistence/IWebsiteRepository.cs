@@ -4,7 +4,7 @@ namespace WebsiteAnalyzer.Core.Persistence;
 
 public interface IWebsiteRepository : IBaseRepository<Website>
 {
-    Task<Website> GetWebsiteByUrlAsync(string url);
+    Task<Website> GetWebsiteByUrlAndUserAsync(string url, Guid userId);
 
-    Task<bool> ExistsUrlAsync(string url);
+    Task<bool> ExistsUrlWithUserAsync(string url, Guid userId);
 }

@@ -6,11 +6,13 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Radzen;
 using WebsiteAnalyzer.Core.Persistence;
+using WebsiteAnalyzer.Infrastructure;
 using WebsiteAnalyzer.Infrastructure.Data;
 using WebsiteAnalyzer.Infrastructure.Repositories;
 using WebsiteAnalyzer.Infrastructure.Services;
 using WebsiteAnalyzer.Web.Components;
 using WebsiteAnalyzer.Web.Components.Account;
+using WebsiteAnalyzer.Web.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -54,12 +56,6 @@ builder.Services.AddHttpClient("WebsiteAnalyser", client =>
     });
 
 builder.Services.AddScoped<ThemeService>();
- 
-builder.Services.AddScoped<IWebsiteRepository, WebsiteRepository>();
-builder.Services.AddScoped<ICacheWarmRepository, CacheWarmRepository>();
-builder.Services.AddScoped<IWebsiteService, WebsiteService>();
-builder.Services.AddScoped<ICacheWarmingService, CacheWarmingService>();
-builder.Services.AddScoped<IBrokenLinkService, BrokenLinkService>();
 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
@@ -72,6 +68,14 @@ builder.Services.AddIdentityCore<ApplicationUser>(options => options.SignIn.Requ
     .AddDefaultTokenProviders();
 
 builder.Services.AddSingleton<IEmailSender<ApplicationUser>, IdentityNoOpEmailSender>();
+
+builder.Services.AddScoped<IWebsiteRepository, WebsiteRepository>();
+builder.Services.AddScoped<ICacheWarmRepository, CacheWarmRepository>();
+
+builder.Services.AddScoped<IWebsiteService, WebsiteService>();
+builder.Services.AddScoped<ICacheWarmingService, CacheWarmingService>();
+builder.Services.AddScoped<IBrokenLinkService, BrokenLinkService>();
+builder.Services.AddScoped<IUserService, UserService>();
 
 var app = builder.Build();
 

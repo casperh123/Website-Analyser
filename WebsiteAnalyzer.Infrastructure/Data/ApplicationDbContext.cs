@@ -5,33 +5,45 @@ using WebsiteAnalyzer.Core.Entities;
 
 namespace WebsiteAnalyzer.Infrastructure.Data;
 
-public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
-    : IdentityDbContext<ApplicationUser>(options)
+public class ApplicationDbContext : IdentityDbContext<ApplicationUser, IdentityRole<Guid>, Guid>
 {
+    public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
+        : base(options)
+    {
+    }
+
     public DbSet<Website> Websites { get; set; }
     public DbSet<CacheWarm> CacheWarms { get; set; }
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
+        base.OnModelCreating(builder);
+
+        // Configure Website entity
         builder.Entity<Website>()
-            .HasKey(w => w.Url);
-        
-        // Configure Website and CacheWarmRun relationship
+            .HasKey(w =>
+            new {
+                w.Url, 
+                w.UserId
+            }); 
+
+        // Configure CacheWarm and Website relationship
         builder.Entity<CacheWarm>()
             .HasOne(c => c.Website)
             .WithMany(w => w.CacheWarmRuns)
-            .HasForeignKey(c => c.WebsiteUrl);
+            .HasForeignKey(c => new { c.WebsiteUrl, c.UserId });
 
-        builder.Entity<CacheWarm>().HasKey(c => c.Id);
-        
-        // Configure Identity entities
-        builder.Entity<IdentityUserLogin<string>>()
+        builder.Entity<CacheWarm>()
+            .HasKey(c => c.Id); // Use GUID for CacheWarm primary key
+
+        // Configure Identity entities to use GUID
+        builder.Entity<IdentityUserLogin<Guid>>()
             .HasKey(l => new { l.LoginProvider, l.ProviderKey });
 
-        builder.Entity<IdentityUserRole<string>>()
+        builder.Entity<IdentityUserRole<Guid>>()
             .HasKey(r => new { r.UserId, r.RoleId });
 
-        builder.Entity<IdentityUserToken<string>>()
+        builder.Entity<IdentityUserToken<Guid>>()
             .HasKey(t => new { t.UserId, t.LoginProvider, t.Name });
     }
 }

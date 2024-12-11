@@ -5,7 +5,7 @@ namespace WebsiteAnalyzer.Infrastructure.Services;
 
 public interface IWebsiteService
 {
-    Task<Website> GetOrAddWebsite(string url);
+    Task<Website> GetOrAddWebsite(string url, Guid userId);
 }
 
 public class WebsiteService : IWebsiteService
@@ -17,14 +17,15 @@ public class WebsiteService : IWebsiteService
         _websiteRepository = websiteRepository;
     }
 
-    public async Task<Website> GetOrAddWebsite(string url)
+    public async Task<Website> GetOrAddWebsite(string url, Guid userId)
     {
-        if (await _websiteRepository.ExistsUrlAsync(url).ConfigureAwait(false))
+        if (await _websiteRepository.ExistsUrlWithUserAsync(url, userId).ConfigureAwait(false))
         {
-            return await _websiteRepository.GetWebsiteByUrlAsync(url).ConfigureAwait(false);
+            return await _websiteRepository.GetWebsiteByUrlAndUserAsync(url, userId).ConfigureAwait(false);
         }
 
-        Website website = new Website { Url = url };
+        Website website = new Website(url, userId);
+        
         await _websiteRepository.AddAsync(website).ConfigureAwait(false);
         return website;
     }
