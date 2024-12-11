@@ -10,7 +10,7 @@
         <RadzenStack Gap="20px">
             @foreach (CacheWarm cacheWarm in CacheWarms)
             {
-                <CacheWarmCard CacheWarm="cacheWarm"/>
+                <CacheWarmCard OnRerunWarm="OnCacheWarmRerun" CacheWarm="cacheWarm"/>
             }
         </RadzenStack>
     </RadzenStack>
@@ -19,4 +19,15 @@
 @code {
     [Parameter]
     public required IEnumerable<CacheWarm> CacheWarms { get; set; }
+    
+    [Parameter]
+    public EventCallback<Website> OnRerunCacheWarm { get; set; }
+
+    public async Task OnCacheWarmRerun(CacheWarm cacheWarm)
+    {
+        if (OnRerunCacheWarm.HasDelegate)
+        {
+            await OnRerunCacheWarm.InvokeAsync(cacheWarm.Website);
+        }
+    }
 }

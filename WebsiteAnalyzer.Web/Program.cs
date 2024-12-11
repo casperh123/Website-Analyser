@@ -76,6 +76,7 @@ builder.Services.AddScoped<IWebsiteService, WebsiteService>();
 builder.Services.AddScoped<ICacheWarmingService, CacheWarmingService>();
 builder.Services.AddScoped<IBrokenLinkService, BrokenLinkService>();
 builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<StateService>();
 
 var app = builder.Build();
 

@@ -1,5 +1,6 @@
 @page "/cache-warmer"
 
+@using Mono.TextTemplating
 @using WebsiteAnalyzer.Core.Entities
 @using WebsiteAnalyzer.Infrastructure
 @using WebsiteAnalyzer.Infrastructure.Services
@@ -9,18 +10,20 @@
 
 @inject ICacheWarmingService CacheWarmingService
 @inject IUserService UserService
+@inject StateService StateService
 
 <PageTitle>Cache Warmer</PageTitle>
 
-<WebsiteInput WebsiteActionStarted="CheckBrokenLinks" LinksChecked="_linksChecked" LinksEnqueued="_linksEnqueued"/>
+<WebsiteInput Url="@_url" WebsiteActionStarted="WarmCache" LinksChecked="_linksChecked" LinksEnqueued="_linksEnqueued"/>
 
 <AuthorizeView>
-    <CacheWarmList CacheWarms="_cacheWarms"/>
+    <CacheWarmList OnRerunCacheWarm="RerunWarmCache" CacheWarms="_cacheWarms"/>
 </AuthorizeView>
 
 @code {
     private int _linksChecked;
     private int _linksEnqueued;
+    private string _url = "https://";
     private ApplicationUser? _user;
     private ICollection<CacheWarm> _cacheWarms = [];
 
@@ -33,9 +36,20 @@
             _cacheWarms = await CacheWarmingService.GetCacheWarmsByUserAsync(_user.Id);
         }
     }
-    
-    private async Task CheckBrokenLinks(Uri url)
+
+    private async Task RerunWarmCache(Website website)
     {
+        _url = website.Url;
+        await WarmCache(new Uri(_url));
+    }
+    
+    private async Task WarmCache(Uri url)
+    {
+        CancellationTokenSource tokenSource = new CancellationTokenSource();
+        CancellationToken cancellationToken = tokenSource.Token;
+
+        StateService.CancellationTokenSource = tokenSource;
+        StateService.IsProcessing = true;
         if (_user is null)
         {
             await CacheWarmingService.WarmCache(url.ToString(), UpdateLinksEnqueued, UpdateLinksChecked);
@@ -45,6 +59,8 @@
         await CacheWarmingService.WarmCacheWithSaveAsync(url.ToString(), _user.Id, UpdateLinksEnqueued, UpdateLinksChecked);
 
         _cacheWarms = await CacheWarmingService.GetCacheWarmsByUserAsync(_user.Id);
+        
+        StateService.IsProcessing = false;
     }
 
     private void UpdateLinksEnqueued(int count)

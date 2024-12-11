@@ -1,11 +1,17 @@
 @using WebsiteAnalyzer.Core.Entities
 @using WebsiteAnalyzer.Web.Components.CacheWarm.Badges
+@using WebsiteAnalyzer.Web.Services
+
+@inject StateService StateService
 
 <RadzenCard>
     <RadzenRow AlignItems="AlignItems.Center" JustifyContent="JustifyContent.SpaceBetween">
-        <RadzenText TextStyle="TextStyle.H6">
-            @CacheWarm.Website.Url
-        </RadzenText>
+        <RadzenRow AlignItems="AlignItems.Center">
+            <RadzenText TextStyle="TextStyle.H6" Style="margin-bottom: 0">
+                @CacheWarm.Website.Url
+            </RadzenText>
+            <RadzenButton Disabled="StateService.IsProcessing" Click="HandleOnClick" Icon="restart_alt"/>
+        </RadzenRow>
         <CacheWarmCompletion CompletedSuccessfully="CacheWarm.IsCompleted"/>
     </RadzenRow>
     <RadzenText>Start Time: @CacheWarm.StartTime</RadzenText>
@@ -20,4 +26,15 @@
 @code {
     [Parameter]
     public required CacheWarm CacheWarm { get; set; }
+    
+    [Parameter]
+    public EventCallback<CacheWarm> OnRerunWarm { get; set; }
+
+    public async Task HandleOnClick()
+    {
+        if (OnRerunWarm.HasDelegate)
+        {
+            await OnRerunWarm.InvokeAsync(CacheWarm);
+        }
+    }
 }

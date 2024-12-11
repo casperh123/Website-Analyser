@@ -1,12 +1,21 @@
-@using BrokenLinkChecker.models.Links
+@using System.Resources
+@using Mono.TextTemplating
 @using WebsiteAnalyzer.Web.Components.ErrorHandling
 @using WebsiteAnalyzer.Web.Components.Crawl.CrawlMetrics
+@using WebsiteAnalyzer.Web.Services
 
-<RadzenCard>
+@inject StateService StateService
+
+<RadzenCard Style="max-width: 600px">
     <RadzenStack>
         <RadzenLabel Component="url-input">Select Url</RadzenLabel>
-        <RadzenTextBox Value="@_targetUrl" Change="ChangeUrl" AutoCompleteType="AutoCompleteType.Url"/>
-        <RadzenButton Click="@OnChanged">Check Broken Links</RadzenButton>
+        <RadzenTextBox Value="@Url" Change="ChangeUrl" AutoCompleteType="AutoCompleteType.Url"/>
+        <RadzenButton Click="@OnChanged" Disabled="StateService.IsProcessing">Check Broken Links</RadzenButton>
+        
+        @if (StateService.IsProcessing)
+        {
+            <RadzenButton Click="OnCancelled" Style="background-color: red">Cancel</RadzenButton>
+        }
     </RadzenStack>
     <ErrorMessage Message="@_errorMessage" />
     <CrawlMetrics LinksChecked="LinksChecked" LinksEnqueued="LinksEnqueued" />
@@ -21,32 +30,38 @@
     
     [Parameter]
     public int LinksEnqueued { get; set; }
+
+    [Parameter] public string Url { get; set; } = "https://";
     
-    private string _targetUrl = "https://";
     private string _errorMessage = "";
 
     private void ChangeUrl(string url)
     {
-        _targetUrl = url;
+        Url = url;
     }
 
     private async Task OnChanged()
     {
         _errorMessage = "";
         
-        if (string.IsNullOrWhiteSpace(_targetUrl))
+        if (string.IsNullOrWhiteSpace(Url))
         {
             return;
         }
 
         try
         {
-            Uri uri = new Uri(_targetUrl, UriKind.Absolute);
+            Uri uri = new Uri(Url, UriKind.Absolute);
             await WebsiteActionStarted.InvokeAsync(uri);
         }
         catch (UriFormatException)
         {
             _errorMessage = "The URL entered is not in a valid format.";
         }
+    }
+
+    private async Task OnCancelled()
+    {
+        await StateService.CancellationTokenSource.CancelAsync();
     }
 }
