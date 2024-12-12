@@ -8,13 +8,19 @@ public class LinkProcessor : ILinkProcessor<Link>
 {
     private readonly HttpClient _httpClient;
     private readonly AbstractLinkExtractor<Link> _linkExtractor;
-    private readonly HashSet<string> _visitedPages;    // Tracks processed pages
-    private readonly HashSet<string> _enqueuedPages;   // Tracks enqueued pages
+    private HashSet<string> _visitedPages;    // Tracks processed pages
+    private HashSet<string> _enqueuedPages;   // Tracks enqueued pages
 
     public LinkProcessor(HttpClient httpClient)
     {
         _httpClient = httpClient;
         _linkExtractor = new LinkExtractor(new HtmlParser());
+        _visitedPages = new HashSet<string>();
+        _enqueuedPages = new HashSet<string>();
+    }
+
+    public void FlushCache()
+    {
         _visitedPages = new HashSet<string>();
         _enqueuedPages = new HashSet<string>();
     }

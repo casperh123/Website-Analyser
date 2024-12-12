@@ -10,7 +10,7 @@ public class BrokenLinkProcessor : ILinkProcessor<IndexedLink>
 {
     private readonly HttpClient _httpClient;
     private readonly AbstractLinkExtractor<IndexedLink> _linkExtractor;
-    private readonly Dictionary<string, HttpStatusCode> _visitedResources = new();
+    private Dictionary<string, HttpStatusCode> _visitedResources = new();
 
     public BrokenLinkProcessor(HttpClient httpClient)
     {
@@ -51,5 +51,10 @@ public class BrokenLinkProcessor : ILinkProcessor<IndexedLink>
         link.StatusCode = statusCode;
         
         return links;
+    }
+
+    public void FlushCache()
+    {
+        _visitedResources = new();
     }
 }

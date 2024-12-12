@@ -6,7 +6,7 @@ namespace BrokenLinkChecker.Crawler.ExtendedCrawlers;
 public class ModularCrawler<T> where T : Link
 {
     private readonly ILinkProcessor<T> _linkProcessor;
-
+    
     private int LinksChecked { get; set; }
     private int LinksEnqueued { get; set; }
     
@@ -21,15 +21,16 @@ public class ModularCrawler<T> where T : Link
         _linkProcessor = linkProcessor;
     }
 
-    public async Task CrawlWebsiteAsync(T startPage)
+    public async Task CrawlWebsiteAsync(T startPage, CancellationToken token = default)
     {
+        _linkProcessor.FlushCache();
         LinksChecked = 0;
         LinksEnqueued = 0;
         Queue<T> linkQueue = new(DefaultQueueSize);
         
         linkQueue.Enqueue(startPage);
 
-        while (linkQueue.TryDequeue(out var link))
+        while (linkQueue.TryDequeue(out var link) && !token.IsCancellationRequested)
         {
       
             IEnumerable<T> foundLinks = await _linkProcessor.ProcessLinkAsync(link).ConfigureAwait(false);

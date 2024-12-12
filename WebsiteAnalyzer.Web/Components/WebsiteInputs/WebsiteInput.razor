@@ -4,17 +4,15 @@
 @using WebsiteAnalyzer.Web.Components.Crawl.CrawlMetrics
 @using WebsiteAnalyzer.Web.Services
 
-@inject StateService StateService
-
 <RadzenCard Style="max-width: 600px">
     <RadzenStack>
         <RadzenLabel Component="url-input">Select Url</RadzenLabel>
         <RadzenTextBox Value="@Url" Change="ChangeUrl" AutoCompleteType="AutoCompleteType.Url"/>
-        <RadzenButton Click="@OnChanged" Disabled="StateService.IsProcessing">Check Broken Links</RadzenButton>
+        <RadzenButton Click="@OnChanged" Disabled="@IsProcessing">Check Broken Links</RadzenButton>
         
-        @if (StateService.IsProcessing)
+        @if (IsProcessing)
         {
-            <RadzenButton Click="OnCancelled" Style="background-color: red">Cancel</RadzenButton>
+            <RadzenButton Click="(() => OnCancel.InvokeAsync())" Style="background-color: red">Cancel</RadzenButton>
         }
     </RadzenStack>
     <ErrorMessage Message="@_errorMessage" />
@@ -26,12 +24,19 @@
     public EventCallback<Uri> WebsiteActionStarted { get; set; }
     
     [Parameter]
+    public EventCallback OnCancel { get; set; }
+    
+    [Parameter]
     public int LinksChecked { get; set; }
     
     [Parameter]
     public int LinksEnqueued { get; set; }
 
-    [Parameter] public string Url { get; set; } = "https://";
+    [Parameter] 
+    public string Url { get; set; } = string.Empty;
+    
+    [Parameter]
+    public bool IsProcessing { get; set; }
     
     private string _errorMessage = "";
 
@@ -58,10 +63,5 @@
         {
             _errorMessage = "The URL entered is not in a valid format.";
         }
-    }
-
-    private async Task OnCancelled()
-    {
-        await StateService.CancellationTokenSource.CancelAsync();
     }
 }

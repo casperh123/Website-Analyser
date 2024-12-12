@@ -1,20 +1,21 @@
 @page "/cache-warmer"
 
-@using Mono.TextTemplating
 @using WebsiteAnalyzer.Core.Entities
 @using WebsiteAnalyzer.Infrastructure
 @using WebsiteAnalyzer.Infrastructure.Services
 @using WebsiteAnalyzer.Web.Components.WebsiteInputs
 @using WebsiteAnalyzer.Web.Components.CacheWarm.Lists
 @using WebsiteAnalyzer.Web.Services
+@using WebsiteAnalyzer.Web.Components
+
+@inherits WebsiteAnalyzer.Web.Components.Templates.ProcessingComponentBase
 
 @inject ICacheWarmingService CacheWarmingService
 @inject IUserService UserService
-@inject StateService StateService
 
 <PageTitle>Cache Warmer</PageTitle>
 
-<WebsiteInput Url="@_url" WebsiteActionStarted="WarmCache" LinksChecked="_linksChecked" LinksEnqueued="_linksEnqueued"/>
+<WebsiteInput Url="@_url" IsProcessing="IsProcessing" LinksChecked="_linksChecked" LinksEnqueued="_linksEnqueued" OnCancel="CancelProcessing" WebsiteActionStarted="StartWarm"/>
 
 <AuthorizeView>
     <CacheWarmList OnRerunCacheWarm="RerunWarmCache" CacheWarms="_cacheWarms"/>
@@ -37,30 +38,38 @@
         }
     }
 
-    private async Task RerunWarmCache(Website website)
+    private Task RerunWarmCache(Website website)
     {
         _url = website.Url;
-        await WarmCache(new Uri(_url));
+        return StartWarm(new Uri(_url));
+    }
+
+    public Task StartWarm(Uri url)
+    {
+        _url = url.ToString();
+        return StartProcessingAsync(async (token) => await WarmCache(url, token));
     }
     
-    private async Task WarmCache(Uri url)
+    private async Task WarmCache(Uri url, CancellationToken cancellationToken)
     {
-        CancellationTokenSource tokenSource = new CancellationTokenSource();
-        CancellationToken cancellationToken = tokenSource.Token;
+            if (_user is null)
+            {
+                await CacheWarmingService.WarmCache(
+                    url.ToString(),
+                    UpdateLinksEnqueued,
+                    UpdateLinksChecked, 
+                    cancellationToken
+                );
+                return;
+            }
+            
+            await CacheWarmingService.WarmCacheWithSaveAsync(url.ToString(), _user.Id, 
+                UpdateLinksEnqueued, 
+                UpdateLinksChecked, 
+                cancellationToken
+            );
 
-        StateService.CancellationTokenSource = tokenSource;
-        StateService.IsProcessing = true;
-        if (_user is null)
-        {
-            await CacheWarmingService.WarmCache(url.ToString(), UpdateLinksEnqueued, UpdateLinksChecked);
-            return;
-        }
-        
-        await CacheWarmingService.WarmCacheWithSaveAsync(url.ToString(), _user.Id, UpdateLinksEnqueued, UpdateLinksChecked);
-
-        _cacheWarms = await CacheWarmingService.GetCacheWarmsByUserAsync(_user.Id);
-        
-        StateService.IsProcessing = false;
+            _cacheWarms = await CacheWarmingService.GetCacheWarmsByUserAsync(_user.Id);
     }
 
     private void UpdateLinksEnqueued(int count)
@@ -74,5 +83,4 @@
         _linksChecked = count;
         InvokeAsync(StateHasChanged);
     }
-
 }

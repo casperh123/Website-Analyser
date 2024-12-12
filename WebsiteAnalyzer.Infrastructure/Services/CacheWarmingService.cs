@@ -9,8 +9,14 @@ namespace WebsiteAnalyzer.Infrastructure.Services;
 
 public interface ICacheWarmingService
 {
-    Task<CacheWarm> WarmCacheWithSaveAsync(string url, Guid userId, Action<int> onLinkEnqueued, Action<int> onLinkChecked);
-    Task WarmCache(string url, Action<int> onLinkEnqueued, Action<int> onLinkChecked);
+    Task<CacheWarm> WarmCacheWithSaveAsync(
+        string url, 
+        Guid userId, 
+        Action<int> onLinkEnqueued, 
+        Action<int> onLinkChecked,
+        CancellationToken cancellationToken = default
+        );
+    Task WarmCache(string url, Action<int> onLinkEnqueued, Action<int> onLinkChecked, CancellationToken cancellationToken = default);
     Task<ICollection<CacheWarm>> GetCacheWarmsAsync();
     Task<ICollection<CacheWarm>> GetCacheWarmsByUserAsync(Guid userId);
 }
@@ -35,14 +41,14 @@ public class CacheWarmingService : ICacheWarmingService
         _linkCrawler = new ModularCrawler<Link>(linkProcessor);
     }
 
-    public async Task WarmCache(string url, Action<int> onLinkEnqueued, Action<int> onLinkChecked)
+    public async Task WarmCache(string url, Action<int> onLinkEnqueued, Action<int> onLinkChecked, CancellationToken cancellationToken = default)
     {
         try
         {
             _linkCrawler.OnLinksChecked += onLinkChecked;
             _linkCrawler.OnLinksEnqueued += onLinkEnqueued;
             
-            await _linkCrawler.CrawlWebsiteAsync(new Link(url));
+            await _linkCrawler.CrawlWebsiteAsync(new Link(url), cancellationToken);
         }
         finally 
         {
@@ -52,7 +58,7 @@ public class CacheWarmingService : ICacheWarmingService
     }
 
 
-    public async Task<CacheWarm> WarmCacheWithSaveAsync(string url, Guid userId, Action<int> onLinkEnqueued, Action<int> onLinkChecked)
+    public async Task<CacheWarm> WarmCacheWithSaveAsync(string url, Guid userId, Action<int> onLinkEnqueued, Action<int> onLinkChecked, CancellationToken cancellationToken = default)
     {
         Website website = await _websiteService.GetOrAddWebsite(url, userId).ConfigureAwait(false);
         CacheWarm cacheWarm = await CreateCacheWarmEntry(website, userId).ConfigureAwait(false);
@@ -70,7 +76,7 @@ public class CacheWarmingService : ICacheWarmingService
             _linkCrawler.OnLinksChecked += OnLinksChecked;
             _linkCrawler.OnLinksEnqueued += onLinkEnqueued;
             
-            await _linkCrawler.CrawlWebsiteAsync(new Link(url));
+            await _linkCrawler.CrawlWebsiteAsync(new Link(url), cancellationToken).ConfigureAwait(false);
         }
         finally 
         {
