@@ -1,11 +1,13 @@
 @page "/cache-warmer"
 
 @using WebsiteAnalyzer.Core.Entities
+@using WebsiteAnalyzer.Core.Enums
 @using WebsiteAnalyzer.Infrastructure
 @using WebsiteAnalyzer.Infrastructure.Services
 @using WebsiteAnalyzer.Web.Components.WebsiteInputs
 @using WebsiteAnalyzer.Web.Components.CacheWarm.Lists
 @using WebsiteAnalyzer.Web.Services
+@using WebsiteAnalyzer.Web.Components.Schedule
 
 @inherits WebsiteAnalyzer.Web.Components.Templates.ProcessingComponentBase
 
@@ -23,9 +25,7 @@
                 <CacheWarmList OnRerunCacheWarm="RerunWarmCache" User="_user" CacheWarms="_cacheWarms" IsProcessing="IsProcessing"/>
             </RadzenTabsItem>
             <RadzenTabsItem Text="Schedule">
-                
-                <p>Schedule</p>
-                
+                <WebsiteScheduler Action="CrawlAction.CacheWarm" User="_user"/>
             </RadzenTabsItem>
         </Tabs>
     </RadzenTabs>

@@ -9,8 +9,8 @@ public record CacheWarm
     public int VisitedPages { get; set; }
     public DateTime StartTime { get; set; }
     public DateTime EndTime { get; set; }
-
+    public Guid? ScheduleId { get; set; }
+    public CrawlSchedule? Schedule { get; set; }
     public bool IsCompleted => EndTime != DateTime.MinValue;
-    
     public TimeSpan TotalTime => IsCompleted ? (EndTime - StartTime): TimeSpan.Zero;
 }

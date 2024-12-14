@@ -17,6 +17,7 @@ public interface ICacheWarmingService
         CancellationToken cancellationToken = default
         );
     Task WarmCache(string url, Action<int> onLinkEnqueued, Action<int> onLinkChecked, CancellationToken cancellationToken = default);
+    Task WarmCacheWithoutMetrics(string url, Guid userId, CancellationToken cancellationToken = default);
     Task<ICollection<CacheWarm>> GetCacheWarmsAsync();
     Task<ICollection<CacheWarm>> GetCacheWarmsByUserAsync(Guid userId);
 }
@@ -54,6 +55,32 @@ public class CacheWarmingService : ICacheWarmingService
         {
             _linkCrawler.OnLinksChecked -= onLinkChecked;
             _linkCrawler.OnLinksEnqueued-= onLinkEnqueued;
+        }
+    }
+
+    public async Task WarmCacheWithoutMetrics(string url, Guid userId, CancellationToken cancellationToken = default)
+    {
+        Website website = await _websiteService.GetOrAddWebsite(url, userId).ConfigureAwait(false);
+        CacheWarm cacheWarm = await CreateCacheWarmEntry(website, userId).ConfigureAwait(false);
+
+        int linksChecked = 0;
+
+        void OnLinksChecked(int count)
+        {
+            linksChecked = count;
+        }
+
+        try
+        {
+            _linkCrawler.OnLinksChecked += OnLinksChecked;
+
+            await _linkCrawler.CrawlWebsiteAsync(new Link(url), cancellationToken).ConfigureAwait(false);
+        }
+        finally
+        {
+            _linkCrawler.OnLinksChecked -= OnLinksChecked;
+
+            await UpdateCacheWarmResults(cacheWarm, linksChecked).ConfigureAwait(false);
         }
     }
 

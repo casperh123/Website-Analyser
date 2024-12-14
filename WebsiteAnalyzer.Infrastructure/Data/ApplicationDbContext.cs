@@ -14,6 +14,7 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser, IdentityR
 
     public DbSet<Website> Websites { get; set; }
     public DbSet<CacheWarm> CacheWarms { get; set; }
+    public DbSet<CrawlSchedule> CrawlSchedules { get; set; }
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
@@ -35,6 +36,9 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser, IdentityR
 
         builder.Entity<CacheWarm>()
             .HasKey(c => c.Id); // Use GUID for CacheWarm primary key
+
+        builder.Entity<CrawlSchedule>()
+            .HasKey(cs => new { cs.UserId, cs.WebsiteUrl });
 
         // Configure Identity entities to use GUID
         builder.Entity<IdentityUserLogin<Guid>>()

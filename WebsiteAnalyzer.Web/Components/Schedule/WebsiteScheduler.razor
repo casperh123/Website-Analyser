@@ -1,0 +1,129 @@
+@using System.Text.RegularExpressions
+@using Mono.TextTemplating
+@using WebsiteAnalyzer.Core.Entities
+@using WebsiteAnalyzer.Core.Enums
+@using WebsiteAnalyzer.Infrastructure
+@using WebsiteAnalyzer.Infrastructure.Services
+@using WebsiteAnalyzer.Web.Models
+@using WebsiteAnalyzer.Web.Components.ErrorHandling
+@using WebsiteAnalyzer.Web.Components.Schedule.Lists
+
+@inject IScheduleService ScheduleService
+@inject NotificationService NotificationService
+
+<RadzenButton Text="New Task" Click="ToggleAddNew" Icon="add" ButtonStyle="ButtonStyle.Primary"/>
+
+@if (_addNew)
+{
+    <RadzenCard>
+        <RadzenStack Gap="20px" class="rz-mt-6">
+
+            <RadzenText TextStyle="TextStyle.H4">Add new @Action Task</RadzenText>
+            <RadzenTemplateForm TItem="ScheduleTaskModel"
+                                Data="_scheduleTask"
+                                Submit="@HandleValidSubmit">
+                <RadzenFormField Text="Website Url">
+                    <RadzenTextBox @bind-Value="@_scheduleTask.WebsiteUrl"
+                                   Name="WebsiteUrl"
+                                   Placeholder="Enter website URL"/>
+                    <RadzenRequiredValidator Component="WebsiteUrl"
+                                             Text="Website URL is required"/>
+                    <RadzenRegexValidator Component="WebsiteUrl"
+                                          Pattern="@_urlRegex"
+                                          Text="Url must start with http:// or https:// and end with .TLD"/>
+                </RadzenFormField>
+
+                <RadzenFormField Text="Action">
+                    <RadzenTextBox Value="@Action.ToString()"
+                                   Disabled="true"/>
+                </RadzenFormField>
+
+                <RadzenFormField Text="Frequency">
+                    <RadzenDropDown @bind-Value="_scheduleTask.Frequency"
+                                    Data="Frequencies"
+                                    Name="Frequency"/>
+                </RadzenFormField>
+                <RadzenRequiredValidator Component="Frequency"
+                                         Text="Frequency is required"/>
+
+                <RadzenStack Orientation="Orientation.Horizontal"
+                             class="mt-4">
+                    <RadzenButton Text="Schedule"
+                                  ButtonType="ButtonType.Submit"
+                                  ButtonStyle="ButtonStyle.Success"/>
+                    <RadzenButton Text="Cancel"
+                                  Click="ToggleAddNew"
+                                  ButtonStyle="ButtonStyle.Secondary"/>
+                </RadzenStack>
+                <ErrorMessage Message="@_errorMessage"/>
+            </RadzenTemplateForm>
+        </RadzenStack>
+    </RadzenCard>
+}
+
+<ScheduledTaskDataGrid ScheduledTasks="@_scheduledTasks" OnScheduleDeleted="DeleteTask"/>
+
+@code {
+    [Parameter]
+    public required ApplicationUser User { get; set; }
+
+    [Parameter]
+    public required CrawlAction Action { get; set; }
+
+    private ScheduleTaskModel _scheduleTask = new();
+    private IEnumerable<Frequency> Frequencies => Enum.GetValues(typeof(Frequency)).Cast<Frequency>();
+    private IList<CrawlSchedule> _scheduledTasks = [];
+    private string _errorMessage = string.Empty;
+    private bool _addNew;
+    private string _urlRegex = @"[(http(s)?):\/\/(www\.)?a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)"; 
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadScheduledTasks();
+    }
+
+    private void ToggleAddNew()
+    {
+        _addNew = !_addNew;
+        _scheduleTask = new ScheduleTaskModel();
+    }
+
+    private async Task LoadScheduledTasks()
+    {
+        ICollection<CrawlSchedule> scheduledItems = await ScheduleService.GetScheduledTasksByUserIdAndTypeAsync(User.Id, Action);
+        _scheduledTasks = scheduledItems.ToList();
+    }
+
+    private async Task HandleValidSubmit()
+    {
+        _errorMessage = string.Empty;
+        try
+        {
+            CrawlSchedule scheduledTask = await ScheduleService.ScheduleTask(
+                _scheduleTask.WebsiteUrl,
+                User.Id,
+                Action,
+                _scheduleTask.Frequency);
+
+            _scheduledTasks.Add(scheduledTask);
+            ToggleAddNew();
+        }
+        catch (Exception ex)
+        {
+            _errorMessage = "Website already scheduled or an error occurred";
+        }
+    }
+
+    private async Task DeleteTask(CrawlSchedule schedule)
+    {
+        try
+        {
+            await ScheduleService.DeleteScheduledTask(schedule);
+            _scheduledTasks.Remove(schedule);
+        }
+        catch (Exception ex)
+        {
+            // TODO: Implement proper error handling
+        }
+    }
+}

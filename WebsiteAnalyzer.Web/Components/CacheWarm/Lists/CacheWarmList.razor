@@ -6,37 +6,40 @@
 @inject ICacheWarmingService CacheWarmingService
 @inject IJSRuntime JSRuntime
 
-<RadzenDataGrid
-    AllowFiltering="true"
-    AllowSorting="true"
-    PageSize="10"
-    AllowPaging="true"
-    ShowPagingSummary="true"
-    Data="CacheWarms"
-    FilterMode="FilterMode.CheckBoxList">
-    <Columns >
-        <RadzenDataGridColumn Property="@nameof(CacheWarm.WebsiteUrl)" Title="Website" MinWidth="fit-content" Sortable="true" Filterable="true">
-            <Template Context="cacheWarm">
-                <RadzenStack>
-                    <RadzenRow AlignItems="AlignItems.Center">
-                        <RadzenText TextStyle="TextStyle.H6" Style="margin-bottom: 0">
-                            @cacheWarm.WebsiteUrl
-                        </RadzenText>
-                        <RadzenButton Disabled="IsProcessing" Size="ButtonSize.ExtraSmall" Click="@(() => OnCacheWarmRerun(cacheWarm))" Icon="restart_alt"/>
-                    </RadzenRow>
-                    <CacheWarmCompletion CompletedSuccessfully="cacheWarm.IsCompleted"/>
-                </RadzenStack>
-            </Template>
-        </RadzenDataGridColumn>
-        <RadzenDataGridColumn Property="@nameof(CacheWarm.TotalTime)" Title="Total Time">
-            <Template Context="cacheWarm">
-                @cacheWarm.TotalTime.ToString(@"h\:m\:s")
-            </Template>
-        </RadzenDataGridColumn>
-        <RadzenDataGridColumn Property="@nameof(CacheWarm.StartTime)" Title="Start Time" Width="200px"/>
-        <RadzenDataGridColumn Property="@nameof(CacheWarm.VisitedPages)" Title="Visited Pages" Width="200px"/>
-    </Columns>
-</RadzenDataGrid>
+@if (CacheWarms.Any())
+{
+    <RadzenDataGrid
+        AllowFiltering="true"
+        AllowSorting="true"
+        PageSize="10"
+        AllowPaging="true"
+        ShowPagingSummary="true"
+        Data="CacheWarms"
+        FilterMode="FilterMode.CheckBoxList">
+        <Columns >
+            <RadzenDataGridColumn Property="@nameof(CacheWarm.WebsiteUrl)" Title="Website" MinWidth="fit-content" Sortable="true" Filterable="true">
+                <Template Context="cacheWarm">
+                    <RadzenStack>
+                        <RadzenRow AlignItems="AlignItems.Center">
+                            <RadzenText TextStyle="TextStyle.H6" Style="margin-bottom: 0">
+                                @cacheWarm.WebsiteUrl
+                            </RadzenText>
+                            <RadzenButton Disabled="IsProcessing" Size="ButtonSize.ExtraSmall" Click="@(() => OnCacheWarmRerun(cacheWarm))" Icon="restart_alt"/>
+                        </RadzenRow>
+                        <CacheWarmCompletion CompletedSuccessfully="cacheWarm.IsCompleted"/>
+                    </RadzenStack>
+                </Template>
+            </RadzenDataGridColumn>
+            <RadzenDataGridColumn Property="@nameof(CacheWarm.TotalTime)" Title="Total Time">
+                <Template Context="cacheWarm">
+                    @cacheWarm.TotalTime.ToString(@"hh\:mm\:ss")
+                </Template>
+            </RadzenDataGridColumn>
+            <RadzenDataGridColumn Property="@nameof(CacheWarm.StartTime)" Title="Start Time" Width="200px"/>
+            <RadzenDataGridColumn Property="@nameof(CacheWarm.VisitedPages)" Title="Visited Pages" Width="200px"/>
+        </Columns>
+    </RadzenDataGrid>   
+}
 
 @code {
     [Parameter]

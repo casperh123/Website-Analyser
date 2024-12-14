@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Radzen;
+using WebsiteAnalyzer.Core.Entities;
 using WebsiteAnalyzer.Core.Persistence;
 using WebsiteAnalyzer.Infrastructure;
 using WebsiteAnalyzer.Infrastructure.Data;
@@ -71,12 +72,16 @@ builder.Services.AddSingleton<IEmailSender<ApplicationUser>, IdentityNoOpEmailSe
 
 builder.Services.AddScoped<IWebsiteRepository, WebsiteRepository>();
 builder.Services.AddScoped<ICacheWarmRepository, CacheWarmRepository>();
+builder.Services.AddScoped<ICrawlScheduleRepository, CrawlSheduleRepository>();
 
 builder.Services.AddScoped<IWebsiteService, WebsiteService>();
 builder.Services.AddScoped<ICacheWarmingService, CacheWarmingService>();
+builder.Services.AddScoped<IScheduleService, ScheduleService>();
 builder.Services.AddScoped<IBrokenLinkService, BrokenLinkService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<StateService>();
+
+builder.Services.AddScoped<NotificationService>();
 
 var app = builder.Build();
 
