@@ -17,9 +17,12 @@ public abstract class AbstractLinkExtractor<T> where T : Link
     {
         if (!response.IsSuccessStatusCode) return [];
 
-        await using var document = await response.Content.ReadAsStreamAsync();
+        await using Stream document = await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
 
-        return GetLinksFromDocument(Parser.ParseDocument(document), referringUrl);
+        return GetLinksFromDocument(
+            await Parser.ParseDocumentAsync(document).ConfigureAwait(false), 
+            referringUrl
+        );
     }
 
     protected abstract IEnumerable<T> GetLinksFromDocument(IDocument document, T referringUrl);

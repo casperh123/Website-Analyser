@@ -1,3 +1,4 @@
+using AngleSharp;
 using AngleSharp.Html.Parser;
 using BrokenLinkChecker.DocumentParsing.ModularLinkExtraction;
 using BrokenLinkChecker.models.Links;
@@ -14,7 +15,24 @@ public class LinkProcessor : ILinkProcessor<Link>
     public LinkProcessor(HttpClient httpClient)
     {
         _httpClient = httpClient;
-        _linkExtractor = new LinkExtractor(new HtmlParser());
+        _linkExtractor = new LinkExtractor(new HtmlParser(new HtmlParserOptions()
+        {
+            IsKeepingSourceReferences = false,
+            DisableElementPositionTracking = true,
+            IsScripting = false,
+            IsNotConsumingCharacterReferences = false,
+            SkipComments = true,
+            SkipScriptText = true,
+            SkipRCDataText = true,
+            SkipCDATA = true,
+            SkipProcessingInstructions = true,
+            SkipRawText = true,
+            SkipDataText = true,
+            SkipPlaintext = true,
+            IsSupportingProcessingInstructions = false,
+            IsAcceptingCustomElementsEverywhere = false,
+            IsNotSupportingFrames = true
+        }));
         _visitedPages = new HashSet<string>();
         _enqueuedPages = new HashSet<string>();
     }
@@ -27,7 +45,6 @@ public class LinkProcessor : ILinkProcessor<Link>
 
     public async Task<IEnumerable<Link>> ProcessLinkAsync(Link link)
     {
-        // If the link has already been visited, return an empty result
         if (!_visitedPages.Add(link.Target))
         {
             return Array.Empty<Link>();
@@ -37,24 +54,19 @@ public class LinkProcessor : ILinkProcessor<Link>
 
         try
         {
-            // Fetch the page
             HttpResponseMessage response = await _httpClient.GetAsync(
                 link.Target,
                 HttpCompletionOption.ResponseHeadersRead
             ).ConfigureAwait(false);
 
-            // If the response is successful, extract links
             if (response.IsSuccessStatusCode)
             {
                 links = await _linkExtractor.GetLinksFromDocument(response, link).ConfigureAwait(false);
-
-                // Filter out links that are already enqueued
-                links = links.Where(l => _enqueuedPages.Add(l.Target)).ToList();
+                links = links.Where(l => _enqueuedPages.Add(l.Target));
             }
         }
         catch (HttpRequestException)
         {
-            // Handle request failures gracefully by returning an empty list
             links = Array.Empty<Link>();
         }
 

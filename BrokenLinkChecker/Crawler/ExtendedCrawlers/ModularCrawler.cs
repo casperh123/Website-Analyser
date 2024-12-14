@@ -32,14 +32,13 @@ public class ModularCrawler<T> where T : Link
 
         while (linkQueue.TryDequeue(out var link) && !token.IsCancellationRequested)
         {
-      
             IEnumerable<T> foundLinks = await _linkProcessor.ProcessLinkAsync(link).ConfigureAwait(false);
             
             foreach (T foundLink in foundLinks)
             {
                 linkQueue.Enqueue(foundLink);
             }
-
+            
             IncrementLinksChecked();
             SetResourceVisited(link);
             SetLinksEnqueued(linkQueue.Count);
@@ -55,7 +54,11 @@ public class ModularCrawler<T> where T : Link
     private void SetLinksEnqueued(int count)
     {
         LinksEnqueued = count;
-        OnLinksEnqueued?.Invoke(LinksEnqueued);
+
+        if (LinksEnqueued % 10 == 0)
+        {
+            OnLinksEnqueued?.Invoke(LinksEnqueued);
+        }
     }
     
     public void SetResourceVisited(T resource)
