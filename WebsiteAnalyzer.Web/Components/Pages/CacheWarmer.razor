@@ -6,7 +6,6 @@
 @using WebsiteAnalyzer.Web.Components.WebsiteInputs
 @using WebsiteAnalyzer.Web.Components.CacheWarm.Lists
 @using WebsiteAnalyzer.Web.Services
-@using WebsiteAnalyzer.Web.Components
 
 @inherits WebsiteAnalyzer.Web.Components.Templates.ProcessingComponentBase
 
@@ -18,7 +17,18 @@
 <WebsiteInput Url="@_url" IsProcessing="IsProcessing" LinksChecked="_linksChecked" LinksEnqueued="_linksEnqueued" OnCancel="CancelProcessing" WebsiteActionStarted="StartWarm"/>
 
 <AuthorizeView>
-    <CacheWarmList OnRerunCacheWarm="RerunWarmCache" CacheWarms="_cacheWarms"/>
+    <RadzenTabs class="rz-mt-12" TabPosition="TabPosition.Top" RenderMode="TabRenderMode.Server">
+        <Tabs>
+            <RadzenTabsItem Text="Previous Warms">
+                <CacheWarmList OnRerunCacheWarm="RerunWarmCache" User="_user" CacheWarms="_cacheWarms" IsProcessing="IsProcessing"/>
+            </RadzenTabsItem>
+            <RadzenTabsItem Text="Schedule">
+                
+                <p>Schedule</p>
+                
+            </RadzenTabsItem>
+        </Tabs>
+    </RadzenTabs>
 </AuthorizeView>
 
 @code {
@@ -26,7 +36,7 @@
     private int _linksEnqueued;
     private string _url = "https://";
     private ApplicationUser? _user;
-    private ICollection<CacheWarm> _cacheWarms = [];
+    private IList<CacheWarm> _cacheWarms;
 
     protected override async Task OnInitializedAsync()
     {
@@ -34,7 +44,8 @@
 
         if (_user is not null)
         {
-            _cacheWarms = await CacheWarmingService.GetCacheWarmsByUserAsync(_user.Id);
+            ICollection<CacheWarm> cacheWarms = await CacheWarmingService.GetCacheWarmsByUserAsync(_user.Id);
+            _cacheWarms = cacheWarms.ToList();
         }
     }
 
@@ -68,8 +79,9 @@
                 UpdateLinksChecked, 
                 cancellationToken
             );
-
-            _cacheWarms = await CacheWarmingService.GetCacheWarmsByUserAsync(_user.Id);
+            
+            ICollection<CacheWarm> cacheWarms = await CacheWarmingService.GetCacheWarmsByUserAsync(_user.Id);
+            _cacheWarms = cacheWarms.ToList();
     }
 
     private void UpdateLinksEnqueued(int count)

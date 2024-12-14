@@ -3,6 +3,7 @@
 @using WebsiteAnalyzer.Web.Services
 
 @inject StateService StateService
+@inject IJSRuntime JSRuntime
 
 <RadzenCard>
     <RadzenRow AlignItems="AlignItems.Center" JustifyContent="JustifyContent.SpaceBetween">
@@ -28,12 +29,14 @@
     public required CacheWarm CacheWarm { get; set; }
     
     [Parameter]
-    public EventCallback<CacheWarm> OnRerunWarm { get; set; }
+    public required EventCallback<CacheWarm> OnRerunWarm { get; set; }
 
     public async Task HandleOnClick()
     {
         if (OnRerunWarm.HasDelegate)
         {
+            await JSRuntime.InvokeVoidAsync("backToTop");
+
             await OnRerunWarm.InvokeAsync(CacheWarm);
         }
     }
