@@ -123,7 +123,6 @@ public class CacheWarmingService : ICacheWarmingService
             Id = Guid.NewGuid(),
             UserId = userId,
             StartTime = DateTime.Now,
-            Website = website,
             WebsiteUrl = website.Url,
         };
 

@@ -15,7 +15,6 @@ public class CacheWarmRepository : BaseRepository<CacheWarm>, ICacheWarmReposito
     public new async Task<ICollection<CacheWarm>> GetAllAsync()
     {
         return await _dbContext.CacheWarms
-            .Include(ch => ch.Website)
             .OrderByDescending(cw => cw.StartTime)
             .ToListAsync().ConfigureAwait(false);
     }
@@ -23,8 +22,7 @@ public class CacheWarmRepository : BaseRepository<CacheWarm>, ICacheWarmReposito
     public async Task<ICollection<CacheWarm>> GetCacheWarmsByUserAsync(Guid id)
     {
         return await _dbContext.CacheWarms
-            .Include(cw => cw.Website)
-            .Where(cw => cw.Website.UserId == id)
+            .Where(cw => cw.UserId == id)
             .OrderByDescending(cw => cw.StartTime)
             .ToListAsync();
     }

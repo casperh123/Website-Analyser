@@ -36,7 +36,7 @@
     private int _linksEnqueued;
     private string _url = "https://";
     private ApplicationUser? _user;
-    private IList<CacheWarm> _cacheWarms;
+    private IList<CacheWarm> _cacheWarms = [];
 
     protected override async Task OnInitializedAsync()
     {
@@ -49,9 +49,9 @@
         }
     }
 
-    private Task RerunWarmCache(Website website)
+    private Task RerunWarmCache(string websiteUrl)
     {
-        _url = website.Url;
+        _url = websiteUrl;
         return StartWarm(new Uri(_url));
     }
 

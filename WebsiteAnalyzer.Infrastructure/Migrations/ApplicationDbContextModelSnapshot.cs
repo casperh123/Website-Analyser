@@ -152,9 +152,6 @@ namespace WebsiteAnalyzer.Infrastructure.Migrations
                     b.Property<DateTime>("EndTime")
                         .HasColumnType("TEXT");
 
-                    b.Property<Guid?>("ScheduleId")
-                        .HasColumnType("TEXT");
-
                     b.Property<Guid?>("ScheduleUserId")
                         .HasColumnType("TEXT");
 
@@ -174,11 +171,14 @@ namespace WebsiteAnalyzer.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
+                    b.Property<Guid?>("WebsiteUserId")
+                        .HasColumnType("TEXT");
+
                     b.HasKey("Id");
 
                     b.HasIndex("ScheduleUserId", "ScheduleWebsiteUrl");
 
-                    b.HasIndex("WebsiteUrl", "UserId");
+                    b.HasIndex("WebsiteUrl", "WebsiteUserId");
 
                     b.ToTable("CacheWarms");
                 });
@@ -348,15 +348,11 @@ namespace WebsiteAnalyzer.Infrastructure.Migrations
                         .WithMany()
                         .HasForeignKey("ScheduleUserId", "ScheduleWebsiteUrl");
 
-                    b.HasOne("WebsiteAnalyzer.Core.Entities.Website", "Website")
+                    b.HasOne("WebsiteAnalyzer.Core.Entities.Website", null)
                         .WithMany("CacheWarmRuns")
-                        .HasForeignKey("WebsiteUrl", "UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("WebsiteUrl", "WebsiteUserId");
 
                     b.Navigation("Schedule");
-
-                    b.Navigation("Website");
                 });
 
             modelBuilder.Entity("WebsiteAnalyzer.Core.Entities.Website", b =>

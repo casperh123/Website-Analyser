@@ -21,7 +21,7 @@ public class ModularCrawler<T> where T : Link
         _linkProcessor = linkProcessor;
     }
 
-    public async Task CrawlWebsiteAsync(T startPage, CancellationToken token = default)
+    public async Task<int> CrawlWebsiteAsync(T startPage, CancellationToken token = default)
     {
         _linkProcessor.FlushCache();
         LinksChecked = 0;
@@ -43,6 +43,8 @@ public class ModularCrawler<T> where T : Link
             SetResourceVisited(link);
             SetLinksEnqueued(linkQueue.Count);
         }
+        
+        return LinksChecked;
     }
     
     private void IncrementLinksChecked()

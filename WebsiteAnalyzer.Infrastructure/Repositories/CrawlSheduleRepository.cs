@@ -27,4 +27,5 @@ public class CrawlSheduleRepository : BaseRepository<CrawlSchedule>, ICrawlSched
             .Where(cs => cs.Action == action)
             .ToListAsync();
     }
+
 }

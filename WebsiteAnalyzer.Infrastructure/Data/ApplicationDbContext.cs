@@ -30,11 +30,6 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser, IdentityR
 
         // Configure CacheWarm and Website relationship
         builder.Entity<CacheWarm>()
-            .HasOne(c => c.Website)
-            .WithMany(w => w.CacheWarmRuns)
-            .HasForeignKey(c => new { c.WebsiteUrl, c.UserId });
-
-        builder.Entity<CacheWarm>()
             .HasKey(c => c.Id); // Use GUID for CacheWarm primary key
 
         builder.Entity<CrawlSchedule>()

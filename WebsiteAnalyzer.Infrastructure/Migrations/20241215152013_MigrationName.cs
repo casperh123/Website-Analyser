@@ -200,9 +200,9 @@ namespace WebsiteAnalyzer.Infrastructure.Migrations
                     VisitedPages = table.Column<int>(type: "INTEGER", nullable: false),
                     StartTime = table.Column<DateTime>(type: "TEXT", nullable: false),
                     EndTime = table.Column<DateTime>(type: "TEXT", nullable: false),
-                    ScheduleId = table.Column<Guid>(type: "TEXT", nullable: true),
                     ScheduleUserId = table.Column<Guid>(type: "TEXT", nullable: true),
-                    ScheduleWebsiteUrl = table.Column<string>(type: "TEXT", nullable: true)
+                    ScheduleWebsiteUrl = table.Column<string>(type: "TEXT", nullable: true),
+                    WebsiteUserId = table.Column<Guid>(type: "TEXT", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -213,11 +213,10 @@ namespace WebsiteAnalyzer.Infrastructure.Migrations
                         principalTable: "CrawlSchedules",
                         principalColumns: new[] { "UserId", "WebsiteUrl" });
                     table.ForeignKey(
-                        name: "FK_CacheWarms_Websites_WebsiteUrl_UserId",
-                        columns: x => new { x.WebsiteUrl, x.UserId },
+                        name: "FK_CacheWarms_Websites_WebsiteUrl_WebsiteUserId",
+                        columns: x => new { x.WebsiteUrl, x.WebsiteUserId },
                         principalTable: "Websites",
-                        principalColumns: new[] { "Url", "UserId" },
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumns: new[] { "Url", "UserId" });
                 });
 
             migrationBuilder.CreateIndex(
@@ -263,9 +262,9 @@ namespace WebsiteAnalyzer.Infrastructure.Migrations
                 columns: new[] { "ScheduleUserId", "ScheduleWebsiteUrl" });
 
             migrationBuilder.CreateIndex(
-                name: "IX_CacheWarms_WebsiteUrl_UserId",
+                name: "IX_CacheWarms_WebsiteUrl_WebsiteUserId",
                 table: "CacheWarms",
-                columns: new[] { "WebsiteUrl", "UserId" });
+                columns: new[] { "WebsiteUrl", "WebsiteUserId" });
 
             migrationBuilder.CreateIndex(
                 name: "IX_Websites_ApplicationUserId",

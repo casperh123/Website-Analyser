@@ -43,7 +43,7 @@
 
 @code {
     [Parameter]
-    public required EventCallback<Website> OnRerunCacheWarm { get; set; }
+    public required EventCallback<string> OnRerunCacheWarm { get; set; }
 
     [Parameter]
     public required ApplicationUser User { get; set; }
@@ -59,7 +59,7 @@
         if (OnRerunCacheWarm.HasDelegate)
         {
             await JSRuntime.InvokeVoidAsync("backToTop");
-            await OnRerunCacheWarm.InvokeAsync(cacheWarm.Website);
+            await OnRerunCacheWarm.InvokeAsync(cacheWarm.WebsiteUrl);
         }
     }
 }

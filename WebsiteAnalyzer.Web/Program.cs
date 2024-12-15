@@ -11,6 +11,7 @@ using WebsiteAnalyzer.Infrastructure;
 using WebsiteAnalyzer.Infrastructure.Data;
 using WebsiteAnalyzer.Infrastructure.Repositories;
 using WebsiteAnalyzer.Infrastructure.Services;
+using WebsiteAnalyzer.Web.BackgroundJobs;
 using WebsiteAnalyzer.Web.Components;
 using WebsiteAnalyzer.Web.Components.Account;
 using WebsiteAnalyzer.Web.Services;
@@ -82,6 +83,9 @@ builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<StateService>();
 
 builder.Services.AddScoped<NotificationService>();
+builder.Services.AddHostedService<CacheWarmBackgroundService>();
+
+
 
 var app = builder.Build();
 
