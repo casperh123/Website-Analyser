@@ -80,11 +80,15 @@ builder.Services.AddScoped<ICacheWarmingService, CacheWarmingService>();
 builder.Services.AddScoped<IScheduleService, ScheduleService>();
 builder.Services.AddScoped<IBrokenLinkService, BrokenLinkService>();
 builder.Services.AddScoped<IUserService, UserService>();
-builder.Services.AddScoped<StateService>();
 
-builder.Services.AddScoped<NotificationService>();
+builder.Services.AddSingleton<IPeriodicTimer, SixHourlyTimer>();
+
+builder.Services.Configure<HostOptions>(options =>
+{
+    options.ServicesStartConcurrently = true;
+});
+
 builder.Services.AddHostedService<CacheWarmBackgroundService>();
-
 
 
 var app = builder.Build();

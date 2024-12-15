@@ -8,63 +8,57 @@ using WebsiteAnalyzer.Core.Persistence;
 
 namespace WebsiteAnalyzer.Web.BackgroundJobs;
 
-public class CacheWarmBackgroundService : BackgroundService
+public class CacheWarmBackgroundService : IHostedService
 {
     private readonly IServiceProvider _serviceProvider;
-    private readonly SemaphoreSlim _semaphore = new SemaphoreSlim(5);
+    private readonly IPeriodicTimer _timer;
     
-    public CacheWarmBackgroundService(HttpClient httpClient, IServiceProvider serviceProvider)
+    public CacheWarmBackgroundService(IServiceProvider serviceProvider, IPeriodicTimer timer)
     {
         _serviceProvider = serviceProvider;
+        _timer = timer;
     }
     
-    protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+    public async Task StartAsync(CancellationToken cancellationToken)
     {
         using IServiceScope scope = _serviceProvider.CreateScope();
-        
-        ICrawlScheduleRepository crawlScheduleRepository = scope.ServiceProvider.GetRequiredService<ICrawlScheduleRepository>();
-        ICacheWarmRepository cacheWarmRepository = scope.ServiceProvider.GetRequiredService<ICacheWarmRepository>();
-        HttpClient httpClient = scope.ServiceProvider.GetRequiredService<HttpClient>();
-        
-        ICollection<CrawlSchedule> scheduledItems = await crawlScheduleRepository.GetAllAsync();
-        Queue<CrawlSchedule> crawledSchedules = new Queue<CrawlSchedule>(scheduledItems.Where(IsDue));
 
-        List<Task<CacheWarm>> tasks = new List<Task<CacheWarm>>();
+        ICrawlScheduleRepository crawlScheduleRepository =
+            scope.ServiceProvider.GetRequiredService<ICrawlScheduleRepository>();
 
-        while (crawledSchedules.Any())
+        while (!cancellationToken.IsCancellationRequested
+               && await _timer.WaitForNextTickAsync(cancellationToken))
         {
-            await _semaphore.WaitAsync(stoppingToken);
+            ICollection<CrawlSchedule> scheduledItems = await crawlScheduleRepository.GetAllAsync();
+            IEnumerable<CrawlSchedule> dueSchedules = scheduledItems.Where(IsDue);
 
-            CrawlSchedule crawlSchedule = crawledSchedules.Dequeue();
-            Task<CacheWarm> task = WarmCacheAsync(httpClient, crawlSchedule);
-            
-            tasks.Add(task);
-            
-            if (tasks.Count >= 5)
+            int maxDegreeOfParallelism = 5;
+
+            await Parallel.ForEachAsync(dueSchedules, new ParallelOptions
             {
-                Task<CacheWarm> completedTask = await Task.WhenAny(tasks);
-                tasks.Remove(completedTask);
-            }
-        }
-        
-        await Task.WhenAll(tasks);
-
-        foreach (Task<CacheWarm> task in tasks)
-        {
-            CacheWarm cacheWarm = await task;
-            CrawlSchedule crawlSchedule = crawledSchedules
-                .Where(cs => cs.WebsiteUrl == cacheWarm.WebsiteUrl)
-                .First(cs => cs.UserId == cacheWarm.UserId);
-            
-            crawlSchedule.LastCrawlDate = DateTime.UtcNow;
-            
-            await cacheWarmRepository.AddAsync(cacheWarm);
-            await crawlScheduleRepository.UpdateAsync(crawlSchedule);
+                MaxDegreeOfParallelism = maxDegreeOfParallelism,
+                CancellationToken = cancellationToken
+            }, async (crawlSchedule, token) =>
+            {
+                await WarmCacheAsync(crawlSchedule);
+            });
         }
     }
 
-    private async Task<CacheWarm> WarmCacheAsync(HttpClient httpClient, CrawlSchedule crawlSchedule)
+
+    private async Task WarmCacheAsync(CrawlSchedule crawlSchedule)
     {
+        using IServiceScope scope = _serviceProvider.CreateScope();
+
+        HttpClient httpClient = scope.ServiceProvider.GetRequiredService<HttpClient>();
+        ICrawlScheduleRepository crawlScheduleRepository = scope.ServiceProvider.GetRequiredService<ICrawlScheduleRepository>();
+        ICacheWarmRepository cacheWarmRepository = scope.ServiceProvider.GetRequiredService<ICacheWarmRepository>();
+
+        crawlSchedule.Status = Status.InProgress;
+        crawlSchedule.LastCrawlDate = DateTime.UtcNow;
+
+        await crawlScheduleRepository.UpdateAsync(crawlSchedule);
+        
         ILinkProcessor<Link> linkProcessor = new LinkProcessor(httpClient);
         ModularCrawler<Link> cacheWarmCrawler = new ModularCrawler<Link>(linkProcessor);
         CacheWarm cacheWarm = new CacheWarm()
@@ -81,7 +75,10 @@ public class CacheWarmBackgroundService : BackgroundService
         cacheWarm.VisitedPages = linksChecked;
         cacheWarm.EndTime = DateTime.UtcNow;
         
-        return cacheWarm;
+        crawlSchedule.Status = Status.Completed;
+        
+        await cacheWarmRepository.AddAsync(cacheWarm);
+        await crawlScheduleRepository.UpdateAsync(crawlSchedule);
     }
     
     private bool IsDue(CrawlSchedule crawlSchedule)
@@ -102,4 +99,7 @@ public class CacheWarmBackgroundService : BackgroundService
                 return false;
         }
     }
-}
+    
+    public Task StopAsync(CancellationToken cancellationToken)
+        => Task.CompletedTask;
+} 

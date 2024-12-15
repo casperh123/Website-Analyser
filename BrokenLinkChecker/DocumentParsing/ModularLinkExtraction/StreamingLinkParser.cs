@@ -16,7 +16,7 @@ public class StreamingLinkParser
     public async Task<IEnumerable<string>> ParseLinksAsync(Stream htmlStream)
     {
         var links = new HashSet<string>();
-        var buffer = new char[32768]; // Buffer size for streaming
+        char[] buffer = new char[32768]; // Buffer size for streaming
         int leftoverLength = 0;
 
         using var reader = new StreamReader(htmlStream, Encoding.UTF8);

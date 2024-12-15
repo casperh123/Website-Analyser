@@ -15,7 +15,7 @@ public class LinkProcessor : ILinkProcessor<Link>
     public LinkProcessor(HttpClient httpClient)
     {
         _httpClient = httpClient;
-        
+        /*
         _linkExtractor = new LinkExtractor(new HtmlParser(new HtmlParserOptions()
         {
             IsKeepingSourceReferences = false,
@@ -33,9 +33,9 @@ public class LinkProcessor : ILinkProcessor<Link>
             IsSupportingProcessingInstructions = false,
             IsAcceptingCustomElementsEverywhere = false,
             IsNotSupportingFrames = true
-        }));
+        }));*/
 
-        //_linkExtractor = new StreamLinkExtractor(new HtmlParser());
+        _linkExtractor = new StreamLinkExtractor(new HtmlParser());
         _visitedPages = new HashSet<string>();
         _enqueuedPages = new HashSet<string>();
     }
