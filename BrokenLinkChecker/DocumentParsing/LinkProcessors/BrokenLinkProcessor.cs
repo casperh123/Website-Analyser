@@ -38,9 +38,14 @@ public class BrokenLinkProcessor : ILinkProcessor<IndexedLink>
                 _visitedResources[link.Target] = statusCode;
 
                 if (response.IsSuccessStatusCode)
-                    links = await _linkExtractor.GetLinksFromDocument(response, link);
+                {
+                    await using Stream responseStream = await response.Content.ReadAsStreamAsync();
+                    links = await _linkExtractor.GetLinksFromStream(responseStream, link).ConfigureAwait(false);   
+                }
                 else
+                {
                     _visitedResources[link.Target] = statusCode;
+                }
             }
             finally
             {

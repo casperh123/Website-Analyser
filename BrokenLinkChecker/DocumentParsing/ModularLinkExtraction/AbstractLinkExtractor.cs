@@ -13,14 +13,10 @@ public abstract class AbstractLinkExtractor<T> where T : Link
         Parser = parser;
     }
 
-    public async Task<IEnumerable<T>> GetLinksFromDocument(HttpResponseMessage response, T referringUrl)
+    public virtual async Task<IEnumerable<T>> GetLinksFromStream(Stream contentStream, T referringUrl)
     {
-        if (!response.IsSuccessStatusCode) return [];
-
-        await using Stream document = await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
-
         return GetLinksFromDocument(
-            await Parser.ParseDocumentAsync(document).ConfigureAwait(false), 
+            await Parser.ParseDocumentAsync(contentStream).ConfigureAwait(false), 
             referringUrl
         );
     }
@@ -36,13 +32,14 @@ public abstract class AbstractLinkExtractor<T> where T : Link
         return !IsExcluded(url);
     }
 
+    private static readonly HashSet<string> ExcludedExtensions = new(
+        new[] { ".js", ".css", ".png", ".jpg", ".jpeg", ".pdf", ".svg" }, 
+        StringComparer.OrdinalIgnoreCase
+    );
+
     protected static bool IsResourceFile(Uri uri)
     {
-        HashSet<string> excludedExtensions = new(StringComparer.OrdinalIgnoreCase)
-        {
-            ".js", ".css", ".png", ".jpg", ".jpeg", ".pdf", ".svg"
-        };
-        return excludedExtensions.Contains(Path.GetExtension(uri.LocalPath));
+        return ExcludedExtensions.Contains(Path.GetExtension(uri.LocalPath));
     }
 
     protected static bool IsExcluded(string url)
