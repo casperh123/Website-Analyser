@@ -8,83 +8,43 @@ using System.Numerics;
 
 public static class ParallelLinkExtractor
 {
-    // Optimize for L3 cache size (typically 4-12MB per socket)
-    private const int ChunkSize = 64 * 1024; // 64KB chunks (typical L1 data cache size)
-    private const int L2CacheSize = 512 * 1024; // 512KB (typical L2 cache size)
-    private static readonly int L3CacheSize = GetL3CacheSize();
+    private const int BufferSize = 32768; // 32KB chunks
     private static readonly ArrayPool<byte> BufferPool = ArrayPool<byte>.Shared;
     private static readonly Vector256<byte> HrefLowerMask = Vector256.Create((byte)'h');
-
-    private static int GetL3CacheSize()
-    {
-        // A reasonable default based on common CPU architectures
-        return Environment.ProcessorCount * 2 * 1024 * 1024; // 2MB per core
-    }
-
+    
     public static async Task<List<string>> ExtractHrefsParallelAsync(Stream responseStream)
     {
-        var links = new ConcurrentBag<string>();
-        var streamLength = responseStream.Length;
+        ConcurrentBag<string> links = new ConcurrentBag<string>();
         
-        // Calculate optimal batch size based on cache sizes
-        int batchSize = CalculateOptimalBatchSize(streamLength);
-        var batches = CreateBatches(streamLength, batchSize);
-
-        await Parallel.ForEachAsync(batches, new ParallelOptions 
-        { 
-            MaxDegreeOfParallelism = GetOptimalParallelism() 
-        }, async (batch, ct) =>
-        {
-            await ProcessBatch(responseStream, batch, links);
-        });
-
-        return links.Distinct().ToList();
-    }
-
-    private static int GetOptimalParallelism()
-    {
-        // Use hardware threads minus 1 to leave room for IO
-        return Math.Max(1, Environment.ProcessorCount - 1);
-    }
-
-    private static int CalculateOptimalBatchSize(long streamLength)
-    {
-        // Target L3 cache size while ensuring multiple batches per core
-        int targetBatches = Environment.ProcessorCount * 4;
-        long idealSize = streamLength / targetBatches;
-        return (int)Math.Min(L3CacheSize / 2, Math.Max(ChunkSize, idealSize));
-    }
-
-    private static IEnumerable<BatchInfo> CreateBatches(long streamLength, int batchSize)
-    {
-        for (long position = 0; position < streamLength; position += batchSize)
-        {
-            yield return new BatchInfo
-            {
-                Start = position,
-                Size = (int)Math.Min(batchSize, streamLength - position)
-            };
-        }
-    }
-
-    private static async Task ProcessBatch(Stream stream, BatchInfo batch, ConcurrentBag<string> links)
-    {
-        byte[] buffer = BufferPool.Rent(batch.Size);
+        // Read stream into memory in chunks, then process
+        using var ms = new MemoryStream();
+        byte[] buffer = BufferPool.Rent(BufferSize);
+        
         try
         {
-            // Read batch
-            lock (stream)
+            int bytesRead;
+            
+            // Read stream in chunks
+            while ((bytesRead = await responseStream.ReadAsync(buffer, 0, BufferSize)) > 0)
             {
-                stream.Position = batch.Start;
-                stream.ReadExactly(buffer, 0, batch.Size);
+                await ms.WriteAsync(buffer, 0, bytesRead);
             }
+            
+            // Get the complete data
+            byte[] fullData = ms.ToArray();
+            
+            // Create partitions for parallel processing
+            var partitioner = Partitioner.Create(0, fullData.Length, 
+                Math.Min(BufferSize, fullData.Length / Environment.ProcessorCount));
 
-            // Process in L2 cache-sized chunks
-            for (int offset = 0; offset < batch.Size; offset += L2CacheSize)
-            {
-                int chunkSize = Math.Min(L2CacheSize, batch.Size - offset);
-                ProcessChunk(buffer, offset, chunkSize, links);
-            }
+            // Process partitions in parallel
+            await Task.WhenAll(partitioner.AsParallel()
+                .WithDegreeOfParallelism(Environment.ProcessorCount)
+                .Select(range => Task.Run(() => 
+                    ProcessPartition(fullData, range.Item1, range.Item2, links)))
+                .ToArray());
+
+            return links.ToList();
         }
         finally
         {
@@ -92,41 +52,33 @@ public static class ParallelLinkExtractor
         }
     }
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static unsafe void ProcessChunk(byte[] buffer, int offset, int size, ConcurrentBag<string> links)
+    private static unsafe void ProcessPartition(byte[] buffer, int start, int end, ConcurrentBag<string> links)
     {
-        fixed (byte* bufPtr = &buffer[offset])
+        fixed (byte* ptr = buffer)
         {
-            int position = 0;
-
-            while (position < size - 4)
-            {
-                // Process in L1 cache-sized blocks
-                int blockSize = Math.Min(ChunkSize, size - position);
-                position += ProcessBlock(bufPtr + position, blockSize, links);
-            }
+            ProcessChunk(ptr + start, end - start, links);
         }
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static unsafe int ProcessBlock(byte* buffer, int size, ConcurrentBag<string> links)
+    private static unsafe void ProcessChunk(byte* buffer, int length, ConcurrentBag<string> links)
     {
         int position = 0;
-        while (position < size - 4)
+        while (position < length - 4)
         {
-            int hrefPos = FindNextHref(buffer + position, size - position);
-            if (hrefPos == -1) return size;
+            int hrefPos = FindNextHref(buffer + position, length - position);
+            if (hrefPos == -1) break;
             
             position += hrefPos;
             
-            while (position < size)
+            while (position < length)
             {
                 byte c = buffer[position++];
                 if (c == '"' || c == '\'')
                 {
                     byte quote = c;
-                    int endPos = FindQuote(buffer + position, size - position, quote);
-                    if (endPos == -1) return position;
+                    int endPos = FindQuote(buffer + position, length - position, quote);
+                    if (endPos == -1) break;
                     
                     if (endPos > 0)
                     {
@@ -136,72 +88,56 @@ public static class ParallelLinkExtractor
                     position += endPos + 1;
                     break;
                 }
-                if (c == '>' || position >= size) return position;
+                if (c == '>' || position >= length) break;
             }
         }
-        return position;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static unsafe void ProcessLink(byte* source, int length, ConcurrentBag<string> links)
     {
-        // Skip whitespace using SIMD
-        int start = 0;
-        int end = length;
+        if (length == 0 || length > 2048) return;
 
-        if (length >= 32 && Avx2.IsSupported)
+        const int maxStackSize = 256;
+        if (length <= maxStackSize)
         {
-            var spaces = Vector256.Create((byte)' ');
-            var wsChars = Vector256.Create(
-                (byte)' ', (byte)'\t', (byte)'\n', (byte)'\r',
-                (byte)' ', (byte)'\t', (byte)'\n', (byte)'\r',
-                (byte)' ', (byte)'\t', (byte)'\n', (byte)'\r',
-                (byte)' ', (byte)'\t', (byte)'\n', (byte)'\r',
-                (byte)' ', (byte)'\t', (byte)'\n', (byte)'\r',
-                (byte)' ', (byte)'\t', (byte)'\n', (byte)'\r',
-                (byte)' ', (byte)'\t', (byte)'\n', (byte)'\r',
-                (byte)' ', (byte)'\t', (byte)'\n', (byte)'\r'
-            );
-
-            // Trim start
-            while (start <= length - 32)
+            char* chars = stackalloc char[length];
+            int charCount = 0;
+            
+            bool inContent = false;
+            int lastNonSpace = -1;
+            
+            for (int i = 0; i < length; i++)
             {
-                var data = Avx2.LoadVector256(source + start);
-                var matches = Avx2.CompareEqual(data, wsChars);
-                var mask = Avx2.MoveMask(matches);
-                
-                if (mask != -1)
+                char c = (char)source[i];
+                if (c > 32)
                 {
-                    start += BitOperations.TrailingZeroCount(~mask);
-                    break;
+                    if (!inContent)
+                    {
+                        inContent = true;
+                        charCount = 0;
+                    }
+                    chars[charCount++] = c;
+                    lastNonSpace = charCount - 1;
                 }
-                start += 32;
+                else if (inContent)
+                {
+                    chars[charCount++] = c;
+                }
             }
-
-            // Trim end
-            while (end >= start + 32)
+            
+            if (lastNonSpace >= 0)
             {
-                var data = Avx2.LoadVector256(source + end - 32);
-                var matches = Avx2.CompareEqual(data, wsChars);
-                var mask = Avx2.MoveMask(matches);
-                
-                if (mask != -1)
-                {
-                    end -= BitOperations.LeadingZeroCount((uint)~mask);
-                    break;
-                }
-                end -= 32;
+                links.Add(new string(chars, 0, lastNonSpace + 1));
             }
         }
-
-        // Handle remaining bytes
-        while (start < end && (source[start] <= 32)) start++;
-        while (end > start && (source[end - 1] <= 32)) end--;
-
-        if (end > start)
+        else
         {
-            var link = Encoding.ASCII.GetString(source + start, end - start);
-            links.Add(link);
+            var str = Encoding.ASCII.GetString(source, length).Trim();
+            if (str.Length > 0)
+            {
+                links.Add(str);
+            }
         }
     }
 
@@ -282,11 +218,5 @@ public static class ParallelLinkExtractor
         }
         
         return -1;
-    }
-
-    private class BatchInfo
-    {
-        public long Start { get; set; }
-        public int Size { get; set; }
     }
 }

@@ -20,7 +20,7 @@ public class StreamLinkExtractor : AbstractLinkExtractor<Link>
             return Enumerable.Empty<Link>();
         }
         
-        IEnumerable<string> links = await ParallelLinkExtractor.ExtractHrefsParallelAsync(contentStream);
+        IEnumerable<string> links = await UltraFastLinkExtractor.ExtractHrefsAsync(contentStream).ConfigureAwait(false);
 
         return links
             .Where(link => Uri.TryCreate(link, UriKind.Absolute, out var uri) && uri.Host == thisUrl.Host)

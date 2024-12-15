@@ -7,7 +7,7 @@ using System.Text;
 
 public static class UltraFastLinkExtractor
 {
-    private const int BufferSize = 32768; // 32KB buffer
+    private const int BufferSize = 1028 * 128; // 32KB buffer
     private static readonly ArrayPool<byte> BufferPool = ArrayPool<byte>.Shared;
     private static readonly Vector256<byte> HrefLowerMask = Vector256.Create((byte)'h');
     
@@ -22,7 +22,7 @@ public static class UltraFastLinkExtractor
             while (true)
             {
                 int bytesRead = await responseStream.ReadAsync(
-                    buffer.AsMemory(remainingBytes, BufferSize - remainingBytes));
+                    buffer.AsMemory(remainingBytes, BufferSize - remainingBytes)).ConfigureAwait(false);
                     
                 if (bytesRead == 0) break;
                 bytesRead += remainingBytes;
@@ -45,6 +45,9 @@ public static class UltraFastLinkExtractor
     
     private static unsafe void ProcessBuffer(byte[] buffer, int bytesRead, ref int remainingBytes, List<string> foundLinks)
     {
+        char colon = '\'';
+        char gooseeye = '\"';
+        
         fixed (byte* bufPtr = buffer)
         {
             int position = 0;
@@ -64,7 +67,8 @@ public static class UltraFastLinkExtractor
                 while (position < bytesRead)
                 {
                     byte c = bufPtr[position++];
-                    if (c == '"' || c == '\'')
+                    
+                    if (c == gooseeye || c == colon)
                     {
                         byte quote = c;
                         
@@ -80,10 +84,7 @@ public static class UltraFastLinkExtractor
                         if (endPos > 0)
                         {
                             var link = Encoding.ASCII.GetString(buffer, position, endPos).Trim();
-                            if (link.Length > 0)
-                            {
-                                foundLinks.Add(link);
-                            }
+                            foundLinks.Add(link);
                         }
                         
                         position += endPos + 1;
@@ -102,7 +103,7 @@ public static class UltraFastLinkExtractor
     {
         if (Avx2.IsSupported && length >= 32)
         {
-            var vQuote = Vector256.Create(quote);
+            Vector256<byte> vQuote = Vector256.Create(quote);
             
             int i = 0;
             while (i <= length - 32)
@@ -136,10 +137,10 @@ public static class UltraFastLinkExtractor
             int i = 0;
             while (i <= length - 32)
             {
-                var data = Avx2.LoadVector256(buffer + i);
-                var normalized = Avx2.Or(data, caseMask);
-                var matches = Avx2.CompareEqual(normalized, HrefLowerMask);
-                int mask = Avx2.MoveMask(matches);
+                Vector256<byte> data = Avx2.LoadVector256(buffer + i);
+                Vector256<byte> normalized = Avx2.Or(data, caseMask);
+                Vector256<byte> matches = Avx2.CompareEqual(normalized, HrefLowerMask);
+                var mask = Avx2.MoveMask(matches);
                 
                 while (mask != 0)
                 {
@@ -163,7 +164,44 @@ public static class UltraFastLinkExtractor
             length = i;
         }
         
-        for (int i = 0; i <= length - 4; i++)
+        for (int i = 0; i <= length - 16; i += 4)
+        {
+            uint word1 = *(uint*)(buffer + i) | 0x20202020;
+            uint word2 = *(uint*)(buffer + i + 1) | 0x20202020;
+            uint word3 = *(uint*)(buffer + i + 2) | 0x20202020;
+            uint word4 = *(uint*)(buffer + i + 3) | 0x20202020;
+
+            if ((word1 & 0xFF) == 'h' &&
+                ((word1 >> 8) & 0xFF) == 'r' &&
+                ((word1 >> 16) & 0xFF) == 'e' &&
+                ((word1 >> 24) & 0xFF) == 'f')
+            {
+                return i;
+            }
+            if ((word2 & 0xFF) == 'h' &&
+                ((word2 >> 8) & 0xFF) == 'r' &&
+                ((word2 >> 16) & 0xFF) == 'e' &&
+                ((word2 >> 24) & 0xFF) == 'f')
+            {
+                return i + 1;
+            }
+            if ((word3 & 0xFF) == 'h' &&
+                ((word3 >> 8) & 0xFF) == 'r' &&
+                ((word3 >> 16) & 0xFF) == 'e' &&
+                ((word3 >> 24) & 0xFF) == 'f')
+            {
+                return i + 2;
+            }
+            if ((word4 & 0xFF) == 'h' &&
+                ((word4 >> 8) & 0xFF) == 'r' &&
+                ((word4 >> 16) & 0xFF) == 'e' &&
+                ((word4 >> 24) & 0xFF) == 'f')
+            {
+                return i + 3;
+            }
+        }
+
+        for (int i = length - 4; i <= length - 4; i++)
         {
             uint word = *(uint*)(buffer + i) | 0x20202020;
             if ((word & 0xFF) == 'h' &&

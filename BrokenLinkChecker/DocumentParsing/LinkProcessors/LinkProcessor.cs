@@ -62,7 +62,7 @@ public class LinkProcessor : ILinkProcessor<Link>
                 HttpCompletionOption.ResponseHeadersRead
             ).ConfigureAwait(false);
 
-            if (response.IsSuccessStatusCode && response.Content.Headers.ContentType?.MediaType == "text/html")
+            if (response.IsSuccessStatusCode)
             {
                 await using Stream responseStream = await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
                 

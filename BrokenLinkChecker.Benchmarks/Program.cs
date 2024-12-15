@@ -1,3 +1,3 @@
-﻿//await ManualBenchmark.RunBenchmarks();
+﻿await ManualBenchmark.RunBenchmarks();
 //await ComparisonBenchmark.RunBenchmarks();
-await ParallelBenchmark.RunBenchmarks();
+//await Parallel.RunBenchmarks();

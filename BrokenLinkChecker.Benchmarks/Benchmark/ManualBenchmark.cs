@@ -12,10 +12,10 @@ public class ManualBenchmark
         
         Console.WriteLine("\nRunning benchmarks...\n");
         await RunSingleBenchmark("Small HTML (10KB)", "small", iterations: 1000);
-        await RunSingleBenchmark("Medium HTML (100KB)", "medium", iterations: 100);
-        await RunSingleBenchmark("Large HTML (1MB)", "large", iterations: 10);
-        await RunSingleBenchmark("Sparse Links", "sparse", iterations: 100);
-        await RunSingleBenchmark("Dense Links", "dense", iterations: 100);
+        await RunSingleBenchmark("Medium HTML (100KB)", "medium", iterations: 1000);
+        await RunSingleBenchmark("Large HTML (1MB)", "large", iterations: 1000);
+        await RunSingleBenchmark("Sparse Links", "sparse", iterations: 1000);
+        await RunSingleBenchmark("Dense Links", "dense", iterations: 1000);
         
         await MeasureThroughput();
     }
@@ -59,7 +59,7 @@ public class ManualBenchmark
     
     private static async Task MeasureThroughput()
     {
-        const int iterations = 5;
+        const int iterations = 10000;
         var sw = Stopwatch.StartNew();
         long totalBytes = 0;
         
