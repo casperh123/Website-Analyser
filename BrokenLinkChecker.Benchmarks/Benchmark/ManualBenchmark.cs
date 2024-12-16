@@ -1,5 +1,7 @@
 using System.Diagnostics;
 using System.Text;
+using BrokenLinkChecker.DocumentParsing.ModularLinkExtraction;
+
 
 public class ManualBenchmark
 {

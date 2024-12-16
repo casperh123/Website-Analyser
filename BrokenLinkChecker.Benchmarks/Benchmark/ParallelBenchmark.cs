@@ -1,6 +1,8 @@
 using System.Diagnostics;
 using System.Text;
 using BrokenLinkChecker.DocumentParsing.ModularLinkExtraction;
+using BrokenLinkChecker.DocumentParsing.ModularLinkExtraction;
+
 
 public class ParallelBenchmark
 {

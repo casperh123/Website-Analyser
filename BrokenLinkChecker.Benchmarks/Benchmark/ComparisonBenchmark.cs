@@ -2,6 +2,7 @@ using System.Diagnostics;
 using System.Text;
 using AngleSharp;
 using AngleSharp.Html.Parser;
+using BrokenLinkChecker.DocumentParsing.ModularLinkExtraction;
 
 public class ComparisonBenchmark
 {

@@ -1,15 +1,21 @@
 using System.Buffers;
 using System.Numerics;
+using System.Runtime.CompilerServices;
 using System.Runtime.Intrinsics;
 using System.Runtime.Intrinsics.X86;
-using System.Runtime.CompilerServices;
 using System.Text;
+using System.Web;
+
+namespace BrokenLinkChecker.DocumentParsing.ModularLinkExtraction;
 
 public static class UltraFastLinkExtractor
 {
-    private const int BufferSize = 1028 * 128; // 32KB buffer
+    private const int BufferSize = 1028 * 64; // 32KB buffer
     private static readonly ArrayPool<byte> BufferPool = ArrayPool<byte>.Shared;
     private static readonly Vector256<byte> HrefLowerMask = Vector256.Create((byte)'h');
+    
+    private static readonly ThreadLocal<byte[]> UrlBuffer = new(() => new byte[8192]);
+    private static readonly ThreadLocal<char[]> CharBuffer = new(() => new char[4096]);
     
     public static async Task<List<string>> ExtractHrefsAsync(Stream responseStream)
     {
@@ -42,17 +48,21 @@ public static class UltraFastLinkExtractor
             BufferPool.Return(buffer);
         }
     }
-    
-    private static unsafe void ProcessBuffer(byte[] buffer, int bytesRead, ref int remainingBytes, List<string> foundLinks)
+
+    private static unsafe void ProcessBuffer(byte[] buffer, int bytesRead, ref int remainingBytes,
+        List<string> foundLinks)
     {
-        char colon = '\'';
-        char gooseeye = '\"';
-        
+        // These could be constants to avoid stack allocation
+        const byte colon = (byte)'\'';
+        const byte gooseeye = (byte)'\"';
+
         fixed (byte* bufPtr = buffer)
         {
             int position = 0;
-            
-            while (position < bytesRead - 4)
+            // Avoid checking bytesRead - 4 on every iteration
+            int safeLength = bytesRead - 4;
+
+            while (position < safeLength)
             {
                 int hrefPos = FindNextHref(bufPtr + position, bytesRead - position);
                 if (hrefPos == -1)
@@ -60,65 +70,130 @@ public static class UltraFastLinkExtractor
                     remainingBytes = Math.Min(4, bytesRead - position);
                     return;
                 }
-                
+
                 position += hrefPos;
-                
-                // Skip to opening quote
-                while (position < bytesRead)
+
+                // We can use pointer arithmetic more efficiently here
+                byte* currentPtr = bufPtr + position;
+                byte* endPtr = bufPtr + bytesRead;
+
+                // Find quote character
+                while (currentPtr < endPtr)
                 {
-                    byte c = bufPtr[position++];
-                    
+                    byte c = *currentPtr++;
+
                     if (c == gooseeye || c == colon)
                     {
-                        byte quote = c;
-                        
-                        // Find closing quote
-                        int endPos = FindQuote(bufPtr + position, bytesRead - position, quote);
+                        // Find closing quote using SIMD
+                        int endPos = FindQuote(currentPtr, (int)(endPtr - currentPtr), c);
                         if (endPos == -1)
                         {
-                            remainingBytes = bytesRead - position;
+                            remainingBytes = (int)(endPtr - currentPtr);
                             return;
                         }
-                        
-                        // Process link
-                        if (endPos > 0)
+
+                        // Zero-copy string creation for valid URLs
+                        if (endPos > 0 && endPos < 2048) // Reasonable URL length limit
                         {
-                            var link = Encoding.ASCII.GetString(buffer, position, endPos).Trim();
-                            foundLinks.Add(link);
-                        }
-                        
-                        position += endPos + 1;
-                        break;
-                    }
-                    if (c == '>' || position >= bytesRead) break;
-                }
-            }
+                            byte* urlStart = currentPtr;
+                            int urlLength = endPos;
+    
+                            // Quick validation - check for common valid URL chars
+                            bool isValid = true;
+                            for (int i = 0; i < urlLength; i++)
+                            {
+                                byte ca = urlStart[i];
+                                if (ca < 32 || ca > 126)
+                                {
+                                    isValid = false;
+                                    break;
+                                }
+                            }
+    
+                            if (isValid)
+                            {
+                                // Use thread-local buffers for zero-allocation processing
+                                var urlBytes = UrlBuffer.Value;
+                                var charBuffer = CharBuffer.Value;
+        
+                                // Copy and basic URL decode in one pass
+                                int decodedLength = 0;
+                                for (int i = 0; i < urlLength && decodedLength < charBuffer.Length - 1; i++)
+                                {
+                                    byte cas = urlStart[i];
             
-            remainingBytes = Math.Min(4, bytesRead - position);
+                                    if (cas == '%' && i + 2 < urlLength)
+                                    {
+                                        // Fast hex decode
+                                        int high = HexValue(urlStart[i + 1]);
+                                        int low = HexValue(urlStart[i + 2]);
+                
+                                        if (high >= 0 && low >= 0)
+                                        {
+                                            charBuffer[decodedLength++] = (char)((high << 4) | low);
+                                            i += 2;
+                                            continue;
+                                        }
+                                    }
+            
+                                    charBuffer[decodedLength++] = (char)cas;
+                                }
+        
+                                // Create final string only once
+                                if (decodedLength > 0)
+                                {
+                                    foundLinks.Add(new string(charBuffer, 0, decodedLength));
+                                }
+                            }
+    
+                            position = (int)(currentPtr - bufPtr) + endPos + 1;
+                            break;
+                        }
+
+                        if (c == (byte)'>' || currentPtr >= endPtr) break;
+                    }
+                }
+
+                remainingBytes = Math.Min(4, bytesRead - position);
+            }
         }
+    }
+    
+    // Helper method for hex decoding
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private static int HexValue(byte b)
+    {
+        if (b >= '0' && b <= '9') return b - '0';
+        if (b >= 'a' && b <= 'f') return b - 'a' + 10;
+        if (b >= 'A' && b <= 'F') return b - 'A' + 10;
+        return -1;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static unsafe int FindQuote(byte* buffer, int length, byte quote)
     {
-        if (Avx2.IsSupported && length >= 32)
+        if (Avx2.IsSupported && length >= 64) // Increased to process more data at once
         {
             Vector256<byte> vQuote = Vector256.Create(quote);
-            
+        
+            // Process two vectors at once to better utilize CPU pipeline
             int i = 0;
-            while (i <= length - 32)
+            while (i <= length - 64)
             {
-                var data = Avx2.LoadVector256(buffer + i);
-                var matches = Avx2.CompareEqual(data, vQuote);
-                int mask = Avx2.MoveMask(matches);
-                
-                if (mask != 0)
-                    return i + BitOperations.TrailingZeroCount(mask);
-                
-                i += 32;
-            }
+                var data1 = Avx2.LoadVector256(buffer + i);
+                var data2 = Avx2.LoadVector256(buffer + i + 32);
+                var matches1 = Avx2.CompareEqual(data1, vQuote);
+                var matches2 = Avx2.CompareEqual(data2, vQuote);
+                int mask1 = Avx2.MoveMask(matches1);
+                int mask2 = Avx2.MoveMask(matches2);
             
-            length = i;
+                if (mask1 != 0)
+                    return i + BitOperations.TrailingZeroCount(mask1);
+                if (mask2 != 0)
+                    return i + 32 + BitOperations.TrailingZeroCount(mask2);
+            
+                i += 64;
+            }
         }
         
         for (int i = 0; i < length; i++)
