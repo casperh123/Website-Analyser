@@ -10,8 +10,10 @@ namespace BrokenLinkChecker.DocumentParsing.ModularLinkExtraction;
 
 public static class UltraFastLinkExtractor
 {
-    private const int BufferSize = 1028 * 256; // 256KB buffer for better streaming
-    private const int UrlBufferSize = 32768; // 32KB for URL storage
+    private const int BoundaryOverlap = 2048; // MaxUrlLength
+    private const int BufferSize = 1024 * 512;  // 524,288 bytes
+    // Aligned power of 2 for better memory allocation
+    private const int UrlBufferSize = 32 * 1024;  // 32,768 bytes
     private const int MaxUrlLength = 2048;
     private const uint HrefPattern = 0x66657268; // 'href' in reverse
     
@@ -34,14 +36,12 @@ public static class UltraFastLinkExtractor
     // Reusable buffers per thread
     private static readonly ThreadLocal<byte[]> UrlBuffer = new(() => new byte[UrlBufferSize]);
     private static readonly ThreadLocal<int[]> UrlLengths = new(() => new int[UrlBufferSize / MaxUrlLength]);
-    
-    // Version 1: 32-bit packed (4 bytes)
+
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
     private readonly struct QuotePosition 
     {
-        private readonly uint _data;
-    
-        // 15 bits each = positions up to 32KB
+        private readonly ulong _data;
+        
         public readonly int Start => (int)(_data & 0x7FFF);
         public readonly int Length => (int)((_data >> 15) & 0x7FFF);
         public readonly bool IsValid => (_data & 0x40000000) != 0;
@@ -57,11 +57,9 @@ public static class UltraFastLinkExtractor
     private static byte[] CreateValidUrlChars()
     {
         var valid = new byte[128];
-        // Standard URL characters
         for (int i = '0'; i <= '9'; i++) valid[i] = 1;
         for (int i = 'A'; i <= 'Z'; i++) valid[i] = 1;
         for (int i = 'a'; i <= 'z'; i++) valid[i] = 1;
-        // Special URL characters
         string special = "-._~:/?#[]@!$&'()*+,;=%";
         foreach (char c in special) valid[c] = 1;
         return valid;
@@ -77,42 +75,71 @@ public static class UltraFastLinkExtractor
         return lookup;
     }
 
-    public static async Task<List<string>> ExtractHrefsAsync(Stream responseStream)
+    public static async ValueTask<List<string>> ExtractHrefsAsync(
+        Stream responseStream,
+        CancellationToken cancellationToken = default)
     {
         var foundLinks = new List<string>();
-        byte[] buffer = BufferPool.Rent(BufferSize);
-        int remainingBytes = 0;
-        
-        // Get thread-local buffers
-        byte[] urlBuffer = UrlBuffer.Value;
-        int[] urlLengths = UrlLengths.Value;
-        int urlCount = 0;
-        
+        byte[] buffer = BufferPool.Rent(BufferSize + BoundaryOverlap);
+    
         try
         {
+            int remainingBytes = 0;
+            Memory<byte> bufferMemory = buffer.AsMemory();
+        
+            byte[] urlBuffer = UrlBuffer.Value;
+            int[] urlLengths = UrlLengths.Value;
+            int urlCount = 0;
+
             while (true)
             {
                 int bytesRead = await responseStream.ReadAsync(
-                    buffer.AsMemory(remainingBytes, BufferSize - remainingBytes)).ConfigureAwait(false);
-                    
-                if (bytesRead == 0) break;
-                bytesRead += remainingBytes;
+                    bufferMemory.Slice(remainingBytes, BufferSize),
+                    cancellationToken).ConfigureAwait(false);
                 
-                ProcessBufferOptimized(buffer, bytesRead, ref remainingBytes, urlBuffer, urlLengths, ref urlCount);
-                
-                if (remainingBytes > 0 && remainingBytes < bytesRead)
+                if (bytesRead == 0)
                 {
-                    Buffer.BlockCopy(buffer, bytesRead - remainingBytes, buffer, 0, remainingBytes);
+                    if (remainingBytes > 0)
+                    {
+                        // Process final buffer
+                        ProcessBufferOptimized(
+                            bufferMemory.Slice(0, remainingBytes).Span,
+                            ref remainingBytes,
+                            urlBuffer,
+                            urlLengths,
+                            ref urlCount,
+                            isLastBuffer: true);
+                        
+                        if (urlCount > 0)
+                        {
+                            ConvertUrlsToStrings(urlBuffer, urlLengths, urlCount, foundLinks);
+                        }
+                    }
+                    break;
                 }
-                
-                // Convert accumulated URLs to strings
+
+                int totalBytes = remainingBytes + bytesRead;
+                ProcessBufferOptimized(
+                    bufferMemory.Slice(0, totalBytes).Span,
+                    ref remainingBytes,
+                    urlBuffer,
+                    urlLengths,
+                    ref urlCount,
+                    isLastBuffer: false);
+            
+                if (remainingBytes > 0 && remainingBytes < totalBytes)
+                {
+                    bufferMemory.Slice(totalBytes - remainingBytes, remainingBytes)
+                        .CopyTo(bufferMemory);
+                }
+            
                 if (urlCount > 0)
                 {
                     ConvertUrlsToStrings(urlBuffer, urlLengths, urlCount, foundLinks);
                     urlCount = 0;
                 }
             }
-            
+        
             return foundLinks;
         }
         finally
@@ -121,60 +148,71 @@ public static class UltraFastLinkExtractor
         }
     }
 
-    private static unsafe void ProcessBufferOptimized(byte[] buffer, int bytesRead, ref int remainingBytes,
-        byte[] urlBuffer, int[] urlLengths, ref int urlCount)
+    private static unsafe void ProcessBufferOptimized(
+        Span<byte> buffer,
+        ref int remainingBytes,
+        byte[] urlBuffer,
+        int[] urlLengths,
+        ref int urlCount,
+        bool isLastBuffer)
     {
         fixed (byte* bufPtr = buffer)
         fixed (byte* urlBufPtr = urlBuffer)
         {
             int position = 0;
-            int safeLength = bytesRead - 4;
+            int safeLength = buffer.Length - Math.Max(MaxUrlLength, 4);
 
             while (position < safeLength)
             {
-                int hrefPos = FindNextHrefOptimized(bufPtr + position, bytesRead - position);
+                int hrefPos = FindNextHrefOptimized(bufPtr + position, buffer.Length - position);
                 if (hrefPos == -1)
                 {
-                    remainingBytes = Math.Min(4, bytesRead - position);
+                    remainingBytes = isLastBuffer ? 0 : Math.Min(MaxUrlLength, buffer.Length - position);
                     return;
                 }
 
                 position += hrefPos;
                 byte* currentPtr = bufPtr + position;
-                byte* endPtr = bufPtr + bytesRead;
-                
-                // Find quote and extract URL
+                byte* endPtr = bufPtr + buffer.Length;
+            
                 var quotePos = FindQuoteOptimized(currentPtr, (int)(endPtr - currentPtr));
                 if (quotePos.IsValid)
                 {
                     byte* urlStart = currentPtr + quotePos.Start;
                     int urlLength = quotePos.Length;
-                    
-                    if (urlLength > 0 && urlLength < MaxUrlLength && IsValidUrl(urlStart, urlLength))
+                
+                    if (urlLength > 0 && urlLength < MaxUrlLength && 
+                        IsValidUrl(urlStart, urlLength))
                     {
-                        // Process URL encoding and copy to buffer
-                        int decodedLength = ProcessUrl(urlStart, urlLength, urlBufPtr + urlCount * MaxUrlLength);
+                        int decodedLength = ProcessUrl(
+                            urlStart,
+                            urlLength,
+                            urlBufPtr + urlCount * MaxUrlLength);
+                        
                         if (decodedLength > 0)
                         {
                             urlLengths[urlCount++] = decodedLength;
-                            
-                            // Check if we need to process accumulated URLs
                             if (urlCount >= urlLengths.Length)
                             {
                                 return;
                             }
                         }
                     }
-                    
+                
                     position += quotePos.Start + quotePos.Length;
+                }
+                else if (!isLastBuffer && position + 4 >= safeLength)
+                {
+                    remainingBytes = buffer.Length - position;
+                    return;
                 }
                 else
                 {
                     position += 4;
                 }
-                
-                remainingBytes = Math.Min(4, bytesRead - position);
             }
+        
+            remainingBytes = isLastBuffer ? 0 : Math.Min(MaxUrlLength, buffer.Length - position);
         }
     }
 
@@ -253,14 +291,32 @@ public static class UltraFastLinkExtractor
         return writePos;
     }
 
-    private static void ConvertUrlsToStrings(byte[] urlBuffer, int[] urlLengths, int count, List<string> output)
+    private static void ConvertUrlsToStrings(
+        byte[] urlBuffer,
+        int[] urlLengths,
+        int count,
+        List<string> output)
     {
         for (int i = 0; i < count; i++)
         {
             int length = urlLengths[i];
             if (length > 0 && length < MaxUrlLength)
             {
-                output.Add(Encoding.ASCII.GetString(urlBuffer, i * MaxUrlLength, length));
+                string url = string.Create(length, (urlBuffer, offset: i * MaxUrlLength, length), 
+                    (chars, state) =>
+                    {
+                        ReadOnlySpan<byte> urlSpan = new(
+                            state.urlBuffer, 
+                            state.offset, 
+                            state.length);
+
+                        for (int j = 0; j < state.length; j++)
+                        {
+                            chars[j] = (char)urlSpan[j];
+                        }
+                    });
+
+                output.Add(url);
             }
         }
     }
@@ -313,7 +369,6 @@ public static class UltraFastLinkExtractor
         if (Avx2.IsSupported && length >= 32)
         {
             int i = 0;
-            // Skip to first quote
             while (i <= length - 32)
             {
                 var data = Avx2.LoadVector256(buffer + i);
@@ -326,7 +381,6 @@ public static class UltraFastLinkExtractor
                     byte quote = buffer[i + quotePos];
                     i += quotePos + 1;
                     
-                    // Find matching quote
                     while (i <= length - 32)
                     {
                         data = Avx2.LoadVector256(buffer + i);
@@ -341,7 +395,6 @@ public static class UltraFastLinkExtractor
                         i += 32;
                     }
                     
-                    // Check remaining bytes
                     while (i < length)
                     {
                         if (buffer[i] == quote)
