@@ -23,10 +23,11 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser, IdentityR
         // Configure Website entity
         builder.Entity<Website>()
             .HasKey(w =>
-            new {
-                w.Url, 
-                w.UserId
-            }); 
+                new
+                {
+                    w.Url,
+                    w.UserId
+                });
 
         // Configure CacheWarm and Website relationship
         builder.Entity<CacheWarm>()

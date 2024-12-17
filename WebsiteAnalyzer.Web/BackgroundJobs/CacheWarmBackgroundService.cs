@@ -12,13 +12,13 @@ public class CacheWarmBackgroundService : IHostedService
 {
     private readonly IServiceProvider _serviceProvider;
     private readonly IPeriodicTimer _timer;
-    
+
     public CacheWarmBackgroundService(IServiceProvider serviceProvider, IPeriodicTimer timer)
     {
         _serviceProvider = serviceProvider;
         _timer = timer;
     }
-    
+
     public async Task StartAsync(CancellationToken cancellationToken)
     {
         using IServiceScope scope = _serviceProvider.CreateScope();
@@ -37,11 +37,7 @@ public class CacheWarmBackgroundService : IHostedService
             await Parallel.ForEachAsync(dueSchedules, new ParallelOptions
             {
                 MaxDegreeOfParallelism = maxDegreeOfParallelism,
-                CancellationToken = cancellationToken
-            }, async (crawlSchedule, token) =>
-            {
-                await WarmCacheAsync(crawlSchedule);
-            });
+            }, async (crawlSchedule, token) => { await WarmCacheAsync(crawlSchedule); });
         }
     }
 
@@ -51,55 +47,64 @@ public class CacheWarmBackgroundService : IHostedService
         using IServiceScope scope = _serviceProvider.CreateScope();
 
         HttpClient httpClient = scope.ServiceProvider.GetRequiredService<HttpClient>();
-        ICrawlScheduleRepository crawlScheduleRepository = scope.ServiceProvider.GetRequiredService<ICrawlScheduleRepository>();
+        ICrawlScheduleRepository crawlScheduleRepository =
+            scope.ServiceProvider.GetRequiredService<ICrawlScheduleRepository>();
         ICacheWarmRepository cacheWarmRepository = scope.ServiceProvider.GetRequiredService<ICacheWarmRepository>();
 
         crawlSchedule.Status = Status.InProgress;
         crawlSchedule.LastCrawlDate = DateTime.UtcNow;
 
         await crawlScheduleRepository.UpdateAsync(crawlSchedule);
-        
-        ILinkProcessor<Link> linkProcessor = new LinkProcessor(httpClient);
-        ModularCrawler<Link> cacheWarmCrawler = new ModularCrawler<Link>(linkProcessor);
-        CacheWarm cacheWarm = new CacheWarm()
-        {
-            Id = Guid.NewGuid(),
-            UserId = crawlSchedule.UserId,
-            WebsiteUrl = crawlSchedule.WebsiteUrl,
-            StartTime = DateTime.UtcNow,
-            Schedule = crawlSchedule,
-        };
 
-        int linksChecked = await cacheWarmCrawler.CrawlWebsiteAsync(new Link(crawlSchedule.WebsiteUrl)); 
-        
-        cacheWarm.VisitedPages = linksChecked;
-        cacheWarm.EndTime = DateTime.UtcNow;
-        
-        crawlSchedule.Status = Status.Completed;
-        
-        await cacheWarmRepository.AddAsync(cacheWarm);
-        await crawlScheduleRepository.UpdateAsync(crawlSchedule);
-    }
-    
-    private bool IsDue(CrawlSchedule crawlSchedule)
-    {
-        DateTime currentDate = DateTime.UtcNow;
-        
-        switch (crawlSchedule.Frequency)
+        try
         {
-            case Frequency.SixHourly:
-                return crawlSchedule.LastCrawlDate.AddHours(6) <= currentDate;
-            case Frequency.TwelveHourly:
-                return crawlSchedule.LastCrawlDate.AddHours(12) <= currentDate;
-            case Frequency.Daily:
-                return crawlSchedule.LastCrawlDate.AddDays(1) <= currentDate;
-            case Frequency.Weekly:
-                return crawlSchedule.LastCrawlDate.AddDays(7) <= currentDate;
-            default:
-                return false;
+            ILinkProcessor<Link> linkProcessor = new LinkProcessor(httpClient);
+            ModularCrawler<Link> cacheWarmCrawler = new ModularCrawler<Link>(linkProcessor);
+            CacheWarm cacheWarm = new CacheWarm()
+            {
+                Id = Guid.NewGuid(),
+                UserId = crawlSchedule.UserId,
+                WebsiteUrl = crawlSchedule.WebsiteUrl,
+                StartTime = DateTime.UtcNow,
+                Schedule = crawlSchedule,
+            };
+
+            int linksChecked = await cacheWarmCrawler.CrawlWebsiteAsync(new Link(crawlSchedule.WebsiteUrl));
+
+            cacheWarm.VisitedPages = linksChecked;
+            cacheWarm.EndTime = DateTime.UtcNow;
+
+            crawlSchedule.Status = Status.Completed;
+
+            await cacheWarmRepository.AddAsync(cacheWarm);
+            await crawlScheduleRepository.UpdateAsync(crawlSchedule);
+        }
+        catch (Exception ex)
+        {
+            crawlSchedule.Status = Status.Failed;
+            await crawlScheduleRepository.UpdateAsync(crawlSchedule);
         }
     }
-    
+
+    private bool IsDue(CrawlSchedule crawlSchedule)
+    {
+        if (crawlSchedule.Status is Status.InProgress)
+        {
+            return false;
+        }
+
+        DateTime currentDate = DateTime.UtcNow;
+
+        return crawlSchedule.Frequency switch
+        {
+            Frequency.SixHourly => crawlSchedule.LastCrawlDate.AddHours(6) <= currentDate,
+            Frequency.TwelveHourly => crawlSchedule.LastCrawlDate.AddHours(12) <= currentDate,
+            Frequency.Daily => crawlSchedule.LastCrawlDate.AddDays(1) <= currentDate,
+            Frequency.Weekly => crawlSchedule.LastCrawlDate.AddDays(7) <= currentDate,
+            _ => false
+        };
+    }
+
     public Task StopAsync(CancellationToken cancellationToken)
         => Task.CompletedTask;
-} 
+}

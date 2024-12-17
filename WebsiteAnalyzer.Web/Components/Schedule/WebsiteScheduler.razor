@@ -61,18 +61,16 @@
 <ScheduledTaskDataGrid ScheduledTasks="@_scheduledTasks" OnScheduleDeleted="DeleteTask"/>
 
 @code {
-    [Parameter]
-    public required ApplicationUser User { get; set; }
+    [Parameter] public required ApplicationUser User { get; set; }
 
-    [Parameter]
-    public required CrawlAction Action { get; set; }
+    [Parameter] public required CrawlAction Action { get; set; }
 
     private ScheduleTaskModel _scheduleTask = new();
     private IEnumerable<Frequency> Frequencies => Enum.GetValues(typeof(Frequency)).Cast<Frequency>();
     private IList<CrawlSchedule> _scheduledTasks = [];
     private string _errorMessage = string.Empty;
     private bool _addNew;
-    private string _urlRegex = @"[(http(s)?):\/\/(www\.)?a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)"; 
+    private string _urlRegex = @"[(http(s)?):\/\/(www\.)?a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)";
 
     protected override async Task OnInitializedAsync()
     {
@@ -123,4 +121,5 @@
             // TODO: Implement proper error handling
         }
     }
+
 }

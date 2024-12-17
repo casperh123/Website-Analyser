@@ -16,7 +16,7 @@ public abstract class AbstractLinkExtractor<T> where T : Link
     public virtual async Task<IEnumerable<T>> GetLinksFromStream(Stream contentStream, T referringUrl)
     {
         return GetLinksFromDocument(
-            await Parser.ParseDocumentAsync(contentStream).ConfigureAwait(false), 
+            await Parser.ParseDocumentAsync(contentStream).ConfigureAwait(false),
             referringUrl
         );
     }
@@ -33,7 +33,7 @@ public abstract class AbstractLinkExtractor<T> where T : Link
     }
 
     private static readonly HashSet<string> ExcludedExtensions = new(
-        new[] { ".js", ".css", ".png", ".jpg", ".jpeg", ".pdf", ".svg" }, 
+        new[] { ".js", ".css", ".png", ".jpg", ".jpeg", ".pdf", ".svg" },
         StringComparer.OrdinalIgnoreCase
     );
 

@@ -9,8 +9,8 @@ public class LinkProcessor : ILinkProcessor<Link>
 {
     private readonly HttpClient _httpClient;
     private readonly AbstractLinkExtractor<Link> _linkExtractor;
-    private HashSet<string> _visitedPages;    // Tracks processed pages
-    private HashSet<string> _enqueuedPages;   // Tracks enqueued pages
+    private HashSet<string> _visitedPages; // Tracks processed pages
+    private HashSet<string> _enqueuedPages; // Tracks enqueued pages
 
     public LinkProcessor(HttpClient httpClient)
     {
@@ -49,7 +49,7 @@ public class LinkProcessor : ILinkProcessor<Link>
     public async Task<IEnumerable<Link>> ProcessLinkAsync(Link link)
     {
         IEnumerable<Link> links = Array.Empty<Link>();
-        
+
         if (!_visitedPages.Add(link.Target))
         {
             return links;
@@ -65,7 +65,7 @@ public class LinkProcessor : ILinkProcessor<Link>
             if (response.IsSuccessStatusCode)
             {
                 await using Stream responseStream = await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
-                
+
                 links = await _linkExtractor.GetLinksFromStream(responseStream, link).ConfigureAwait(false);
                 links = links.Where(l => _enqueuedPages.Add(l.Target));
             }

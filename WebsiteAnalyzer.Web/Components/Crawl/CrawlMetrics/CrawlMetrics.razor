@@ -7,7 +7,7 @@
                 <RadzenBadge BadgeStyle="BadgeStyle.Success">In Progress</RadzenBadge>
             </RadzenCard>
         }
-        
+
         @if (LinksChecked > 0)
         {
             <RadzenCard>
@@ -28,11 +28,9 @@
 
 @code {
 
-    [Parameter]
-    public required int LinksChecked { get; set; }
+    [Parameter] public required int LinksChecked { get; set; }
 
-    [Parameter]
-    public required int LinksEnqueued { get; set; }
+    [Parameter] public required int LinksEnqueued { get; set; }
 
     private bool InProgress => LinksEnqueued > 0;
 }

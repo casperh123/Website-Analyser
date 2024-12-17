@@ -20,10 +20,10 @@
 @if (_linksChecked > 0)
 {
     <p>Links checked: @_linksChecked</p>
-    
+
     <div class="padding-m round-corners box-shadow">
         <h2>Broken Links</h2>
-        <BrokenLinksStats BrokenLinks="_brokenLinks" />
+        <BrokenLinksStats BrokenLinks="_brokenLinks"/>
     </div>
 }
 
@@ -48,7 +48,7 @@
             StateHasChanged();
         }
     }
-    
+
     private void ResetResults()
     {
         _brokenLinks.Clear();
@@ -72,4 +72,5 @@
         _brokenLinks.Add(link);
         InvokeAsync(StateHasChanged);
     }
+
 }

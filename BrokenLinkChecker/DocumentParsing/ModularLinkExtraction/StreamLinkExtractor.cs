@@ -7,7 +7,7 @@ namespace BrokenLinkChecker.DocumentParsing.ModularLinkExtraction;
 public class StreamLinkExtractor : AbstractLinkExtractor<Link>
 {
     private readonly StreamingLinkParser _streamParser;
-    
+
     public StreamLinkExtractor(HtmlParser parser) : base(parser)
     {
         _streamParser = new StreamingLinkParser();
@@ -19,12 +19,12 @@ public class StreamLinkExtractor : AbstractLinkExtractor<Link>
         {
             return Enumerable.Empty<Link>();
         }
-        
+
         IEnumerable<string> links = await UltraFastLinkExtractor.ExtractHrefsAsync(contentStream).ConfigureAwait(false);
 
         return links
             .Where(link => Uri.TryCreate(link, UriKind.Absolute, out var uri) && uri.Host == thisUrl.Host)
-            .Where(link => !IsExcluded(link)) 
+            .Where(link => !IsExcluded(link))
             .Select(link => new Link(link));
     }
 
@@ -32,5 +32,4 @@ public class StreamLinkExtractor : AbstractLinkExtractor<Link>
     {
         throw new NotImplementedException();
     }
-
 }

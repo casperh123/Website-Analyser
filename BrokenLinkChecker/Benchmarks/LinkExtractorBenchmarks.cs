@@ -5,22 +5,22 @@ using BrokenLinkChecker.DocumentParsing.ModularLinkExtraction;
 public class ManualBenchmark
 {
     private static readonly Dictionary<string, byte[]> _testData = new();
-    
+
     public static async Task RunBenchmarks()
     {
         Console.WriteLine("Preparing test data...");
         PrepareTestData();
-        
+
         Console.WriteLine("\nRunning benchmarks...\n");
         await RunSingleBenchmark("Small HTML (10KB)", "small", iterations: 1000);
         await RunSingleBenchmark("Medium HTML (100KB)", "medium", iterations: 100);
         await RunSingleBenchmark("Large HTML (1MB)", "large", iterations: 10);
         await RunSingleBenchmark("Sparse Links", "sparse", iterations: 100);
         await RunSingleBenchmark("Dense Links", "dense", iterations: 100);
-        
+
         await MeasureThroughput();
     }
-    
+
     private static void PrepareTestData()
     {
         _testData["small"] = GenerateHtml(totalSize: 10_000, linkEveryNBytes: 500);
@@ -29,27 +29,27 @@ public class ManualBenchmark
         _testData["sparse"] = GenerateHtml(totalSize: 100_000, linkEveryNBytes: 5000);
         _testData["dense"] = GenerateHtml(totalSize: 100_000, linkEveryNBytes: 200);
     }
-    
+
     private static async Task RunSingleBenchmark(string name, string dataKey, int iterations)
     {
         var sw = Stopwatch.StartNew();
         long totalLinks = 0;
         long peakMemoryStart = GC.GetTotalMemory(true);
-        
+
         for (int i = 0; i < iterations; i++)
         {
             using var stream = new MemoryStream(_testData[dataKey]);
             var links = await UltraFastLinkExtractor.ExtractHrefsAsync(stream);
             totalLinks += links.Count;
         }
-        
+
         sw.Stop();
         long peakMemoryEnd = GC.GetTotalMemory(false);
         double memoryMB = (peakMemoryEnd - peakMemoryStart) / (1024.0 * 1024.0);
-        
+
         double averageMs = sw.ElapsedMilliseconds / (double)iterations;
         double linksPerSecond = totalLinks * 1000.0 / sw.ElapsedMilliseconds;
-        
+
         Console.WriteLine($"{name}:");
         Console.WriteLine($"  Average time: {averageMs:F2}ms per iteration");
         Console.WriteLine($"  Links found: {totalLinks / iterations:F0} per iteration");
@@ -57,13 +57,13 @@ public class ManualBenchmark
         Console.WriteLine($"  Memory delta: {memoryMB:F2}MB");
         Console.WriteLine();
     }
-    
+
     private static async Task MeasureThroughput()
     {
         const int iterations = 5;
         var sw = Stopwatch.StartNew();
         long totalBytes = 0;
-        
+
         for (int i = 0; i < iterations; i++)
         {
             foreach (var testFile in _testData.Values)
@@ -73,17 +73,17 @@ public class ManualBenchmark
                 totalBytes += testFile.Length;
             }
         }
-        
+
         sw.Stop();
         double seconds = sw.ElapsedMilliseconds / 1000.0;
         double megabytes = totalBytes / (1024.0 * 1024.0);
         double throughput = megabytes / seconds;
-        
+
         Console.WriteLine("Throughput Test:");
         Console.WriteLine($"  Processed {megabytes:F2}MB in {seconds:F2}s");
         Console.WriteLine($"  Throughput: {throughput:F2}MB/s");
     }
-    
+
     private static byte[] GenerateHtml(int totalSize, int linkEveryNBytes)
     {
         var sb = new StringBuilder(totalSize);

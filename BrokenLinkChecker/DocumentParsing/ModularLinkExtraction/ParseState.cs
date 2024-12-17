@@ -5,5 +5,4 @@ public enum ParseState
     InHrefValue,
     SearchingForHref,
     SearchingForQuote,
-    
 }

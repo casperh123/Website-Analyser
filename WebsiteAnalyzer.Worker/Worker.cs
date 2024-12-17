@@ -17,9 +17,8 @@ public class Worker : BackgroundService
             {
                 _logger.LogInformation("Worker running at: {time}", DateTimeOffset.Now);
             }
-            
-            
-            
+
+
             await Task.Delay(TimeSpan.FromHours(6), stoppingToken);
         }
     }

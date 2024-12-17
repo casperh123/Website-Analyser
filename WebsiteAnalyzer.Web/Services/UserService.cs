@@ -14,7 +14,8 @@ public class UserService : IUserService
     private readonly UserManager<ApplicationUser> _userManager;
     private readonly AuthenticationStateProvider _authenticationStateProvider;
 
-    public UserService(UserManager<ApplicationUser> userManager, AuthenticationStateProvider authenticationStateProvider)
+    public UserService(UserManager<ApplicationUser> userManager,
+        AuthenticationStateProvider authenticationStateProvider)
     {
         _userManager = userManager;
         _authenticationStateProvider = authenticationStateProvider;

@@ -25,11 +25,9 @@
 </RadzenCard>
 
 @code {
-    [Parameter]
-    public required CacheWarm CacheWarm { get; set; }
-    
-    [Parameter]
-    public required EventCallback<CacheWarm> OnRerunWarm { get; set; }
+    [Parameter] public required CacheWarm CacheWarm { get; set; }
+
+    [Parameter] public required EventCallback<CacheWarm> OnRerunWarm { get; set; }
 
     public async Task HandleOnClick()
     {
@@ -40,4 +38,5 @@
             await OnRerunWarm.InvokeAsync(CacheWarm);
         }
     }
+
 }

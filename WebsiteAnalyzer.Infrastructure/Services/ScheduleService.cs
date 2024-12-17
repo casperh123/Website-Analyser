@@ -13,7 +13,7 @@ public interface IScheduleService
     Task<ICollection<CrawlSchedule>> GetScheduledTasksByUserIdAndTypeAsync(Guid userId, CrawlAction action);
 }
 
-public class ScheduleService :  IScheduleService
+public class ScheduleService : IScheduleService
 {
     private readonly ICrawlScheduleRepository _scheduleRepository;
     private readonly ICacheWarmingService _cacheWarmingService;
@@ -37,10 +37,10 @@ public class ScheduleService :  IScheduleService
             WebsiteUrl = url,
             Frequency = frequency,
             Action = action,
-            LastCrawlDate = DateTime.Today,
+            LastCrawlDate = DateTime.Today.Subtract(TimeSpan.FromDays(14)),
             Status = Status.Scheduled
         };
-        
+
         await _scheduleRepository.AddAsync(scheduledAction).ConfigureAwait(false);
 
         return scheduledAction;
@@ -48,9 +48,8 @@ public class ScheduleService :  IScheduleService
 
     public async Task UpdateScheduledTask(CrawlSchedule scheduledTask, Frequency frequency)
     {
-        
         scheduledTask.Frequency = frequency;
-        
+
         await _scheduleRepository.UpdateAsync(scheduledTask);
     }
 

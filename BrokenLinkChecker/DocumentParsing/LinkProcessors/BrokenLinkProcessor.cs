@@ -40,7 +40,7 @@ public class BrokenLinkProcessor : ILinkProcessor<IndexedLink>
                 if (response.IsSuccessStatusCode)
                 {
                     await using Stream responseStream = await response.Content.ReadAsStreamAsync();
-                    links = await _linkExtractor.GetLinksFromStream(responseStream, link).ConfigureAwait(false);   
+                    links = await _linkExtractor.GetLinksFromStream(responseStream, link).ConfigureAwait(false);
                 }
                 else
                 {
@@ -54,7 +54,7 @@ public class BrokenLinkProcessor : ILinkProcessor<IndexedLink>
         }
 
         link.StatusCode = statusCode;
-        
+
         return links;
     }
 

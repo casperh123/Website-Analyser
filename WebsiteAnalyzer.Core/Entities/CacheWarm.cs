@@ -10,5 +10,5 @@ public record CacheWarm
     public DateTime EndTime { get; set; }
     public CrawlSchedule? Schedule { get; set; }
     public bool IsCompleted => EndTime != DateTime.MinValue;
-    public TimeSpan TotalTime => IsCompleted ? (EndTime - StartTime): TimeSpan.Zero;
+    public TimeSpan TotalTime => IsCompleted ? (EndTime - StartTime) : TimeSpan.Zero;
 }

@@ -1,11 +1,11 @@
 namespace WebsiteAnalyzer.Web.BackgroundJobs;
 
-public class SixHourlyTimer : IPeriodicTimer
+public class HourlyTimer : IPeriodicTimer
 {
     private readonly PeriodicTimer _timer;
     private bool _firstTick = true;
 
-    public SixHourlyTimer()
+    public HourlyTimer()
     {
         _timer = new PeriodicTimer(TimeSpan.FromHours(1));
     }

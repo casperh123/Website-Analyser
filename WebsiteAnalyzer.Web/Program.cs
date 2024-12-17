@@ -40,7 +40,7 @@ builder.Services.AddHttpClient("WebsiteAnalyser", client =>
         client.DefaultVersionPolicy = HttpVersionPolicy.RequestVersionOrLower;
         client.Timeout = TimeSpan.FromSeconds(20);
         client.DefaultRequestHeaders.ConnectionClose = false;
-        
+
         client.DefaultRequestHeaders.UserAgent.ParseAdd(
             "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36");
         client.DefaultRequestHeaders.Accept.ParseAdd(
@@ -59,7 +59,8 @@ builder.Services.AddHttpClient("WebsiteAnalyser", client =>
 
 builder.Services.AddScoped<ThemeService>();
 
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ??
+                       throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlite(connectionString));
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
@@ -81,12 +82,9 @@ builder.Services.AddScoped<IScheduleService, ScheduleService>();
 builder.Services.AddScoped<IBrokenLinkService, BrokenLinkService>();
 builder.Services.AddScoped<IUserService, UserService>();
 
-builder.Services.AddSingleton<IPeriodicTimer, SixHourlyTimer>();
+builder.Services.AddSingleton<IPeriodicTimer, HourlyTimer>();
 
-builder.Services.Configure<HostOptions>(options =>
-{
-    options.ServicesStartConcurrently = true;
-});
+builder.Services.Configure<HostOptions>(options => { options.ServicesStartConcurrently = true; });
 
 builder.Services.AddHostedService<CacheWarmBackgroundService>();
 

@@ -28,9 +28,11 @@ internal static class IdentityComponentsEndpointRouteBuilderExtensions
             [FromForm] string provider,
             [FromForm] string returnUrl) =>
         {
-            IEnumerable<KeyValuePair<string, StringValues>> query = [
+            IEnumerable<KeyValuePair<string, StringValues>> query =
+            [
                 new("ReturnUrl", returnUrl),
-                new("Action", ExternalLogin.LoginCallbackAction)];
+                new("Action", ExternalLogin.LoginCallbackAction)
+            ];
 
             var redirectUrl = UriHelper.BuildRelative(
                 context.Request.PathBase,
@@ -65,7 +67,8 @@ internal static class IdentityComponentsEndpointRouteBuilderExtensions
                 "/Account/Manage/ExternalLogins",
                 QueryString.Create("Action", ExternalLogins.LinkLoginCallbackAction));
 
-            var properties = signInManager.ConfigureExternalAuthenticationProperties(provider, redirectUrl, signInManager.UserManager.GetUserId(context.User));
+            var properties = signInManager.ConfigureExternalAuthenticationProperties(provider, redirectUrl,
+                signInManager.UserManager.GetUserId(context.User));
             return TypedResults.Challenge(properties, [provider]);
         });
 

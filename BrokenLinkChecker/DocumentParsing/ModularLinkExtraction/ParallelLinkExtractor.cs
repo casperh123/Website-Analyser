@@ -11,36 +11,36 @@ public static class ParallelLinkExtractor
     private const int BufferSize = 32768; // 32KB chunks
     private static readonly ArrayPool<byte> BufferPool = ArrayPool<byte>.Shared;
     private static readonly Vector256<byte> HrefLowerMask = Vector256.Create((byte)'h');
-    
+
     public static async Task<List<string>> ExtractHrefsParallelAsync(Stream responseStream)
     {
         ConcurrentBag<string> links = new ConcurrentBag<string>();
-        
+
         // Read stream into memory in chunks, then process
         using var ms = new MemoryStream();
         byte[] buffer = BufferPool.Rent(BufferSize);
-        
+
         try
         {
             int bytesRead;
-            
+
             // Read stream in chunks
             while ((bytesRead = await responseStream.ReadAsync(buffer, 0, BufferSize)) > 0)
             {
                 await ms.WriteAsync(buffer, 0, bytesRead);
             }
-            
+
             // Get the complete data
             byte[] fullData = ms.ToArray();
-            
+
             // Create partitions for parallel processing
-            var partitioner = Partitioner.Create(0, fullData.Length, 
+            var partitioner = Partitioner.Create(0, fullData.Length,
                 Math.Min(BufferSize, fullData.Length / Environment.ProcessorCount));
 
             // Process partitions in parallel
             await Task.WhenAll(partitioner.AsParallel()
                 .WithDegreeOfParallelism(Environment.ProcessorCount)
-                .Select(range => Task.Run(() => 
+                .Select(range => Task.Run(() =>
                     ProcessPartition(fullData, range.Item1, range.Item2, links)))
                 .ToArray());
 
@@ -68,9 +68,9 @@ public static class ParallelLinkExtractor
         {
             int hrefPos = FindNextHref(buffer + position, length - position);
             if (hrefPos == -1) break;
-            
+
             position += hrefPos;
-            
+
             while (position < length)
             {
                 byte c = buffer[position++];
@@ -79,15 +79,16 @@ public static class ParallelLinkExtractor
                     byte quote = c;
                     int endPos = FindQuote(buffer + position, length - position, quote);
                     if (endPos == -1) break;
-                    
+
                     if (endPos > 0)
                     {
                         ProcessLink(buffer + position, endPos, links);
                     }
-                    
+
                     position += endPos + 1;
                     break;
                 }
+
                 if (c == '>' || position >= length) break;
             }
         }
@@ -103,10 +104,10 @@ public static class ParallelLinkExtractor
         {
             char* chars = stackalloc char[length];
             int charCount = 0;
-            
+
             bool inContent = false;
             int lastNonSpace = -1;
-            
+
             for (int i = 0; i < length; i++)
             {
                 char c = (char)source[i];
@@ -117,6 +118,7 @@ public static class ParallelLinkExtractor
                         inContent = true;
                         charCount = 0;
                     }
+
                     chars[charCount++] = c;
                     lastNonSpace = charCount - 1;
                 }
@@ -125,7 +127,7 @@ public static class ParallelLinkExtractor
                     chars[charCount++] = c;
                 }
             }
-            
+
             if (lastNonSpace >= 0)
             {
                 links.Add(new string(chars, 0, lastNonSpace + 1));
@@ -147,25 +149,27 @@ public static class ParallelLinkExtractor
         if (Avx2.IsSupported && length >= 32)
         {
             var vQuote = Vector256.Create(quote);
-            
+
             int i = 0;
             while (i <= length - 32)
             {
                 var data = Avx2.LoadVector256(buffer + i);
                 var matches = Avx2.CompareEqual(data, vQuote);
                 int mask = Avx2.MoveMask(matches);
-                
+
                 if (mask != 0)
                     return i + BitOperations.TrailingZeroCount(mask);
-                
+
                 i += 32;
             }
+
             length = i;
         }
-        
+
         for (int i = 0; i < length; i++)
-            if (buffer[i] == quote) return i;
-        
+            if (buffer[i] == quote)
+                return i;
+
         return -1;
     }
 
@@ -175,7 +179,7 @@ public static class ParallelLinkExtractor
         if (Avx2.IsSupported && length >= 32)
         {
             var caseMask = Vector256.Create((byte)0x20);
-            
+
             int i = 0;
             while (i <= length - 32)
             {
@@ -183,7 +187,7 @@ public static class ParallelLinkExtractor
                 var normalized = Avx2.Or(data, caseMask);
                 var matches = Avx2.CompareEqual(normalized, HrefLowerMask);
                 int mask = Avx2.MoveMask(matches);
-                
+
                 while (mask != 0)
                 {
                     int pos = i + BitOperations.TrailingZeroCount(mask);
@@ -198,13 +202,16 @@ public static class ParallelLinkExtractor
                             return pos;
                         }
                     }
+
                     mask &= mask - 1;
                 }
+
                 i += 32 - 3;
             }
+
             length = i;
         }
-        
+
         for (int i = 0; i <= length - 4; i++)
         {
             uint word = *(uint*)(buffer + i) | 0x20202020;
@@ -216,7 +223,7 @@ public static class ParallelLinkExtractor
                 return i;
             }
         }
-        
+
         return -1;
     }
 }

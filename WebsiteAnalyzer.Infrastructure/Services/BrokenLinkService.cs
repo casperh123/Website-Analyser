@@ -22,10 +22,9 @@ public class BrokenLinkService : IBrokenLinkService
     public async Task FindBrokenLinks(string url, Action<int> onLinkEnqueued, Action<int> onLinkChecked,
         Action<IndexedLink> onLinkFound)
     {
-        
         ILinkProcessor<IndexedLink> linkProcessor = new BrokenLinkProcessor(_httpClient);
         ModularCrawler<IndexedLink> crawler = new(linkProcessor);
-        
+
         crawler.OnLinksEnqueued += onLinkEnqueued;
         crawler.OnLinksChecked += onLinkChecked;
         crawler.OnResourceVisited += onLinkFound;

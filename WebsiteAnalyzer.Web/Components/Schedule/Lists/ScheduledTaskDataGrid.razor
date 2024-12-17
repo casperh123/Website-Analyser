@@ -8,14 +8,15 @@
                     PageSize="10"
                     EmptyText="No scheduled tasks">
         <Columns>
-            <RadzenDataGridColumn Title="Website URL" Property="@nameof(CrawlSchedule.WebsiteUrl)" />
+            <RadzenDataGridColumn Title="Website URL" Property="@nameof(CrawlSchedule.WebsiteUrl)"/>
             <RadzenDataGridColumn Title="Frequency" Property="@nameof(CrawlSchedule.Frequency)">
                 <Template Context="schedule">
                     @schedule.Frequency.ToFriendlyString()
                 </Template>
             </RadzenDataGridColumn>
-            <RadzenDataGridColumn Title="Action" Property="@nameof(CrawlSchedule.Action)" />
-            <RadzenDataGridColumn Title="Status" Property="@nameof(CrawlSchedule.Status)" />
+            <RadzenDataGridColumn Title="Action" Property="@nameof(CrawlSchedule.Action)"/>
+            <RadzenDataGridColumn Title="Status" Property="@nameof(CrawlSchedule.Status)"/>
+            <RadzenDataGridColumn Title="Last Check" Property="@nameof(CrawlSchedule.LastCrawlDate)"/>
             <RadzenDataGridColumn>
                 <Template Context="schedule">
                     <RadzenButton Icon="delete"
@@ -28,11 +29,9 @@
 </RadzenStack>
 
 @code {
-    [Parameter]
-    public required IList<CrawlSchedule> ScheduledTasks { get; set; }
-    
-    [Parameter]
-    public required EventCallback<CrawlSchedule> OnScheduleDeleted { get; set; }
+    [Parameter] public required IList<CrawlSchedule> ScheduledTasks { get; set; }
+
+    [Parameter] public required EventCallback<CrawlSchedule> OnScheduleDeleted { get; set; }
 
     public async Task DeleteTask(CrawlSchedule schedule)
     {
@@ -42,4 +41,5 @@
             ScheduledTasks.Remove(schedule);
         }
     }
+
 }

@@ -8,31 +8,31 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Microsoft.AspNetCore.Components.QuickGrid" Version="9.0.0" />
-        <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="9.0.0" />
-        <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="9.0.0" />
-        <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="9.0.0" />
-        <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="9.0.0" />
-        <PackageReference Include="Radzen.Blazor" Version="5.6.11" />
+        <PackageReference Include="Microsoft.AspNetCore.Components.QuickGrid" Version="9.0.0"/>
+        <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="9.0.0"/>
+        <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="9.0.0"/>
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="9.0.0"/>
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="9.0.0"/>
+        <PackageReference Include="Radzen.Blazor" Version="5.6.11"/>
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\BrokenLinkChecker\BrokenLinkChecker.csproj" />
-      <ProjectReference Include="..\WebsiteAnalyzer.Infrastructure\WebsiteAnalyzer.Infrastructure.csproj" />
+        <ProjectReference Include="..\BrokenLinkChecker\BrokenLinkChecker.csproj"/>
+        <ProjectReference Include="..\WebsiteAnalyzer.Infrastructure\WebsiteAnalyzer.Infrastructure.csproj"/>
     </ItemGroup>
 
     <ItemGroup>
-      <AdditionalFiles Include="Components\Cards\CollapsableCacheCard.razor" />
-      <AdditionalFiles Include="Components\Search\SearchBar.razor" />
-      <AdditionalFiles Include="Components\WebsiteInputs\WebsiteInput.razor" />
-      <AdditionalFiles Include="Components\WebsiteMetrics\BrokenLinksStats.razor" />
-      <AdditionalFiles Include="Components\WebsiteMetrics\PageHeaders.razor" />
-      <AdditionalFiles Include="Components\WebsiteMetrics\PerformanceStats.razor" />
-      <AdditionalFiles Include="Components\WebsiteMetrics\StateButtons.razor" />
+        <AdditionalFiles Include="Components\Cards\CollapsableCacheCard.razor"/>
+        <AdditionalFiles Include="Components\Search\SearchBar.razor"/>
+        <AdditionalFiles Include="Components\WebsiteInputs\WebsiteInput.razor"/>
+        <AdditionalFiles Include="Components\WebsiteMetrics\BrokenLinksStats.razor"/>
+        <AdditionalFiles Include="Components\WebsiteMetrics\PageHeaders.razor"/>
+        <AdditionalFiles Include="Components\WebsiteMetrics\PerformanceStats.razor"/>
+        <AdditionalFiles Include="Components\WebsiteMetrics\StateButtons.razor"/>
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="Data\" />
+        <Folder Include="Data\"/>
     </ItemGroup>
 
 </Project>

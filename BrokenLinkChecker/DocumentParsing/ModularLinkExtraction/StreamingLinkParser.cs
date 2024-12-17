@@ -9,7 +9,7 @@ public class StreamingLinkParser
 {
     // Use a HashSet for automatic uniqueness checks, avoiding Distinct().
     private static readonly Regex LinkRegex = new Regex(
-        @"<a\s+[^>]*\s*href\s*=\s*(?:['""""])(?<href>https?://[^'""\s]+)(?:['""""])", 
+        @"<a\s+[^>]*\s*href\s*=\s*(?:['""""])(?<href>https?://[^'""\s]+)(?:['""""])",
         RegexOptions.IgnoreCase | RegexOptions.Compiled);
 
 
@@ -26,13 +26,13 @@ public class StreamingLinkParser
         {
             // Process the new chunk and leftover from the previous chunk
             ReadOnlySpan<char> chunk = new ReadOnlySpan<char>(buffer, 0, buffer.Length);
-            
+
             Regex.ValueMatchEnumerator match = LinkRegex.EnumerateMatches(chunk);
-            
+
             while (match.MoveNext())
             {
                 ValueMatch currentMatch = match.Current;
-                
+
                 // Get the matched span for the entire <a> tag
                 ReadOnlySpan<char> matchChunk = chunk.Slice(currentMatch.Index, currentMatch.Length);
 
@@ -42,7 +42,7 @@ public class StreamingLinkParser
                 {
                     // Locate the end of the href value (before closing '"')
                     int hrefEndIndex = matchChunk.Slice(hrefStartIndex).IndexOf('"');
-                        
+
                     if (hrefEndIndex >= 0)
                     {
                         // Extract the link (the substring between the quotes)

@@ -10,5 +10,4 @@ public record CrawlSchedule
     public Frequency Frequency { get; set; }
     public CrawlAction Action { get; set; }
     public Status Status { get; set; }
-    
 }
