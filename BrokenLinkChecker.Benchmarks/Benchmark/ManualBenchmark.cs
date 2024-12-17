@@ -13,11 +13,11 @@ public class ManualBenchmark
         PrepareTestData();
 
         Console.WriteLine("\nRunning benchmarks...\n");
-        await RunSingleBenchmark("Small HTML (10KB)", "small", iterations: 1000);
-        await RunSingleBenchmark("Medium HTML (100KB)", "medium", iterations: 1000);
-        await RunSingleBenchmark("Large HTML (1MB)", "large", iterations: 1000);
-        await RunSingleBenchmark("Sparse Links", "sparse", iterations: 1000);
-        await RunSingleBenchmark("Dense Links", "dense", iterations: 1000);
+        await RunSingleBenchmark("Small HTML (10KB)", "small", iterations: 1);
+        await RunSingleBenchmark("Medium HTML (100KB)", "medium", iterations: 1);
+        await RunSingleBenchmark("Large HTML (1MB)", "large", iterations: 1);
+        await RunSingleBenchmark("Sparse Links", "sparse", iterations: 1);
+        await RunSingleBenchmark("Dense Links", "dense", iterations: 1);
 
         await MeasureThroughput();
     }
