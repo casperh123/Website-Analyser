@@ -13,7 +13,7 @@
 
 @if (recoveryCodes is not null)
 {
-    <ShowRecoveryCodes RecoveryCodes="recoveryCodes.ToArray()" StatusMessage="@message" />
+    <ShowRecoveryCodes RecoveryCodes="recoveryCodes.ToArray()" StatusMessage="@message"/>
 }
 else
 {
@@ -27,13 +27,15 @@ else
             If you lose your device and don't have the recovery codes you will lose access to your account.
         </p>
         <p>
-            Generating new recovery codes does not change the keys used in authenticator apps. If you wish to change the key
-            used in an authenticator app you should <a href="Account/Manage/ResetAuthenticator">reset your authenticator keys.</a>
+            Generating new recovery codes does not change the keys used in authenticator apps. If you wish to change the
+            key
+            used in an authenticator app you should <a href="Account/Manage/ResetAuthenticator">reset your authenticator
+                keys.</a>
         </p>
     </div>
     <div>
         <form @formname="generate-recovery-codes" @onsubmit="OnSubmitAsync" method="post">
-            <AntiforgeryToken />
+            <AntiforgeryToken/>
             <button class="btn btn-danger" type="submit">Generate Recovery Codes</button>
         </form>
     </div>
@@ -44,8 +46,7 @@ else
     private ApplicationUser user = default!;
     private IEnumerable<string>? recoveryCodes;
 
-    [CascadingParameter]
-    private HttpContext HttpContext { get; set; } = default!;
+    [CascadingParameter] private HttpContext HttpContext { get; set; } = default!;
 
     protected override async Task OnInitializedAsync()
     {
@@ -66,4 +67,5 @@ else
 
         Logger.LogInformation("User with ID '{UserId}' has generated new 2FA recovery codes.", userId);
     }
+
 }

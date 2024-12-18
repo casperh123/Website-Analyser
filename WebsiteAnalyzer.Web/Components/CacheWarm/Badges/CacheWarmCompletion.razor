@@ -1,13 +1,12 @@
 @if (CompletedSuccessfully)
 {
-    <RadzenBadge BadgeStyle="BadgeStyle.Success">Completed</RadzenBadge>
+    <RadzenBadge BadgeStyle="BadgeStyle.Success" Style="width: fit-content">Completed</RadzenBadge>
 }
 else
 {
-    <RadzenBadge BadgeStyle="BadgeStyle.Warning">Encountered Error</RadzenBadge>
+    <RadzenBadge BadgeStyle="BadgeStyle.Warning" Style="width: fit-content">Encountered Error</RadzenBadge>
 }
 
 @code {
-    [Parameter]
-    public bool CompletedSuccessfully { get; set; }
+    [Parameter] public bool CompletedSuccessfully { get; set; }
 }

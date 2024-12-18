@@ -1,33 +1,64 @@
 @using WebsiteAnalyzer.Core.Entities
-@using WebsiteAnalyzer.Web.Components.CacheWarm.Cards
+@using WebsiteAnalyzer.Infrastructure
+@using WebsiteAnalyzer.Infrastructure.Services
+@using WebsiteAnalyzer.Web.Components.CacheWarm.Badges
+
+@inject ICacheWarmingService CacheWarmingService
+@inject IJSRuntime JSRuntime
 
 @if (CacheWarms.Any())
 {
-    <RadzenStack class="rz-mt-12">
-
-        <RadzenText TextStyle="TextStyle.H2">Previous Cache Warms</RadzenText>
-
-        <RadzenStack Gap="20px">
-            @foreach (CacheWarm cacheWarm in CacheWarms)
-            {
-                <CacheWarmCard OnRerunWarm="OnCacheWarmRerun" CacheWarm="cacheWarm"/>
-            }
-        </RadzenStack>
-    </RadzenStack>
+    <RadzenDataGrid
+        AllowFiltering="true"
+        AllowSorting="true"
+        PageSize="10"
+        AllowPaging="true"
+        ShowPagingSummary="true"
+        Data="CacheWarms"
+        FilterMode="FilterMode.CheckBoxList">
+        <Columns>
+            <RadzenDataGridColumn Property="@nameof(CacheWarm.WebsiteUrl)" Title="Website" MinWidth="fit-content"
+                                  Sortable="true" Filterable="true">
+                <Template Context="cacheWarm">
+                    <RadzenStack>
+                        <RadzenRow AlignItems="AlignItems.Center">
+                            <RadzenText TextStyle="TextStyle.H6" Style="margin-bottom: 0">
+                                @cacheWarm.WebsiteUrl
+                            </RadzenText>
+                            <RadzenButton Disabled="IsProcessing" Size="ButtonSize.ExtraSmall"
+                                          Click="@(() => OnCacheWarmRerun(cacheWarm))" Icon="restart_alt"/>
+                        </RadzenRow>
+                        <CacheWarmCompletion CompletedSuccessfully="cacheWarm.IsCompleted"/>
+                    </RadzenStack>
+                </Template>
+            </RadzenDataGridColumn>
+            <RadzenDataGridColumn Property="@nameof(CacheWarm.TotalTime)" Title="Total Time">
+                <Template Context="cacheWarm">
+                    @cacheWarm.TotalTime.ToString(@"hh\:mm\:ss")
+                </Template>
+            </RadzenDataGridColumn>
+            <RadzenDataGridColumn Property="@nameof(CacheWarm.StartTime)" Title="Start Time" Width="200px"/>
+            <RadzenDataGridColumn Property="@nameof(CacheWarm.VisitedPages)" Title="Visited Pages" Width="200px"/>
+        </Columns>
+    </RadzenDataGrid>
 }
 
 @code {
-    [Parameter]
-    public required IEnumerable<CacheWarm> CacheWarms { get; set; }
-    
-    [Parameter]
-    public EventCallback<Website> OnRerunCacheWarm { get; set; }
+    [Parameter] public required EventCallback<string> OnRerunCacheWarm { get; set; }
+
+    [Parameter] public required ApplicationUser User { get; set; }
+
+    [Parameter] public required IList<CacheWarm> CacheWarms { get; set; }
+
+    [Parameter] public required bool IsProcessing { get; set; }
 
     public async Task OnCacheWarmRerun(CacheWarm cacheWarm)
     {
         if (OnRerunCacheWarm.HasDelegate)
         {
-            await OnRerunCacheWarm.InvokeAsync(cacheWarm.Website);
+            await JSRuntime.InvokeVoidAsync("backToTop");
+            await OnRerunCacheWarm.InvokeAsync(cacheWarm.WebsiteUrl);
         }
     }
+
 }

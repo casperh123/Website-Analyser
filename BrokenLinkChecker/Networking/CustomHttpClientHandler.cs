@@ -8,14 +8,14 @@ public class CustomHttpClientHandler : HttpClientHandler
         CancellationToken cancellationToken)
     {
         var response = await base.SendAsync(request, cancellationToken);
-        
+
         // If no content encoding, return as-is
         if (!response.Content.Headers.ContentEncoding.Any())
             return response;
 
         // Create a stream that will handle the decompression on-demand
         var originalStream = await response.Content.ReadAsStreamAsync(cancellationToken);
-        var decompressionStream = CreateDecompressionStream(originalStream, 
+        var decompressionStream = CreateDecompressionStream(originalStream,
             response.Content.Headers.ContentEncoding.ToList());
 
         // Create new content without loading everything into memory
@@ -27,7 +27,7 @@ public class CustomHttpClientHandler : HttpClientHandler
             if (header.Key.Equals("Content-Encoding", StringComparison.OrdinalIgnoreCase) ||
                 header.Key.Equals("Content-Length", StringComparison.OrdinalIgnoreCase))
                 continue;
-                
+
             newContent.Headers.TryAddWithoutValidation(header.Key, header.Value);
         }
 

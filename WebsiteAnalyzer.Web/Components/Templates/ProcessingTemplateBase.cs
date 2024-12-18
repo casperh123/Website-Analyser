@@ -18,7 +18,7 @@ public abstract class ProcessingComponentBase : ComponentBase, IDisposable
             _currentOperation?.Cancel();
             _currentOperation?.Dispose();
             _currentOperation = new CancellationTokenSource();
-            
+
             IsProcessing = true;
             await processingTask(CurrentToken);
         }

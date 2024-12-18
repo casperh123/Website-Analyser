@@ -1,12 +1,13 @@
 @page "/cache-warmer"
 
 @using WebsiteAnalyzer.Core.Entities
+@using WebsiteAnalyzer.Core.Enums
 @using WebsiteAnalyzer.Infrastructure
 @using WebsiteAnalyzer.Infrastructure.Services
 @using WebsiteAnalyzer.Web.Components.WebsiteInputs
 @using WebsiteAnalyzer.Web.Components.CacheWarm.Lists
 @using WebsiteAnalyzer.Web.Services
-@using WebsiteAnalyzer.Web.Components
+@using WebsiteAnalyzer.Web.Components.Schedule
 
 @inherits WebsiteAnalyzer.Web.Components.Templates.ProcessingComponentBase
 
@@ -15,10 +16,21 @@
 
 <PageTitle>Cache Warmer</PageTitle>
 
-<WebsiteInput Url="@_url" IsProcessing="IsProcessing" LinksChecked="_linksChecked" LinksEnqueued="_linksEnqueued" OnCancel="CancelProcessing" WebsiteActionStarted="StartWarm"/>
+<WebsiteInput Url="@_url" IsProcessing="IsProcessing" LinksChecked="_linksChecked" LinksEnqueued="_linksEnqueued"
+              OnCancel="CancelProcessing" WebsiteActionStarted="StartWarm"/>
 
 <AuthorizeView>
-    <CacheWarmList OnRerunCacheWarm="RerunWarmCache" CacheWarms="_cacheWarms"/>
+    <RadzenTabs class="rz-mt-12" TabPosition="TabPosition.Top" RenderMode="TabRenderMode.Server">
+        <Tabs>
+            <RadzenTabsItem Text="Previous Warms">
+                <CacheWarmList OnRerunCacheWarm="RerunWarmCache" User="_user" CacheWarms="_cacheWarms"
+                               IsProcessing="IsProcessing"/>
+            </RadzenTabsItem>
+            <RadzenTabsItem Text="Schedule">
+                <WebsiteScheduler Action="CrawlAction.CacheWarm" User="_user"/>
+            </RadzenTabsItem>
+        </Tabs>
+    </RadzenTabs>
 </AuthorizeView>
 
 @code {
@@ -26,7 +38,7 @@
     private int _linksEnqueued;
     private string _url = "https://";
     private ApplicationUser? _user;
-    private ICollection<CacheWarm> _cacheWarms = [];
+    private IList<CacheWarm> _cacheWarms = [];
 
     protected override async Task OnInitializedAsync()
     {
@@ -34,13 +46,14 @@
 
         if (_user is not null)
         {
-            _cacheWarms = await CacheWarmingService.GetCacheWarmsByUserAsync(_user.Id);
+            ICollection<CacheWarm> cacheWarms = await CacheWarmingService.GetCacheWarmsByUserAsync(_user.Id);
+            _cacheWarms = cacheWarms.ToList();
         }
     }
 
-    private Task RerunWarmCache(Website website)
+    private Task RerunWarmCache(string websiteUrl)
     {
-        _url = website.Url;
+        _url = websiteUrl;
         return StartWarm(new Uri(_url));
     }
 
@@ -49,27 +62,28 @@
         _url = url.ToString();
         return StartProcessingAsync(async (token) => await WarmCache(url, token));
     }
-    
+
     private async Task WarmCache(Uri url, CancellationToken cancellationToken)
     {
-            if (_user is null)
-            {
-                await CacheWarmingService.WarmCache(
-                    url.ToString(),
-                    UpdateLinksEnqueued,
-                    UpdateLinksChecked, 
-                    cancellationToken
-                );
-                return;
-            }
-            
-            await CacheWarmingService.WarmCacheWithSaveAsync(url.ToString(), _user.Id, 
-                UpdateLinksEnqueued, 
-                UpdateLinksChecked, 
+        if (_user is null)
+        {
+            await CacheWarmingService.WarmCache(
+                url.ToString(),
+                UpdateLinksEnqueued,
+                UpdateLinksChecked,
                 cancellationToken
             );
+            return;
+        }
 
-            _cacheWarms = await CacheWarmingService.GetCacheWarmsByUserAsync(_user.Id);
+        await CacheWarmingService.WarmCacheWithSaveAsync(url.ToString(), _user.Id,
+            UpdateLinksEnqueued,
+            UpdateLinksChecked,
+            cancellationToken
+        );
+
+        ICollection<CacheWarm> cacheWarms = await CacheWarmingService.GetCacheWarmsByUserAsync(_user.Id);
+        _cacheWarms = cacheWarms.ToList();
     }
 
     private void UpdateLinksEnqueued(int count)
@@ -83,4 +97,5 @@
         _linksChecked = count;
         InvokeAsync(StateHasChanged);
     }
+
 }

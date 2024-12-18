@@ -9,8 +9,9 @@ public class LinkExtractor : AbstractLinkExtractor<Link>
 {
     // Cache the delegate for Uri.TryCreate to avoid repeated delegate creation
     private static readonly TryParseDelegate<Uri?> TryCreateUri = Uri.TryCreate;
+
     private delegate bool TryParseDelegate<T>(string uriString, UriKind uriKind, out T result);
-    
+
     private const int InitialLinksCapacity = 256;
 
     public LinkExtractor(HtmlParser parser) : base(parser)
@@ -21,22 +22,22 @@ public class LinkExtractor : AbstractLinkExtractor<Link>
     {
         string currentHost = new Uri(referringUrl.Target).Host;
         List<Link> links = new List<Link>(InitialLinksCapacity);
-        
+
         ReadOnlySpan<char> hrefSpan;
         ReadOnlySpan<char> srcSpan;
 
         IHtmlCollection<IElement> elements = document.QuerySelectorAll("a[href], img[src]");
-        
+
         foreach (IElement element in elements)
         {
             string? attributeValue;
-            
+
             if (element is IHtmlAnchorElement anchor)
             {
                 attributeValue = anchor.Href;
                 hrefSpan = attributeValue.AsSpan();
-                
-                if (!hrefSpan.IsEmpty && !IsExcludedFast(hrefSpan) && 
+
+                if (!hrefSpan.IsEmpty && !IsExcludedFast(hrefSpan) &&
                     IsValidHostMatch(attributeValue, currentHost))
                 {
                     links.Add(new Link(attributeValue));
@@ -46,8 +47,8 @@ public class LinkExtractor : AbstractLinkExtractor<Link>
             {
                 attributeValue = img.Source;
                 srcSpan = attributeValue.AsSpan();
-                
-                if (!srcSpan.IsEmpty && !IsExcludedFast(srcSpan) && 
+
+                if (!srcSpan.IsEmpty && !IsExcludedFast(srcSpan) &&
                     IsValidHostMatch(attributeValue, currentHost))
                 {
                     links.Add(new Link(attributeValue));
@@ -62,13 +63,13 @@ public class LinkExtractor : AbstractLinkExtractor<Link>
     {
         if (url.Contains('#') || url.Contains('?'))
         {
-            return true;   
+            return true;
         }
 
         if (url.StartsWith("mailto:", StringComparison.OrdinalIgnoreCase) ||
             url.StartsWith("tel:", StringComparison.OrdinalIgnoreCase))
         {
-            return true;   
+            return true;
         }
 
         return false;
@@ -81,6 +82,7 @@ public class LinkExtractor : AbstractLinkExtractor<Link>
         {
             return string.Equals(uri.Host, currentHost, StringComparison.OrdinalIgnoreCase);
         }
+
         return false;
     }
 }

@@ -3,12 +3,13 @@
 @using WebsiteAnalyzer.Web.Services
 
 @inject StateService StateService
+@inject IJSRuntime JSRuntime
 
 <RadzenCard>
     <RadzenRow AlignItems="AlignItems.Center" JustifyContent="JustifyContent.SpaceBetween">
         <RadzenRow AlignItems="AlignItems.Center">
             <RadzenText TextStyle="TextStyle.H6" Style="margin-bottom: 0">
-                @CacheWarm.Website.Url
+                @CacheWarm.WebsiteUrl
             </RadzenText>
             <RadzenButton Disabled="StateService.IsProcessing" Click="HandleOnClick" Icon="restart_alt"/>
         </RadzenRow>
@@ -24,17 +25,18 @@
 </RadzenCard>
 
 @code {
-    [Parameter]
-    public required CacheWarm CacheWarm { get; set; }
-    
-    [Parameter]
-    public EventCallback<CacheWarm> OnRerunWarm { get; set; }
+    [Parameter] public required CacheWarm CacheWarm { get; set; }
+
+    [Parameter] public required EventCallback<CacheWarm> OnRerunWarm { get; set; }
 
     public async Task HandleOnClick()
     {
         if (OnRerunWarm.HasDelegate)
         {
+            await JSRuntime.InvokeVoidAsync("backToTop");
+
             await OnRerunWarm.InvokeAsync(CacheWarm);
         }
     }
+
 }
