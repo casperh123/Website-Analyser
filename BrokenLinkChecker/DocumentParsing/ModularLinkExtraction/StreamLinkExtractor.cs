@@ -1,5 +1,6 @@
 using AngleSharp.Dom;
 using AngleSharp.Html.Parser;
+using BrokenLinkChecker.DocumentParsing.ModularLinkExtraction.FastParse;
 using BrokenLinkChecker.models.Links;
 
 namespace BrokenLinkChecker.DocumentParsing.ModularLinkExtraction;

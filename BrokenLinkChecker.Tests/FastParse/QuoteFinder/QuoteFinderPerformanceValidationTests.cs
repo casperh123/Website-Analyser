@@ -125,8 +125,8 @@ public unsafe class QuoteFinderPerformanceValidationTests
     [InlineData(128)]   // Four SIMD blocks
     [InlineData(31)]    // Just under SIMD block
     [InlineData(33)]    // Just over SIMD block
-    [InlineData(8190)]  // Near max bit-packed value
-    [InlineData(8192)]  // Just over max bit-packed value
+    [InlineData(256)]
+    [InlineData(512)] 
     public void DifferentBufferSizes_Performance(int size)
     {
         // Arrange

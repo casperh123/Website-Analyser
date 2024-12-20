@@ -1,8 +1,6 @@
 using System.Text;
 using BrokenLinkChecker.DocumentParsing.ModularLinkExtraction.FastParse;
-using Xunit;
 
-namespace BrokenLinkChecker.Tests.DocumentParsing.ModularLinkExtraction.FastParse;
 
 public unsafe class QuoteFinderHrefTests
 {

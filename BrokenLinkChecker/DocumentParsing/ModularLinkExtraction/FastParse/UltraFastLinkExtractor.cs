@@ -8,28 +8,38 @@ namespace BrokenLinkChecker.DocumentParsing.ModularLinkExtraction.FastParse;
 
 public static class UltraFastLinkExtractor
 {
-    private const int BoundaryOverlap = 2048; // MaxUrlLength
+     // Maximum length of a URL that will be extracted, also used for buffer overlap
+    // to ensure URLs spanning buffer boundaries are handled correctly
+    private const int BoundaryOverlap = 2048;
 
-    private const int BufferSize = 1024 * 256; // 524,288 bytes
+    // Main buffer size for reading from stream (512KB)
+    // Chosen to balance between memory usage and read efficiency
+    private const int BufferSize = 1024 * 256;
 
-    // Aligned power of 2 for better memory allocation
-    private const int UrlBufferSize = 32 * 1024; // 32,768 bytes
+    // URL storage buffer sized as power of 2 for better memory alignment
+    private const int UrlBufferSize = 32 * 1024;
     private const int MaxUrlLength = 2048;
-    private const uint HrefPattern = 0x66657268; // 'href' in reverse
+    
+    // 'href' stored in reverse order for little-endian comparison
+    private const uint HrefPattern = 0x66657268;
 
+    // Shared buffer pool to avoid repeated large allocations
     private static readonly ArrayPool<byte> BufferPool = ArrayPool<byte>.Shared;
 
-    // Pre-computed lookup tables
+    // Pre-computed lookup tables for fast validation
     private static readonly byte[] ValidUrlChars = CreateValidUrlChars();
     private static readonly int[] HexLookup = CreateHexLookup();
     
+    // SIMD constants for case-insensitive 'h' matching
     private static readonly Vector256<byte> LowerMask = Vector256.Create((byte)0x20);
     private static readonly Vector256<byte> HChar = Vector256.Create((byte)'h');
 
-    // Reusable buffers per thread
+    // Thread-local buffers to avoid allocation and contention in multi-threaded scenarios
     private static readonly ThreadLocal<byte[]> UrlBuffer = new(() => new byte[UrlBufferSize]);
     private static readonly ThreadLocal<int[]> UrlLengths = new(() => new int[UrlBufferSize / MaxUrlLength]);
 
+    // Creates lookup table for valid URL characters
+    // Includes alphanumeric and special characters allowed in URLs
     private static byte[] CreateValidUrlChars()
     {
         var valid = new byte[128];
@@ -41,6 +51,7 @@ public static class UltraFastLinkExtractor
         return valid;
     }
 
+    // Creates lookup table for hex value parsing (%xx sequences)
     private static int[] CreateHexLookup()
     {
         var lookup = new int[128];
@@ -51,33 +62,39 @@ public static class UltraFastLinkExtractor
         return lookup;
     }
 
+    // Main entry point: Extracts href URLs from a stream
     public static async ValueTask<List<string>> ExtractHrefsAsync(
         Stream responseStream,
         CancellationToken cancellationToken = default)
     {
+        // Initial capacity based on typical HTML page
         var foundLinks = new List<string>(1028);
         byte[] buffer = BufferPool.Rent(BufferSize + BoundaryOverlap);
 
         try
         {
+            // Track bytes that need to be carried over to next read
             int remainingBytes = 0;
             Memory<byte> bufferMemory = buffer.AsMemory();
 
+            // Get thread-local buffers
             byte[] urlBuffer = UrlBuffer.Value;
             int[] urlLengths = UrlLengths.Value;
             int urlCount = 0;
 
+            // Main processing loop
             while (true)
             {
+                // Read next chunk of data
                 int bytesRead = await responseStream.ReadAsync(
                     bufferMemory.Slice(remainingBytes, BufferSize),
                     cancellationToken).ConfigureAwait(false);
 
                 if (bytesRead == 0)
                 {
+                    // Process any final data
                     if (remainingBytes > 0)
                     {
-                        // Process final buffer
                         ProcessBufferOptimized(
                             bufferMemory.Slice(0, remainingBytes).Span,
                             ref remainingBytes,
@@ -91,10 +108,10 @@ public static class UltraFastLinkExtractor
                             UrlCreater.ConvertUrlsToStrings(urlBuffer, urlLengths, urlCount, MaxUrlLength, foundLinks);
                         }
                     }
-
                     break;
                 }
 
+                // Process current buffer
                 int totalBytes = remainingBytes + bytesRead;
                 ProcessBufferOptimized(
                     bufferMemory.Slice(0, totalBytes).Span,
@@ -104,12 +121,14 @@ public static class UltraFastLinkExtractor
                     ref urlCount,
                     isLastBuffer: false);
 
+                // Copy remaining bytes to start of buffer if needed
                 if (remainingBytes > 0 && remainingBytes < totalBytes)
                 {
                     bufferMemory.Slice(totalBytes - remainingBytes, remainingBytes)
                         .CopyTo(bufferMemory);
                 }
 
+                // Convert found URLs to strings
                 if (urlCount > 0)
                 {
                     UrlCreater.ConvertUrlsToStrings(urlBuffer, urlLengths, urlCount, MaxUrlLength, foundLinks);
@@ -125,6 +144,7 @@ public static class UltraFastLinkExtractor
         }
     }
 
+    // Core processing method: finds and validates URLs in the current buffer
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static unsafe void ProcessBufferOptimized(
         Span<byte> buffer,
@@ -137,40 +157,41 @@ public static class UltraFastLinkExtractor
         fixed (byte* bufPtr = buffer)
         fixed (byte* urlBufPtr = urlBuffer)
         {
-            // Cache frequently accessed values
+            // Setup buffer boundaries and safety margins
             int position = 0;
             int length = buffer.Length;
-            int safeLength = length - 4;
+            int safeLength = length - 4;  // Leave room for 'href' pattern matching
             byte* endPtr = bufPtr + length;
 
-            // Process in 4KB chunks for better cache utilization
-            const int CHUNK_SIZE = 4096;
+            // Process in chunks to optimize CPU cache usage
+            const int CHUNK_SIZE = 4096;  // Typical CPU cache line multiple
             byte* chunkEnd = bufPtr + Math.Min(CHUNK_SIZE, safeLength);
 
             while (position < safeLength)
             {
-                // Prefetch next chunk
+                // Prefetch next chunk for better performance
                 if (position + CHUNK_SIZE < safeLength)
                 {
                     Sse.Prefetch0(bufPtr + position + CHUNK_SIZE);
                 }
 
-                // Quick check for 'href' pattern
+                // Find next occurrence of 'href'
                 int hrefPos = FindNextHrefOptimized(bufPtr + position, length - position);
                 if (hrefPos == -1)
                 {
+                    // Keep minimal bytes for next buffer to handle split patterns
                     remainingBytes = isLastBuffer ? 0 : Math.Min(MaxUrlLength, length - position);
                     return;
                 }
 
                 position += hrefPos;
-
                 byte* currentPtr = bufPtr + position;
             
-                // Find quotes and validate URL
+                // Find and validate quoted URL after href
                 var quotePos = QuoteFinder.FindQuoteOptimized(currentPtr, (int)(endPtr - currentPtr));
                 if (!quotePos.IsValid)
                 {
+                    // Handle potential split quote at buffer boundary
                     if (!isLastBuffer && position + 4 >= safeLength)
                     {
                         remainingBytes = length - position;
@@ -180,15 +201,16 @@ public static class UltraFastLinkExtractor
                     continue;
                 }
 
+                // Extract URL between quotes
                 int urlStart = quotePos.Start + 1;
                 int urlLength = quotePos.Length;
             
-                // Quick URL validation
+                // Validate URL if it's within size limits
                 if (urlLength > 0 && urlLength < MaxUrlLength)
                 {
                     byte* urlStartPtr = currentPtr + urlStart;
                 
-                    // Quick pre-check of first few chars
+                    // Quick validation of first few characters
                     bool quickValid = true;
                     for (int i = 0; i < Math.Min(8, urlLength); i++)
                     {
@@ -200,6 +222,7 @@ public static class UltraFastLinkExtractor
                         }
                     }
 
+                    // Full validation and processing of valid URLs
                     if (quickValid && IsValidUrl(urlStartPtr, urlLength))
                     {
                         int writePos = urlCount * MaxUrlLength;
@@ -221,30 +244,36 @@ public static class UltraFastLinkExtractor
 
                 position += urlStart + urlLength;
 
-                // Check if we've crossed chunk boundary
+                // Adjust chunk boundary if we've crossed it
                 if (position > (int)(chunkEnd - bufPtr))
                 {
                     chunkEnd = bufPtr + Math.Min(position + CHUNK_SIZE, safeLength);
                 }
             }
 
+            // Keep minimal bytes for next buffer
             remainingBytes = isLastBuffer ? 0 : Math.Min(MaxUrlLength, length - position);
         }
     }
 
+    // Validates URL characters using SIMD when possible
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static unsafe bool IsValidUrl(byte* url, int length)
     {
+        // Use SIMD for longer URLs
         if (Avx2.IsSupported && length >= 32)
         {
             fixed (byte* validPtr = ValidUrlChars)
             {
                 int i = 0;
+                // Process 32 bytes at a time
                 while (i <= length - 32)
                 {
                     var chunk = Avx2.LoadVector256(url + i);
+                    // Check for high ASCII characters
                     if (Avx2.MoveMask(chunk) != 0) return false;
 
+                    // Validate each character against lookup table
                     for (int j = 0; j < 32; j++)
                     {
                         if (validPtr[url[i + j]] == 0) return false;
@@ -253,6 +282,7 @@ public static class UltraFastLinkExtractor
                     i += 32;
                 }
 
+                // Handle remaining bytes
                 for (; i < length; i++)
                 {
                     byte c = url[i];
@@ -263,6 +293,7 @@ public static class UltraFastLinkExtractor
             return true;
         }
 
+        // Scalar fallback for shorter URLs
         fixed (byte* validPtr = ValidUrlChars)
         {
             for (int i = 0; i < length; i++)
@@ -275,6 +306,7 @@ public static class UltraFastLinkExtractor
         return true;
     }
 
+    // Processes URL encoding (handles %xx sequences)
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static unsafe int ProcessUrl(byte* source, int length, byte* destination)
     {
@@ -285,6 +317,7 @@ public static class UltraFastLinkExtractor
             {
                 byte c = source[i];
 
+                // Handle URL encoded characters (%xx)
                 if (c == '%' && i + 2 < length)
                 {
                     byte h1 = source[i + 1];
@@ -311,26 +344,31 @@ public static class UltraFastLinkExtractor
         return writePos;
     }
 
+    // Finds 'href' pattern using SIMD acceleration
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static unsafe int FindNextHrefOptimized(byte* buffer, int length)
     {
         if (length < 4) return -1;
         
+        // Use SIMD for longer sequences
         if (length >= 32)
         {
             int i = 0;
             while (i <= length - 32)
             {
+                // Load 32 bytes and make case-insensitive comparison for 'h'
                 var data = Avx2.LoadVector256(buffer + i);
                 var lower = Avx2.Or(data, LowerMask);
                 var matches = Avx2.CompareEqual(lower, HChar);
                 int mask = Avx2.MoveMask(matches);
 
+                // Check each potential 'h' position
                 while (mask != 0)
                 {
                     int pos = i + BitOperations.TrailingZeroCount(mask);
                     if (pos <= length - 4)
                     {
+                        // Verify full 'href' pattern
                         uint pattern = *(uint*)(buffer + pos) | 0x20202020;
                         if (pattern == HrefPattern)
                         {
@@ -338,6 +376,7 @@ public static class UltraFastLinkExtractor
                         }
                     }
 
+                    // Clear lowest set bit
                     mask &= mask - 1;
                 }
 
@@ -345,6 +384,7 @@ public static class UltraFastLinkExtractor
             }
         }
 
+        // Scalar fallback for remaining bytes
         for (int i = 0; i <= length - 4; i++)
         {
             uint word = *(uint*)(buffer + i) | 0x20202020;

@@ -1,0 +1,31 @@
+@using WebsiteAnalyzer.Infrastructure
+
+@inject NavigationManager NavigationManager
+
+@if (User is null)
+{
+    <div class="rz-mt-12" style="max-width: 600px;">
+        <RadzenText TextStyle="TextStyle.H3">Take Control of Your Site's Performance</RadzenText>
+        <RadzenText class="mb-4">
+            While you can warm your cache right now, creating a free account unlocks powerful features to automate and monitor your site's performance:
+        </RadzenText>
+        <ul>
+            <li>Schedule automatic cache warming </li>
+            <li>Track historical performance</li>
+        </ul>
+        <div class="mt-4">
+        <a href="/Account/Register"><RadzenButton>Sign Up For Free</RadzenButton></a>
+        </div>
+    </div>
+}
+
+@code {
+
+    [Parameter]
+    public required ApplicationUser? User { get; set; }
+
+    private void RedirectToLogin()
+    {
+        NavigationManager.NavigateTo($"Account/login?returnUrl={Uri.EscapeDataString(NavigationManager.Uri)}");
+    }
+}

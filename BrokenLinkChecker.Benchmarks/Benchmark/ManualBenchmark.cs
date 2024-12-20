@@ -1,6 +1,8 @@
 using System.Diagnostics;
 using System.Text;
 using BrokenLinkChecker.DocumentParsing.ModularLinkExtraction;
+using BrokenLinkChecker.DocumentParsing.ModularLinkExtraction.FastParse;
+using UltraFastLinkExtractor = BrokenLinkChecker.DocumentParsing.ModularLinkExtraction.FastParse.UltraFastLinkExtractor;
 
 
 public class ManualBenchmark

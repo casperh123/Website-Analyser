@@ -1,9 +1,14 @@
 using System.Diagnostics;
 using System.Text;
-using AngleSharp;
 using AngleSharp.Html.Parser;
-using BrokenLinkChecker.DocumentParsing.ModularLinkExtraction;
 using BrokenLinkChecker.DocumentParsing.ModularLinkExtraction.FastParse;
+
+namespace BrokenLinkChecker.DocumentParsing.ModularLinkExtraction
+{
+    public class UltraFastLinkExtractor
+    {
+    }
+}
 
 public class ComparisonBenchmark
 {

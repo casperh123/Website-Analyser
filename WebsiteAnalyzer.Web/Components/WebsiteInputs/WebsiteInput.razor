@@ -4,11 +4,11 @@
 @using WebsiteAnalyzer.Web.Components.Crawl.CrawlMetrics
 @using WebsiteAnalyzer.Web.Services
 
-<RadzenCard Style="max-width: 600px">
+<RadzenCard Style="max-width: 600px" class="rz-mt-12">
     <RadzenStack>
         <RadzenLabel Component="url-input">Select Url</RadzenLabel>
         <RadzenTextBox Value="@Url" Change="ChangeUrl" AutoCompleteType="AutoCompleteType.Url"/>
-        <RadzenButton Click="@OnChanged" Disabled="@IsProcessing">Check Broken Links</RadzenButton>
+        <RadzenButton Click="@OnChanged" Disabled="@IsProcessing">Start</RadzenButton>
 
         @if (IsProcessing)
         {
@@ -28,7 +28,7 @@
 
     [Parameter] public int LinksEnqueued { get; set; }
 
-    [Parameter] public string Url { get; set; } = string.Empty;
+    [Parameter] public string Url { get; set; } = "https://";
 
     [Parameter] public bool IsProcessing { get; set; }
 

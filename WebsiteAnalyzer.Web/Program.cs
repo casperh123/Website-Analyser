@@ -1,11 +1,9 @@
 using System.Net;
 using System.Security.Authentication;
-using BrokenLinkChecker.Networking;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Radzen;
-using WebsiteAnalyzer.Core.Entities;
 using WebsiteAnalyzer.Core.Persistence;
 using WebsiteAnalyzer.Infrastructure;
 using WebsiteAnalyzer.Infrastructure.Data;
@@ -17,6 +15,24 @@ using WebsiteAnalyzer.Web.Components.Account;
 using WebsiteAnalyzer.Web.Services;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.WebHost.ConfigureKestrel(serverOptions =>
+{
+    // Configure HTTP endpoint
+    serverOptions.Listen(IPAddress.Any, 8080);
+    
+    // Configure HTTPS endpoint
+    serverOptions.Listen(IPAddress.Any, 8081, listenOptions =>
+    {
+        listenOptions.UseHttps();
+        listenOptions.Protocols = Microsoft.AspNetCore.Server.Kestrel.Core.HttpProtocols.Http1AndHttp2AndHttp3;
+    });
+
+    serverOptions.ConfigureHttpsDefaults(httpsOptions =>
+    {
+        httpsOptions.SslProtocols = SslProtocols.Tls12 | SslProtocols.Tls13;
+    });
+});
 
 // Add services to the container.
 builder.Services.AddRazorComponents()

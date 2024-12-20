@@ -8,22 +8,15 @@
 
 @rendermode InteractiveServer
 
-<h2>Website Analyser</h2>
+<PageTitle>Broken Link Checker</PageTitle>
 
-<WebsiteInput WebsiteActionStarted="CheckBrokenLinks"></WebsiteInput>
+<h2>Broken Link Chcker</h2>
 
-@if (IsChecking)
-{
-    <p>Crawling website, please wait...</p>
-    <p>Links enqueued: @_linksEnqueued</p>
-}
+<WebsiteInput WebsiteActionStarted="CheckBrokenLinks" IsProcessing="IsChecking" LinksChecked="_linksChecked" LinksEnqueued="_linksEnqueued"/>
 
 @if (_linksChecked > 0)
 {
-    <p>Links checked: @_linksChecked</p>
-
     <div class="padding-m round-corners box-shadow">
-        <h2>Broken Links</h2>
         <BrokenLinksStats BrokenLinks="_brokenLinks"/>
     </div>
 }

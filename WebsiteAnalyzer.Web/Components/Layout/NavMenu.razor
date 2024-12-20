@@ -3,10 +3,18 @@
 @inject NavigationManager NavigationManager
 
 <div class="top-row ps-3 navbar navbar-dark">
-    <div class="container-fluid">
-        <a class="navbar-brand" href="">WebsiteAnalyzer.Web</a>
+    <div class="header-logo-title-container">
+        <RadzenImage Path="/images/W_N_SVG_ClypperLogo.svg" class="header-icon"></RadzenImage>
+        <div class="header-title-container">
+            <a class="navbar-brand" href="">
+                <h3>Clypper's</h3>
+                <h4>Website Analyzer</h4>
+            </a>
+        </div>
     </div>
 </div>
+
+<RadzenAppearanceToggle />
 
 <input type="checkbox" title="Navigation menu" class="navbar-toggler"/>
 

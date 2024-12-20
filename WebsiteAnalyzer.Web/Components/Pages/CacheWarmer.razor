@@ -8,6 +8,7 @@
 @using WebsiteAnalyzer.Web.Components.CacheWarm.Lists
 @using WebsiteAnalyzer.Web.Services
 @using WebsiteAnalyzer.Web.Components.Schedule
+@using WebsiteAnalyzer.Web.Components.User
 
 @inherits WebsiteAnalyzer.Web.Components.Templates.ProcessingComponentBase
 
@@ -16,11 +17,27 @@
 
 <PageTitle>Cache Warmer</PageTitle>
 
+<RadzenHeading Text="Cache Warmer" />
+
+<div style="max-width: 600px;">
+    <RadzenText class="mb-4">
+        Keep your website lightning-fast by proactively loading pages into your server's cache.
+        Our cache warming tool crawls your entire site systematically, ensuring every page is
+        ready to serve visitors instantly, eliminating those costly first-load delays.
+    </RadzenText>
+
+    <RadzenText class="mb-6">
+        Whether you've just deployed changes or are preparing for high traffic, cache warming
+        helps maintain consistent, rapid response times. Watch the process in real-time, review
+        past warming sessions, and automate the whole process with our scheduling feature.
+    </RadzenText>
+</div>
+
 <WebsiteInput Url="@_url" IsProcessing="IsProcessing" LinksChecked="_linksChecked" LinksEnqueued="_linksEnqueued"
               OnCancel="CancelProcessing" WebsiteActionStarted="StartWarm"/>
 
 <AuthorizeView>
-    <RadzenTabs class="rz-mt-12" TabPosition="TabPosition.Top" RenderMode="TabRenderMode.Server">
+        <RadzenTabs class="rz-mt-12" TabPosition="TabPosition.Top" RenderMode="TabRenderMode.Server">
         <Tabs>
             <RadzenTabsItem Text="Previous Warms">
                 <CacheWarmList OnRerunCacheWarm="RerunWarmCache" User="_user" CacheWarms="_cacheWarms"
@@ -32,6 +49,12 @@
         </Tabs>
     </RadzenTabs>
 </AuthorizeView>
+
+<SignUp User="_user"/>
+
+<HeadContent>
+    <meta name="description" content="">
+</HeadContent>
 
 @code {
     private int _linksChecked;

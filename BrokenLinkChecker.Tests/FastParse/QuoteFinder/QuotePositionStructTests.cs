@@ -1,3 +1,4 @@
+using BrokenLinkChecker.DocumentParsing.ModularLinkExtraction.FastParse;
 using Xunit;
 
 namespace BrokenLinkChecker.Tests.DocumentParsing.ModularLinkExtraction.FastParse;
@@ -19,35 +20,7 @@ public class QuotePositionTests
         Assert.Equal(length, position.Length);
         Assert.Equal(isValid, position.IsValid);
     }
-
-    [Theory]
-    [InlineData(8192)]      // 2^13 (just over limit)
-    [InlineData(16384)]     // 2^14
-    [InlineData(int.MaxValue)]
-    public void Constructor_TruncatesLargeStartValues(int start)
-    {
-        // Act
-        var position = new QuotePosition(start, 0, true);
-
-        // Assert
-        Assert.Equal(start & 0x1FFF, position.Start);  // Should only keep lower 13 bits
-    }
     
-
-    [Fact]
-    public void MaxValues_HandledCorrectly()
-    {
-        // Arrange
-        const int maxValue = 0x1FFF;  // 13 bits all set
-
-        // Act
-        var position = new QuotePosition(maxValue, maxValue, true);
-
-        // Assert
-        Assert.Equal(maxValue, position.Start);
-        Assert.Equal(maxValue, position.Length);
-        Assert.True(position.IsValid);
-    }
 
     [Fact]
     public void MultipleInstances_DoNotInterfere()

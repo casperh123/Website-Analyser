@@ -1,2 +1,2 @@
-docker build -t clyppertechnology/websiteanalyzer:0.0.2 .
-docker push clyppertechnology/websiteanalyzer:0.0.2
+docker build -t clyppertechnology/websiteanalyzer:0.0.38 .
+docker push clyppertechnology/websiteanalyzer:0.0.38
