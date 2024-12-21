@@ -61,7 +61,7 @@
     private int _linksEnqueued;
     private int _concurrentRequests = 1;
 
-    public ICollection<IndexedLink> BrokenLinks { get; set; } = new List<IndexedLink>();
+    public IList<IndexedLink> BrokenLinks { get; set; } = new List<IndexedLink>();
     public ICollection<PageStat> VisitedPages { get; set; } = new List<PageStat>();
 
     private PageStatState _currentStatus = PageStatState.DisplayBrokenLinks;

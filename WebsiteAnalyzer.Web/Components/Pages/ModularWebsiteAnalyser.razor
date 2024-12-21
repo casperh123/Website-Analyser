@@ -31,7 +31,7 @@
     private bool IsChecking { get; set; }
     private int _linksChecked;
     private int _linksEnqueued;
-    private ICollection<IndexedLink> _brokenLinks = [];
+    private IList<IndexedLink> _brokenLinks = [];
 
     private async Task CheckBrokenLinks(Uri url)
     {

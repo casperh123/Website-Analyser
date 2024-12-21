@@ -10,13 +10,13 @@
 
 <PageTitle>Broken Link Checker</PageTitle>
 
-<h2>Broken Link Chcker</h2>
+<h2>Broken Link Checker</h2>
 
 <WebsiteInput WebsiteActionStarted="CheckBrokenLinks" IsProcessing="IsChecking" LinksChecked="_linksChecked" LinksEnqueued="_linksEnqueued"/>
 
 @if (_linksChecked > 0)
 {
-    <div class="padding-m round-corners box-shadow">
+    <div class="rz-mt-6">
         <BrokenLinksStats BrokenLinks="_brokenLinks"/>
     </div>
 }
@@ -25,7 +25,7 @@
     private bool IsChecking { get; set; }
     private int _linksChecked;
     private int _linksEnqueued;
-    private readonly ICollection<IndexedLink> _brokenLinks = [];
+    private IList<IndexedLink> _brokenLinks = [];
 
     private async Task CheckBrokenLinks(Uri url)
     {
@@ -69,6 +69,7 @@
         }
 
         _brokenLinks.Add(link);
+        _brokenLinks = new List<IndexedLink>(_brokenLinks);
         InvokeAsync(StateHasChanged);
     }
 

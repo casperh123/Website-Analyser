@@ -2,74 +2,54 @@
 
 @inject NavigationManager NavigationManager
 
-<div class="top-row ps-3 navbar navbar-dark">
+<header class="header">
     <div class="header-logo-title-container">
-        <RadzenImage Path="/images/W_N_SVG_ClypperLogo.svg" class="header-icon"></RadzenImage>
+        <RadzenImage Path="/images/B_N_SVG_ClypperLogo.svg" class="header-icon"></RadzenImage>
         <div class="header-title-container">
             <a class="navbar-brand" href="">
-                <h3>Clypper's</h3>
-                <h4>Website Analyzer</h4>
+                <RadzenText TextStyle="TextStyle.H4" Style="margin-bottom: 0;">Clypper's</RadzenText>
+                <RadzenText TextStyle="TextStyle.H5" Style="margin-bottom: 0;">Website Analyzer</RadzenText>
             </a>
         </div>
     </div>
-</div>
-
-<RadzenAppearanceToggle />
-
-<input type="checkbox" title="Navigation menu" class="navbar-toggler"/>
-
-<div class="nav-scrollable" onclick="document.querySelector('.navbar-toggler').click()">
-    <nav class="flex-column">
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
-                <span class="bi bi-house-door-fill-nav-menu" aria-hidden="true"></span> Home
-            </NavLink>
-        </div>
-
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="/cache-warmer">
-                <span class="bi bi-lock-nav-menu" aria-hidden="true"></span> Cache Warmer
-            </NavLink>
-        </div>
-
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="/broken-link-checker">
-                <span class="bi bi-lock-nav-menu" aria-hidden="true"></span> Broken Link Checker
-            </NavLink>
-        </div>
-
+    <div class="nav-wrapper">
+        <RadzenMenu Responsive="false">
+            <RadzenMenuItem Text="Cache Warmer" Path="/cache-warmer" />
+            <RadzenMenuItem Text="Broken Link Checker" Path="/broken-link-checker"/>
+        </RadzenMenu>
+    </div>
+    
+    <div class="utility-menu">
         <AuthorizeView>
             <Authorized>
-                <div class="nav-item px-3">
-                    <NavLink class="nav-link" href="Account/Manage">
-                        <span class="bi bi-person-fill-nav-menu" aria-hidden="true"></span> @context.User.Identity?.Name
-                    </NavLink>
-                </div>
-                <div class="nav-item px-3">
-                    <form action="Account/Logout" method="post">
-                        <AntiforgeryToken/>
-                        <input type="hidden" name="ReturnUrl" value="@currentUrl"/>
-                        <button type="submit" class="nav-link">
-                            <span class="bi bi-arrow-bar-left-nav-menu" aria-hidden="true"></span> Logout
-                        </button>
-                    </form>
-                </div>
+                <RadzenProfileMenu>
+                    <Template>
+                        <RadzenGravatar Email="@context.User.Identity?.Name">
+                        </RadzenGravatar>
+                    </Template>
+                    <ChildContent>
+                        <RadzenProfileMenuItem Text="Profile Settings" Path="Account/Manage"/>
+                        <form action="Account/Logout" method="post" style="padding:20px;">
+                            <AntiforgeryToken/>
+                            <input type="hidden" name="ReturnUrl" value="@currentUrl"/>
+                            <RadzenButton ButtonType="ButtonType.Submit" class="nav-link">
+                                <span class="bi bi-arrow-bar-left-nav-menu" aria-hidden="true"></span> Logout
+                            </RadzenButton>
+                        </form>
+                    </ChildContent>
+                </RadzenProfileMenu>
             </Authorized>
             <NotAuthorized>
-                <div class="nav-item px-3">
-                    <NavLink class="nav-link" href="Account/Register">
-                        <span class="bi bi-person-nav-menu" aria-hidden="true"></span> Register
-                    </NavLink>
-                </div>
-                <div class="nav-item px-3">
-                    <NavLink class="nav-link" href="Account/Login">
-                        <span class="bi bi-person-badge-nav-menu" aria-hidden="true"></span> Login
-                    </NavLink>
-                </div>
+                <RadzenMenu>
+                    <RadzenLink Path="Account/Login">
+                        <RadzenButton Text="Login"/>
+                    </RadzenLink>
+                    <RadzenMenuItem Text="Register" Path="Account/Register" />
+                </RadzenMenu>
             </NotAuthorized>
         </AuthorizeView>
-    </nav>
-</div>
+    </div>
+</header>
 
 @code {
     private string? currentUrl;

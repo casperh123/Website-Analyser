@@ -1,24 +1,24 @@
 @using BrokenLinkChecker.Models.Links
 @rendermode InteractiveServer
 
-<h3>Broken Links:</h3>
-
 @if (BrokenLinks.Count > 0)
 {
-    <RadzenDataGrid Data="@BrokenLinks.AsQueryable()" AllowSorting="true" AllowPaging="true" PageSize="20">
-        <RadzenDataGridColumn Property="@nameof(IndexedLink.Target)" Sortable="true"/>
-        <RadzenDataGridColumn Property="@nameof(IndexedLink.ReferringPage)"Title="Referring Page" Sortable="true">
-            <Template Context="indexedLink">
-                <RadzenLink href="@indexedLink.ReferringPage" target="_blank">@indexedLink.ReferringPage</RadzenLink>
-            </Template>
-        </RadzenDataGridColumn>
-        <RadzenDataGridColumn Property="@nameof(IndexedLink.AnchorText)" Title="Anchor Text" Sortable="true"/>
-        <RadzenDataGridColumn Property="@nameof(IndexedLink.Line)"/>
-        <RadzenDataGridColumn Property="@nameof(IndexedLink.StatusCode)" Title="Status Code" Sortable="true"/>
+    <RadzenDataGrid Data="@BrokenLinks" AllowSorting="true" AllowPaging="true" PageSize="20">
+        <Columns>
+            <RadzenDataGridColumn Property="@nameof(IndexedLink.Target)" Title="Target" Sortable="true"/>
+            <RadzenDataGridColumn Property="@nameof(IndexedLink.ReferringPage)" Title="Referring Page" Sortable="true">
+                <Template Context="indexedLink">
+                    <RadzenLink href="@indexedLink.ReferringPage" target="_blank">@indexedLink.ReferringPage</RadzenLink>
+                </Template>
+            </RadzenDataGridColumn>
+            <RadzenDataGridColumn Property="@nameof(IndexedLink.AnchorText)" Title="Anchor Text" Sortable="true"/>
+            <RadzenDataGridColumn Property="@nameof(IndexedLink.Line)" Title="Line"/>
+            <RadzenDataGridColumn Property="@nameof(IndexedLink.StatusCode)" Title="Status Code" Sortable="true"/>
+        </Columns>
     </RadzenDataGrid>
 }
 
 @code {
     [Parameter]
-    public ICollection<IndexedLink> BrokenLinks { get; set; }
+    public IList<IndexedLink> BrokenLinks { get; set; }
 }
