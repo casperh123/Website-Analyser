@@ -1,10 +1,11 @@
 ﻿@implements IDisposable
 
 @inject NavigationManager NavigationManager
+@inject ThemeService ThemeService
 
 <header class="header">
     <div class="header-logo-title-container">
-        <RadzenImage Path="/images/B_N_SVG_ClypperLogo.svg" class="header-icon"></RadzenImage>
+        <RadzenImage Path="@_logoPath" class="header-icon"></RadzenImage>
         <div class="header-title-container">
             <a class="navbar-brand" href="">
                 <RadzenText TextStyle="TextStyle.H4" Style="margin-bottom: 0;">Clypper's</RadzenText>
@@ -20,6 +21,9 @@
     </div>
     
     <div class="utility-menu">
+        <RadzenStack Orientation="Orientation.Vertical" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center" Gap="2rem" Wrap="FlexWrap.Wrap" class="rz-mr-3">
+            <RadzenAppearanceToggle />
+        </RadzenStack>
         <AuthorizeView>
             <Authorized>
                 <RadzenProfileMenu>
@@ -28,6 +32,11 @@
                         </RadzenGravatar>
                     </Template>
                     <ChildContent>
+                        <RadzenStack Orientation="Orientation.Vertical" Gap="0.5rem" class="rz-p-sm-2 rz-mb-3">
+                            <RadzenLabel Text="Change the current theme"/>
+                            <RadzenDropDown Name="ThemeDropDown" TValue="string" Value="@ThemeService.Theme" ValueChanged="@ChangeTheme" Data="@Themes.Free" TextProperty=@nameof(Theme.Text) ValueProperty=@nameof(Theme.Value)>
+                            </RadzenDropDown>
+                        </RadzenStack>
                         <RadzenProfileMenuItem Text="Profile Settings" Path="Account/Manage"/>
                         <form action="Account/Logout" method="post" style="padding:20px;">
                             <AntiforgeryToken/>
@@ -44,7 +53,7 @@
                     <RadzenLink Path="Account/Login">
                         <RadzenButton Text="Login"/>
                     </RadzenLink>
-                    <RadzenMenuItem Text="Register" Path="Account/Register" />
+                    <RadzenMenuItem Text="Register" Path="Account/Register"/>
                 </RadzenMenu>
             </NotAuthorized>
         </AuthorizeView>
@@ -52,12 +61,33 @@
 </header>
 
 @code {
+    private string? _logoPath;
     private string? currentUrl;
 
     protected override void OnInitialized()
     {
         currentUrl = NavigationManager.ToBaseRelativePath(NavigationManager.Uri);
         NavigationManager.LocationChanged += OnLocationChanged;
+    }
+
+    protected override void OnParametersSet()
+    {
+        ThemeService.ThemeChanged += ThemeChanged;
+        
+        ThemeChanged();
+    }
+
+    protected void ThemeChanged()
+    {
+        if (ThemeService.Theme.Contains("dark", StringComparison.OrdinalIgnoreCase))
+        {
+            _logoPath = "/images/W_N_SVG_ClypperLogo.svg";
+        }
+        else
+        {
+            _logoPath = "/images/B_N_SVG_ClypperLogo.svg";
+        }
+        StateHasChanged();
     }
 
     private void OnLocationChanged(object? sender, LocationChangedEventArgs e)
@@ -70,6 +100,10 @@
     {
         NavigationManager.LocationChanged -= OnLocationChanged;
     }
-
+    
+    void ChangeTheme(string value)
+    {
+        ThemeService.SetTheme(value);
+    }
 }
 

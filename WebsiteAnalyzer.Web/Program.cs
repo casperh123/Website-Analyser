@@ -75,6 +75,12 @@ builder.Services.AddHttpClient("WebsiteAnalyser", client =>
 
 builder.Services.AddScoped<ThemeService>();
 
+builder.Services.AddRadzenCookieThemeService(options =>
+{
+    options.Name = "WebsiteAnalyzerTheme";
+    options.Duration = TimeSpan.FromDays(365); // The duration of the cookie
+});
+
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ??
                        throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
 builder.Services.AddDbContext<ApplicationDbContext>(options =>

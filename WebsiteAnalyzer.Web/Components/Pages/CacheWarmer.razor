@@ -9,6 +9,7 @@
 @using WebsiteAnalyzer.Web.Services
 @using WebsiteAnalyzer.Web.Components.Schedule
 @using WebsiteAnalyzer.Web.Components.User
+@using WebsiteAnalyzer.Web.Components.CacheWarm.Seo
 
 @inherits WebsiteAnalyzer.Web.Components.Templates.ProcessingComponentBase
 
@@ -19,19 +20,7 @@
 
 <RadzenHeading Text="Cache Warmer" />
 
-<div style="max-width: 600px;">
-    <RadzenText class="mb-4">
-        Keep your website lightning-fast by proactively loading pages into your server's cache.
-        Our cache warming tool crawls your entire site systematically, ensuring every page is
-        ready to serve visitors instantly, eliminating those costly first-load delays.
-    </RadzenText>
-
-    <RadzenText class="mb-6">
-        Whether you've just deployed changes or are preparing for high traffic, cache warming
-        helps maintain consistent, rapid response times. Watch the process in real-time, review
-        past warming sessions, and automate the whole process with our scheduling feature.
-    </RadzenText>
-</div>
+<CacheWarmIntroText />
 
 <WebsiteInput Url="@_url" IsProcessing="IsProcessing" LinksChecked="_linksChecked" LinksEnqueued="_linksEnqueued"
               OnCancel="CancelProcessing" WebsiteActionStarted="StartWarm"/>
@@ -53,8 +42,10 @@
 <SignUp User="_user"/>
 
 <HeadContent>
-    <meta name="description" content="">
+    <meta name="description" content="Boost website performance with automated cache warming. Proactively load pages into your server's cache, eliminate first-load delays, and maintain lightning-fast speeds for all visitors.">
 </HeadContent>
+
+<CacheWarmSeoText />
 
 @code {
     private int _linksChecked;

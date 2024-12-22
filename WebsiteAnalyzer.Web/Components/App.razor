@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="@Assets["lib/bootstrap/dist/css/bootstrap.min.css"]"/>
     <link rel="stylesheet" href="@Assets["app.css"]"/>
     <link rel="stylesheet" href="@Assets["WebsiteAnalyzer.Web.styles.css"]"/>
-    <RadzenTheme Theme="humanistic" @rendermode="InteractiveServer"/>
+    <RadzenTheme Theme="standard-dark" @rendermode="InteractiveServer"/>
 
     <ImportMap/>
     <link rel="icon" type="image/png" href="favicon.ico"/>
@@ -29,5 +29,22 @@
 
     private IComponentRenderMode? PageRenderMode =>
         HttpContext.AcceptsInteractiveRouting() ? InteractiveServer : null;
+   
+    [Inject]
+    private ThemeService ThemeService { get; set; }
 
+    protected override void OnParametersSet()
+    {
+        base.OnInitialized();
+
+        if (HttpContext != null)
+        {
+            var theme = HttpContext.Request.Cookies["WebsiteAnalyzerTheme"];
+
+            if (!string.IsNullOrEmpty(theme))
+            {
+                ThemeService.SetTheme(theme, false);
+            }
+        }
+    }
 }
