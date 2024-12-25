@@ -4,25 +4,28 @@
 @inject ThemeService ThemeService
 
 <header class="header">
+    <a href="">
     <div class="header-logo-title-container">
         <RadzenImage Path="@_logoPath" class="header-icon"></RadzenImage>
         <div class="header-title-container">
-            <a class="navbar-brand" href="">
+            <div class="navbar-brand">
                 <RadzenText TextStyle="TextStyle.H4" Style="margin-bottom: 0;">Clypper's</RadzenText>
                 <RadzenText TextStyle="TextStyle.H5" Style="margin-bottom: 0;">Website Analyzer</RadzenText>
-            </a>
+            </div>
         </div>
     </div>
+    </a>
+
     <div class="nav-wrapper">
         <RadzenMenu Responsive="false">
-            <RadzenMenuItem Text="Cache Warmer" Path="/cache-warmer" />
-            <RadzenMenuItem Text="Broken Link Checker" Path="/broken-link-checker"/>
+            <RadzenMenuItem Text="Cache Warmer" Path="/cache-warmer" Icon="local_fire_department"/>
+            <RadzenMenuItem Text="Broken Link Checker" Path="/broken-link-checker" Icon="link_off"/>
         </RadzenMenu>
     </div>
-    
+
     <div class="utility-menu">
         <RadzenStack Orientation="Orientation.Vertical" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center" Gap="2rem" Wrap="FlexWrap.Wrap" class="rz-mr-3">
-            <RadzenAppearanceToggle />
+            <RadzenAppearanceToggle/>
         </RadzenStack>
         <AuthorizeView>
             <Authorized>
@@ -32,13 +35,13 @@
                         </RadzenGravatar>
                     </Template>
                     <ChildContent>
-                        <RadzenStack Orientation="Orientation.Vertical" Gap="0.5rem" class="rz-p-sm-2 rz-mb-3">
+                        <RadzenStack Orientation="Orientation.Vertical" Gap="0.5rem" class="rz-p-3 rz-mb-3">
                             <RadzenLabel Text="Change the current theme"/>
                             <RadzenDropDown Name="ThemeDropDown" TValue="string" Value="@ThemeService.Theme" ValueChanged="@ChangeTheme" Data="@Themes.Free" TextProperty=@nameof(Theme.Text) ValueProperty=@nameof(Theme.Value)>
                             </RadzenDropDown>
                         </RadzenStack>
                         <RadzenProfileMenuItem Text="Profile Settings" Path="Account/Manage"/>
-                        <form action="Account/Logout" method="post" style="padding:20px;">
+                        <form action="Account/Logout" method="post" class="rz-p-3">
                             <AntiforgeryToken/>
                             <input type="hidden" name="ReturnUrl" value="@currentUrl"/>
                             <RadzenButton ButtonType="ButtonType.Submit" class="nav-link">

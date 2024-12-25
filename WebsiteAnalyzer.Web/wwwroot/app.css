@@ -102,6 +102,7 @@ h1:focus {
 .body {
     width: 100%;
     max-width: 1024px;
+    padding-top: 80px;
 }
 
 @media only screen and (max-width : 780px) {
@@ -111,5 +112,27 @@ h1:focus {
     
     .header {
         grid-template-columns: 2fr 1fr;
+    }
+
+    .body {
+        width: 100%;
+        max-width: 1024px;
+        padding-top: 40px;
+    }
+    
+    .nav-wrapper {
+        position: fixed;
+        bottom: 0;
+        width: 100vw;
+        left: 0;
+        padding: 20px 10px;
+        background-color: var(--rz-header-background-color);
+    }
+    
+    .nav-wrapper > .rz-menu {
+        display: flex;
+        width: 100%;
+        : 10px 20px;
+        justify-content: space-around;
     }
 }
