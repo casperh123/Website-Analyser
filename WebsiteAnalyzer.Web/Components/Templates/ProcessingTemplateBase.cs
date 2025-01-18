@@ -1,5 +1,3 @@
-// ProcessingComponentBase.cs
-
 using Microsoft.AspNetCore.Components;
 
 namespace WebsiteAnalyzer.Web.Components.Templates;

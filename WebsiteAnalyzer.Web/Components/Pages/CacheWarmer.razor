@@ -68,16 +68,16 @@
         }
     }
 
-    private Task RerunWarmCache(string websiteUrl)
+    private async Task RerunWarmCache(string websiteUrl)
     {
         _url = websiteUrl;
-        return StartWarm(new Uri(_url));
+        await StartWarm(new Uri(_url));
     }
 
-    public Task StartWarm(Uri url)
+    public async Task StartWarm(Uri url)
     {
         _url = url.ToString();
-        return StartProcessingAsync(async (token) => await WarmCache(url, token));
+        await StartProcessingAsync(async (token) => await WarmCache(url, token));
     }
 
     private async Task WarmCache(Uri url, CancellationToken cancellationToken)

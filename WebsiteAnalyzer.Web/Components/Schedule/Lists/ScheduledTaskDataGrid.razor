@@ -27,11 +27,6 @@
     </RadzenDataGrid>
 </RadzenStack>
 
-@foreach (CrawlSchedule schedule in ScheduledTasks)
-{
-    <p>@schedule.WebsiteUrl</p>
-}
-
 @code {
     [Parameter] 
     public required ICollection<CrawlSchedule> ScheduledTasks { get; set; }

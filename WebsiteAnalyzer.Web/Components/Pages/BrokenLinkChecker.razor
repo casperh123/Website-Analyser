@@ -1,9 +1,13 @@
 @page "/broken-link-checker"
 @using System.Net
+@using global::BrokenLinkChecker.models.Links
 @using global::BrokenLinkChecker.Models.Links
 @using WebsiteAnalyzer.Core.Interfaces.Services
 @using WebsiteAnalyzer.Web.Components.WebsiteInputs
 @using WebsiteAnalyzer.Web.Components.WebsiteMetrics
+
+@inherits WebsiteAnalyzer.Web.Components.Templates.ProcessingComponentBase
+
 @inject IBrokenLinkService BrokenLinkService
 
 @rendermode InteractiveServer
@@ -12,7 +16,12 @@
 
 <h2>Broken Link Checker</h2>
 
-<WebsiteInput WebsiteActionStarted="CheckBrokenLinks" IsProcessing="IsChecking" LinksChecked="_linksChecked" LinksEnqueued="_linksEnqueued"/>
+<WebsiteInput 
+    WebsiteActionStarted="StartBrokenLinkCheck" 
+    IsProcessing="IsProcessing" 
+    LinksChecked="_linksChecked" 
+    LinksEnqueued="_linksEnqueued"
+    OnCancel="CancelProcessing"/>
 
 @if (_linksChecked > 0)
 {
@@ -22,25 +31,25 @@
 }
 
 @code {
-    private bool IsChecking { get; set; }
     private int _linksChecked;
     private int _linksEnqueued;
     private IList<IndexedLink> _brokenLinks = [];
 
-    private async Task CheckBrokenLinks(Uri url)
+    private async Task StartBrokenLinkCheck(Uri url)
     {
-        try
-        {
-            IsChecking = true;
-            ResetResults();
+        ResetResults();
+        await StartProcessingAsync(async (token) => await CheckBrokenLinks(url, token));
+    }
 
-            await BrokenLinkService.FindBrokenLinks(url.ToString(), UpdateLinksEnqueued, UpdateLinksChecked, UpdateBrokenLinks);
-        }
-        finally
-        {
-            IsChecking = false;
-            StateHasChanged();
-        }
+    private async Task CheckBrokenLinks(Uri url, CancellationToken cancellationToken)
+    {
+        await BrokenLinkService.FindBrokenLinks(
+            url.ToString(), 
+            UpdateLinksEnqueued, 
+            UpdateLinksChecked, 
+            UpdateBrokenLinks, 
+            cancellationToken
+        );
     }
 
     private void ResetResults()
@@ -70,7 +79,6 @@
 
         _brokenLinks.Add(link);
         _brokenLinks = new List<IndexedLink>(_brokenLinks);
-        InvokeAsync(StateHasChanged);
     }
 
 }

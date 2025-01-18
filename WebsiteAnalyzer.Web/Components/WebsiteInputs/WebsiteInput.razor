@@ -12,7 +12,7 @@
 
         @if (IsProcessing)
         {
-            <RadzenButton Click="(() => OnCancel.InvokeAsync())" Style="background-color: red">Cancel</RadzenButton>
+            <RadzenButton Click="(async (e) => await OnCancel.InvokeAsync())" Style="background-color: red">Cancel</RadzenButton>
         }
     </RadzenStack>
     <ErrorMessage Message="@_errorMessage"/>
@@ -20,17 +20,23 @@
 </RadzenCard>
 
 @code {
-    [Parameter] public EventCallback<Uri> WebsiteActionStarted { get; set; }
+    [Parameter] 
+    public EventCallback<Uri> WebsiteActionStarted { get; set; }
 
-    [Parameter] public EventCallback OnCancel { get; set; }
+    [Parameter] 
+    public EventCallback OnCancel { get; set; }
 
-    [Parameter] public int LinksChecked { get; set; }
+    [Parameter] 
+    public int LinksChecked { get; set; }
 
-    [Parameter] public int LinksEnqueued { get; set; }
+    [Parameter] 
+    public int LinksEnqueued { get; set; }
 
-    [Parameter] public string Url { get; set; } = "https://";
+    [Parameter] 
+    public string Url { get; set; } = "https://";
 
-    [Parameter] public bool IsProcessing { get; set; }
+    [Parameter] 
+    public bool IsProcessing { get; set; }
 
     private string _errorMessage = "";
 

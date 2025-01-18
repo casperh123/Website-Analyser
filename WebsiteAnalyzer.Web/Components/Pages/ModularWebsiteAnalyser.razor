@@ -40,7 +40,7 @@
             IsChecking = true;
             ResetResults();
 
-            await BrokenLinkService.FindBrokenLinks(url.ToString(), UpdateLinksEnqueued, UpdateLinksChecked, UpdateBrokenLinks);
+            await BrokenLinkService.FindBrokenLinks(url.ToString(), UpdateLinksEnqueued, UpdateLinksChecked, UpdateBrokenLinks, new CancellationToken());
         }
         finally
         {
