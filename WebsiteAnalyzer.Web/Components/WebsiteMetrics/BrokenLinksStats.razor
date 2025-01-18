@@ -9,7 +9,8 @@
                 <Template Context="link">
                     @(link.Target)
                 </Template>
-            </RadzenDataGridColumn>            <RadzenDataGridColumn Property="@nameof(IndexedLink.ReferringPage)" Title="Referring Page" Sortable="true">
+            </RadzenDataGridColumn>            
+            <RadzenDataGridColumn Property="@nameof(IndexedLink.ReferringPage)" Title="Referring Page" Sortable="true">
                 <Template Context="indexedLink">
                     <RadzenLink href="@indexedLink.ReferringPage" target="_blank">@indexedLink.ReferringPage</RadzenLink>
                 </Template>

@@ -3,6 +3,7 @@
 @using WebsiteAnalyzer.Core.Enums
 @using WebsiteAnalyzer.Core.Interfaces.Services
 @using WebsiteAnalyzer.Infrastructure
+@using WebsiteAnalyzer.Infrastructure.Repositories
 @using WebsiteAnalyzer.Web.Models
 @using WebsiteAnalyzer.Web.Components.ErrorHandling
 @using WebsiteAnalyzer.Web.Components.Schedule.Lists
@@ -15,7 +16,6 @@
 {
     <RadzenCard class="rz-mt-6">
         <RadzenStack Gap="20px">
-
             <RadzenText TextStyle="TextStyle.H4">Add new @Action Task</RadzenText>
             <RadzenTemplateForm TItem="ScheduleTaskModel"
                                 Data="_scheduleTask"
@@ -59,19 +59,21 @@
     </RadzenCard>
 }
 
-<ScheduledTaskDataGrid ScheduledTasks="@_scheduledTasks" OnScheduleDeleted="DeleteTask"/>
+<ScheduledTaskDataGrid ScheduledTasks="@_scheduledTasks" OnScheduleDeleted="DeleteTask" />
 
 @code {
-    [Parameter] public required ApplicationUser User { get; set; }
+    [Parameter] 
+    public required ApplicationUser User { get; set; }
 
-    [Parameter] public required CrawlAction Action { get; set; }
+    [Parameter] 
+    public required CrawlAction Action { get; set; }
 
     private ScheduleTaskModel _scheduleTask = new();
     private IEnumerable<Frequency> Frequencies => Enum.GetValues(typeof(Frequency)).Cast<Frequency>();
     private IList<CrawlSchedule> _scheduledTasks = [];
     private string _errorMessage = string.Empty;
     private bool _addNew;
-    private string _urlRegex = @"[(http(s)?):\/\/(www\.)?a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)";
+    private string _urlRegex = @"[(http(s)?):\/\/(www\.)?a-zA-Z0-9@:%._\-+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)";
 
     protected override async Task OnInitializedAsync()
     {
@@ -93,6 +95,7 @@
     private async Task HandleValidSubmit()
     {
         _errorMessage = string.Empty;
+        
         try
         {
             CrawlSchedule scheduledTask = await ScheduleService.ScheduleTask(
@@ -100,10 +103,10 @@
                 User.Id,
                 Action,
                 _scheduleTask.Frequency);
-
-            
             
             _scheduledTasks.Add(scheduledTask);
+            _scheduledTasks = new List<CrawlSchedule>(_scheduledTasks);
+            
             ToggleAddNew();
         }
         catch (Exception ex)
@@ -114,15 +117,9 @@
 
     private async Task DeleteTask(CrawlSchedule schedule)
     {
-        try
-        {
             await ScheduleService.DeleteScheduledTask(schedule);
             _scheduledTasks.Remove(schedule);
-        }
-        catch (Exception ex)
-        {
-            // TODO: Implement proper error handling
-        }
+            _scheduledTasks = new List<CrawlSchedule>(_scheduledTasks);
     }
 
 }

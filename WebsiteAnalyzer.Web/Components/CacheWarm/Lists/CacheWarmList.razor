@@ -44,13 +44,17 @@
 }
 
 @code {
-    [Parameter] public required EventCallback<string> OnRerunCacheWarm { get; set; }
+    [Parameter] 
+    public required EventCallback<string> OnRerunCacheWarm { get; set; }
 
-    [Parameter] public required ApplicationUser User { get; set; }
+    [Parameter] 
+    public required ApplicationUser User { get; set; }
 
-    [Parameter] public required IList<CacheWarm> CacheWarms { get; set; }
+    [Parameter] 
+    public required IList<CacheWarm> CacheWarms { get; set; }
 
-    [Parameter] public required bool IsProcessing { get; set; }
+    [Parameter] 
+    public required bool IsProcessing { get; set; }
 
     public async Task OnCacheWarmRerun(CacheWarm cacheWarm)
     {

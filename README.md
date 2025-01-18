@@ -120,4 +120,4 @@ To generate database migrations, use the provided script:
 
 ## License
 
-MIT License - Copyright (c) 2024 Clypper Technology
+GPL License - Copyright (c) 2025 Clypper Technology
