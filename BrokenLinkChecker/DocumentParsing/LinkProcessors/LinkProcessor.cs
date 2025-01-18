@@ -9,32 +9,13 @@ public class LinkProcessor : ILinkProcessor<Link>
 {
     private readonly HttpClient _httpClient;
     private readonly AbstractLinkExtractor<Link> _linkExtractor;
-    private HashSet<string> _visitedPages; // Tracks processed pages
-    private HashSet<string> _enqueuedPages; // Tracks enqueued pages
+    private HashSet<string> _visitedPages;
+    private HashSet<string> _enqueuedPages;
 
     public LinkProcessor(HttpClient httpClient)
     {
         _httpClient = httpClient;
-        /*
-        _linkExtractor = new LinkExtractor(new HtmlParser(new HtmlParserOptions()
-        {
-            IsKeepingSourceReferences = false,
-            DisableElementPositionTracking = true,
-            IsScripting = false,
-            IsNotConsumingCharacterReferences = false,
-            SkipComments = true,
-            SkipScriptText = true,
-            SkipRCDataText = true,
-            SkipCDATA = true,
-            SkipProcessingInstructions = true,
-            SkipRawText = true,
-            SkipDataText = true,
-            SkipPlaintext = true,
-            IsSupportingProcessingInstructions = false,
-            IsAcceptingCustomElementsEverywhere = false,
-            IsNotSupportingFrames = true
-        }));*/
-
+        
         _linkExtractor = new StreamLinkExtractor(new HtmlParser());
         _visitedPages = new HashSet<string>();
         _enqueuedPages = new HashSet<string>();

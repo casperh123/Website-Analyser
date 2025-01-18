@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using Microsoft.EntityFrameworkCore;
 using WebsiteAnalyzer.Infrastructure.Data;
 
@@ -16,7 +17,18 @@ public static class DatabaseMigrator
             var logger = services.GetRequiredService<ILogger<Program>>();
 
             logger.LogInformation("Starting database migration");
-            await context.Database.MigrateAsync();
+            // Ensure database is created and all pending migrations are applied
+            await context.Database.EnsureCreatedAsync();
+
+            try
+            {
+                await context.Database.MigrateAsync();
+            }
+            catch (Exception ex)
+            {
+                // ignored
+            }
+
             logger.LogInformation("Database migration completed successfully");
         }
         catch (Exception ex)

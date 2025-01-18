@@ -89,6 +89,13 @@ The project uses several key packages:
    # Update database
    dotnet ef database update
    ```
+   
+## Add Env file
+
+    POSTGRES_DB=
+    POSTGRES_USER=
+    POSTGRES_PASSWORD=
+    CERT_PASSWORD=
 
 3. **Running the Application**
    ```bash

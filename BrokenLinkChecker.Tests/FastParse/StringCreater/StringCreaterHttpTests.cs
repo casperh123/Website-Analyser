@@ -1,8 +1,7 @@
 using System.Net.Http;
 using System.Text;
 using Xunit;
-using RichardSzalay.MockHttp;
-using System.IO;
+
 using BrokenLinkChecker.DocumentParsing.ModularLinkExtraction.FastParse;
 
 public class StringCreatorHttpTests

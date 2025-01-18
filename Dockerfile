@@ -13,13 +13,6 @@ RUN dotnet restore "./WebsiteAnalyzer.Web/WebsiteAnalyzer.Web.csproj" \
 FROM mcr.microsoft.com/dotnet/aspnet:9.0
 WORKDIR /app
 
-# Set environment variables
-ENV DOTNET_gcServer=1 \
-    DOTNET_GCHeapCount=2 \
-    DOTNET_SYSTEM_NET_HTTP_SOCKETSHTTPHANDLER_HTTP3SUPPORT=1 \
-    ASPNETCORE_URLS="https://+:8081;http://+:8080" \
-    ASPNETCORE_HTTPS_PORT=8081
-
 # Performance optimizations and QUIC installation
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
@@ -36,10 +29,7 @@ RUN apt-get update \
     && mkdir -p /Data \
     && mkdir -p /https
 
-# Copy from build
 COPY --from=build-env /app/publish .
-
-# Create directory for certificates
 VOLUME ["/Data", "/https"]
 EXPOSE 8080
 EXPOSE 8081
