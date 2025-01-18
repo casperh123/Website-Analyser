@@ -1,12 +1,8 @@
 using WebsiteAnalyzer.Core.Entities;
+using WebsiteAnalyzer.Core.Interfaces.Services;
 using WebsiteAnalyzer.Core.Persistence;
 
-namespace WebsiteAnalyzer.Infrastructure.Services;
-
-public interface IWebsiteService
-{
-    Task<Website> GetOrAddWebsite(string url, Guid userId);
-}
+namespace WebsiteAnalyzer.Application.Services;
 
 public class WebsiteService : IWebsiteService
 {

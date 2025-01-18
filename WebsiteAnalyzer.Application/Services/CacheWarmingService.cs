@@ -1,29 +1,11 @@
 using BrokenLinkChecker.Crawler.ExtendedCrawlers;
 using BrokenLinkChecker.DocumentParsing.LinkProcessors;
-using BrokenLinkChecker.DocumentParsing.ModularLinkExtraction;
 using BrokenLinkChecker.models.Links;
 using WebsiteAnalyzer.Core.Entities;
+using WebsiteAnalyzer.Core.Interfaces.Services;
 using WebsiteAnalyzer.Core.Persistence;
 
-namespace WebsiteAnalyzer.Infrastructure.Services;
-
-public interface ICacheWarmingService
-{
-    Task<CacheWarm> WarmCacheWithSaveAsync(
-        string url,
-        Guid userId,
-        Action<int> onLinkEnqueued,
-        Action<int> onLinkChecked,
-        CancellationToken cancellationToken = default
-    );
-
-    Task WarmCache(string url, Action<int> onLinkEnqueued, Action<int> onLinkChecked,
-        CancellationToken cancellationToken = default);
-
-    Task WarmCacheWithoutMetrics(string url, Guid userId, CancellationToken cancellationToken = default);
-    Task<ICollection<CacheWarm>> GetCacheWarmsAsync();
-    Task<ICollection<CacheWarm>> GetCacheWarmsByUserAsync(Guid userId);
-}
+namespace WebsiteAnalyzer.Application.Services;
 
 public class CacheWarmingService : ICacheWarmingService
 {

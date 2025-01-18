@@ -2,8 +2,8 @@
 
 @using WebsiteAnalyzer.Core.Entities
 @using WebsiteAnalyzer.Core.Enums
+@using WebsiteAnalyzer.Core.Interfaces.Services
 @using WebsiteAnalyzer.Infrastructure
-@using WebsiteAnalyzer.Infrastructure.Services
 @using WebsiteAnalyzer.Web.Components.WebsiteInputs
 @using WebsiteAnalyzer.Web.Components.CacheWarm.Lists
 @using WebsiteAnalyzer.Web.Services
@@ -26,20 +26,23 @@
               OnCancel="CancelProcessing" WebsiteActionStarted="StartWarm"/>
 
 <AuthorizeView>
+    <Authorized>
         <RadzenTabs class="rz-mt-12" TabPosition="TabPosition.Top" RenderMode="TabRenderMode.Server">
-        <Tabs>
-            <RadzenTabsItem Text="Previous Warms">
-                <CacheWarmList OnRerunCacheWarm="RerunWarmCache" User="_user" CacheWarms="_cacheWarms"
-                               IsProcessing="IsProcessing"/>
-            </RadzenTabsItem>
-            <RadzenTabsItem Text="Schedule">
-                <WebsiteScheduler Action="CrawlAction.CacheWarm" User="_user"/>
-            </RadzenTabsItem>
-        </Tabs>
-    </RadzenTabs>
+            <Tabs>
+                <RadzenTabsItem Text="Previous Warms">
+                    <CacheWarmList OnRerunCacheWarm="RerunWarmCache" User="_user" CacheWarms="_cacheWarms"
+                                   IsProcessing="IsProcessing"/>
+                </RadzenTabsItem>
+                <RadzenTabsItem Text="Schedule">
+                    <WebsiteScheduler Action="CrawlAction.CacheWarm" User="_user"/>
+                </RadzenTabsItem>
+            </Tabs>
+        </RadzenTabs>
+    </Authorized>
+    <NotAuthorized>
+        <SignUp User="_user"/>
+    </NotAuthorized>
 </AuthorizeView>
-
-<SignUp User="_user"/>
 
 <HeadContent>
     <meta name="description" content="Boost website performance with automated cache warming. Proactively load pages into your server's cache, eliminate first-load delays, and maintain lightning-fast speeds for all visitors.">

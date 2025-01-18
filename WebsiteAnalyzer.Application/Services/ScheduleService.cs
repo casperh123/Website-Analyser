@@ -1,17 +1,11 @@
 using WebsiteAnalyzer.Core.Entities;
 using WebsiteAnalyzer.Core.Enums;
+using WebsiteAnalyzer.Core.Interfaces.Services;
 using WebsiteAnalyzer.Core.Persistence;
+using ICacheWarmingService = WebsiteAnalyzer.Core.Interfaces.Services.ICacheWarmingService;
 
-namespace WebsiteAnalyzer.Infrastructure.Services;
+namespace WebsiteAnalyzer.Application.Services;
 
-public interface IScheduleService
-{
-    Task<CrawlSchedule> ScheduleTask(string url, Guid userId, CrawlAction action, Frequency frequency);
-    Task UpdateScheduledTask(CrawlSchedule scheduledTask, Frequency frequency);
-    Task DeleteScheduledTask(CrawlSchedule scheduledTask);
-    Task RunScheduledTask(CrawlSchedule scheduledTaskId);
-    Task<ICollection<CrawlSchedule>> GetScheduledTasksByUserIdAndTypeAsync(Guid userId, CrawlAction action);
-}
 
 public class ScheduleService : IScheduleService
 {

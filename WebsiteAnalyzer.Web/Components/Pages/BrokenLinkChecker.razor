@@ -1,7 +1,7 @@
 @page "/broken-link-checker"
 @using System.Net
 @using global::BrokenLinkChecker.Models.Links
-@using WebsiteAnalyzer.Infrastructure.Services
+@using WebsiteAnalyzer.Core.Interfaces.Services
 @using WebsiteAnalyzer.Web.Components.WebsiteInputs
 @using WebsiteAnalyzer.Web.Components.WebsiteMetrics
 @inject IBrokenLinkService BrokenLinkService
@@ -16,9 +16,9 @@
 
 @if (_linksChecked > 0)
 {
-    <div class="rz-mt-6">
+    <RadzenStack class="rz-mt-6">
         <BrokenLinksStats BrokenLinks="_brokenLinks"/>
-    </div>
+    </RadzenStack>
 }
 
 @code {

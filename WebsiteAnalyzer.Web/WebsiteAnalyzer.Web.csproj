@@ -19,6 +19,7 @@
     <ItemGroup>
         <ProjectReference Include="..\BrokenLinkChecker\BrokenLinkChecker.csproj"/>
         <ProjectReference Include="..\WebsiteAnalyzer.Infrastructure\WebsiteAnalyzer.Infrastructure.csproj"/>
+        <ProjectReference Include="..\WebsiteAnalyzer.Application\WebsiteAnalyzer.Application.csproj"/>
     </ItemGroup>
 
     <ItemGroup>

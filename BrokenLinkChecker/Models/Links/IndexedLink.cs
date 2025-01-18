@@ -26,10 +26,4 @@ public class IndexedLink : Link
     public string AnchorText { get; set; }
     public int Line { get; set; }
     public HttpStatusCode StatusCode { get; set; }
-
-    public override string ToString()
-    {
-        return
-            $"Broken Link Found: TARGET={Target}, ANCHOR TEXT='{AnchorText}', REFERRER={ReferringPage}, LINE={Line}, STATUS CODE={StatusCode}";
-    }
 }

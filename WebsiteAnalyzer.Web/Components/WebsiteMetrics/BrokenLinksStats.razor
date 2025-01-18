@@ -5,8 +5,11 @@
 {
     <RadzenDataGrid Data="@BrokenLinks" AllowSorting="true" AllowPaging="true" PageSize="20">
         <Columns>
-            <RadzenDataGridColumn Property="@nameof(IndexedLink.Target)" Title="Target" Sortable="true"/>
-            <RadzenDataGridColumn Property="@nameof(IndexedLink.ReferringPage)" Title="Referring Page" Sortable="true">
+            <RadzenDataGridColumn Property="Target" Title="Target" Sortable="true">
+                <Template Context="link">
+                    @(link.Target)
+                </Template>
+            </RadzenDataGridColumn>            <RadzenDataGridColumn Property="@nameof(IndexedLink.ReferringPage)" Title="Referring Page" Sortable="true">
                 <Template Context="indexedLink">
                     <RadzenLink href="@indexedLink.ReferringPage" target="_blank">@indexedLink.ReferringPage</RadzenLink>
                 </Template>

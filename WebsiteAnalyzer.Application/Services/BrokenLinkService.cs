@@ -1,14 +1,9 @@
 using BrokenLinkChecker.Crawler.ExtendedCrawlers;
 using BrokenLinkChecker.DocumentParsing.LinkProcessors;
 using BrokenLinkChecker.Models.Links;
+using WebsiteAnalyzer.Core.Interfaces.Services;
 
-namespace WebsiteAnalyzer.Infrastructure.Services;
-
-public interface IBrokenLinkService
-{
-    Task FindBrokenLinks(string url, Action<int> onLinkEnqueued, Action<int> onLinkChecked,
-        Action<IndexedLink> onLinkFound);
-}
+namespace WebsiteAnalyzer.Application.Services;
 
 public class BrokenLinkService : IBrokenLinkService
 {

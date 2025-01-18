@@ -1,6 +1,6 @@
 @using WebsiteAnalyzer.Core.Entities
+@using WebsiteAnalyzer.Core.Interfaces.Services
 @using WebsiteAnalyzer.Infrastructure
-@using WebsiteAnalyzer.Infrastructure.Services
 @using WebsiteAnalyzer.Web.Components.CacheWarm.Badges
 
 @inject ICacheWarmingService CacheWarmingService
@@ -32,13 +32,13 @@
                     </RadzenStack>
                 </Template>
             </RadzenDataGridColumn>
-            <RadzenDataGridColumn Property="@nameof(CacheWarm.TotalTime)" Title="Total Time">
+            <RadzenDataGridColumn Property="@nameof(CacheWarm.TotalTime)" Title="Total Time" Filterable="false">
                 <Template Context="cacheWarm">
                     @cacheWarm.TotalTime.ToString(@"hh\:mm\:ss")
                 </Template>
             </RadzenDataGridColumn>
-            <RadzenDataGridColumn Property="@nameof(CacheWarm.StartTime)" Title="Start Time" Width="200px"/>
-            <RadzenDataGridColumn Property="@nameof(CacheWarm.VisitedPages)" Title="Visited Pages" Width="200px"/>
+            <RadzenDataGridColumn Property="@nameof(CacheWarm.StartTime)" Title="Start Time" Width="200px" Filterable="false"/>
+            <RadzenDataGridColumn Property="@nameof(CacheWarm.VisitedPages)" Title="Visited Pages" Width="200px" Filterable="false"/>
         </Columns>
     </RadzenDataGrid>
 }
