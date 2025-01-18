@@ -59,6 +59,10 @@ h1:focus {
     text-align: start;
 }
 
+:root {
+    --page-width: 1300px;
+}
+
 .header-icon {
     width: 55px;
     margin-right: 10px;
@@ -101,7 +105,7 @@ h1:focus {
 
 .body {
     width: 100%;
-    max-width: 1024px;
+    max-width: var(--page-width);
     padding-top: 80px;
 }
 

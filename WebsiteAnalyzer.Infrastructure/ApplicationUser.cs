@@ -1,5 +1,6 @@
 using WebsiteAnalyzer.Core.Entities;
 using Microsoft.AspNetCore.Identity;
+using WebsiteAnalyzer.Core.Entities.Website;
 
 namespace WebsiteAnalyzer.Infrastructure;
 

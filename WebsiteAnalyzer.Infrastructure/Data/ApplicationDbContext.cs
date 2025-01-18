@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using WebsiteAnalyzer.Core.Entities;
+using WebsiteAnalyzer.Core.Entities.BrokenLink;
+using WebsiteAnalyzer.Core.Entities.Website;
 
 namespace WebsiteAnalyzer.Infrastructure.Data;
 
@@ -51,7 +53,10 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser, IdentityR
             .HasKey(c => c.Id); // Use GUID for CacheWarm primary key
 
         builder.Entity<CrawlSchedule>()
-            .HasKey(cs => new { cs.UserId, cs.WebsiteUrl });
+            .HasKey(cs => new { cs.UserId, WebsiteUrl = cs.Url });
+
+        builder.Entity<BrokenLinkCrawl>()
+            .HasKey(blc => new { blc.Id, blc.Url, blc.UserId });
 
         // Configure Identity entities to use GUID
         builder.Entity<IdentityUserLogin<Guid>>()

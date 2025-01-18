@@ -28,7 +28,7 @@ public class ScheduleService : IScheduleService
         CrawlSchedule scheduledAction = new CrawlSchedule()
         {
             UserId = userId,
-            WebsiteUrl = url,
+            Url = url,
             Frequency = frequency,
             Action = action,
             LastCrawlDate = DateTime.Today.Subtract(TimeSpan.FromDays(14)),
@@ -60,7 +60,7 @@ public class ScheduleService : IScheduleService
                 //TODO IMPLEMENT
                 break;
             case CrawlAction.CacheWarm:
-                await _cacheWarmingService.WarmCacheWithoutMetrics(schedule.WebsiteUrl, schedule.UserId);
+                await _cacheWarmingService.WarmCacheWithoutMetrics(schedule.Url, schedule.UserId);
                 break;
         }
     }

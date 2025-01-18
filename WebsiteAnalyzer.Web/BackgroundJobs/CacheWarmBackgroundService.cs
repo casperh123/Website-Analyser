@@ -64,12 +64,12 @@ public class CacheWarmBackgroundService : IHostedService
             {
                 Id = Guid.NewGuid(),
                 UserId = crawlSchedule.UserId,
-                WebsiteUrl = crawlSchedule.WebsiteUrl,
+                WebsiteUrl = crawlSchedule.Url,
                 StartTime = DateTime.UtcNow,
                 Schedule = crawlSchedule,
             };
 
-            int linksChecked = await cacheWarmCrawler.CrawlWebsiteAsync(new Link(crawlSchedule.WebsiteUrl));
+            int linksChecked = await cacheWarmCrawler.CrawlWebsiteAsync(new Link(crawlSchedule.Url));
 
             cacheWarm.VisitedPages = linksChecked;
             cacheWarm.EndTime = DateTime.UtcNow;

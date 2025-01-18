@@ -7,7 +7,7 @@
                     PageSize="10"
                     EmptyText="No scheduled tasks">
         <Columns>
-            <RadzenDataGridColumn Title="Website URL" Property="@nameof(CrawlSchedule.WebsiteUrl)"/>
+            <RadzenDataGridColumn Title="Website URL" Property="@nameof(CrawlSchedule.Url)"/>
             <RadzenDataGridColumn Title="Frequency" Property="@nameof(CrawlSchedule.Frequency)">
                 <Template Context="schedule">
                     @schedule.Frequency.ToFriendlyString()

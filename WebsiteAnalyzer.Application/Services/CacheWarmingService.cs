@@ -2,6 +2,7 @@ using BrokenLinkChecker.Crawler.ExtendedCrawlers;
 using BrokenLinkChecker.DocumentParsing.LinkProcessors;
 using BrokenLinkChecker.models.Links;
 using WebsiteAnalyzer.Core.Entities;
+using WebsiteAnalyzer.Core.Entities.Website;
 using WebsiteAnalyzer.Core.Interfaces.Services;
 using WebsiteAnalyzer.Core.Persistence;
 

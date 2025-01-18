@@ -1,4 +1,4 @@
-namespace WebsiteAnalyzer.Core.Entities;
+namespace WebsiteAnalyzer.Core.Entities.Website;
 
 public record Website
 {

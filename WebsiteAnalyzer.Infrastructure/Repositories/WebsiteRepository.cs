@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using WebsiteAnalyzer.Core.Entities;
+using WebsiteAnalyzer.Core.Entities.Website;
 using WebsiteAnalyzer.Core.Persistence;
 using WebsiteAnalyzer.Infrastructure.Data;
 
