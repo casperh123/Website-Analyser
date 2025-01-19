@@ -4,10 +4,10 @@ namespace WebsiteAnalyzer.Core.Entities.BrokenLink;
 
 public record BrokenLink
 {
-    public BrokenLink(Guid id, Guid brokenLinkCrawlId, BrokenLinkCrawl brokenLinkCrawl, string targetPage, string referringPage, string anchorText, int line, HttpStatusCode statusCode)
+    public BrokenLink(BrokenLinkCrawl brokenLinkCrawl, string targetPage, string referringPage, string anchorText, int line, HttpStatusCode statusCode)
     {
-        Id = id;
-        BrokenLinkCrawlId = brokenLinkCrawlId;
+        Id = Guid.NewGuid();
+        BrokenLinkCrawlId = brokenLinkCrawl.Id;
         BrokenLinkCrawl = brokenLinkCrawl;
         TargetPage = targetPage;
         ReferringPage = referringPage;
@@ -16,14 +16,19 @@ public record BrokenLink
         StatusCode = statusCode;
     }
 
+    public BrokenLink()
+    {
+        
+    }
+
     public Guid Id { get; set; }
-    public required Guid BrokenLinkCrawlId { get; set; }
-    public required BrokenLinkCrawl BrokenLinkCrawl { get; set; }
-    public required string TargetPage { get; set; }
-    public required string ReferringPage { get; set; }
-    public required string AnchorText { get; set; }
-    public required int Line { get; set; }
-    public required HttpStatusCode StatusCode { get; set; }
+    public Guid BrokenLinkCrawlId { get; set; }
+    public BrokenLinkCrawl BrokenLinkCrawl { get; set; }
+    public string TargetPage { get; set; }
+    public string ReferringPage { get; set; }
+    public string AnchorText { get; set; }
+    public int Line { get; set; }
+    public HttpStatusCode StatusCode { get; set; }
     
     
 }

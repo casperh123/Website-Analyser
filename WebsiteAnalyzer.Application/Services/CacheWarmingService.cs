@@ -28,15 +28,15 @@ public class CacheWarmingService : ICacheWarmingService
         _linkCrawler = new ModularCrawler<Link>(linkProcessor);
     }
 
-    public async Task WarmCache(string url, Action<int> onLinkEnqueued, Action<int> onLinkChecked,
+    public async Task WarmCache(string url, Action<int>? onLinkEnqueued, Action<int>? onLinkChecked,
         CancellationToken cancellationToken = default)
     {
         try
         {
             _linkCrawler.OnLinksChecked += onLinkChecked;
             _linkCrawler.OnLinksEnqueued += onLinkEnqueued;
-
-            await _linkCrawler.CrawlWebsiteAsync(new Link(url), cancellationToken);
+            
+            await foreach(Link link in _linkCrawler.CrawlWebsiteAsync(new Link(url), cancellationToken));
         }
         finally
         {
@@ -61,7 +61,9 @@ public class CacheWarmingService : ICacheWarmingService
         {
             _linkCrawler.OnLinksChecked += OnLinksChecked;
 
-            await _linkCrawler.CrawlWebsiteAsync(new Link(url), cancellationToken).ConfigureAwait(false);
+            IAsyncEnumerable<Link> links = _linkCrawler.CrawlWebsiteAsync(new Link(url), cancellationToken);
+            
+            await foreach(Link link in links);
         }
         finally
         {
@@ -72,7 +74,7 @@ public class CacheWarmingService : ICacheWarmingService
     }
 
 
-    public async Task<CacheWarm> WarmCacheWithSaveAsync(string url, Guid userId, Action<int> onLinkEnqueued,
+    public async Task<CacheWarm> WarmCacheWithSaveAsync(string url, Guid userId, Action<int>? onLinkEnqueued,
         Action<int> onLinkChecked, CancellationToken cancellationToken = default)
     {
         Website website = await _websiteService.GetOrAddWebsite(url, userId).ConfigureAwait(false);
@@ -90,8 +92,10 @@ public class CacheWarmingService : ICacheWarmingService
         {
             _linkCrawler.OnLinksChecked += OnLinksChecked;
             _linkCrawler.OnLinksEnqueued += onLinkEnqueued;
+            
+            IAsyncEnumerable<Link> links = _linkCrawler.CrawlWebsiteAsync(new Link(url), cancellationToken);
 
-            await _linkCrawler.CrawlWebsiteAsync(new Link(url), cancellationToken).ConfigureAwait(false);
+            await foreach(Link link in links);
         }
         finally
         {

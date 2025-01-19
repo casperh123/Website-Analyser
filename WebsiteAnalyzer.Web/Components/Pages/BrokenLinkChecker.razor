@@ -1,14 +1,16 @@
 @page "/broken-link-checker"
 @using System.Net
-@using global::BrokenLinkChecker.models.Links
 @using global::BrokenLinkChecker.Models.Links
 @using WebsiteAnalyzer.Core.Interfaces.Services
+@using WebsiteAnalyzer.Infrastructure
 @using WebsiteAnalyzer.Web.Components.WebsiteInputs
 @using WebsiteAnalyzer.Web.Components.WebsiteMetrics
+@using WebsiteAnalyzer.Web.Services
 
 @inherits WebsiteAnalyzer.Web.Components.Templates.ProcessingComponentBase
 
 @inject IBrokenLinkService BrokenLinkService
+@inject IUserService UserService
 
 @rendermode InteractiveServer
 
@@ -34,6 +36,12 @@
     private int _linksChecked;
     private int _linksEnqueued;
     private IList<IndexedLink> _brokenLinks = [];
+    private ApplicationUser? _user;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _user = await UserService.GetCurrentUserAsync();
+    }
 
     private async Task StartBrokenLinkCheck(Uri url)
     {
@@ -43,13 +51,19 @@
 
     private async Task CheckBrokenLinks(Uri url, CancellationToken cancellationToken)
     {
-        await BrokenLinkService.FindBrokenLinks(
-            url.ToString(), 
-            UpdateLinksEnqueued, 
-            UpdateLinksChecked, 
-            UpdateBrokenLinks, 
+        IAsyncEnumerable<IndexedLink> brokenLinks = BrokenLinkService.FindBrokenLinks(
+            url.ToString(),
+            _user?.Id,
+            UpdateLinksEnqueued,
+            UpdateLinksChecked,
             cancellationToken
-        );
+        ); 
+        
+        await foreach (IndexedLink link in brokenLinks)
+        {
+            _brokenLinks.Add(link);
+            _brokenLinks = new List<IndexedLink>(_brokenLinks);
+        }
     }
 
     private void ResetResults()
@@ -69,16 +83,4 @@
         _linksChecked = count;
         InvokeAsync(StateHasChanged);
     }
-
-    private void UpdateBrokenLinks(IndexedLink link)
-    {
-        if (link.StatusCode is HttpStatusCode.OK)
-        {
-            return;
-        }
-
-        _brokenLinks.Add(link);
-        _brokenLinks = new List<IndexedLink>(_brokenLinks);
-    }
-
 }

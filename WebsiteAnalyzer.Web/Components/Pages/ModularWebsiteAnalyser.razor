@@ -1,9 +1,12 @@
 @page "/website-analyser"
 @using global::BrokenLinkChecker.Models.Links
 @using WebsiteAnalyzer.Core.Interfaces.Services
+@using WebsiteAnalyzer.Infrastructure
 @using WebsiteAnalyzer.Web.Components.WebsiteInputs
 @using WebsiteAnalyzer.Web.Components.WebsiteMetrics
+@using WebsiteAnalyzer.Web.Services
 @inject IBrokenLinkService BrokenLinkService
+@inject IUserService UserService
 
 @rendermode InteractiveServer
 
@@ -32,6 +35,12 @@
     private int _linksChecked;
     private int _linksEnqueued;
     private IList<IndexedLink> _brokenLinks = [];
+    private ApplicationUser? _user;
+
+    protected async override Task OnInitializedAsync()
+    {
+        _user = await UserService.GetCurrentUserAsync();
+    }
 
     private async Task CheckBrokenLinks(Uri url)
     {
@@ -40,7 +49,7 @@
             IsChecking = true;
             ResetResults();
 
-            await BrokenLinkService.FindBrokenLinks(url.ToString(), UpdateLinksEnqueued, UpdateLinksChecked, UpdateBrokenLinks, new CancellationToken());
+            //await BrokenLinkService.FindBrokenLinks(url.ToString(), _user.Id, UpdateLinksEnqueued, UpdateLinksChecked, UpdateBrokenLinks, new CancellationToken());
         }
         finally
         {

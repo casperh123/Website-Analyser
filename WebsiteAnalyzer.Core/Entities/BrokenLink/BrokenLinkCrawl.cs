@@ -2,9 +2,14 @@ namespace WebsiteAnalyzer.Core.Entities.BrokenLink;
 
 public record BrokenLinkCrawl
 {
-    public BrokenLinkCrawl(Guid id, Guid userId, string url)
+    public BrokenLinkCrawl()
     {
-        Id = id;
+        
+    }
+    
+    public BrokenLinkCrawl(Guid userId, string url)
+    {
+        Id = Guid.NewGuid();
         UserId = userId;
         Url = url;
         BrokenLinks = [];

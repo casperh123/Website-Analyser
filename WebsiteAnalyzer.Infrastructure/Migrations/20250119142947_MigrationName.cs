@@ -51,11 +51,24 @@ namespace WebsiteAnalyzer.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "BrokenLinkCrawls",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "TEXT", nullable: false),
+                    UserId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    Url = table.Column<string>(type: "TEXT", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_BrokenLinkCrawls", x => new { x.Id, x.Url, x.UserId });
+                });
+
+            migrationBuilder.CreateTable(
                 name: "CrawlSchedules",
                 columns: table => new
                 {
                     UserId = table.Column<Guid>(type: "TEXT", nullable: false),
-                    WebsiteUrl = table.Column<string>(type: "TEXT", nullable: false),
+                    Url = table.Column<string>(type: "TEXT", nullable: false),
                     LastCrawlDate = table.Column<DateTime>(type: "TEXT", nullable: false),
                     Frequency = table.Column<int>(type: "INTEGER", nullable: false),
                     Action = table.Column<int>(type: "INTEGER", nullable: false),
@@ -63,7 +76,7 @@ namespace WebsiteAnalyzer.Infrastructure.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_CrawlSchedules", x => new { x.UserId, x.WebsiteUrl });
+                    table.PrimaryKey("PK_CrawlSchedules", x => new { x.UserId, x.Url });
                 });
 
             migrationBuilder.CreateTable(
@@ -191,6 +204,31 @@ namespace WebsiteAnalyzer.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "BrokenLinks",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "TEXT", nullable: false),
+                    BrokenLinkCrawlId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    BrokenLinkCrawlUrl = table.Column<string>(type: "TEXT", nullable: false),
+                    BrokenLinkCrawlUserId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    TargetPage = table.Column<string>(type: "TEXT", nullable: false),
+                    ReferringPage = table.Column<string>(type: "TEXT", nullable: false),
+                    AnchorText = table.Column<string>(type: "TEXT", nullable: false),
+                    Line = table.Column<int>(type: "INTEGER", nullable: false),
+                    StatusCode = table.Column<int>(type: "INTEGER", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_BrokenLinks", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_BrokenLinks_BrokenLinkCrawls_BrokenLinkCrawlId_BrokenLinkCrawlUrl_BrokenLinkCrawlUserId",
+                        columns: x => new { x.BrokenLinkCrawlId, x.BrokenLinkCrawlUrl, x.BrokenLinkCrawlUserId },
+                        principalTable: "BrokenLinkCrawls",
+                        principalColumns: new[] { "Id", "Url", "UserId" },
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "CacheWarms",
                 columns: table => new
                 {
@@ -201,17 +239,17 @@ namespace WebsiteAnalyzer.Infrastructure.Migrations
                     StartTime = table.Column<DateTime>(type: "TEXT", nullable: false),
                     EndTime = table.Column<DateTime>(type: "TEXT", nullable: false),
                     ScheduleUserId = table.Column<Guid>(type: "TEXT", nullable: true),
-                    ScheduleWebsiteUrl = table.Column<string>(type: "TEXT", nullable: true),
+                    ScheduleUrl = table.Column<string>(type: "TEXT", nullable: true),
                     WebsiteUserId = table.Column<Guid>(type: "TEXT", nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_CacheWarms", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_CacheWarms_CrawlSchedules_ScheduleUserId_ScheduleWebsiteUrl",
-                        columns: x => new { x.ScheduleUserId, x.ScheduleWebsiteUrl },
+                        name: "FK_CacheWarms_CrawlSchedules_ScheduleUserId_ScheduleUrl",
+                        columns: x => new { x.ScheduleUserId, x.ScheduleUrl },
                         principalTable: "CrawlSchedules",
-                        principalColumns: new[] { "UserId", "WebsiteUrl" });
+                        principalColumns: new[] { "UserId", "Url" });
                     table.ForeignKey(
                         name: "FK_CacheWarms_Websites_WebsiteUrl_WebsiteUserId",
                         columns: x => new { x.WebsiteUrl, x.WebsiteUserId },
@@ -257,9 +295,14 @@ namespace WebsiteAnalyzer.Infrastructure.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_CacheWarms_ScheduleUserId_ScheduleWebsiteUrl",
+                name: "IX_BrokenLinks_BrokenLinkCrawlId_BrokenLinkCrawlUrl_BrokenLinkCrawlUserId",
+                table: "BrokenLinks",
+                columns: new[] { "BrokenLinkCrawlId", "BrokenLinkCrawlUrl", "BrokenLinkCrawlUserId" });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_CacheWarms_ScheduleUserId_ScheduleUrl",
                 table: "CacheWarms",
-                columns: new[] { "ScheduleUserId", "ScheduleWebsiteUrl" });
+                columns: new[] { "ScheduleUserId", "ScheduleUrl" });
 
             migrationBuilder.CreateIndex(
                 name: "IX_CacheWarms_WebsiteUrl_WebsiteUserId",
@@ -291,10 +334,16 @@ namespace WebsiteAnalyzer.Infrastructure.Migrations
                 name: "AspNetUserTokens");
 
             migrationBuilder.DropTable(
+                name: "BrokenLinks");
+
+            migrationBuilder.DropTable(
                 name: "CacheWarms");
 
             migrationBuilder.DropTable(
                 name: "AspNetRoles");
+
+            migrationBuilder.DropTable(
+                name: "BrokenLinkCrawls");
 
             migrationBuilder.DropTable(
                 name: "CrawlSchedules");

@@ -69,7 +69,14 @@ public class CacheWarmBackgroundService : IHostedService
                 Schedule = crawlSchedule,
             };
 
-            int linksChecked = await cacheWarmCrawler.CrawlWebsiteAsync(new Link(crawlSchedule.Url));
+            int linksChecked = 0;
+
+            IAsyncEnumerable<Link> links = cacheWarmCrawler.CrawlWebsiteAsync(new Link(crawlSchedule.Url));
+
+            await foreach (Link link in links)
+            {
+                linksChecked++;
+            }
 
             cacheWarm.VisitedPages = linksChecked;
             cacheWarm.EndTime = DateTime.UtcNow;

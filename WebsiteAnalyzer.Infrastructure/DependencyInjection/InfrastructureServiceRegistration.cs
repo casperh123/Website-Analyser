@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using WebsiteAnalyzer.Core.Interfaces.Repositories;
 using WebsiteAnalyzer.Core.Persistence;
 using WebsiteAnalyzer.Infrastructure.Data;
 using WebsiteAnalyzer.Infrastructure.Repositories;
@@ -16,6 +17,8 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IWebsiteRepository, WebsiteRepository>();
         services.AddScoped<ICacheWarmRepository, CacheWarmRepository>();
         services.AddScoped<ICrawlScheduleRepository, CrawlSheduleRepository>();
+        services.AddScoped<IBrokenLinkRepository, BrokenLinkRepository>();
+        services.AddScoped<IBrokenLinkCrawlRepository, BrokenLinkCrawlRepository>();
         
         return services;
     }

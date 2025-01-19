@@ -7,12 +7,12 @@ public interface ICacheWarmingService
     Task<CacheWarm> WarmCacheWithSaveAsync(
         string url,
         Guid userId,
-        Action<int> onLinkEnqueued,
+        Action<int>? onLinkEnqueued,
         Action<int> onLinkChecked,
         CancellationToken cancellationToken = default
     );
 
-    Task WarmCache(string url, Action<int> onLinkEnqueued, Action<int> onLinkChecked,
+    Task WarmCache(string url, Action<int>? onLinkEnqueued, Action<int>? onLinkChecked,
         CancellationToken cancellationToken = default);
 
     Task WarmCacheWithoutMetrics(string url, Guid userId, CancellationToken cancellationToken = default);
