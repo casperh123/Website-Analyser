@@ -1,8 +1,10 @@
 using BrokenLinkChecker.Crawler.ExtendedCrawlers;
 using BrokenLinkChecker.DocumentParsing.LinkProcessors;
 using BrokenLinkChecker.models.Links;
+using BrokenLinkChecker.models.Result;
 using WebsiteAnalyzer.Core.Entities;
 using WebsiteAnalyzer.Core.Entities.Website;
+using WebsiteAnalyzer.Core.Events;
 using WebsiteAnalyzer.Core.Interfaces.Services;
 using WebsiteAnalyzer.Core.Persistence;
 
@@ -14,6 +16,8 @@ public class CacheWarmingService : ICacheWarmingService
     private readonly ICacheWarmRepository _cacheWarmRepository;
     private readonly ModularCrawler<Link> _linkCrawler;
 
+    public event EventHandler<CrawlProgressEventArgs>? ProgressUpdated;
+
     public CacheWarmingService(
         ICacheWarmRepository cacheWarmRepository,
         IWebsiteService websiteService,
@@ -22,26 +26,14 @@ public class CacheWarmingService : ICacheWarmingService
     {
         _cacheWarmRepository = cacheWarmRepository;
         _websiteService = websiteService;
-
-        ILinkProcessor<Link> linkProcessor = new LinkProcessor(httpClient);
-
-        _linkCrawler = new ModularCrawler<Link>(linkProcessor);
+        _linkCrawler = new ModularCrawler<Link>(new LinkProcessor(httpClient));
     }
 
-    public async Task WarmCache(string url, Action<int>? onLinkEnqueued, Action<int>? onLinkChecked,
-        CancellationToken cancellationToken = default)
+    public async Task WarmCache(string url, CancellationToken cancellationToken = default)
     {
-        try
+        await foreach (CrawlProgress<Link> link in _linkCrawler.CrawlWebsiteAsync(new Link(url), cancellationToken))
         {
-            _linkCrawler.OnLinksChecked += onLinkChecked;
-            _linkCrawler.OnLinksEnqueued += onLinkEnqueued;
-            
-            await foreach(Link link in _linkCrawler.CrawlWebsiteAsync(new Link(url), cancellationToken));
-        }
-        finally
-        {
-            _linkCrawler.OnLinksChecked -= onLinkChecked;
-            _linkCrawler.OnLinksEnqueued -= onLinkEnqueued;
+            UpdateProgress(link);
         }
     }
 
@@ -51,59 +43,39 @@ public class CacheWarmingService : ICacheWarmingService
         CacheWarm cacheWarm = await CreateCacheWarmEntry(website, userId).ConfigureAwait(false);
 
         int linksChecked = 0;
-
-        void OnLinksChecked(int count)
-        {
-            linksChecked = count;
-        }
-
+        
         try
         {
-            _linkCrawler.OnLinksChecked += OnLinksChecked;
+            IAsyncEnumerable<CrawlProgress<Link>> crawlProgress = _linkCrawler.CrawlWebsiteAsync(new Link(url), cancellationToken);
 
-            IAsyncEnumerable<Link> links = _linkCrawler.CrawlWebsiteAsync(new Link(url), cancellationToken);
-            
-            await foreach(Link link in links);
+            await foreach (CrawlProgress<Link> progress in crawlProgress)
+            {
+                linksChecked = progress.LinksChecked;
+            }
         }
         finally
         {
-            _linkCrawler.OnLinksChecked -= OnLinksChecked;
-
             await UpdateCacheWarmResults(cacheWarm, linksChecked).ConfigureAwait(false);
         }
     }
 
 
-    public async Task<CacheWarm> WarmCacheWithSaveAsync(string url, Guid userId, Action<int>? onLinkEnqueued,
-        Action<int> onLinkChecked, CancellationToken cancellationToken = default)
+    public async Task<CacheWarm> WarmCacheWithSaveAsync(string url, Guid userId, CancellationToken cancellationToken = default)
     {
         Website website = await _websiteService.GetOrAddWebsite(url, userId).ConfigureAwait(false);
         CacheWarm cacheWarm = await CreateCacheWarmEntry(website, userId).ConfigureAwait(false);
 
-        int finalLinksChecked = 0;
+        int linksChecked = 0;
+        
+        IAsyncEnumerable<CrawlProgress<Link>> crawlProgress = _linkCrawler.CrawlWebsiteAsync(new Link(url), cancellationToken);
 
-        void OnLinksChecked(int count)
+        await foreach (CrawlProgress<Link> progress in crawlProgress)
         {
-            finalLinksChecked = count;
-            onLinkChecked(count);
+            linksChecked = progress.LinksChecked;
+            UpdateProgress(progress);
         }
-
-        try
-        {
-            _linkCrawler.OnLinksChecked += OnLinksChecked;
-            _linkCrawler.OnLinksEnqueued += onLinkEnqueued;
-            
-            IAsyncEnumerable<Link> links = _linkCrawler.CrawlWebsiteAsync(new Link(url), cancellationToken);
-
-            await foreach(Link link in links);
-        }
-        finally
-        {
-            _linkCrawler.OnLinksChecked -= OnLinksChecked;
-            _linkCrawler.OnLinksEnqueued -= onLinkEnqueued;
-        }
-
-        await UpdateCacheWarmResults(cacheWarm, finalLinksChecked);
+        
+        await UpdateCacheWarmResults(cacheWarm, linksChecked);
 
         return cacheWarm;
     }
@@ -118,13 +90,13 @@ public class CacheWarmingService : ICacheWarmingService
             WebsiteUrl = website.Url,
         };
 
-        await _cacheWarmRepository.AddAsync(cacheWarm).ConfigureAwait(false);
+        await _cacheWarmRepository.AddAsync(cacheWarm);
         return cacheWarm;
     }
 
     public async Task<ICollection<CacheWarm>> GetCacheWarmsAsync()
     {
-        return await _cacheWarmRepository.GetAllAsync().ConfigureAwait(false);
+        return await _cacheWarmRepository.GetAllAsync();
     }
 
     public async Task<ICollection<CacheWarm>> GetCacheWarmsByUserAsync(Guid userId)
@@ -137,5 +109,13 @@ public class CacheWarmingService : ICacheWarmingService
         cacheWarm.EndTime = DateTime.Now;
         cacheWarm.VisitedPages = linksChecked;
         await _cacheWarmRepository.UpdateAsync(cacheWarm).ConfigureAwait(false);
+    }
+
+    private void UpdateProgress(CrawlProgress<Link> progress)
+    {
+        ProgressUpdated?.Invoke(
+            this, 
+            new CrawlProgressEventArgs(progress.LinksEnqueued, progress.LinksChecked)
+        );
     }
 }

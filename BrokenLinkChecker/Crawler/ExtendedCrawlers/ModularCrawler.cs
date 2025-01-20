@@ -1,6 +1,7 @@
 using System.Runtime.CompilerServices;
 using BrokenLinkChecker.DocumentParsing.LinkProcessors;
 using BrokenLinkChecker.models.Links;
+using BrokenLinkChecker.models.Result;
 
 namespace BrokenLinkChecker.Crawler.ExtendedCrawlers;
 
@@ -9,10 +10,7 @@ public class ModularCrawler<T>(ILinkProcessor<T> linkProcessor)
 {
     private const int DefaultQueueSize = 1000;
     
-    public Action<int>? OnLinksChecked { get; set; }
-    public Action<int>? OnLinksEnqueued { get; set; }
-    
-    public async IAsyncEnumerable<T> CrawlWebsiteAsync(T startPage, [EnumeratorCancellation] CancellationToken token = default)
+    public async IAsyncEnumerable<CrawlProgress<T>> CrawlWebsiteAsync(T startPage, [EnumeratorCancellation] CancellationToken token = default)
     {
         linkProcessor.FlushCache();
         
@@ -32,10 +30,7 @@ public class ModularCrawler<T>(ILinkProcessor<T> linkProcessor)
 
             linksChecked++;
             
-            OnLinksChecked?.Invoke(linksChecked);
-            OnLinksEnqueued?.Invoke(linkQueue.Count);
-            
-            yield return link;
+            yield return new CrawlProgress<T>(link, linksChecked, linkQueue.Count);
         }
     }
 }

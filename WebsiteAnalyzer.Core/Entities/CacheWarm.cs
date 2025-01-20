@@ -3,7 +3,7 @@ namespace WebsiteAnalyzer.Core.Entities;
 public record CacheWarm
 {
     public required Guid Id { get; init; }
-    public required Guid UserId { get; init; }
+    public required Guid? UserId { get; init; }
     public required string WebsiteUrl { get; init; }
     public int VisitedPages { get; set; }
     public DateTime StartTime { get; set; }

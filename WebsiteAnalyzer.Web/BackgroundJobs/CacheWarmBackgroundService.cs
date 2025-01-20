@@ -1,6 +1,7 @@
 using BrokenLinkChecker.Crawler.ExtendedCrawlers;
 using BrokenLinkChecker.DocumentParsing.LinkProcessors;
 using BrokenLinkChecker.models.Links;
+using BrokenLinkChecker.models.Result;
 using WebsiteAnalyzer.Core.Entities;
 using WebsiteAnalyzer.Core.Enums;
 using WebsiteAnalyzer.Core.Persistence;
@@ -71,9 +72,9 @@ public class CacheWarmBackgroundService : IHostedService
 
             int linksChecked = 0;
 
-            IAsyncEnumerable<Link> links = cacheWarmCrawler.CrawlWebsiteAsync(new Link(crawlSchedule.Url));
+            IAsyncEnumerable<CrawlProgress<Link>> links = cacheWarmCrawler.CrawlWebsiteAsync(new Link(crawlSchedule.Url));
 
-            await foreach (Link link in links)
+            await foreach (CrawlProgress<Link> link in links)
             {
                 linksChecked++;
             }

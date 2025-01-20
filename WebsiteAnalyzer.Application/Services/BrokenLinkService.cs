@@ -4,7 +4,9 @@ using System.Threading.Channels;
 using BrokenLinkChecker.Crawler.ExtendedCrawlers;
 using BrokenLinkChecker.DocumentParsing.LinkProcessors;
 using BrokenLinkChecker.Models.Links;
+using BrokenLinkChecker.models.Result;
 using WebsiteAnalyzer.Core.Entities.BrokenLink;
+using WebsiteAnalyzer.Core.Events;
 using WebsiteAnalyzer.Core.Interfaces.Repositories;
 using WebsiteAnalyzer.Core.Interfaces.Services;
 
@@ -13,6 +15,8 @@ public class BrokenLinkService : IBrokenLinkService
     private readonly HttpClient _httpClient;
     private readonly IBrokenLinkCrawlRepository _crawlRepository;
     private readonly IBrokenLinkRepository _brokenLinkRepository;
+
+    public event EventHandler<CrawlProgressEventArgs>? ProgressUpdated;
 
     public BrokenLinkService(
         HttpClient httpClient,
@@ -27,27 +31,26 @@ public class BrokenLinkService : IBrokenLinkService
     public async IAsyncEnumerable<IndexedLink> FindBrokenLinks(
         string url,
         Guid? userId,
-        Action<int>? onLinkEnqueued,
-        Action<int>? onLinkChecked,
         [EnumeratorCancellation] CancellationToken cancellationToken)
     {
 
         BrokenLinkProcessor linkProcessor = new BrokenLinkProcessor(_httpClient);
         ModularCrawler<IndexedLink> crawler = new ModularCrawler<IndexedLink>(linkProcessor);
+        IndexedLink startLink = new IndexedLink(string.Empty, url, "", 0);
+        IAsyncEnumerable<CrawlProgress<IndexedLink>> crawlProgress = crawler.CrawlWebsiteAsync(startLink, cancellationToken);
         BrokenLinkCrawl? crawl = null;
 
         if (userId.HasValue)
         {
             crawl = await SaveBrokenLinkCrawl(url, userId.Value);
         }
-        
-        IndexedLink startLink = new IndexedLink(string.Empty, url, "", 0);
 
-        crawler.OnLinksEnqueued += onLinkEnqueued;
-        crawler.OnLinksChecked += onLinkChecked;
-        
-        await foreach (IndexedLink link in crawler.CrawlWebsiteAsync(startLink, cancellationToken))
+        await foreach (CrawlProgress<IndexedLink> progress in crawlProgress)
         {
+            IndexedLink link = progress.Link;
+            UpdateProgress(progress);
+            
+            
             if (link.StatusCode == HttpStatusCode.OK)
             {
                 continue;
@@ -62,7 +65,7 @@ public class BrokenLinkService : IBrokenLinkService
                     link.AnchorText,
                     link.Line,
                     link.StatusCode
-                    );
+                );
             }
 
             yield return link;
@@ -89,5 +92,16 @@ public class BrokenLinkService : IBrokenLinkService
         BrokenLinkCrawl crawl = new BrokenLinkCrawl(userId, url);
         await _crawlRepository.AddAsync(crawl);
         return crawl;
+    }
+
+    private void UpdateProgress(CrawlProgress<IndexedLink> progress)
+    {
+        ProgressUpdated?.Invoke(
+            this, 
+            new CrawlProgressEventArgs(
+                progress.LinksEnqueued,
+                progress.LinksChecked
+                )
+            );
     }
 }

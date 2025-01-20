@@ -1,6 +1,7 @@
 @page "/broken-link-checker"
 @using System.Net
 @using global::BrokenLinkChecker.Models.Links
+@using WebsiteAnalyzer.Core.Events
 @using WebsiteAnalyzer.Core.Interfaces.Services
 @using WebsiteAnalyzer.Infrastructure
 @using WebsiteAnalyzer.Web.Components.WebsiteInputs
@@ -40,6 +41,7 @@
 
     protected override async Task OnInitializedAsync()
     {
+        BrokenLinkService.ProgressUpdated += HandleProgressUpdate;
         _user = await UserService.GetCurrentUserAsync();
     }
 
@@ -51,11 +53,13 @@
 
     private async Task CheckBrokenLinks(Uri url, CancellationToken cancellationToken)
     {
+        _brokenLinks.Clear();
+        _linksChecked = 0;
+        _linksEnqueued = 0;
+        
         IAsyncEnumerable<IndexedLink> brokenLinks = BrokenLinkService.FindBrokenLinks(
             url.ToString(),
             _user?.Id,
-            UpdateLinksEnqueued,
-            UpdateLinksChecked,
             cancellationToken
         ); 
         
@@ -73,14 +77,13 @@
         _linksEnqueued = 0;
     }
 
-    private void UpdateLinksEnqueued(int count)
+    private async void HandleProgressUpdate(object? sender, CrawlProgressEventArgs args)
     {
-        _linksEnqueued = count;
-    }
-
-    private void UpdateLinksChecked(int count)
-    {
-        _linksChecked = count;
-        InvokeAsync(StateHasChanged);
+        await InvokeAsync(() =>
+        {
+            _linksEnqueued = args.LinksEnqueued;
+            _linksChecked = args.LinksChecked;
+            StateHasChanged();
+        });
     }
 }

@@ -2,6 +2,7 @@
 
 @using WebsiteAnalyzer.Core.Entities
 @using WebsiteAnalyzer.Core.Enums
+@using WebsiteAnalyzer.Core.Events
 @using WebsiteAnalyzer.Core.Interfaces.Services
 @using WebsiteAnalyzer.Infrastructure
 @using WebsiteAnalyzer.Web.Components.WebsiteInputs
@@ -12,6 +13,7 @@
 @using WebsiteAnalyzer.Web.Components.CacheWarm.Seo
 
 @inherits WebsiteAnalyzer.Web.Components.Templates.ProcessingComponentBase
+
 
 @inject ICacheWarmingService CacheWarmingService
 @inject IUserService UserService
@@ -59,6 +61,7 @@
 
     protected override async Task OnInitializedAsync()
     {
+        CacheWarmingService.ProgressUpdated += HandleProgressUpdate;
         _user = await UserService.GetCurrentUserAsync();
 
         if (_user is not null)
@@ -82,37 +85,31 @@
 
     private async Task WarmCache(Uri url, CancellationToken cancellationToken)
     {
+        _linksChecked = 0;
+        _linksEnqueued = 0;
+        
         if (_user is null)
         {
             await CacheWarmingService.WarmCache(
                 url.ToString(),
-                UpdateLinksEnqueued,
-                UpdateLinksChecked,
                 cancellationToken
             );
             return;
         }
 
-        await CacheWarmingService.WarmCacheWithSaveAsync(url.ToString(), _user.Id,
-            UpdateLinksEnqueued,
-            UpdateLinksChecked,
-            cancellationToken
-        );
+        await CacheWarmingService.WarmCacheWithSaveAsync(url.ToString(), _user.Id, cancellationToken);
 
         ICollection<CacheWarm> cacheWarms = await CacheWarmingService.GetCacheWarmsByUserAsync(_user.Id);
         _cacheWarms = cacheWarms.ToList();
     }
 
-    private void UpdateLinksEnqueued(int count)
+    private async void HandleProgressUpdate(object? sender, CrawlProgressEventArgs args)
     {
-        _linksEnqueued = count;
-        InvokeAsync(StateHasChanged);
+        await InvokeAsync(() =>
+        {
+            _linksEnqueued = args.LinksEnqueued;
+            _linksChecked = args.LinksChecked;
+            StateHasChanged();
+        });
     }
-
-    private void UpdateLinksChecked(int count)
-    {
-        _linksChecked = count;
-        InvokeAsync(StateHasChanged);
-    }
-
 }
