@@ -82,15 +82,16 @@ public class CacheWarmingService : ICacheWarmingService
 
     private async Task<CacheWarm> CreateCacheWarmEntry(Website website, Guid userId)
     {
-        CacheWarm cacheWarm = new CacheWarm
+        var cacheWarm = new CacheWarm
         {
             Id = Guid.NewGuid(),
             UserId = userId,
-            StartTime = DateTime.Now,
-            WebsiteUrl = website.Url,
+            WebsiteUrl = website.Url
         };
+    
+        cacheWarm.Start();
 
-        await _cacheWarmRepository.AddAsync(cacheWarm);
+        await _cacheWarmRepository.AddAsync(cacheWarm).ConfigureAwait(false);
         return cacheWarm;
     }
 
@@ -106,16 +107,20 @@ public class CacheWarmingService : ICacheWarmingService
 
     private async Task UpdateCacheWarmResults(CacheWarm cacheWarm, int linksChecked)
     {
-        cacheWarm.EndTime = DateTime.Now;
         cacheWarm.VisitedPages = linksChecked;
-        await _cacheWarmRepository.UpdateAsync(cacheWarm).ConfigureAwait(false);
+        cacheWarm.Complete();
+    
+        await _cacheWarmRepository.UpdateAsync(cacheWarm);
     }
 
     private void UpdateProgress(CrawlProgress<Link> progress)
     {
         ProgressUpdated?.Invoke(
             this, 
-            new CrawlProgressEventArgs(progress.LinksEnqueued, progress.LinksChecked)
+            new CrawlProgressEventArgs(
+                progress.LinksEnqueued, 
+                progress.LinksChecked
+            )
         );
     }
 }

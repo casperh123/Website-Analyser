@@ -1,7 +1,6 @@
 using WebsiteAnalyzer.Infrastructure.Data.Configurations;
 using WebsiteAnalyzer.Infrastructure.DependencyInjection;
 using WebsiteAnalyzer.Web.Configuration;
-using WebsiteAnalyzer.Web.Components;
 using WebsiteAnalyzer.Web.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -25,6 +24,15 @@ builder.Services
     .AddBackgroundServices();
 
 builder.Services.AddScoped<IUserService, UserService>();
+
+builder.Services.AddLogging(logging =>
+{
+    logging.ClearProviders();
+    logging.AddConsole();  // For console output
+    logging.AddDebug();    // For debug window output
+    
+    logging.SetMinimumLevel(LogLevel.Information);
+});
 
 // Build and configure the application
 var app = builder.Build();

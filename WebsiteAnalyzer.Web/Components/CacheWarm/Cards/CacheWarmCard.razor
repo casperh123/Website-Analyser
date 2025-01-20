@@ -1,6 +1,7 @@
 @using WebsiteAnalyzer.Core.Entities
 @using WebsiteAnalyzer.Web.Components.CacheWarm.Badges
 @using WebsiteAnalyzer.Web.Services
+@using CacheWarm = global::CacheWarm
 
 @inject StateService StateService
 @inject IJSRuntime JSRuntime
@@ -25,9 +26,11 @@
 </RadzenCard>
 
 @code {
-    [Parameter] public required CacheWarm CacheWarm { get; set; }
+    [Parameter] 
+    public required CacheWarm CacheWarm { get; set; }
 
-    [Parameter] public required EventCallback<CacheWarm> OnRerunWarm { get; set; }
+    [Parameter] 
+    public required EventCallback<CacheWarm> OnRerunWarm { get; set; }
 
     public async Task HandleOnClick()
     {
