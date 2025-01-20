@@ -1,6 +1,7 @@
 @page "/broken-link-checker"
 
-@using global::BrokenLinkChecker.Models.Links
+@using WebsiteAnalyzer.Core.DataTransferObject
+@using WebsiteAnalyzer.Core.Entities.BrokenLink
 @using WebsiteAnalyzer.Core.Events
 @using WebsiteAnalyzer.Core.Interfaces.Services
 @using WebsiteAnalyzer.Infrastructure
@@ -36,7 +37,7 @@
 @code {
     private int _linksChecked;
     private int _linksEnqueued;
-    private IList<IndexedLink> _brokenLinks = [];
+    private IList<BrokenLinkDTO> _brokenLinks = [];
     private ApplicationUser? _user;
 
     protected override async Task OnInitializedAsync()
@@ -47,7 +48,6 @@
 
     private async Task StartBrokenLinkCheck(Uri url)
     {
-        ResetResults();
         await StartProcessingAsync(async (token) => await CheckBrokenLinks(url, token));
     }
 
@@ -57,24 +57,17 @@
         _linksChecked = 0;
         _linksEnqueued = 0;
         
-        IAsyncEnumerable<IndexedLink> brokenLinks = BrokenLinkService.FindBrokenLinks(
+        IAsyncEnumerable<BrokenLinkDTO> brokenLinks = BrokenLinkService.FindBrokenLinks(
             url.ToString(),
             _user?.Id,
             cancellationToken
         ); 
         
-        await foreach (IndexedLink link in brokenLinks)
+        await foreach (BrokenLinkDTO link in brokenLinks)
         {
             _brokenLinks.Add(link);
-            _brokenLinks = new List<IndexedLink>(_brokenLinks);
+            _brokenLinks = new List<BrokenLinkDTO>(_brokenLinks);
         }
-    }
-
-    private void ResetResults()
-    {
-        _brokenLinks.Clear();
-        _linksChecked = 0;
-        _linksEnqueued = 0;
     }
 
     private async void HandleProgressUpdate(object? sender, CrawlProgressEventArgs args)

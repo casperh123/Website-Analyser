@@ -1,0 +1,35 @@
+@using WebsiteAnalyzer.Core.DataTransferObject
+
+<RadzenCard class="broken-link">
+    <RadzenStack>
+        <RadzenStack Gap="5">
+            <RadzenText TextStyle="TextStyle.Body1">Found On</RadzenText>
+            <RadzenLink Path="@Link.ReferringPage" Target="_blank">@Link.ReferringPage</RadzenLink>
+        </RadzenStack>
+        <RadzenStack Orientation="Orientation.Horizontal">
+            <RadzenStack Gap="5">
+                <RadzenText TextStyle="TextStyle.Body1">Anchor Text</RadzenText>
+                <RadzenText TextStyle="TextStyle.Body2">@Link.NormalizedAnchorText()</RadzenText>
+            </RadzenStack>
+            <RadzenStack Gap="5">
+                <RadzenText TextStyle="TextStyle.Body1">Line</RadzenText>
+                <RadzenText TextStyle="TextStyle.Body2">@Link.Line</RadzenText>
+            </RadzenStack>
+        </RadzenStack>
+    </RadzenStack>
+    <RadzenStack>
+        <RadzenStack Gap="5">
+            <RadzenText TextStyle="TextStyle.Body1">Target Page</RadzenText>
+            <RadzenLink Path="@Link.TargetPage" Target="_blank">@Link.TargetPage</RadzenLink>
+        </RadzenStack>
+        <RadzenStack Gap="5">
+            <RadzenText TextStyle="TextStyle.Body1">Status Code</RadzenText>
+            <RadzenText TextStyle="TextStyle.Body2">@Link.StatusCode</RadzenText>
+        </RadzenStack>
+    </RadzenStack>
+</RadzenCard>
+
+@code {
+    [Parameter]
+    public required BrokenLinkDTO Link { get; set; }
+}

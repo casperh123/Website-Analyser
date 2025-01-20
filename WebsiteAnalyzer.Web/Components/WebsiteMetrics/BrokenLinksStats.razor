@@ -1,28 +1,19 @@
-@using BrokenLinkChecker.Models.Links
-@rendermode InteractiveServer
+@using WebsiteAnalyzer.Core.DataTransferObject
+@using WebsiteAnalyzer.Web.Components.BrokenLink.Cards
 
 @if (BrokenLinks.Count > 0)
 {
-    <RadzenDataGrid Data="@BrokenLinks" AllowSorting="true" AllowPaging="true" PageSize="20">
-        <Columns>
-            <RadzenDataGridColumn Property="Target" Title="Target" Sortable="true">
-                <Template Context="link">
-                    @(link.Target)
-                </Template>
-            </RadzenDataGridColumn>            
-            <RadzenDataGridColumn Property="@nameof(IndexedLink.ReferringPage)" Title="Referring Page" Sortable="true">
-                <Template Context="indexedLink">
-                    <RadzenLink href="@indexedLink.ReferringPage" target="_blank">@indexedLink.ReferringPage</RadzenLink>
-                </Template>
-            </RadzenDataGridColumn>
-            <RadzenDataGridColumn Property="@nameof(IndexedLink.AnchorText)" Title="Anchor Text" Sortable="true"/>
-            <RadzenDataGridColumn Property="@nameof(IndexedLink.Line)" Title="Line"/>
-            <RadzenDataGridColumn Property="@nameof(IndexedLink.StatusCode)" Title="Status Code" Sortable="true"/>
-        </Columns>
-    </RadzenDataGrid>
+    foreach (BrokenLinkDTO brokenLink in BrokenLinks)
+    {
+        <BrokenLinkCard Link="@brokenLink" />
+    }
 }
+
+<AuthorizeView>
+    
+</AuthorizeView>
 
 @code {
     [Parameter]
-    public IList<IndexedLink> BrokenLinks { get; set; }
+    public required IList<BrokenLinkDTO> BrokenLinks { get; set; }
 }

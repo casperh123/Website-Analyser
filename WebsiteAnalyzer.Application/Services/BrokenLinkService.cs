@@ -1,10 +1,10 @@
 using System.Net;
 using System.Runtime.CompilerServices;
-using System.Threading.Channels;
 using BrokenLinkChecker.Crawler.ExtendedCrawlers;
 using BrokenLinkChecker.DocumentParsing.LinkProcessors;
 using BrokenLinkChecker.Models.Links;
 using BrokenLinkChecker.models.Result;
+using WebsiteAnalyzer.Core.DataTransferObject;
 using WebsiteAnalyzer.Core.Entities.BrokenLink;
 using WebsiteAnalyzer.Core.Events;
 using WebsiteAnalyzer.Core.Interfaces.Repositories;
@@ -28,7 +28,7 @@ public class BrokenLinkService : IBrokenLinkService
         _brokenLinkRepository = brokenLinkRepository;
     }
 
-    public async IAsyncEnumerable<IndexedLink> FindBrokenLinks(
+    public async IAsyncEnumerable<BrokenLinkDTO> FindBrokenLinks(
         string url,
         Guid? userId,
         [EnumeratorCancellation] CancellationToken cancellationToken)
@@ -60,27 +60,23 @@ public class BrokenLinkService : IBrokenLinkService
             {
                 await SaveBrokenLinkAsync(
                     crawl,
-                    link.Target,
-                    link.ReferringPage,
-                    link.AnchorText,
-                    link.Line,
-                    link.StatusCode
+                    link
                 );
             }
 
-            yield return link;
+            yield return BrokenLinkDTO.FromIndexedLink(link);
         }
     }
 
-    private async Task SaveBrokenLinkAsync(BrokenLinkCrawl crawl, string target, string referringPage, string anchorText, int line, HttpStatusCode statusCode)
+    private async Task SaveBrokenLinkAsync(BrokenLinkCrawl crawl, IndexedLink link)
     {
         BrokenLink brokenLink = new BrokenLink(
             crawl,
-            target,
-            referringPage,
-            anchorText,
-            line,
-            statusCode
+            link.Target,
+            link.ReferringPage,
+            link.AnchorText,
+            link.Line,
+            link.StatusCode
         );
 
         await _brokenLinkRepository.AddAsync(brokenLink);

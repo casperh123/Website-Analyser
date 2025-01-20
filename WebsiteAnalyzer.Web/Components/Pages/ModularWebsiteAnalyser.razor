@@ -1,5 +1,6 @@
 @page "/website-analyser"
 @using global::BrokenLinkChecker.Models.Links
+@using WebsiteAnalyzer.Core.DataTransferObject
 @using WebsiteAnalyzer.Core.Interfaces.Services
 @using WebsiteAnalyzer.Infrastructure
 @using WebsiteAnalyzer.Web.Components.WebsiteInputs
@@ -34,7 +35,7 @@
     private bool IsChecking { get; set; }
     private int _linksChecked;
     private int _linksEnqueued;
-    private IList<IndexedLink> _brokenLinks = [];
+    private IList<BrokenLinkDTO> _brokenLinks = [];
     private ApplicationUser? _user;
 
     protected async override Task OnInitializedAsync()
@@ -76,7 +77,7 @@
         InvokeAsync(StateHasChanged);
     }
 
-    private void UpdateBrokenLinks(IndexedLink link)
+    private void UpdateBrokenLinks(BrokenLinkDTO link)
     {
         _brokenLinks.Add(link);
         InvokeAsync(StateHasChanged);
