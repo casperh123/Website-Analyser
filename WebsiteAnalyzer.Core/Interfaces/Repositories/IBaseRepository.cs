@@ -1,4 +1,4 @@
-namespace WebsiteAnalyzer.Core.Persistence;
+namespace WebsiteAnalyzer.Core.Interfaces.Repositories;
 
 public interface IBaseRepository<T> where T : class
 {

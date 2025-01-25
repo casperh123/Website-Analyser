@@ -17,6 +17,46 @@ namespace WebsiteAnalyzer.Infrastructure.Migrations
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "9.0.1");
 
+            modelBuilder.Entity("CacheWarm", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("EndTime")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("ScheduleUrl")
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid?>("ScheduleUserId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("StartTime")
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid?>("UserId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("VisitedPages")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("WebsiteUrl")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid?>("WebsiteUserId")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ScheduleUserId", "ScheduleUrl");
+
+                    b.HasIndex("WebsiteUrl", "WebsiteUserId");
+
+                    b.ToTable("CacheWarms");
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole<System.Guid>", b =>
                 {
                     b.Property<Guid>("Id")
@@ -153,14 +193,13 @@ namespace WebsiteAnalyzer.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<Guid>("BrokenLinkCrawlId")
+                    b.Property<Guid?>("BrokenLinkCrawlId")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("BrokenLinkCrawlUrl")
-                        .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<Guid>("BrokenLinkCrawlUserId")
+                    b.Property<Guid?>("BrokenLinkCrawlUserId")
                         .HasColumnType("TEXT");
 
                     b.Property<int>("Line")
@@ -195,49 +234,12 @@ namespace WebsiteAnalyzer.Infrastructure.Migrations
                     b.Property<Guid>("UserId")
                         .HasColumnType("TEXT");
 
+                    b.Property<int>("LinksChecked")
+                        .HasColumnType("INTEGER");
+
                     b.HasKey("Id", "Url", "UserId");
 
                     b.ToTable("BrokenLinkCrawls");
-                });
-
-            modelBuilder.Entity("WebsiteAnalyzer.Core.Entities.CacheWarm", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("TEXT");
-
-                    b.Property<DateTime>("EndTime")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("ScheduleUrl")
-                        .HasColumnType("TEXT");
-
-                    b.Property<Guid?>("ScheduleUserId")
-                        .HasColumnType("TEXT");
-
-                    b.Property<DateTime>("StartTime")
-                        .HasColumnType("TEXT");
-
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("TEXT");
-
-                    b.Property<int>("VisitedPages")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("WebsiteUrl")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<Guid?>("WebsiteUserId")
-                        .HasColumnType("TEXT");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ScheduleUserId", "ScheduleUrl");
-
-                    b.HasIndex("WebsiteUrl", "WebsiteUserId");
-
-                    b.ToTable("CacheWarms");
                 });
 
             modelBuilder.Entity("WebsiteAnalyzer.Core.Entities.CrawlSchedule", b =>
@@ -348,6 +350,19 @@ namespace WebsiteAnalyzer.Infrastructure.Migrations
                     b.ToTable("AspNetUsers", (string)null);
                 });
 
+            modelBuilder.Entity("CacheWarm", b =>
+                {
+                    b.HasOne("WebsiteAnalyzer.Core.Entities.CrawlSchedule", "Schedule")
+                        .WithMany()
+                        .HasForeignKey("ScheduleUserId", "ScheduleUrl");
+
+                    b.HasOne("WebsiteAnalyzer.Core.Entities.Website.Website", null)
+                        .WithMany("CacheWarmRuns")
+                        .HasForeignKey("WebsiteUrl", "WebsiteUserId");
+
+                    b.Navigation("Schedule");
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<System.Guid>", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole<System.Guid>", null)
@@ -403,24 +418,9 @@ namespace WebsiteAnalyzer.Infrastructure.Migrations
                 {
                     b.HasOne("WebsiteAnalyzer.Core.Entities.BrokenLink.BrokenLinkCrawl", "BrokenLinkCrawl")
                         .WithMany("BrokenLinks")
-                        .HasForeignKey("BrokenLinkCrawlId", "BrokenLinkCrawlUrl", "BrokenLinkCrawlUserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("BrokenLinkCrawlId", "BrokenLinkCrawlUrl", "BrokenLinkCrawlUserId");
 
                     b.Navigation("BrokenLinkCrawl");
-                });
-
-            modelBuilder.Entity("WebsiteAnalyzer.Core.Entities.CacheWarm", b =>
-                {
-                    b.HasOne("WebsiteAnalyzer.Core.Entities.CrawlSchedule", "Schedule")
-                        .WithMany()
-                        .HasForeignKey("ScheduleUserId", "ScheduleUrl");
-
-                    b.HasOne("WebsiteAnalyzer.Core.Entities.Website.Website", null)
-                        .WithMany("CacheWarmRuns")
-                        .HasForeignKey("WebsiteUrl", "WebsiteUserId");
-
-                    b.Navigation("Schedule");
                 });
 
             modelBuilder.Entity("WebsiteAnalyzer.Core.Entities.Website.Website", b =>

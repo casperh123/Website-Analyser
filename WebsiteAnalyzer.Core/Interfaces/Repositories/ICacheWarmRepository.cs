@@ -1,4 +1,5 @@
 using WebsiteAnalyzer.Core.Entities;
+using WebsiteAnalyzer.Core.Interfaces.Repositories;
 
 namespace WebsiteAnalyzer.Core.Persistence;
 

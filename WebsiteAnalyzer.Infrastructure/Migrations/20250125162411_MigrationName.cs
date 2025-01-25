@@ -56,7 +56,8 @@ namespace WebsiteAnalyzer.Infrastructure.Migrations
                 {
                     Id = table.Column<Guid>(type: "TEXT", nullable: false),
                     UserId = table.Column<Guid>(type: "TEXT", nullable: false),
-                    Url = table.Column<string>(type: "TEXT", nullable: false)
+                    Url = table.Column<string>(type: "TEXT", nullable: false),
+                    LinksChecked = table.Column<int>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -208,9 +209,9 @@ namespace WebsiteAnalyzer.Infrastructure.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "TEXT", nullable: false),
-                    BrokenLinkCrawlId = table.Column<Guid>(type: "TEXT", nullable: false),
-                    BrokenLinkCrawlUrl = table.Column<string>(type: "TEXT", nullable: false),
-                    BrokenLinkCrawlUserId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    BrokenLinkCrawlId = table.Column<Guid>(type: "TEXT", nullable: true),
+                    BrokenLinkCrawlUrl = table.Column<string>(type: "TEXT", nullable: true),
+                    BrokenLinkCrawlUserId = table.Column<Guid>(type: "TEXT", nullable: true),
                     TargetPage = table.Column<string>(type: "TEXT", nullable: false),
                     ReferringPage = table.Column<string>(type: "TEXT", nullable: false),
                     AnchorText = table.Column<string>(type: "TEXT", nullable: false),
@@ -224,8 +225,7 @@ namespace WebsiteAnalyzer.Infrastructure.Migrations
                         name: "FK_BrokenLinks_BrokenLinkCrawls_BrokenLinkCrawlId_BrokenLinkCrawlUrl_BrokenLinkCrawlUserId",
                         columns: x => new { x.BrokenLinkCrawlId, x.BrokenLinkCrawlUrl, x.BrokenLinkCrawlUserId },
                         principalTable: "BrokenLinkCrawls",
-                        principalColumns: new[] { "Id", "Url", "UserId" },
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumns: new[] { "Id", "Url", "UserId" });
                 });
 
             migrationBuilder.CreateTable(
@@ -233,7 +233,7 @@ namespace WebsiteAnalyzer.Infrastructure.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "TEXT", nullable: false),
-                    UserId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    UserId = table.Column<Guid>(type: "TEXT", nullable: true),
                     WebsiteUrl = table.Column<string>(type: "TEXT", nullable: false),
                     VisitedPages = table.Column<int>(type: "INTEGER", nullable: false),
                     StartTime = table.Column<DateTime>(type: "TEXT", nullable: false),

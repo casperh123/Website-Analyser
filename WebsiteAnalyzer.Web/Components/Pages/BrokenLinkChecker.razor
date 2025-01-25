@@ -34,16 +34,24 @@
     </RadzenStack>
 }
 
+@foreach (BrokenLinkCrawlDTO crawl in _brokenLinkCrawls)
+{
+    <RadzenText>@crawl.Url</RadzenText>
+    <RadzenText>@crawl.LinksChecked</RadzenText>
+}
+
 @code {
     private int _linksChecked;
     private int _linksEnqueued;
-    private IList<BrokenLinkDTO> _brokenLinks = [];
+    private ICollection<BrokenLinkDTO> _brokenLinks = [];
+    private ICollection<BrokenLinkCrawlDTO> _brokenLinkCrawls = [];
     private ApplicationUser? _user;
 
     protected override async Task OnInitializedAsync()
     {
         BrokenLinkService.ProgressUpdated += HandleProgressUpdate;
         _user = await UserService.GetCurrentUserAsync();
+        _brokenLinkCrawls = await BrokenLinkService.GetCrawlsByUserAsync(_user?.Id);
     }
 
     private async Task StartBrokenLinkCheck(Uri url)
@@ -56,6 +64,10 @@
         _brokenLinks.Clear();
         _linksChecked = 0;
         _linksEnqueued = 0;
+
+        BrokenLinkCrawlDTO crawl = await BrokenLinkService.StartCrawl(url.ToString(), _user?.Id);
+
+        _brokenLinkCrawls.Add(crawl);
         
         IAsyncEnumerable<BrokenLinkDTO> brokenLinks = BrokenLinkService.FindBrokenLinks(
             url.ToString(),
@@ -67,7 +79,10 @@
         {
             _brokenLinks.Add(link);
             _brokenLinks = new List<BrokenLinkDTO>(_brokenLinks);
+            crawl.BrokenLinks.Add(link);
         }
+
+        await BrokenLinkService.EndCrawl(crawl, _linksChecked, _user?.Id);
     }
 
     private async void HandleProgressUpdate(object? sender, CrawlProgressEventArgs args)

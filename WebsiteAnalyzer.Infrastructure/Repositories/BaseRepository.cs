@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using WebsiteAnalyzer.Core.Interfaces.Repositories;
 using WebsiteAnalyzer.Core.Persistence;
 using WebsiteAnalyzer.Infrastructure.Data;
 

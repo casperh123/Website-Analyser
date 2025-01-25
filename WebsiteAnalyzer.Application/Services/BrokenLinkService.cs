@@ -10,6 +10,8 @@ using WebsiteAnalyzer.Core.Events;
 using WebsiteAnalyzer.Core.Interfaces.Repositories;
 using WebsiteAnalyzer.Core.Interfaces.Services;
 
+namespace WebsiteAnalyzer.Application.Services;
+
 public class BrokenLinkService : IBrokenLinkService
 {
     private readonly HttpClient _httpClient;
@@ -33,7 +35,6 @@ public class BrokenLinkService : IBrokenLinkService
         Guid? userId,
         [EnumeratorCancellation] CancellationToken cancellationToken)
     {
-
         BrokenLinkProcessor linkProcessor = new BrokenLinkProcessor(_httpClient);
         ModularCrawler<IndexedLink> crawler = new ModularCrawler<IndexedLink>(linkProcessor);
         IndexedLink startLink = new IndexedLink(string.Empty, url, "", 0);
@@ -68,6 +69,44 @@ public class BrokenLinkService : IBrokenLinkService
         }
     }
 
+    public async Task<BrokenLinkCrawlDTO> StartCrawl(string url, Guid? userId)
+    {
+        if (!userId.HasValue)
+        {
+            return new BrokenLinkCrawlDTO(url, DateTime.UtcNow);
+        }
+        
+        BrokenLinkCrawl crawl = new BrokenLinkCrawl(userId.Value, url);
+        await _crawlRepository.AddAsync(crawl);
+
+
+        return new BrokenLinkCrawlDTO(crawl.Id, url, DateTime.UtcNow);
+    }
+    
+    public async Task<BrokenLinkCrawlDTO> EndCrawl(BrokenLinkCrawlDTO crawl, int linksChecked, Guid? userId)
+    {
+        crawl.LinksChecked = linksChecked;
+        
+        if (userId.HasValue)
+        {
+            await _crawlRepository.UpdateAsync(crawl.ToBrokenLink(userId.Value));
+        }
+
+        return crawl;
+    }
+
+    public async Task<ICollection<BrokenLinkCrawlDTO>> GetCrawlsByUserAsync(Guid? userId)
+    {
+        if (!userId.HasValue)
+        {
+            return [];
+        }
+        
+        ICollection<BrokenLinkCrawl> brokenLinkCrawls = await _crawlRepository.GetByUserAsync(userId) ?? [];
+
+        return brokenLinkCrawls.Select(BrokenLinkCrawlDTO.From).ToList();
+    }
+
     private async Task SaveBrokenLinkAsync(BrokenLinkCrawl crawl, IndexedLink link)
     {
         BrokenLink brokenLink = new BrokenLink(
@@ -97,7 +136,7 @@ public class BrokenLinkService : IBrokenLinkService
             new CrawlProgressEventArgs(
                 progress.LinksEnqueued,
                 progress.LinksChecked
-                )
-            );
+            )
+        );
     }
 }

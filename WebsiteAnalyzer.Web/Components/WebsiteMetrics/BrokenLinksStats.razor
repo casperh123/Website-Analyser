@@ -9,11 +9,7 @@
     }
 }
 
-<AuthorizeView>
-    
-</AuthorizeView>
-
 @code {
     [Parameter]
-    public required IList<BrokenLinkDTO> BrokenLinks { get; set; }
+    public required ICollection<BrokenLinkDTO> BrokenLinks { get; set; }
 }

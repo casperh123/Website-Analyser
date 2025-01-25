@@ -22,6 +22,18 @@ public record BrokenLinkDTO
     public HttpStatusCode StatusCode { get; set; }
     
     public string NormalizedAnchorText() => string.IsNullOrEmpty(AnchorText) ? "N/A" : AnchorText;
+
+    public BrokenLink ToBrokenLink()
+    {
+        return new BrokenLink
+        {
+            TargetPage = TargetPage,
+            ReferringPage = ReferringPage,
+            AnchorText = AnchorText,
+            Line = Line,
+            StatusCode = StatusCode
+        };
+    }
     
     public static BrokenLinkDTO FromIndexedLink(IndexedLink link) => new BrokenLinkDTO(link.Target, link.ReferringPage, link.AnchorText, link.Line, link.StatusCode);
     public static BrokenLinkDTO FromBrokenLink(BrokenLink link) => new BrokenLinkDTO(link.TargetPage, link.ReferringPage, link.AnchorText, link.Line, link.StatusCode);

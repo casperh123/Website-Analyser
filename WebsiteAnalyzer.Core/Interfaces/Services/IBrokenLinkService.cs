@@ -10,4 +10,9 @@ public interface IBrokenLinkService
     IAsyncEnumerable<BrokenLinkDTO> FindBrokenLinks(string url,
         Guid? userId,
         CancellationToken cancellationToken);
+
+    Task<BrokenLinkCrawlDTO> StartCrawl(string url, Guid? userId);
+    Task<BrokenLinkCrawlDTO> EndCrawl(BrokenLinkCrawlDTO crawl, int linksChecked, Guid? userId);
+    
+    Task<ICollection<BrokenLinkCrawlDTO>> GetCrawlsByUserAsync(Guid? userId);
 }
