@@ -105,6 +105,15 @@ public class BrokenLinkService : IBrokenLinkService
         return brokenLinkCrawls.Select(BrokenLinkCrawlDTO.From).ToList();
     }
 
+    public async Task<ICollection<BrokenLinkDTO>> GetBrokenLinksByCrawlIdAsync(Guid crawlId)
+    {
+        IEnumerable<BrokenLink> brokenLinks = await _brokenLinkRepository.GetBrokenLinksByCrawlAsync(crawlId);
+        
+        return brokenLinks
+            .Select(BrokenLinkDTO.FromBrokenLink)
+            .ToList();
+    }
+
     private async Task SaveBrokenLinkAsync(BrokenLinkCrawl crawl, IndexedLink link)
     {
         BrokenLink brokenLink = new BrokenLink(

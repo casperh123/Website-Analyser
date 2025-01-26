@@ -34,7 +34,8 @@ public record BrokenLinkCrawlDTO
             Id = crawl.Id,
             Url = crawl.Url,
             BrokenLinks = crawl.BrokenLinks.Select(BrokenLinkDTO.FromBrokenLink).ToList(),
-            LinksChecked = crawl.LinksChecked
+            LinksChecked = crawl.LinksChecked,
+            Time = crawl.Date
         };
     }
     
@@ -45,7 +46,8 @@ public record BrokenLinkCrawlDTO
              UserId = userId,
              Url = Url,
              BrokenLinks = BrokenLinks.Select(link => link.ToBrokenLink()).ToList(),
-             LinksChecked = LinksChecked
+             LinksChecked = LinksChecked,
+             Date = Time
          };
     }
 }

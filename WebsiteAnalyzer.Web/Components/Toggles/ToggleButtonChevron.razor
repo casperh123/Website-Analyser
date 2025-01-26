@@ -1,0 +1,24 @@
+<RadzenButton Click="Toggle" Size="ButtonSize.Small" Icon="@_icon"/>
+
+@code {
+    [Parameter] 
+    public bool Open { get; set; } = false;
+    
+    [Parameter]
+    public EventCallback<bool> OpenChanged { get; set; }
+    
+    private string _icon = "keyboard_arrow_down";
+    private const string _closedIcon = "keyboard_arrow_down";
+    private const string _openIcon = "keyboard_arrow_up";
+
+    private async Task Toggle()
+    {
+        Open = !Open;
+        _icon = Open ? _openIcon : _closedIcon;
+
+        if(OpenChanged.HasDelegate)
+        {
+            await OpenChanged.InvokeAsync(Open);
+        }
+    }
+}

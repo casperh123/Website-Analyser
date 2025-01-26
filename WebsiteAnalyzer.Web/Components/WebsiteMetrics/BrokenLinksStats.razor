@@ -3,10 +3,16 @@
 
 @if (BrokenLinks.Count > 0)
 {
-    foreach (BrokenLinkDTO brokenLink in BrokenLinks)
-    {
-        <BrokenLinkCard Link="@brokenLink" />
-    }
+    <RadzenStack Gap="20">
+        @foreach (BrokenLinkDTO brokenLink in BrokenLinks)
+        {
+            <BrokenLinkCard Link="@brokenLink" />
+        }
+    </RadzenStack>
+}
+else
+{
+    <RadzenText>No broken links found</RadzenText>
 }
 
 @code {

@@ -1,0 +1,42 @@
+@using WebsiteAnalyzer.Core.DataTransferObject
+@using WebsiteAnalyzer.Core.Interfaces.Services
+@using WebsiteAnalyzer.Web.Components.BrokenLink.Cards
+
+@inject IBrokenLinkService BrokenLinkService
+
+<RadzenStack class="rz-mt-12">
+    <RadzenText TextStyle="TextStyle.Body2">Broken Links</RadzenText>
+    @foreach (BrokenLinkDTO brokenLink in _brokenLinks)
+    {
+        <BrokenLinkCard Link="brokenLink"/>
+    }
+</RadzenStack>
+
+<RadzenPager ></RadzenPager>
+
+@code {
+    [Parameter]
+    public required BrokenLinkCrawlDTO BrokenLinkCrawl { get; set; }
+    
+    private ICollection<BrokenLinkDTO> _brokenLinks = [];
+    private ICollection<BrokenLinkDTO> _filteredLinks = [];
+
+    private int _count;
+    private int _pageSize = 20;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender)
+        {
+            return;
+        }
+        
+        if (BrokenLinkCrawl.Id is not null)
+        {
+            BrokenLinkCrawl.BrokenLinks = await BrokenLinkService.GetBrokenLinksByCrawlIdAsync(BrokenLinkCrawl.Id.Value);
+        }
+        
+        _brokenLinks = BrokenLinkCrawl.BrokenLinks;
+    }
+
+}

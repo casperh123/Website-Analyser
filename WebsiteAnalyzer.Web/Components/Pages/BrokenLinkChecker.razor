@@ -1,18 +1,21 @@
 @page "/broken-link-checker"
 
 @using WebsiteAnalyzer.Core.DataTransferObject
-@using WebsiteAnalyzer.Core.Entities.BrokenLink
+@using WebsiteAnalyzer.Core.Enums
 @using WebsiteAnalyzer.Core.Events
 @using WebsiteAnalyzer.Core.Interfaces.Services
 @using WebsiteAnalyzer.Infrastructure
 @using WebsiteAnalyzer.Web.Components.WebsiteInputs
 @using WebsiteAnalyzer.Web.Components.WebsiteMetrics
 @using WebsiteAnalyzer.Web.Services
+@using WebsiteAnalyzer.Web.Components.BrokenLink.Lists
+@using WebsiteAnalyzer.Web.Components.Schedule
 
 @inherits WebsiteAnalyzer.Web.Components.Templates.ProcessingComponentBase
 
 @inject IBrokenLinkService BrokenLinkService
 @inject IUserService UserService
+@inject IJSRuntime JsRuntime
 
 @rendermode InteractiveServer
 
@@ -21,28 +24,33 @@
 <h2>Broken Link Checker</h2>
 
 <WebsiteInput 
+    Url="@_url"
     WebsiteActionStarted="StartBrokenLinkCheck" 
     IsProcessing="IsProcessing" 
     LinksChecked="_linksChecked" 
     LinksEnqueued="_linksEnqueued"
     OnCancel="CancelProcessing"/>
 
-@if (_linksChecked > 0)
-{
-    <RadzenStack class="rz-mt-6">
-        <BrokenLinksStats BrokenLinks="_brokenLinks"/>
-    </RadzenStack>
-}
-
-@foreach (BrokenLinkCrawlDTO crawl in _brokenLinkCrawls)
-{
-    <RadzenText>@crawl.Url</RadzenText>
-    <RadzenText>@crawl.LinksChecked</RadzenText>
-}
+<RadzenTabs class="rz-mt-12">
+    <Tabs>
+        <RadzenTabsItem Text="Broken Links">
+            <BrokenLinksStats BrokenLinks="_brokenLinks"/>
+        </RadzenTabsItem>
+        <RadzenTabsItem Text="History">
+            <BrokenLinkCrawlHistory BrokenLinkCrawls="_brokenLinkCrawls" IsProcessing="IsProcessing" OnRerun="RerunBrokenLink"/>
+        </RadzenTabsItem>
+        <AuthorizeView>
+            <RadzenTabsItem Text="Schedule">
+                <WebsiteScheduler User="_user" Action="CrawlAction.BrokenLink" />
+            </RadzenTabsItem>
+        </AuthorizeView>
+    </Tabs>
+</RadzenTabs>
 
 @code {
     private int _linksChecked;
     private int _linksEnqueued;
+    private string _url = "https://";
     private ICollection<BrokenLinkDTO> _brokenLinks = [];
     private ICollection<BrokenLinkCrawlDTO> _brokenLinkCrawls = [];
     private ApplicationUser? _user;
@@ -54,8 +62,17 @@
         _brokenLinkCrawls = await BrokenLinkService.GetCrawlsByUserAsync(_user?.Id);
     }
 
+    private async Task RerunBrokenLink(string url)
+    {
+        await JsRuntime.InvokeVoidAsync("backToTop");
+        _url = url;
+        Uri uri = new Uri(url);
+        await StartProcessingAsync(async (token) => await CheckBrokenLinks(uri, token));
+    }
+
     private async Task StartBrokenLinkCheck(Uri url)
     {
+        _url = url.ToString();
         await StartProcessingAsync(async (token) => await CheckBrokenLinks(url, token));
     }
 
@@ -71,7 +88,7 @@
         
         IAsyncEnumerable<BrokenLinkDTO> brokenLinks = BrokenLinkService.FindBrokenLinks(
             url.ToString(),
-            _user?.Id,
+            crawl.Id,
             cancellationToken
         ); 
         

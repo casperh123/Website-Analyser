@@ -13,6 +13,7 @@ public record BrokenLinkCrawl
         UserId = userId;
         Url = url;
         BrokenLinks = [];
+        Date = DateTime.UtcNow;
     }
 
     public Guid Id { get; set; }
@@ -20,6 +21,7 @@ public record BrokenLinkCrawl
     public string Url { get; set; }
     public ICollection<BrokenLink> BrokenLinks { get; set; } = [];
     public int LinksChecked { get; set; }
+    public DateTime Date { get; set; }
     
     public void AddBrokenLink(BrokenLink brokenLink) => BrokenLinks.Add(brokenLink);
 }

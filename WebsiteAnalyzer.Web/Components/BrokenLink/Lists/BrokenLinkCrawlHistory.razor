@@ -1,0 +1,30 @@
+@using WebsiteAnalyzer.Core.DataTransferObject
+@using WebsiteAnalyzer.Web.Components.BrokenLink.Cards
+
+<RadzenStack Gap="20">
+    @if (BrokenLinkCrawls.Any())
+    {
+        @foreach (BrokenLinkCrawlDTO crawl in BrokenLinkCrawls.OrderByDescending(crawl => crawl.Time))
+        {
+            <BrokenLinkCrawlCard Crawl="crawl" IsProcessing="IsProcessing" OnRerun="OnRerun"/>
+        }
+    }
+    else
+    {
+        <RadzenText>
+            No previous crawls
+        </RadzenText>
+    }
+</RadzenStack>
+
+@code {
+    [Parameter]
+    public ICollection<BrokenLinkCrawlDTO> BrokenLinkCrawls { get; set; }
+
+    [Parameter]
+    public bool IsProcessing { get; set; }
+    
+    [Parameter]
+    public EventCallback<string> OnRerun { get; set; }
+
+}

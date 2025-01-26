@@ -1,0 +1,65 @@
+@using WebsiteAnalyzer.Core.DataTransferObject
+@using WebsiteAnalyzer.Core.Interfaces.Services
+@using WebsiteAnalyzer.Web.Components.Toggles
+
+@inject IBrokenLinkService BrokenLinkService
+
+<RadzenCard Variant="Variant.Outlined">
+    <RadzenRow JustifyContent="JustifyContent.SpaceBetween">
+        <RadzenRow>
+            <RadzenStack>
+                <RadzenText TextStyle="TextStyle.Body1">Url</RadzenText>
+                <RadzenText TextStyle="TextStyle.Body2">@Crawl.Url</RadzenText>
+            </RadzenStack>
+            <RadzenStack>
+                <RadzenText TextStyle="TextStyle.Body1">Links Checked</RadzenText>
+                <RadzenText TextStyle="TextStyle.Body2">@Crawl.LinksChecked</RadzenText>
+            </RadzenStack>
+            <RadzenStack>
+                <RadzenText TextStyle="TextStyle.Body1">Date</RadzenText>
+                <RadzenText TextStyle="TextStyle.Body2">@Crawl.Time</RadzenText>
+            </RadzenStack>
+            <RadzenStack>
+                <RadzenText TextStyle="TextStyle.Body1">Broken Links</RadzenText>
+                <RadzenText TextStyle="TextStyle.Body2">@Crawl.BrokenLinks.Count</RadzenText>
+            </RadzenStack>
+        </RadzenRow>
+        <RadzenRow JustifyContent="JustifyContent.Center" AlignItems="AlignItems.Center">
+            <RadzenButton Disabled="IsProcessing" Size="ButtonSize.Small"
+                          Click="@(() => Rerun(Crawl.Url))" Icon="restart_alt"/>
+            <ToggleButtonChevron @bind-Open="_open"/>
+        </RadzenRow>
+    </RadzenRow>
+    
+    @if (_open)
+    {
+        <RadzenStack>
+            <RadzenText TextStyle="TextStyle.H4">Broken Links</RadzenText>
+            @foreach (BrokenLinkDTO brokenLink in Crawl.BrokenLinks)
+            {
+                <BrokenLinkCard Link="brokenLink"/>
+            }
+        </RadzenStack>
+    }
+</RadzenCard>
+
+@code {
+    [Parameter] 
+    public required BrokenLinkCrawlDTO Crawl { get; set; }
+
+    [Parameter] 
+    public required bool IsProcessing { get; set; }
+
+    [Parameter] 
+    public EventCallback<string> OnRerun { get; set; }
+
+    private bool _open = false;
+
+    public async Task Rerun(string url)
+    {
+        if (OnRerun.HasDelegate)
+        {
+            await OnRerun.InvokeAsync(url);
+        }
+    }
+}
