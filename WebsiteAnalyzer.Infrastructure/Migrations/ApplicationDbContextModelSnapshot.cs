@@ -26,6 +26,9 @@ namespace WebsiteAnalyzer.Infrastructure.Migrations
                     b.Property<DateTime>("EndTime")
                         .HasColumnType("TEXT");
 
+                    b.Property<int?>("ScheduleAction")
+                        .HasColumnType("INTEGER");
+
                     b.Property<string>("ScheduleUrl")
                         .HasColumnType("TEXT");
 
@@ -50,9 +53,9 @@ namespace WebsiteAnalyzer.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ScheduleUserId", "ScheduleUrl");
-
                     b.HasIndex("WebsiteUrl", "WebsiteUserId");
+
+                    b.HasIndex("ScheduleUserId", "ScheduleUrl", "ScheduleAction");
 
                     b.ToTable("CacheWarms");
                 });
@@ -196,12 +199,6 @@ namespace WebsiteAnalyzer.Infrastructure.Migrations
                     b.Property<Guid?>("BrokenLinkCrawlId")
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("BrokenLinkCrawlUrl")
-                        .HasColumnType("TEXT");
-
-                    b.Property<Guid?>("BrokenLinkCrawlUserId")
-                        .HasColumnType("TEXT");
-
                     b.Property<int>("Line")
                         .HasColumnType("INTEGER");
 
@@ -218,7 +215,7 @@ namespace WebsiteAnalyzer.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("BrokenLinkCrawlId", "BrokenLinkCrawlUrl", "BrokenLinkCrawlUserId");
+                    b.HasIndex("BrokenLinkCrawlId");
 
                     b.ToTable("BrokenLinks");
                 });
@@ -226,18 +223,20 @@ namespace WebsiteAnalyzer.Infrastructure.Migrations
             modelBuilder.Entity("WebsiteAnalyzer.Core.Entities.BrokenLink.BrokenLinkCrawl", b =>
                 {
                     b.Property<Guid>("Id")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("Url")
-                        .HasColumnType("TEXT");
-
-                    b.Property<Guid>("UserId")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("TEXT");
 
                     b.Property<int>("LinksChecked")
                         .HasColumnType("INTEGER");
 
-                    b.HasKey("Id", "Url", "UserId");
+                    b.Property<string>("Url")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
 
                     b.ToTable("BrokenLinkCrawls");
                 });
@@ -262,7 +261,7 @@ namespace WebsiteAnalyzer.Infrastructure.Migrations
                     b.Property<int>("Status")
                         .HasColumnType("INTEGER");
 
-                    b.HasKey("UserId", "Url");
+                    b.HasKey("UserId", "Url", "Action");
 
                     b.ToTable("CrawlSchedules");
                 });
@@ -352,13 +351,13 @@ namespace WebsiteAnalyzer.Infrastructure.Migrations
 
             modelBuilder.Entity("CacheWarm", b =>
                 {
-                    b.HasOne("WebsiteAnalyzer.Core.Entities.CrawlSchedule", "Schedule")
-                        .WithMany()
-                        .HasForeignKey("ScheduleUserId", "ScheduleUrl");
-
                     b.HasOne("WebsiteAnalyzer.Core.Entities.Website.Website", null)
                         .WithMany("CacheWarmRuns")
                         .HasForeignKey("WebsiteUrl", "WebsiteUserId");
+
+                    b.HasOne("WebsiteAnalyzer.Core.Entities.CrawlSchedule", "Schedule")
+                        .WithMany()
+                        .HasForeignKey("ScheduleUserId", "ScheduleUrl", "ScheduleAction");
 
                     b.Navigation("Schedule");
                 });
@@ -418,7 +417,7 @@ namespace WebsiteAnalyzer.Infrastructure.Migrations
                 {
                     b.HasOne("WebsiteAnalyzer.Core.Entities.BrokenLink.BrokenLinkCrawl", "BrokenLinkCrawl")
                         .WithMany("BrokenLinks")
-                        .HasForeignKey("BrokenLinkCrawlId", "BrokenLinkCrawlUrl", "BrokenLinkCrawlUserId");
+                        .HasForeignKey("BrokenLinkCrawlId");
 
                     b.Navigation("BrokenLinkCrawl");
                 });

@@ -8,7 +8,7 @@ public interface IBrokenLinkService
     event EventHandler<CrawlProgressEventArgs> ProgressUpdated;
 
     IAsyncEnumerable<BrokenLinkDTO> FindBrokenLinks(string url,
-        Guid? userId,
+        Guid? crawlId,
         CancellationToken cancellationToken);
 
     Task<BrokenLinkCrawlDTO> StartCrawl(string url, Guid? userId);

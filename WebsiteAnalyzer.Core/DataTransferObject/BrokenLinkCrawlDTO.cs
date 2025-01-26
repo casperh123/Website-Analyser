@@ -8,7 +8,7 @@ public record BrokenLinkCrawlDTO
     public string Url { get; set; }
     public DateTime Time { get; set; }
     public int LinksChecked { get; set; }
-    public ICollection<BrokenLinkDTO> BrokenLinks { get; set; }
+    public ICollection<BrokenLinkDTO> BrokenLinks { get; set; } = [];
 
     public BrokenLinkCrawlDTO() {}
     
@@ -33,7 +33,8 @@ public record BrokenLinkCrawlDTO
         {
             Id = crawl.Id,
             Url = crawl.Url,
-            BrokenLinks = crawl.BrokenLinks.Select(BrokenLinkDTO.FromBrokenLink).ToList()
+            BrokenLinks = crawl.BrokenLinks.Select(BrokenLinkDTO.FromBrokenLink).ToList(),
+            LinksChecked = crawl.LinksChecked
         };
     }
     

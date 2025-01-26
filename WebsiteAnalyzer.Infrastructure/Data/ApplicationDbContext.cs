@@ -38,13 +38,13 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser, IdentityR
 
         // Configure CacheWarm and Website relationship
         builder.Entity<CacheWarm>()
-            .HasKey(c => c.Id); // Use GUID for CacheWarm primary key
+            .HasKey(cw => cw.Id);
 
         builder.Entity<CrawlSchedule>()
-            .HasKey(cs => new { cs.UserId, WebsiteUrl = cs.Url });
+            .HasKey(cs => new { cs.UserId, cs.Url, cs.Action });
 
         builder.Entity<BrokenLinkCrawl>()
-            .HasKey(blc => new { blc.Id, blc.Url, blc.UserId });
+            .HasKey(blc => new { blc.Id });
 
         // Configure Identity entities to use GUID
         builder.Entity<IdentityUserLogin<Guid>>()
