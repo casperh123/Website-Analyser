@@ -1,13 +1,17 @@
 @using WebsiteAnalyzer.Core.DataTransferObject
 @using WebsiteAnalyzer.Web.Components.BrokenLink.Cards
+@using WebsiteAnalyzer.Web.Components.General.Lists
 
 @if (BrokenLinks.Count > 0)
 {
-    <RadzenStack Gap="20">
-        @foreach (BrokenLinkDTO brokenLink in BrokenLinks)
-        {
-            <BrokenLinkCard Link="@brokenLink" />
-        }
+    <RadzenStack class="rz-mt-12" >
+        <RadzenText TextStyle="TextStyle.H4">Broken Links</RadzenText>
+        <RadzenText>Found: @BrokenLinks.Count</RadzenText>
+        <PaginatedList Items="BrokenLinks" PageSize="10">
+            <ItemTemplate Context="brokenLink">
+                <BrokenLinkCard Link="brokenLink"/>
+            </ItemTemplate>
+        </PaginatedList>
     </RadzenStack>
 }
 else
