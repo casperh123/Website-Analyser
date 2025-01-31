@@ -1,0 +1,36 @@
+@typeparam TItem
+
+<RadzenStack Gap="20">
+    @foreach (TItem item in _filteredItems)
+    {
+        @ItemTemplate(item)
+    }
+</RadzenStack>
+
+<RadzenPager PageSize="PageSize" Count="Count" PageNumbersCount="5" PageChanged="OnPageChanged"/>
+
+@code {
+    [Parameter, EditorRequired]
+    public RenderFragment<TItem> ItemTemplate { get; set; }
+    
+    [Parameter]
+    public ICollection<TItem> Items { get; set; }
+    
+    [Parameter]
+    public int PageSize { get; set; }
+
+    private ICollection<TItem> _filteredItems { get; set; } = [];
+    private int Count => Items.Count;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+
+        _filteredItems = Items.Take(PageSize).ToList();
+    }
+
+    private void OnPageChanged(PagerEventArgs args)
+    {
+        _filteredItems = Items.Skip(args.Skip).Take(args.Top).ToList();
+    }
+}

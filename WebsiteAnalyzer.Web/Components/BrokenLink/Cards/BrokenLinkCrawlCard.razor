@@ -1,6 +1,7 @@
 @using WebsiteAnalyzer.Core.DataTransferObject
 @using WebsiteAnalyzer.Core.Interfaces.Services
 @using WebsiteAnalyzer.Web.Components.Toggles
+@using WebsiteAnalyzer.Web.Components.WebsiteMetrics
 
 @inject IBrokenLinkService BrokenLinkService
 
@@ -33,13 +34,7 @@
     
     @if (_open)
     {
-        <RadzenStack>
-            <RadzenText TextStyle="TextStyle.H4">Broken Links</RadzenText>
-            @foreach (BrokenLinkDTO brokenLink in Crawl.BrokenLinks)
-            {
-                <BrokenLinkCard Link="brokenLink"/>
-            }
-        </RadzenStack>
+        <BrokenLinksStats BrokenLinks="Crawl.BrokenLinks"/>
     }
 </RadzenCard>
 
