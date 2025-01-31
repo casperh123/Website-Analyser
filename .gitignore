@@ -1,11 +1,12 @@
 .idea
 */obj
 */bin
+*.config
 
 *.db
 *.db-shm
 *.db-wal
-.env
+*.env
 
-Folder.DotSettings.user
-identifier.sqlite
+*Folder.DotSettings.user
+*identifier.sqlite
