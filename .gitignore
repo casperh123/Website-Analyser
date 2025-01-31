@@ -6,3 +6,6 @@
 *.db-shm
 *.db-wal
 .env
+
+Folder.DotSettings.user
+identifier.sqlite
