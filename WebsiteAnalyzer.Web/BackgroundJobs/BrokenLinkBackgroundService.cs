@@ -29,10 +29,6 @@ public class BrokenLinkBackgroundService : CrawlBackgroundServiceBase
         void OnProgressUpdated(object? sender, CrawlProgressEventArgs e)
         {
             totalLinks = e.LinksChecked;
-            Logger.LogInformation(
-                "Crawl progress for {Url}: {Checked} links checked", 
-                schedule.Url, 
-                e.LinksChecked);
         }
 
         try
@@ -48,10 +44,6 @@ public class BrokenLinkBackgroundService : CrawlBackgroundServiceBase
             await foreach (BrokenLinkDTO brokenLink in linksFound.WithCancellation(token))
             {
                 brokenLinks++;
-                Logger.LogInformation(
-                    "Found broken link #{Count} at {BrokenUrl}", 
-                    brokenLinks, 
-                    brokenLink.ReferringPage);
             }
 
             await brokenLinkService.EndCrawl(brokenLinkCrawl, totalLinks, schedule.UserId);

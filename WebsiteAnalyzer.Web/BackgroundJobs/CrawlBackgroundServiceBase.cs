@@ -64,7 +64,7 @@ public abstract class CrawlBackgroundServiceBase : IHostedService
             await Parallel.ForEachAsync(dueSchedules, 
                 new ParallelOptions 
                 { 
-                    MaxDegreeOfParallelism = 5,
+                    MaxDegreeOfParallelism = 3,
                     CancellationToken = cancellationToken 
                 }, 
                 async (schedule, token) => {
