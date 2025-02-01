@@ -145,4 +145,9 @@ h1:focus {
         : 10px 20px;
         justify-content: space-around;
     }
+
+    .broken-link {
+        display: flex;
+        flex-direction: column;
+    }
 }
