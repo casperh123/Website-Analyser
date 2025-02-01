@@ -9,7 +9,7 @@ public interface IBrokenLinkService
 
     IAsyncEnumerable<BrokenLinkDTO> FindBrokenLinks(string url,
         Guid? crawlId,
-        CancellationToken cancellationToken);
+        CancellationToken cancellationToken = default);
 
     Task<BrokenLinkCrawlDTO> StartCrawl(string url, Guid? userId);
     Task<BrokenLinkCrawlDTO> EndCrawl(BrokenLinkCrawlDTO crawl, int linksChecked, Guid? userId);

@@ -33,7 +33,7 @@ public class BrokenLinkService : IBrokenLinkService
     public async IAsyncEnumerable<BrokenLinkDTO> FindBrokenLinks(
         string url,
         Guid? crawlId,
-        [EnumeratorCancellation] CancellationToken cancellationToken)
+        [EnumeratorCancellation] CancellationToken cancellationToken = default)
     {
         BrokenLinkProcessor linkProcessor = new BrokenLinkProcessor(_httpClient);
         ModularCrawler<IndexedLink> crawler = new ModularCrawler<IndexedLink>(linkProcessor);

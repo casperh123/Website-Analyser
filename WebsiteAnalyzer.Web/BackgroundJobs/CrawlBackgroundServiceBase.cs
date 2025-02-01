@@ -7,99 +7,112 @@ namespace WebsiteAnalyzer.Web.BackgroundJobs;
 public abstract class CrawlBackgroundServiceBase : IHostedService
 {
     private readonly IPeriodicTimer _timer;
-    protected readonly IServiceProvider _serviceProvider;
-    protected readonly ILogger _logger;
-    protected readonly CrawlAction _crawlAction;
+    private readonly IServiceProvider _serviceProvider;
+    private readonly CrawlAction _crawlAction;
+    protected readonly ILogger Logger;
+    
+    private Task _executingTask;
 
     protected CrawlBackgroundServiceBase(
-        IServiceProvider serviceProvider,
-        IPeriodicTimer timer,
         ILogger logger,
+        IServiceProvider serviceprovider,
         CrawlAction crawlAction)
     {
-        _serviceProvider = serviceProvider;
-        _timer = timer;
-        _logger = logger;
+        _timer = new HourlyTimer();
+        Logger = logger;
+        _serviceProvider = serviceprovider;
         _crawlAction = crawlAction;
     }
 
-    public async Task StartAsync(CancellationToken cancellationToken)
+    public Task StartAsync(CancellationToken cancellationToken)
     {
-        _logger.LogInformation("{ServiceType} background service is starting", _crawlAction);
+        Logger.LogInformation("{ServiceType} background service is starting", _crawlAction);
 
+        // Start the processing loop as a background task and store it
+        // This allows the method to return immediately while processing continues
+        _executingTask = ProcessingLoop(cancellationToken);
+
+        // Return immediately so other services can start
+        return Task.CompletedTask;
+    }
+
+    private async Task ProcessingLoop(CancellationToken cancellationToken)
+    {
         while (!cancellationToken.IsCancellationRequested && 
                await _timer.WaitForNextTickAsync(cancellationToken))
         {
-            await ProcessDueSchedulesAsync();
+            await ProcessDueSchedulesAsync(cancellationToken);
         }
     }
 
-    private async Task ProcessDueSchedulesAsync()
+    private async Task ProcessDueSchedulesAsync(CancellationToken cancellationToken)
     {
         try
         {
             using IServiceScope scope = _serviceProvider.CreateScope();
             ICrawlScheduleRepository repository = scope.ServiceProvider.GetRequiredService<ICrawlScheduleRepository>();
-
-            ICollection<CrawlSchedule> schedules = await repository.GetAllAsync();
+            
+            // Get schedules that need processing
+            ICollection<CrawlSchedule> schedules = await repository.GetByAction(_crawlAction);
             List<CrawlSchedule> dueSchedules = schedules
                 .Where(cs => cs.IsDue() && cs.Action == _crawlAction)
                 .ToList();
 
-            _logger.LogInformation("Processing {Count} due {Action} schedules", 
+            Logger.LogInformation("Processing {Count} due {Action} schedules", 
                 dueSchedules.Count, _crawlAction);
-
+            
             await Parallel.ForEachAsync(dueSchedules, 
-                new ParallelOptions { MaxDegreeOfParallelism = 5 }, 
-                ProcessScheduleAsync);
+                new ParallelOptions 
+                { 
+                    MaxDegreeOfParallelism = 5,
+                    CancellationToken = cancellationToken 
+                }, 
+                async (schedule, token) => {
+                    using IServiceScope operationScope = _serviceProvider.CreateScope();
+                    await ProcessScheduleAsync(schedule, operationScope, token);
+                });
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error processing scheduled {Action} tasks", _crawlAction);
+            Logger.LogError(ex, "Error processing scheduled {Action} tasks", _crawlAction);
         }
     }
 
-    private async ValueTask ProcessScheduleAsync(CrawlSchedule schedule, CancellationToken token)
+    private async ValueTask ProcessScheduleAsync(
+        CrawlSchedule schedule, 
+        IServiceScope scope, 
+        CancellationToken token)
     {
-        using var scope = _serviceProvider.CreateScope();
-        var repository = scope.ServiceProvider.GetRequiredService<ICrawlScheduleRepository>();
-
+        ICrawlScheduleRepository repository = scope.ServiceProvider.GetRequiredService<ICrawlScheduleRepository>();
+        
         try
         {
-            await UpdateScheduleStatusAsync(repository, schedule, Status.InProgress);
-            
-            // This is where specific crawl implementations will differ
-            await ExecuteCrawlAsync(scope, schedule);
-            
-            await UpdateScheduleStatusAsync(repository, schedule, Status.Completed);
-            
-            _logger.LogInformation("Completed {Action} for {Url}", _crawlAction, schedule.Url);
+            schedule.Status = Status.InProgress;
+            schedule.LastCrawlDate = DateTime.UtcNow;
+            await repository.UpdateAsync(schedule);
+
+            await ExecuteCrawlTaskAsync(schedule, scope, token);
+
+            schedule.Status = Status.Completed;
+            await repository.UpdateAsync(schedule);
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Failed {Action} for {Url}", _crawlAction, schedule.Url);
-            await UpdateScheduleStatusAsync(repository, schedule, Status.Failed);
+            Logger.LogError(ex, "Failed {Action} for {Url}", _crawlAction, schedule.Url);
+            
+            schedule.Status = Status.Failed;
+            await repository.UpdateAsync(schedule);
         }
     }
 
-    protected abstract Task ExecuteCrawlAsync(IServiceScope scope, CrawlSchedule schedule);
-
-    private async Task UpdateScheduleStatusAsync(
-        ICrawlScheduleRepository repository, 
+    protected abstract Task ExecuteCrawlTaskAsync(
         CrawlSchedule schedule, 
-        Status status)
-    {
-        schedule.Status = status;
-        if (status == Status.InProgress)
-        {
-            schedule.LastCrawlDate = DateTime.UtcNow;
-        }
-        await repository.UpdateAsync(schedule);
-    }
+        IServiceScope scope, 
+        CancellationToken token);
 
     public Task StopAsync(CancellationToken cancellationToken)
     {
-        _logger.LogInformation("{ServiceType} background service is stopping", _crawlAction);
+        Logger.LogInformation("{ServiceType} background service is stopping", _crawlAction);
         return Task.CompletedTask;
     }
 }

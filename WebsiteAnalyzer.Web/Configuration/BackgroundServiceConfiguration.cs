@@ -6,8 +6,6 @@ public static class BackgroundServiceConfiguration
 {
     public static IServiceCollection AddBackgroundServices(this IServiceCollection services)
     {
-        // Register the periodic timer as a singleton
-        services.AddSingleton<IPeriodicTimer, HourlyTimer>();
 
         // Configure background service options
         services.Configure<HostOptions>(options => 
@@ -17,6 +15,7 @@ public static class BackgroundServiceConfiguration
 
         // Register the background service
         services.AddHostedService<CacheWarmBackgroundService>();
+        services.AddHostedService<BrokenLinkBackgroundService>();
 
         return services;
     }

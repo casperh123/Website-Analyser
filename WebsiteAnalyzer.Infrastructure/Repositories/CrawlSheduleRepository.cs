@@ -30,6 +30,13 @@ public class CrawlSheduleRepository : BaseRepository<CrawlSchedule>, ICrawlSched
             .ToListAsync();
     }
 
+    public async Task<ICollection<CrawlSchedule>> GetByAction(CrawlAction action)
+    {
+        return await _dbContext.CrawlSchedules
+            .Where(cs => cs.Action == action)
+            .ToListAsync();
+    }
+
     public async Task<CrawlSchedule?> GetCrawlScheduleBy(string url, Guid userId, CrawlAction action)
     {
         return await _dbContext.CrawlSchedules
