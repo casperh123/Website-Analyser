@@ -1,4 +1,5 @@
 using WebsiteAnalyzer.Core.Entities;
+using WebsiteAnalyzer.Core.Entities.BrokenLink;
 using WebsiteAnalyzer.Core.Enums;
 using WebsiteAnalyzer.Core.Interfaces.Repositories;
 using WebsiteAnalyzer.Core.Interfaces.Services;
@@ -6,16 +7,16 @@ using WebsiteAnalyzer.Core.Persistence;
 
 namespace WebsiteAnalyzer.Web.BackgroundJobs;
 
-public class CacheWarmBackgroundService : IHostedService
+public class BrokenLinkBackgroundService : IHostedService
 {
     private readonly IServiceProvider _serviceProvider;
     private readonly IPeriodicTimer _timer;
-    private readonly ILogger<CacheWarmBackgroundService> _logger;
+    private readonly ILogger<BrokenLinkBackgroundService> _logger;
 
-    public CacheWarmBackgroundService(
+    public BrokenLinkBackgroundService(
         IServiceProvider serviceProvider, 
         IPeriodicTimer timer,
-        ILogger<CacheWarmBackgroundService> logger)
+        ILogger<BrokenLinkBackgroundService> logger)
     {
         _serviceProvider = serviceProvider;
         _timer = timer;
@@ -37,9 +38,9 @@ public class CacheWarmBackgroundService : IHostedService
             try
             {
                 ICollection<CrawlSchedule> scheduledItems = await crawlScheduleRepository.GetAllAsync();
-                ICollection<CrawlSchedule> dueSchedules = scheduledItems.Where(cs => cs.IsDue()).ToList();
+                ICollection<CrawlSchedule> dueSchedules = scheduledItems.Where(IsDue).ToList();
                 
-                _logger.LogInformation("Found {TotalSchedules} schedules, {DueSchedules} are due for processing", scheduledItems.Count, dueSchedules.Count);
+                _logger.LogInformation("Found {TotalSchedules} schedules, {DueSchedules} are due for processing", scheduledItems.Count, dueSchedules.Count());
 
                 int maxDegreeOfParallelism = 5;
 
@@ -84,7 +85,7 @@ public class CacheWarmBackgroundService : IHostedService
             crawlSchedule.Status = Status.Completed;
             await crawlScheduleRepository.UpdateAsync(crawlSchedule);
 
-            // Log successful completion    
+            // Log successful completion
             _logger.LogInformation(
                 "Successfully completed cache warm for URL {Url} (Schedule ID: {ScheduleId})", 
                 crawlSchedule.Url, 
@@ -102,9 +103,28 @@ public class CacheWarmBackgroundService : IHostedService
         }
     }
 
+    private bool IsDue(CrawlSchedule crawlSchedule)
+    {
+        if (crawlSchedule.Status is Status.InProgress)
+        {
+            return false;
+        }
+
+        DateTime currentDate = DateTime.UtcNow;
+
+        return crawlSchedule.Frequency switch
+        {
+            Frequency.SixHourly => crawlSchedule.LastCrawlDate.AddHours(6) <= currentDate,
+            Frequency.TwelveHourly => crawlSchedule.LastCrawlDate.AddHours(12) <= currentDate,
+            Frequency.Daily => crawlSchedule.LastCrawlDate.AddDays(1) <= currentDate,
+            Frequency.Weekly => crawlSchedule.LastCrawlDate.AddDays(7) <= currentDate,
+            _ => false
+        };
+    }
+
     public Task StopAsync(CancellationToken cancellationToken)
     {
-        _logger.LogInformation("Cache Warming background service is stopping");
+        _logger.LogInformation("Cache warming background service is stopping");
         return Task.CompletedTask;
     }
 }
