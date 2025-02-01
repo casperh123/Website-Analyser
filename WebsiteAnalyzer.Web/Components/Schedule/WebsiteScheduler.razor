@@ -94,7 +94,6 @@
     private void ToggleAddNew()
     {
         _addNew = !_addNew;
-        _scheduleTask = new ScheduleTaskModel();
     }
 
     private async Task LoadScheduledTasks()
@@ -120,14 +119,19 @@
             _scheduledTasks = new List<CrawlSchedule>(_scheduledTasks);
 
             ToggleAddNew();
+            _scheduleTask = new();
         }
         catch (UrlException e)
         {
             _errorMessage = e.Message;
         }
+        catch (AlreadyScheduledException e)
+        {
+            _errorMessage = e.Message;
+        }
         catch (Exception e)
         {
-            _errorMessage = "Website already scheduled or an error occurred";
+            _errorMessage = "An error occurred";
         }
     }
 

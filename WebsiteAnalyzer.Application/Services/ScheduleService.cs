@@ -1,8 +1,8 @@
 using WebsiteAnalyzer.Core.Entities;
 using WebsiteAnalyzer.Core.Enums;
 using WebsiteAnalyzer.Core.Exceptions;
+using WebsiteAnalyzer.Core.Interfaces.Repositories;
 using WebsiteAnalyzer.Core.Interfaces.Services;
-using WebsiteAnalyzer.Core.Persistence;
 using ICacheWarmingService = WebsiteAnalyzer.Core.Interfaces.Services.ICacheWarmingService;
 
 namespace WebsiteAnalyzer.Application.Services;
@@ -39,8 +39,8 @@ public class ScheduleService : IScheduleService
             Status = Status.Scheduled
         };
 
-        await VerifyUrl(url);
-        await _scheduleRepository.AddAsync(scheduledAction).ConfigureAwait(false);
+        await VerifyCrawl(url, userId, scheduledAction.Action);
+        await _scheduleRepository.AddAsync(scheduledAction);
 
         return scheduledAction;
     }
@@ -80,13 +80,22 @@ public class ScheduleService : IScheduleService
         return await _scheduleRepository.GetCrawlSchedulesByUserIdAndTypeAsync(userId.Value, action);
     }
 
-    private async Task VerifyUrl(string url)
+    private async Task VerifyCrawl(string url, Guid userId, CrawlAction action)
     {
-        HttpResponseMessage request = await _httpClient.GetAsync(url);
+        CrawlSchedule? crawlSchedule = await _scheduleRepository.GetCrawlScheduleBy(url, userId, action);
 
-        if (!request.IsSuccessStatusCode)
+        if (crawlSchedule is not null)
         {
-            throw new UrlException($"Could not get page at {url}");
+            throw new AlreadyScheduledException($"{url} is already scheduled.");
+        }
+        
+        try
+        {
+            await _httpClient.GetAsync(url);
+        }
+        catch (Exception e)
+        {
+            throw new UrlException($"Could not verify URL: {url}");
         }
     }
 }
