@@ -6,105 +6,54 @@ using WebsiteAnalyzer.Core.Persistence;
 
 namespace WebsiteAnalyzer.Web.BackgroundJobs;
 
-public class CacheWarmBackgroundService : IHostedService
+public class CacheWarmBackgroundService : CrawlBackgroundServiceBase
 {
-    private readonly IServiceProvider _serviceProvider;
-    private readonly IPeriodicTimer _timer;
-    private readonly ILogger<CacheWarmBackgroundService> _logger;
-
     public CacheWarmBackgroundService(
         IServiceProvider serviceProvider, 
         IPeriodicTimer timer,
-        ILogger<CacheWarmBackgroundService> logger)
+        ILogger<CacheWarmBackgroundService> logger) : base(serviceProvider, timer, logger, CrawlAction.CacheWarm)
     {
-        _serviceProvider = serviceProvider;
-        _timer = timer;
-        _logger = logger;
     }
 
-    public async Task StartAsync(CancellationToken cancellationToken)
+    protected override async Task ExecuteCrawlAsync(IServiceScope scope, CrawlSchedule schedule)
     {
-        // Log when the service starts - this helps track service lifecycle
-        _logger.LogInformation("Cache warming background service is starting");
-
-        using IServiceScope scope = _serviceProvider.CreateScope();
-        ICrawlScheduleRepository crawlScheduleRepository =
-            scope.ServiceProvider.GetRequiredService<ICrawlScheduleRepository>();
-
-        while (!cancellationToken.IsCancellationRequested
-               && await _timer.WaitForNextTickAsync(cancellationToken))
-        {
-            try
-            {
-                ICollection<CrawlSchedule> scheduledItems = await crawlScheduleRepository.GetAllAsync();
-                ICollection<CrawlSchedule> dueSchedules = scheduledItems.Where(cs => cs.IsDue()).ToList();
-                
-                _logger.LogInformation("Found {TotalSchedules} schedules, {DueSchedules} are due for processing", scheduledItems.Count, dueSchedules.Count);
-
-                int maxDegreeOfParallelism = 5;
-
-                await Parallel.ForEachAsync(dueSchedules, new ParallelOptions
-                {
-                    MaxDegreeOfParallelism = maxDegreeOfParallelism,
-                }, async (crawlSchedule, token) => 
-                { 
-                    await WarmCacheAsync(crawlSchedule);
-                });
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Unexpected error in cache warming background service");
-            }
-        }
-    }
-
-    private async Task WarmCacheAsync(CrawlSchedule crawlSchedule)
-    {
-        using IServiceScope scope = _serviceProvider.CreateScope();
-
         ICrawlScheduleRepository crawlScheduleRepository =
             scope.ServiceProvider.GetRequiredService<ICrawlScheduleRepository>();
         ICacheWarmingService cacheWarmingService = 
             scope.ServiceProvider.GetRequiredService<ICacheWarmingService>();
 
         _logger.LogInformation(
-            "Starting cache warm for URL {Url} (Schedule ID: {ScheduleId})", 
-            crawlSchedule.Url, 
-            crawlSchedule.UserId);
+            "Starting cache warm for URL " +
+            "{Url} (Schedule ID: {ScheduleId})", 
+            schedule.Url, 
+            schedule.UserId);
 
-        crawlSchedule.Status = Status.InProgress;
-        crawlSchedule.LastCrawlDate = DateTime.UtcNow;
+        schedule.Status = Status.InProgress;
+        schedule.LastCrawlDate = DateTime.UtcNow;
 
-        await crawlScheduleRepository.UpdateAsync(crawlSchedule);
+        await crawlScheduleRepository.UpdateAsync(schedule);
 
         try
         {
-            await cacheWarmingService.WarmCacheWithoutMetrics(crawlSchedule.Url, crawlSchedule.UserId);
+            await cacheWarmingService.WarmCacheWithoutMetrics(schedule.Url, schedule.UserId);
             
-            crawlSchedule.Status = Status.Completed;
-            await crawlScheduleRepository.UpdateAsync(crawlSchedule);
+            schedule.Status = Status.Completed;
+            await crawlScheduleRepository.UpdateAsync(schedule);
 
             // Log successful completion    
             _logger.LogInformation(
                 "Successfully completed cache warm for URL {Url} (Schedule ID: {ScheduleId})", 
-                crawlSchedule.Url, 
-                crawlSchedule.UserId);
+                schedule.Url, 
+                schedule.UserId);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, 
                 "Failed to warm cache for URL {Url} (Schedule ID: {ScheduleId})", 
-                crawlSchedule.Url, 
-                crawlSchedule.UserId);
+                schedule.Url, 
+                schedule.UserId);
 
-            crawlSchedule.Status = Status.Failed;
-            await crawlScheduleRepository.UpdateAsync(crawlSchedule);
-        }
-    }
-
-    public Task StopAsync(CancellationToken cancellationToken)
-    {
-        _logger.LogInformation("Cache Warming background service is stopping");
-        return Task.CompletedTask;
-    }
+            schedule.Status = Status.Failed;
+            await crawlScheduleRepository.UpdateAsync(schedule);
+        }    }
 }
