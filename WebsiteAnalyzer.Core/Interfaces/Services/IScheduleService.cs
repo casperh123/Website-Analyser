@@ -9,5 +9,5 @@ public interface IScheduleService
     Task UpdateScheduledTask(CrawlSchedule scheduledTask, Frequency frequency);
     Task DeleteScheduledTask(CrawlSchedule scheduledTask);
     Task RunScheduledTask(CrawlSchedule scheduledTaskId);
-    Task<ICollection<CrawlSchedule>> GetScheduledTasksByUserIdAndTypeAsync(Guid userId, CrawlAction action);
+    Task<ICollection<CrawlSchedule>> GetScheduledTasksByUserIdAndTypeAsync(Guid? userId, CrawlAction action);
 }

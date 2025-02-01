@@ -4,19 +4,19 @@
 
 @if (User is null)
 {
-    <div class="rz-mt-12" style="max-width: 600px;">
-        <RadzenText TextStyle="TextStyle.H3">Take Control of Your Site's Performance</RadzenText>
+    <RadzenStack class="rz-mt-12">
+        <RadzenText TextStyle="TextStyle.H3">Take Control of Your Site's Performance and Maintenance</RadzenText>
         <RadzenText class="mb-4">
-            While you can warm your cache right now, creating a free account unlocks powerful features to automate and monitor your site's performance:
+            While you can warm your cache right now and check for broken links now, creating a free account unlocks powerful features to automate and monitor your site's performance and reliability:
         </RadzenText>
         <ul>
             <li>Schedule automatic cache warming </li>
             <li>Track historical performance</li>
         </ul>
-        <div class="mt-4">
-        <a href="/Account/Register"><RadzenButton>Sign Up For Free</RadzenButton></a>
-        </div>
-    </div>
+        <RadzenStack class="rz-mt-4">
+        <RadzenLink Target="/Account/Register"><RadzenButton>Sign Up For Free</RadzenButton></RadzenLink>
+        </RadzenStack>
+    </RadzenStack>
 }
 
 @code {

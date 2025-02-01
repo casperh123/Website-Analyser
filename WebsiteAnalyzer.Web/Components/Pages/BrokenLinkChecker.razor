@@ -39,11 +39,9 @@
         <RadzenTabsItem Text="History">
             <BrokenLinkCrawlHistory BrokenLinkCrawls="_brokenLinkCrawls" IsProcessing="IsProcessing" OnRerun="RerunBrokenLink"/>
         </RadzenTabsItem>
-        <AuthorizeView>
             <RadzenTabsItem Text="Schedule">
                 <WebsiteScheduler User="_user" Action="CrawlAction.BrokenLink" />
             </RadzenTabsItem>
-        </AuthorizeView>
     </Tabs>
 </RadzenTabs>
 
