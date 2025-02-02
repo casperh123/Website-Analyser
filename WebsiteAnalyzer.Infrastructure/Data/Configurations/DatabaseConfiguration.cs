@@ -16,7 +16,7 @@ public static class DatabaseConfiguration
         string? environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
         string? connectionString = configuration.GetConnectionString("DefaultConnection");
 
-        services.AddDbContext<ApplicationDbContext>(options =>
+        services.AddDbContextPool<ApplicationDbContext>(options =>
         {
             if (environment == "Development")
             {
@@ -33,11 +33,10 @@ public static class DatabaseConfiguration
                 
                 options.UseNpgsql(connectionString, npgsqlOptions =>
                 {
-                    // Add reliability features
-                    npgsqlOptions.EnableRetryOnFailure(3);
                     npgsqlOptions.CommandTimeout(30);
+                    npgsqlOptions.MaxBatchSize(10);
+                    npgsqlOptions.EnableRetryOnFailure(3);
                 });
-
                 options.ConfigureWarnings(w => w.Ignore(RelationalEventId.PendingModelChangesWarning));
             }
         });
