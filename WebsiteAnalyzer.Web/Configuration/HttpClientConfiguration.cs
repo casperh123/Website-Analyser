@@ -11,7 +11,7 @@ namespace WebsiteAnalyzer.Web.Configuration
             
             ConfigureHttpClient(client);
 
-            services.AddSingleton<HttpClient>(s => client);
+            services.AddSingleton<HttpClient>(_ => client);
 
             return services;
         }

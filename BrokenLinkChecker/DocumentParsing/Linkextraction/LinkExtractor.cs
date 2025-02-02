@@ -1,6 +1,7 @@
 using AngleSharp.Dom;
 using AngleSharp.Html.Parser;
 using BrokenLinkChecker.crawler;
+using BrokenLinkChecker.Crawler.BaseCrawler;
 using BrokenLinkChecker.DocumentParsing.Browsing;
 using BrokenLinkChecker.models;
 using BrokenLinkChecker.Models.Links;

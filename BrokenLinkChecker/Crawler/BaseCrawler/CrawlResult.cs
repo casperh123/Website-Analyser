@@ -2,7 +2,7 @@ using System.Net;
 using BrokenLinkChecker.models;
 using BrokenLinkChecker.Models.Links;
 
-namespace BrokenLinkChecker.crawler;
+namespace BrokenLinkChecker.Crawler.BaseCrawler;
 
 public class CrawlResult
 {

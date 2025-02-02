@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
 using WebsiteAnalyzer.Core.Entities;
 using WebsiteAnalyzer.Core.Entities.BrokenLink;
 using WebsiteAnalyzer.Core.Entities.Website;

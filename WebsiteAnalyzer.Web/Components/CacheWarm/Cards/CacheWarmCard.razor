@@ -1,10 +1,9 @@
-@using WebsiteAnalyzer.Core.Entities
 @using WebsiteAnalyzer.Web.Components.CacheWarm.Badges
 @using WebsiteAnalyzer.Web.Services
-@using CacheWarm = global::CacheWarm
+@using CacheWarm = global::WebsiteAnalyzer.Core.Entities.CacheWarm
 
 @inject StateService StateService
-@inject IJSRuntime JSRuntime
+@inject IJSRuntime JsRuntime
 
 <RadzenCard>
     <RadzenRow AlignItems="AlignItems.Center" JustifyContent="JustifyContent.SpaceBetween">
@@ -36,7 +35,7 @@
     {
         if (OnRerunWarm.HasDelegate)
         {
-            await JSRuntime.InvokeVoidAsync("backToTop");
+            await JsRuntime.InvokeVoidAsync("backToTop");
 
             await OnRerunWarm.InvokeAsync(CacheWarm);
         }

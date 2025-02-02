@@ -1,4 +1,4 @@
-namespace BrokenLinkChecker.crawler;
+namespace BrokenLinkChecker.Crawler.BaseCrawler;
 
 public enum CrawlMode
 {

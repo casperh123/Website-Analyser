@@ -15,7 +15,8 @@
 </div>
 
 @code {
-    [Parameter] public Cache Cache { get; set; }
+    [Parameter] 
+    public required Cache Cache { get; set; }
 
     private bool _collapsed = true;
 

@@ -1,4 +1,3 @@
-using System.ComponentModel;
 using Microsoft.EntityFrameworkCore;
 using WebsiteAnalyzer.Infrastructure.Data;
 
@@ -8,13 +7,13 @@ public static class DatabaseMigrator
 {
     public static async Task MigrateDatabase(WebApplication app)
     {
-        using var scope = app.Services.CreateScope();
-        var services = scope.ServiceProvider;
+        using IServiceScope scope = app.Services.CreateScope();
+        IServiceProvider services = scope.ServiceProvider;
 
         try
         {
-            var context = services.GetRequiredService<ApplicationDbContext>();
-            var logger = services.GetRequiredService<ILogger<Program>>();
+            ApplicationDbContext context = services.GetRequiredService<ApplicationDbContext>();
+            ILogger<Program> logger = services.GetRequiredService<ILogger<Program>>();
 
             logger.LogInformation("Starting database migration");
             // Ensure database is created and all pending migrations are applied
@@ -24,7 +23,7 @@ public static class DatabaseMigrator
             {
                 await context.Database.MigrateAsync();
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 // ignored
             }
@@ -33,7 +32,7 @@ public static class DatabaseMigrator
         }
         catch (Exception ex)
         {
-            var logger = services.GetRequiredService<ILogger<Program>>();
+            ILogger<Program> logger = services.GetRequiredService<ILogger<Program>>();
             logger.LogError(ex, "An error occurred while migrating the database");
             throw;
         }

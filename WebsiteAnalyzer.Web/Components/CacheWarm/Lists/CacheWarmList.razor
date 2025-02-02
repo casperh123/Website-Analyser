@@ -1,10 +1,10 @@
 @using WebsiteAnalyzer.Core.Interfaces.Services
 @using WebsiteAnalyzer.Infrastructure
 @using WebsiteAnalyzer.Web.Components.CacheWarm.Badges
-@using CacheWarm = global::CacheWarm
+@using CacheWarm = global::WebsiteAnalyzer.Core.Entities.CacheWarm
 
 @inject ICacheWarmingService CacheWarmingService
-@inject IJSRuntime JSRuntime
+@inject IJSRuntime JsRuntime
 
 @if (CacheWarms.Any())
 {
@@ -60,7 +60,7 @@
     {
         if (OnRerunCacheWarm.HasDelegate)
         {
-            await JSRuntime.InvokeVoidAsync("backToTop");
+            await JsRuntime.InvokeVoidAsync("backToTop");
             await OnRerunCacheWarm.InvokeAsync(cacheWarm.WebsiteUrl);
         }
     }

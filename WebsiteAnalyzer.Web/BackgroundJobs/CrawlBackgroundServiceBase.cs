@@ -1,6 +1,7 @@
 using WebsiteAnalyzer.Core.Entities;
 using WebsiteAnalyzer.Core.Enums;
 using WebsiteAnalyzer.Core.Interfaces.Repositories;
+using WebsiteAnalyzer.Web.BackgroundJobs.Timers;
 
 namespace WebsiteAnalyzer.Web.BackgroundJobs;
 

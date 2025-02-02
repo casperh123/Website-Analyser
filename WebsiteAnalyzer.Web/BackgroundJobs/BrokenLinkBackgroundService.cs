@@ -41,7 +41,7 @@ public class BrokenLinkBackgroundService : CrawlBackgroundServiceBase
             IAsyncEnumerable<BrokenLinkDTO> linksFound = 
                 brokenLinkService.FindBrokenLinks(brokenLinkCrawl.Url, brokenLinkCrawl.Id, token);
 
-            await foreach (BrokenLinkDTO brokenLink in linksFound.WithCancellation(token))
+            await foreach (BrokenLinkDTO unused in linksFound)
             {
                 brokenLinks++;
             }

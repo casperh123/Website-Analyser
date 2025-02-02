@@ -24,7 +24,7 @@
                     <RadzenTemplateForm TItem="ScheduleTaskModel"
                                         Data="_scheduleTask"
                                         Submit="@HandleValidSubmit"
-                                        Context="TaskModel">
+                                        Context="taskModel">
                         <RadzenFormField Text="Website Url">
                             <RadzenTextBox @bind-Value="@_scheduleTask.WebsiteUrl"
                                            Name="WebsiteUrl"
@@ -129,7 +129,7 @@
         {
             _errorMessage = e.Message;
         }
-        catch (Exception e)
+        catch (Exception)
         {
             _errorMessage = "An error occurred";
         }

@@ -1,8 +1,5 @@
-@using System.Resources
-@using Mono.TextTemplating
 @using WebsiteAnalyzer.Web.Components.ErrorHandling
 @using WebsiteAnalyzer.Web.Components.Crawl.CrawlMetrics
-@using WebsiteAnalyzer.Web.Services
 
 <RadzenCard Style="max-width: 600px" class="rz-mt-12">
     <RadzenStack>
@@ -12,7 +9,7 @@
 
         @if (IsProcessing)
         {
-            <RadzenButton Click="(async (e) => await OnCancel.InvokeAsync())" Style="background-color: red">Cancel</RadzenButton>
+            <RadzenButton Click="(async () => await OnCancel.InvokeAsync())" Style="background-color: red">Cancel</RadzenButton>
         }
     </RadzenStack>
     <ErrorMessage Message="@_errorMessage"/>

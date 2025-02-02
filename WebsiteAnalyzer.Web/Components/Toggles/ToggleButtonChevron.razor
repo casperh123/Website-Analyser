@@ -8,13 +8,13 @@
     public EventCallback<bool> OpenChanged { get; set; }
     
     private string _icon = "keyboard_arrow_down";
-    private const string _closedIcon = "keyboard_arrow_down";
-    private const string _openIcon = "keyboard_arrow_up";
+    private const string ClosedIcon = "keyboard_arrow_down";
+    private const string OpenIcon = "keyboard_arrow_up";
 
     private async Task Toggle()
     {
         Open = !Open;
-        _icon = Open ? _openIcon : _closedIcon;
+        _icon = Open ? OpenIcon : ClosedIcon;
 
         if(OpenChanged.HasDelegate)
         {

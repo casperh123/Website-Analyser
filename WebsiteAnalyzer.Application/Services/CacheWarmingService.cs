@@ -5,8 +5,8 @@ using BrokenLinkChecker.models.Result;
 using WebsiteAnalyzer.Core.Entities;
 using WebsiteAnalyzer.Core.Entities.Website;
 using WebsiteAnalyzer.Core.Events;
+using WebsiteAnalyzer.Core.Interfaces.Repositories;
 using WebsiteAnalyzer.Core.Interfaces.Services;
-using WebsiteAnalyzer.Core.Persistence;
 
 namespace WebsiteAnalyzer.Application.Services;
 

@@ -14,7 +14,7 @@ public class BrokenLinkRepository : BaseRepository<BrokenLink>, IBrokenLinkRepos
 
     public async Task<IEnumerable<BrokenLink>> GetBrokenLinksByCrawlAsync(Guid brokenLinkCrawlId)
     {
-        return await _dbSet
+        return await DbSet
             .Where(bl => bl.BrokenLinkCrawlId == brokenLinkCrawlId)
             .ToListAsync();
     }

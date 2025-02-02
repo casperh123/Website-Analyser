@@ -1,4 +1,4 @@
-using WebsiteAnalyzer.Core.Entities;
+namespace WebsiteAnalyzer.Core.Entities;
 
 public record CacheWarm
 {

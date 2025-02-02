@@ -1,3 +1,5 @@
+using BrokenLinkChecker.Crawler.BaseCrawler;
+
 namespace BrokenLinkChecker.crawler;
 
 public class CrawlerConfig(int concurrentRequests, CrawlMode crawlMode, bool jitter = true)

@@ -1,7 +1,6 @@
 using WebsiteAnalyzer.Core.Entities;
-using WebsiteAnalyzer.Core.Interfaces.Repositories;
 
-namespace WebsiteAnalyzer.Core.Persistence;
+namespace WebsiteAnalyzer.Core.Interfaces.Repositories;
 
 public interface ICacheWarmRepository : IBaseRepository<CacheWarm>
 {

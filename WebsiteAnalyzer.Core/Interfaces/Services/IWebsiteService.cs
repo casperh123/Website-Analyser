@@ -1,4 +1,3 @@
-using WebsiteAnalyzer.Core.Entities;
 using WebsiteAnalyzer.Core.Entities.Website;
 
 namespace WebsiteAnalyzer.Core.Interfaces.Services;

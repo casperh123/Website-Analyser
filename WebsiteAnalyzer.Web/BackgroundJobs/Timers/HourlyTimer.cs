@@ -1,4 +1,4 @@
-namespace WebsiteAnalyzer.Web.BackgroundJobs;
+namespace WebsiteAnalyzer.Web.BackgroundJobs.Timers;
 
 public class HourlyTimer : IPeriodicTimer
 {

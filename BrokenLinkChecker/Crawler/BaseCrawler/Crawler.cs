@@ -1,12 +1,12 @@
 using System.Collections.Concurrent;
 using System.Net;
-using BrokenLinkChecker.DocumentParsing.Linkextraction;
+using BrokenLinkChecker.crawler;
 using BrokenLinkChecker.models;
 using BrokenLinkChecker.Models.Links;
 using BrokenLinkChecker.Networking;
 using BrokenLinkChecker.utility;
 
-namespace BrokenLinkChecker.crawler;
+namespace BrokenLinkChecker.Crawler.BaseCrawler;
 
 public class Crawler
 {

@@ -1,9 +1,6 @@
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using WebsiteAnalyzer.Core.Interfaces.Repositories;
-using WebsiteAnalyzer.Core.Persistence;
-using WebsiteAnalyzer.Infrastructure.Data;
 using WebsiteAnalyzer.Infrastructure.Repositories;
 
 namespace WebsiteAnalyzer.Infrastructure.DependencyInjection;
