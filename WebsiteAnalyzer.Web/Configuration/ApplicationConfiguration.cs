@@ -16,7 +16,7 @@ public static class ApplicationConfiguration
         else
         {
             app.UseExceptionHandler("/Error", createScopeForErrors: true);
-            app.UseHsts();
+            app.UseHsts().UseHttpsRedirection();
         }
 
         // Configure common middleware

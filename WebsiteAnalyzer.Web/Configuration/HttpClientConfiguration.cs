@@ -7,11 +7,11 @@ namespace WebsiteAnalyzer.Web.Configuration
     {
         public static IServiceCollection AddHttpClients(this IServiceCollection services)
         {
-            HttpClient client = new HttpClient(CreateHttpMessageHandler());
-            
-            ConfigureHttpClient(client);
-
-            services.AddSingleton<HttpClient>(_ => client);
+            services.AddHttpClient("DefaultClient", (_, client) =>
+                {
+                    ConfigureHttpClient(client);
+                })
+                .ConfigurePrimaryHttpMessageHandler(CreateHttpMessageHandler);
 
             return services;
         }

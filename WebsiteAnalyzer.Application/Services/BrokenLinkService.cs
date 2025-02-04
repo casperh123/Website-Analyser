@@ -47,7 +47,7 @@ public class BrokenLinkService : IBrokenLinkService
             IndexedLink link = progress.Link;
             UpdateProgress(progress);
             
-            if (link.StatusCode == HttpStatusCode.OK)
+            if (link.StatusCode is HttpStatusCode.OK or HttpStatusCode.MovedPermanently)
             {
                 continue;
             }

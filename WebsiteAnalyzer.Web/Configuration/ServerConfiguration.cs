@@ -13,11 +13,10 @@ public static class ServerConfiguration
             // HTTP endpoint configuration
             serverOptions.Listen(IPAddress.Any, 8080);
             
-            // HTTPS endpoint configuration
             serverOptions.Listen(IPAddress.Any, 8081, listenOptions =>
             {
-                listenOptions.UseHttps();
                 listenOptions.Protocols = HttpProtocols.Http1AndHttp2AndHttp3;
+                listenOptions.UseHttps();
             });
 
             serverOptions.ConfigureHttpsDefaults(httpsOptions =>
