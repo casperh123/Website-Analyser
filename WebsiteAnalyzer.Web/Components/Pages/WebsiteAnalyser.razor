@@ -10,9 +10,7 @@
 
 <h2>Website Analyser</h2>
 
-<WebsiteInput UriHasChanged="CheckBrokenLinks"
-              SelectedCrawlMode="@CrawlMode"
-              SelectedCrawlModeChanged="@OnCrawlModeChanged"></WebsiteInput>
+<WebsiteInput WebsiteActionStarted="@CheckBrokenLinks"></WebsiteInput>
 
 <div class="concurrency-input">
     <label for="concurrencyInput" class="margin-bottom-m center-text">Concurrent Requests:</label>
@@ -65,7 +63,7 @@
     public IList<IndexedLink> BrokenLinks { get; set; } = new List<IndexedLink>();
     public ICollection<PageStat> VisitedPages { get; set; } = new List<PageStat>();
 
-    private PageStatState _currentStatus = PageStatState.DisplayBrokenLinks;
+    private PageStatState _currentStatus = PageStatState.DisplayPerformance;
 
     public CrawlMode CrawlMode { get; set; } = CrawlMode.SiteStats; // Initialize default crawl mode
 

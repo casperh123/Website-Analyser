@@ -1,3 +1,6 @@
+using Sidio.Sitemap.AspNetCore;
+using Sidio.Sitemap.Blazor;
+using Sidio.Sitemap.Core.Services;
 using WebsiteAnalyzer.Infrastructure.Data.Configurations;
 using WebsiteAnalyzer.Infrastructure.DependencyInjection;
 using WebsiteAnalyzer.Web.Configuration;
@@ -21,7 +24,9 @@ builder.Services
     .AddInfrastructureServices(builder.Configuration)
     .AddApplicationServices()
     .AddThemeServices()
-    .AddBackgroundServices();
+    .AddBackgroundServices()
+    .AddHttpContextAccessor()
+    .AddDefaultSitemapServices<HttpContextBaseUrlProvider>();
 
 builder.Services.AddScoped<IUserService, UserService>();
 
@@ -42,6 +47,8 @@ await DatabaseMigrator.MigrateDatabase(app);
 
 // Configure the HTTP pipeline
 app.ConfigurePipeline();
+
+app.UseSitemap();
 
 // Start the application
 app.Run();
