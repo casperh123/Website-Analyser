@@ -24,15 +24,22 @@
 
 <PageTitle>Broken Link Checker</PageTitle>
 
-<RadzenText TextStyle="TextStyle.H1">Broken Link Checker</RadzenText>
-
-<WebsiteInput 
+<RadzenStack Style="max-width: 600px">
+    <RadzenHeading Text="Broken Link Checker" />
+    <RadzenText>
+        Check your entire website for broken links in a few minutes.
+        You can even schedule check, and be notified when new broken
+        links are found!
+    </RadzenText>
+</RadzenStack>
+<WebsiteInput
     Url="@_url"
-    WebsiteActionStarted="StartBrokenLinkCheck" 
-    IsProcessing="IsProcessing" 
-    LinksChecked="_linksChecked" 
+    WebsiteActionStarted="StartBrokenLinkCheck"
+    IsProcessing="IsProcessing"
+    LinksChecked="_linksChecked"
     LinksEnqueued="_linksEnqueued"
     OnCancel="CancelProcessing"/>
+
 
 <RadzenTabs class="rz-mt-12">
     <Tabs>
