@@ -10,7 +10,7 @@ if [ -z "${NEW_RELIC_LICENSE_KEY:-}" ]; then
     exit 1
 fi
 
-IMAGE_TAG="clyppertechnology/websiteanalyzer:0.0.70"
+IMAGE_TAG="clyppertechnology/websiteanalyzer:0.0.71"
 
 echo "Building image ${IMAGE_TAG}..."
 docker build --build-arg NEW_RELIC_LICENSE_KEY="$NEW_RELIC_LICENSE_KEY" -t "${IMAGE_TAG}" .
