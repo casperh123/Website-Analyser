@@ -63,7 +63,7 @@
     private ApplicationUser? _user;
     private IList<CacheWarm> _cacheWarms = [];
 
-    protected override async Task OnAfterRenderAsync(bool firstRender)
+    protected override async Task OnInitializedAsync()
     {
         CacheWarmingService.ProgressUpdated += HandleProgressUpdate;
         _user = await UserService.GetCurrentUserAsync();
