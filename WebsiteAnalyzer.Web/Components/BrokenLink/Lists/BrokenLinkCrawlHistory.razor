@@ -4,10 +4,9 @@
 <RadzenStack Gap="20">
     @if (BrokenLinkCrawls.Any())
     {
-        @foreach (BrokenLinkCrawlDTO crawl in BrokenLinkCrawls.OrderByDescending(crawl => crawl.Time))
-        {
+        <Virtualize Items="BrokenLinkCrawls.OrderByDescending(crawl => crawl.Time).ToList()" Context="crawl">
             <BrokenLinkCrawlCard Crawl="crawl" IsProcessing="IsProcessing" OnRerun="OnRerun"/>
-        }
+        </Virtualize>
     }
     else
     {
