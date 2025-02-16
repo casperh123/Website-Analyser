@@ -109,7 +109,7 @@
         try
         {
             CrawlSchedule scheduledTask = await ScheduleService.ScheduleTask(
-                _scheduleTask.WebsiteUrl,
+                new Uri(_scheduleTask.WebsiteUrl),
                 User.Id,
                 Action,
                 _scheduleTask.Frequency

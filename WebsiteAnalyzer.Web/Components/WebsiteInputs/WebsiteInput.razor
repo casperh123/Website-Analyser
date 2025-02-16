@@ -4,7 +4,7 @@
 <RadzenCard Style="max-width: 600px" class="rz-mt-12">
     <RadzenStack>
         <RadzenLabel Component="url-input">Select Url</RadzenLabel>
-        <RadzenTextBox Value="@Url" Change="ChangeUrl" AutoCompleteType="AutoCompleteType.Url"/>
+        <RadzenTextBox Value="@Url" Change="ChangeUrl" AutoCompleteType="AutoCompleteType.Url" />
         <RadzenButton Click="@OnChanged" Disabled="@IsProcessing">Start</RadzenButton>
 
         @if (IsProcessing)
@@ -53,6 +53,8 @@
 
         try
         {
+            Url.TrimEnd('/');
+            
             Uri uri = new Uri(Url, UriKind.Absolute);
             await WebsiteActionStarted.InvokeAsync(uri);
         }
