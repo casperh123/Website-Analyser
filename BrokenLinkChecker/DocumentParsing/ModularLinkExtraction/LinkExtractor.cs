@@ -14,6 +14,29 @@ public class LinkExtractor : AbstractLinkExtractor<Link>
 
     private const int InitialLinksCapacity = 256;
 
+    // File extensions that should be excluded from crawling (not HTML pages)
+    private static readonly HashSet<string> ExcludedExtensions = new(StringComparer.OrdinalIgnoreCase)
+    {
+        // Images
+        ".jpg", ".jpeg", ".png", ".gif", ".bmp", ".svg", ".webp", ".ico", ".tiff",
+        
+        // Documents
+        ".pdf", ".doc", ".docx", ".xls", ".xlsx", ".ppt", ".pptx", ".odt", ".ods", ".odp",
+        
+        // Archives
+        ".zip", ".rar", ".7z", ".tar", ".gz", ".bz2", ".tgz",
+        
+        // Audio/Video
+        ".mp3", ".mp4", ".avi", ".mov", ".wmv", ".flv", ".wav", ".ogg", ".webm", ".m4a", ".m4v",
+        
+        // Other
+        ".css", ".js", ".json", ".xml", ".rss", ".atom", ".csv", ".txt", ".rtf",
+        ".exe", ".dll", ".apk", ".dmg", ".iso", ".bin", ".dat",
+        
+        // Fonts
+        ".ttf", ".otf", ".woff", ".woff2", ".eot"
+    };
+
     public LinkExtractor(HtmlParser parser) : base(parser)
     {
     }
@@ -38,7 +61,8 @@ public class LinkExtractor : AbstractLinkExtractor<Link>
                 hrefSpan = attributeValue.AsSpan();
 
                 if (!hrefSpan.IsEmpty && !IsExcludedFast(hrefSpan) &&
-                    IsValidHostMatch(attributeValue, currentHost))
+                    IsValidHostMatch(attributeValue, currentHost) &&
+                    !HasExcludedFileExtension(attributeValue))
                 {
                     links.Add(new Link(attributeValue));
                 }
@@ -49,7 +73,8 @@ public class LinkExtractor : AbstractLinkExtractor<Link>
                 srcSpan = attributeValue.AsSpan();
 
                 if (!srcSpan.IsEmpty && !IsExcludedFast(srcSpan) &&
-                    IsValidHostMatch(attributeValue, currentHost))
+                    IsValidHostMatch(attributeValue, currentHost) &&
+                    !HasExcludedFileExtension(attributeValue))
                 {
                     links.Add(new Link(attributeValue));
                 }
@@ -61,11 +86,13 @@ public class LinkExtractor : AbstractLinkExtractor<Link>
 
     private static bool IsExcludedFast(ReadOnlySpan<char> url)
     {
+        // Exclude URLs with fragments or query parameters
         if (url.Contains('#') || url.Contains('?'))
         {
             return true;
         }
 
+        // Exclude mailto: and tel: protocols
         if (url.StartsWith("mailto:", StringComparison.OrdinalIgnoreCase) ||
             url.StartsWith("tel:", StringComparison.OrdinalIgnoreCase))
         {
@@ -80,9 +107,40 @@ public class LinkExtractor : AbstractLinkExtractor<Link>
     {
         if (TryCreateUri(url, UriKind.Absolute, out var uri))
         {
-            return string.Equals(uri.Host, currentHost, StringComparison.OrdinalIgnoreCase);
+            // Get the host name from the URI
+            string host = uri.Host;
+        
+            // Check if the host ends with .dk (Danish domain)
+            return host.EndsWith(".dk", StringComparison.OrdinalIgnoreCase);
         }
 
+        return false;
+    }
+    
+    // Check if the URL has a file extension that should be excluded
+    private static bool HasExcludedFileExtension(string url)
+    {
+        // Try to parse as URI to handle complex URLs properly
+        if (TryCreateUri(url, UriKind.Absolute, out var uri))
+        {
+            // Get the path part of the URI
+            string path = uri.AbsolutePath;
+            
+            // Find the last dot in the path
+            int lastDotIndex = path.LastIndexOf('.');
+            
+            // If there's a dot and it's in the last part of the path (not in a directory name)
+            if (lastDotIndex > path.LastIndexOf('/'))
+            {
+                // Extract the extension including the dot
+                string extension = path.Substring(lastDotIndex);
+                
+                // Check if it's in our excluded list
+                return ExcludedExtensions.Contains(extension);
+            }
+        }
+        
+        // If we can't parse the URL or it doesn't have an extension, we assume it's not excluded
         return false;
     }
 }

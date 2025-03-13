@@ -4,11 +4,11 @@ namespace BrokenLinkChecker.models.Result;
 
 public record CrawlProgress<T> where T : Link
 {
-    public CrawlProgress(T link, int linksChecked, int linksEnqueued)
+    public CrawlProgress(T link, int linksChecked, long linksEnqueued)
     {
         Link = link;
         LinksChecked = linksChecked;
-        LinksEnqueued = linksEnqueued;
+        LinksEnqueued = (int)linksEnqueued;
     }
 
     public T Link { get; set; }
