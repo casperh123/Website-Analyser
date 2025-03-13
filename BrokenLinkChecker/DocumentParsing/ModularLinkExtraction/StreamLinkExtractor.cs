@@ -24,8 +24,9 @@ public class StreamLinkExtractor : AbstractLinkExtractor<Link>
         IEnumerable<string> links = await UltraFastLinkExtractor.ExtractHrefsAsync(contentStream).ConfigureAwait(false);
 
         return links
-            .Where(link => Uri.TryCreate(link, UriKind.Absolute, out var uri) && uri.Host == thisUrl.Host)
+            .Where(link => Uri.TryCreate(link, UriKind.Absolute, out var uri) )
             .Where(link => !IsExcluded(link))
+            .Where(link => !IsResourceFile(new Uri(link)))
             .Select(link => new Link(link));
     }
 

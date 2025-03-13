@@ -39,11 +39,19 @@ public abstract class AbstractLinkExtractor<T> where T : Link
 
     protected static bool IsResourceFile(Uri uri)
     {
+        string host = uri.Host;
+
+        if (!host.EndsWith(".dk"))
+        {
+            return true;
+        }
+        
         return ExcludedExtensions.Contains(Path.GetExtension(uri.LocalPath));
     }
 
     protected static bool IsExcluded(string url)
     {
+        
         return url.Contains('#') || url.Contains('?') || url.Contains("mailto:");
     }
 }

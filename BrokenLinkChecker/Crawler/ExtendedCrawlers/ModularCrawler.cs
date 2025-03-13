@@ -12,7 +12,7 @@ public class ModularCrawler<T>(ILinkProcessor<T> linkProcessor)
     where T : Link
 {
     private const int DefaultQueueSize = 1000000;
-    private const int MaxConcurrentRequests = 10000;
+    private const int MaxConcurrentRequests = 1024;
     private const int SlowHostThresholdMs = 5000; // 5 seconds threshold for slow hosts
     
     public async IAsyncEnumerable<CrawlProgress<T>> CrawlWebsiteAsync(T startPage, [EnumeratorCancellation] CancellationToken token = default)

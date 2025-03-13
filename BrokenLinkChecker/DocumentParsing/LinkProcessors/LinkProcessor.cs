@@ -16,7 +16,7 @@ public class LinkProcessor : ILinkProcessor<Link>
     {
         _httpClient = httpClient;
         
-        _linkExtractor = new LinkExtractor(new HtmlParser());
+        _linkExtractor = new StreamLinkExtractor(new HtmlParser());
         _visitedPages = new HashSet<string>();
         _enqueuedPages = new HashSet<string>();
     }
