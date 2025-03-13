@@ -24,7 +24,6 @@ builder.Services
     .AddInfrastructureServices(builder.Configuration)
     .AddApplicationServices()
     .AddThemeServices()
-    .AddBackgroundServices()
     .AddHttpContextAccessor()
     .AddDefaultSitemapServices<HttpContextBaseUrlProvider>();
 
@@ -36,7 +35,7 @@ builder.Services.AddLogging(logging =>
     logging.AddConsole();  // For console output
     logging.AddDebug();    // For debug window output
     
-    logging.SetMinimumLevel(LogLevel.Information);
+    logging.SetMinimumLevel(LogLevel.Debug);
 });
 
 // Build and configure the application
