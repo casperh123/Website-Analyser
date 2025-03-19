@@ -12,25 +12,15 @@
 
 <h2>Website Analyser</h2>
 
-<WebsiteInput WebsiteActionStarted="@CheckBrokenLinks"></WebsiteInput>
+<WebsiteInput WebsiteActionStarted="@CheckBrokenLinks" LinksChecked="_linksChecked" LinksEnqueued="_linksEnqueued" IsProcessing="IsChecking"></WebsiteInput>
 
-<div class="concurrency-input">
-    <label for="concurrencyInput" class="margin-bottom-m center-text">Concurrent Requests:</label>
-    <input type="number" id="concurrencyInput" @bind="_concurrentRequests" required class="margin-bottom-m" min="1"
-           max="100"/>
-    <p>Concurrency: @_concurrentRequests</p>
-</div>
-
-@if (IsChecking)
-{
-    <p>Crawling website, please wait...</p>
-    <p>Links enqueued: @_linksEnqueued</p>
-}
+<RadzenCard Style="margin: 20px 0; max-width: 600px; display: flex; flex-direction: column">
+    <RadzenLabel>Concurrent Requests:</RadzenLabel>
+    <RadzenNumeric @bind-Value="_concurrentRequests"/>
+</RadzenCard>
 
 @if (_linksChecked > 0)
 {
-    <p>Links checked: @_linksChecked</p>
-
     <div class="padding-m round-corners box-shadow">
         <h2>Website metrics</h2>
 
