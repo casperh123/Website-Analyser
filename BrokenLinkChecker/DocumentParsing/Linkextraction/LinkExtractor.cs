@@ -76,16 +76,6 @@ public class LinkExtractor
             }
         }
 
-        foreach (var script in document.Scripts)
-        {
-            var src = script.Source;
-            if (!string.IsNullOrEmpty(src))
-            {
-                var newTraceableLink = GenerateLinkNode(script, checkingUrl.Target, "src", ResourceType.Script);
-                links.Add(newTraceableLink);
-            }
-        }
-
         foreach (var image in document.Images)
         {
             var src = image.Source;
@@ -114,7 +104,7 @@ public class LinkExtractor
 
     private static bool IsExcluded(string url)
     {
-        HashSet<string> excludedExtensions = new(StringComparer.OrdinalIgnoreCase) { ".js", ".css" };
+        HashSet<string> excludedExtensions = new(StringComparer.OrdinalIgnoreCase) { ".js", ".css", "" };
         HashSet<string> asyncKeywords = new(StringComparer.OrdinalIgnoreCase) { "ajax", "async", "action=async" };
 
         if (Uri.TryCreate(url, UriKind.Absolute, out var uri))

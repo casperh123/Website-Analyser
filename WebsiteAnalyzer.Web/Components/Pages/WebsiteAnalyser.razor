@@ -8,6 +8,8 @@
 @using WebsiteAnalyzer.Web.Components.WebsiteMetrics
 @rendermode InteractiveServer
 
+@inject HttpClient HttpClient
+
 <h2>Website Analyser</h2>
 
 <WebsiteInput WebsiteActionStarted="@CheckBrokenLinks"></WebsiteInput>
@@ -53,8 +55,6 @@
 }
 
 @code {
-    [Inject] private IHttpClientFactory HttpClientFactory { get; set; }
-
     private bool IsChecking { get; set; }
     private int _linksChecked;
     private int _linksEnqueued;
@@ -77,7 +77,7 @@
             var crawlerState = new CrawlerConfig(_concurrentRequests, CrawlMode);
             var crawlResult = InitializeCrawlResult();
 
-            var crawler = new Crawler(HttpClientFactory.CreateClient("WebsiteAnalyser"), crawlerState, crawlResult);
+            var crawler = new Crawler(HttpClient, crawlerState, crawlResult);
 
             await crawler.CrawlWebsiteAsync(url);
         }
