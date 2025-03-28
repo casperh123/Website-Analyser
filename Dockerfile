@@ -26,6 +26,15 @@ RUN apt-get update \
         curl \
         wget \
         gnupg \
+        libc6 \
+    && wget -O - https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor -o /usr/share/keyrings/microsoft-archive-keyring.gpg \
+    && echo "deb [arch=amd64 signed-by=/usr/share/keyrings/microsoft-archive-keyring.gpg] https://packages.microsoft.com/debian/12/prod bookworm main" > /etc/apt/sources.list.d/microsoft.list \
+    && apt-get update \
+    && apt-get install -y --no-install-recommends \
+        libmsquic \
+    && rm -rf /var/lib/apt/lists/* \
+    && mkdir -p /Data \
+    && mkdir -p /https \
     && apt-get update && apt-get install -y wget ca-certificates gnupg \
     && echo 'deb http://apt.newrelic.com/debian/ newrelic non-free' | tee /etc/apt/sources.list.d/newrelic.list \
     && wget https://download.newrelic.com/548C16BF.gpg \
