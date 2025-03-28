@@ -60,11 +60,7 @@ public class LinkExtractor
                 links.Add(newTraceableLink);
             }
         }
-
-        if (_crawlerConfig.CrawlMode is CrawlMode.CacheWarm)
-            return links.Where(link =>
-                Uri.TryCreate(link.Target, UriKind.Absolute, out var uri) && uri.Host == thisUrl.Host).ToList();
-
+        
         foreach (var stylesheet in document.StyleSheets)
         {
             var href = stylesheet.Href;
@@ -104,13 +100,18 @@ public class LinkExtractor
 
     private static bool IsExcluded(string url)
     {
-        HashSet<string> excludedExtensions = new(StringComparer.OrdinalIgnoreCase) { ".js", ".css", "" };
+        HashSet<string> excludedExtensions = new(StringComparer.OrdinalIgnoreCase) { ".js", ".css" };
         HashSet<string> asyncKeywords = new(StringComparer.OrdinalIgnoreCase) { "ajax", "async", "action=async" };
 
         if (Uri.TryCreate(url, UriKind.Absolute, out var uri))
             if (excludedExtensions.Contains(Path.GetExtension(uri.LocalPath)))
-                return false;
+                return true;
+        
+        if (url.Contains('#') || url.Contains('?') || url.Contains("mailto:") || url.Contains("tel:"))
+        {
+            return true;
+        }
 
-        return asyncKeywords.Any(url.Contains) || url.Contains('#') || url.Contains('?') || url.Contains("mailto");
+        return asyncKeywords.Any(url.Contains);
     }
 }

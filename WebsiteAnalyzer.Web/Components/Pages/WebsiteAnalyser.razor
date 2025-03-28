@@ -71,7 +71,7 @@
 
             await crawler.CrawlWebsiteAsync(url);
         }
-        catch (Exception)
+        catch (Exception e)
         {
             _currentStatus = PageStatState.Error;
         }
