@@ -8,7 +8,7 @@ public class CrawlerConfig(int concurrentRequests, CrawlMode crawlMode, bool jit
     public readonly CrawlMode CrawlMode = crawlMode;
     public readonly SemaphoreSlim Semaphore = new(concurrentRequests);
     private bool Jitter => ConcurrentRequests > 1 && jitter;
-    private int JitterFrequency => ConcurrentRequests * 100;
+    private int JitterFrequency => (ConcurrentRequests - 1) * 100;
 
     public async Task ApplyJitterAsync()
     {
