@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Identity.UI.Services;
 using Sidio.Sitemap.AspNetCore;
 using Sidio.Sitemap.Blazor;
 using Sidio.Sitemap.Core.Services;
@@ -10,6 +11,8 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Configure the server settings (Kestrel, etc.)
 builder.ConfigureServer();
+
+builder.Configuration.AddEnvironmentVariables();
 
 // Add core Blazor services
 builder.Services
@@ -28,6 +31,8 @@ builder.Services
     .AddHttpContextAccessor()
     .AddDefaultSitemapServices<HttpContextBaseUrlProvider>();
 
+builder.Services.AddTransient<IEmailSender, MailSenderProvider>();
+
 builder.Services.AddScoped<IUserService, UserService>();
 
 builder.Services.AddLogging(logging =>
@@ -38,6 +43,7 @@ builder.Services.AddLogging(logging =>
     
     logging.SetMinimumLevel(LogLevel.Information);
 });
+
 
 // Build and configure the application
 var app = builder.Build();
