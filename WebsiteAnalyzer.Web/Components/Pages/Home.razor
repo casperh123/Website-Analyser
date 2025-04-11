@@ -1,7 +1,11 @@
 ﻿@page "/"
+@using System.Text.Encodings.Web
 @using Sidio.Sitemap.Blazor
 @using WebsiteAnalyzer.Web.Components.WebsiteInputs
 @using WebsiteAnalyzer.Web.Components.Templates.UITemplates
+
+@inject NavigationManager NavManager
+
 @* default *@
 @attribute [Sitemap]
 
@@ -16,7 +20,7 @@
             Your website's performance directly impacts user experience and search engine rankings.
             Our specialized tools help you identify and fix common issues that could be holding your site back.
         </RadzenText>
-        <WebsiteInput/>
+        <WebsiteInput Url="@_url" WebsiteActionStarted="AnalyseWebsite"/>
     </RadzenColumn>
     <RadzenColumn class="rz-display-none rz-display-sm-block">
         <RadzenImage Path="./images/undraw_programming.png" Style="height: 100%; width:  100%; border-radius: 3px;"></RadzenImage>
@@ -77,3 +81,13 @@
         like scheduling, historical tracking, and detailed performance analytics.
     </RadzenText>
 </RadzenStack>
+
+@code {
+    private string _url = "https://";
+    private string _selectedUrl = "/cache-warmer";
+    
+    private void AnalyseWebsite(Uri url)
+    {
+        NavManager.NavigateTo(_selectedUrl + "?Url=" + UrlEncoder.Default.Encode(url.ToString()));
+    }
+}

@@ -57,6 +57,9 @@
 <CacheWarmSeoText />
 
 @code {
+    [SupplyParameterFromQuery]
+    public string? Url { get; set; }
+    
     private int _linksChecked;
     private int _linksEnqueued;
     private string _url = "https://";
@@ -72,6 +75,12 @@
         {
             ICollection<CacheWarm> cacheWarms = await CacheWarmingService.GetCacheWarmsByUserAsync(_user.Id);
             _cacheWarms = cacheWarms.ToList();
+        }
+        
+        if (Url is not null)
+        {
+            _url = Url;
+            await StartWarm(new Uri(_url));
         }
     }
 

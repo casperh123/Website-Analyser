@@ -56,6 +56,9 @@
 </RadzenTabs>
 
 @code {
+    [SupplyParameterFromQuery]
+    public string? Url { get; set; }
+    
     private int _linksChecked;
     private int _linksEnqueued;
     private string _url = "https://";
@@ -68,6 +71,12 @@
         BrokenLinkService.ProgressUpdated += HandleProgressUpdate;
         _user = await UserService.GetCurrentUserAsync();
         _brokenLinkCrawls = await BrokenLinkService.GetCrawlsByUserAsync(_user?.Id);
+
+        if (Url is not null)
+        {
+            _url = Url;
+            await StartBrokenLinkCheck(new Uri(_url));
+        }
     }
 
     private async Task RerunBrokenLink(string url)
