@@ -1,0 +1,21 @@
+<RadzenCard class="p-6" Style="height: 100%; display: flex; flex-direction: column; justify-content: space-between;">
+    <RadzenText TextStyle="TextStyle.H4">@TemplateHeader</RadzenText>
+    <RadzenText class="mb-4">@TemplateText</RadzenText>
+    <a href="@Url">
+        <RadzenButton Text="@ButtonText" ButtonStyle="ButtonStyle.Primary"/>
+    </a>
+</RadzenCard>
+
+@code {
+    [Parameter, EditorRequired]
+    public required RenderFragment TemplateHeader { get; set; }
+    
+    [Parameter, EditorRequired]
+    public required RenderFragment TemplateText { get; set; }
+    
+    [Parameter, EditorRequired]
+    public required string Url { get; set; }
+    
+    [Parameter, EditorRequired]
+    public required string ButtonText { get; set; }
+}

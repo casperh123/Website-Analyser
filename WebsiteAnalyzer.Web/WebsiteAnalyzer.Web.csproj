@@ -23,17 +23,7 @@
         <ProjectReference Include="..\WebsiteAnalyzer.Infrastructure\WebsiteAnalyzer.Infrastructure.csproj"/>
         <ProjectReference Include="..\WebsiteAnalyzer.Application\WebsiteAnalyzer.Application.csproj"/>
     </ItemGroup>
-
-    <ItemGroup>
-        <AdditionalFiles Include="Components\Cards\CollapsableCacheCard.razor"/>
-        <AdditionalFiles Include="Components\Search\SearchBar.razor"/>
-        <AdditionalFiles Include="Components\WebsiteInputs\WebsiteInput.razor"/>
-        <AdditionalFiles Include="Components\WebsiteMetrics\BrokenLinksStats.razor"/>
-        <AdditionalFiles Include="Components\WebsiteMetrics\PageHeaders.razor"/>
-        <AdditionalFiles Include="Components\WebsiteMetrics\PerformanceStats.razor"/>
-        <AdditionalFiles Include="Components\WebsiteMetrics\StateButtons.razor"/>
-    </ItemGroup>
-
+    
     <ItemGroup>
         <Folder Include="Data\"/>
     </ItemGroup>
