@@ -1,66 +1,93 @@
 ﻿@page "/"
+@using System.Text.Encodings.Web
 @using Sidio.Sitemap.Blazor
+@using WebsiteAnalyzer.Web.Components.WebsiteInputs
+@using WebsiteAnalyzer.Web.Components.Templates.UITemplates
+
+@inject NavigationManager NavManager
+
 @* default *@
 @attribute [Sitemap]
 
 <PageTitle>Website Analyzer</PageTitle>
 
-<div style="max-width:1000px;">
-<RadzenText TextStyle="TextStyle.H1" class="mb-4">
-    Website Analyzer
-</RadzenText>
-
-<RadzenText class="mb-6">
-    Your website's performance directly impacts user experience and search engine rankings. 
-    Our specialized tools help you identify and fix common issues that could be holding your site back.
-</RadzenText>
-
-<RadzenRow class="rz-mt-6">
+<RadzenRow Gap="40px">
     <RadzenColumn>
-        <RadzenCard class="p-6" Style="height: 100%; display: flex; flex-direction: column; justify-content: space-between;">
-            <RadzenText TextStyle="TextStyle.H3">Broken Link Checker</RadzenText>
-            <RadzenText class="mb-4">
-                Dead links frustrate users and harm your SEO. Our broken link checker crawls
-                your entire website, identifying broken internal and external links that need
-                attention. Stay on top of your site's health with comprehensive link analysis.
-            </RadzenText>
-            <a href="/broken-link-checker">
-                <RadzenButton Text="Find Broken Links" ButtonStyle="ButtonStyle.Primary"/>
-            </a>
-        </RadzenCard>
+        <RadzenText TextStyle="TextStyle.H2">
+            Website Analyzer
+        </RadzenText>
+        <RadzenText>
+            Your website's performance directly impacts user experience and search engine rankings.
+            Our specialized tools help you identify and fix common issues that could be holding your site back.
+        </RadzenText>
+        <WebsiteInput Url="@_url" WebsiteActionStarted="AnalyseWebsite"/>
     </RadzenColumn>
-    <RadzenColumn>
-        <RadzenCard class="p-6">
-            <RadzenText TextStyle="TextStyle.H3">Cache Warmer</RadzenText>
-            <RadzenText class="mb-4">
-                Don't let slow page loads drive visitors away. Our cache warming tool
-                proactively loads your pages into server cache, ensuring consistently fast
-                response times across your entire site. Perfect for after deployments or
-                before high-traffic periods.
-            </RadzenText>
-            <a href="/cache-warmer">
-                <RadzenButton Text="Warm Your Cache" ButtonStyle="ButtonStyle.Primary"/>
-            </a>
-        </RadzenCard>
+    <RadzenColumn class="rz-display-none rz-display-sm-block">
+        <RadzenImage Path="./images/undraw_programming.png" Style="height: 100%; width:  100%; border-radius: 3px;"></RadzenImage>
     </RadzenColumn>
-</RadzenRow>    
+</RadzenRow>
 
-<RadzenText TextStyle="TextStyle.H2" class="mb-4 rz-mt-6">Why Use Website Analyzer?</RadzenText>
+<RadzenStack class="mt-5">
+    <RadzenRow class="rz-mt-6">
+        <RadzenColumn SizeXS="4">
+            <CTACard Url="/broken-link-checker" ButtonText="Find Broken Links">
+                <TemplateHeader>Broken Links</TemplateHeader>
+                <TemplateText>
+                    Dead links frustrate users and harm your SEO. Find broken links across your website.
+                    Stay on top of your site's health with broken link analysis.
+                </TemplateText>
+            </CTACard>
+        </RadzenColumn>
+        
+        <RadzenColumn SizeXS="4">
+            <CTACard Url="/cache-warmer" ButtonText="Warm Your Cache">
+                <TemplateHeader>Cache Warm</TemplateHeader>
+                <TemplateText>
+                    Slow page loads drive visitors away. Warm your cache proactively, ensuring consistently fast
+                    response times across your entire site. Perfect for after deployments or
+                    before high-traffic periods.
+                </TemplateText>
+            </CTACard>
+        </RadzenColumn>
+        
+        <RadzenColumn SizeXS="4">
+            <CTACard Url="/website-analyser-legacy" ButtonText="Analyze">
+                <TemplateHeader>Website Analysis</TemplateHeader>
+                <TemplateText>
+                    You need the latest metrics for your website when developing.
+                    Get Speed metrics, HTTP headers and other developer insights, by
+                    using our website analysis tool while you work.
+                </TemplateText>
+            </CTACard>
+        </RadzenColumn>
+    </RadzenRow>
 
-<RadzenText class="mb-2">
-    Whether you're managing a small business website or a large e-commerce platform, 
-    maintaining optimal performance is crucial. Our tools help you:
-</RadzenText>
+    <RadzenText TextStyle="TextStyle.H2" class="mb-4 rz-mt-6">Why Use Website Analyzer?</RadzenText>
 
-<ul class="mb-6">
-    <li>Identify and fix broken links before they impact your users</li>
-    <li>Ensure consistently fast page loads with intelligent cache warming</li>
-    <li>Monitor your website's health with detailed historical data</li>
-    <li>Automate maintenance tasks to save time and resources</li>
-</ul>
+    <RadzenText class="mb-2">
+        Whether you're managing a small business website or a large e-commerce platform,
+        maintaining optimal performance is crucial. Our tools help you:
+    </RadzenText>
 
-<RadzenText>
-    Get started now with our free tools, or create an account to unlock advanced features 
-    like scheduling, historical tracking, and detailed performance analytics.
-</RadzenText>
-</div>
+    <ul class="mb-6">
+        <li>Identify and fix broken links before they impact your users</li>
+        <li>Ensure consistently fast page loads with intelligent cache warming</li>
+        <li>Monitor your website's health with detailed historical data</li>
+        <li>Automate maintenance tasks to save time and resources</li>
+    </ul>
+
+    <RadzenText>
+        Get started now with our free tools, or create an account to unlock advanced features
+        like scheduling, historical tracking, and detailed performance analytics.
+    </RadzenText>
+</RadzenStack>
+
+@code {
+    private string _url = "https://";
+    private string _selectedUrl = "/cache-warmer";
+    
+    private void AnalyseWebsite(Uri url)
+    {
+        NavManager.NavigateTo(_selectedUrl + "?Url=" + UrlEncoder.Default.Encode(url.ToString()));
+    }
+}
