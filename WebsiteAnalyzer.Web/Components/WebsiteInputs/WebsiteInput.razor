@@ -5,9 +5,9 @@
     <RadzenStack>
         <RadzenLabel Component="url-input">Select Url</RadzenLabel>
         <RadzenTextBox Value="@Url" Change="ChangeUrl" AutoCompleteType="AutoCompleteType.Url" />
-        <RadzenButton Click="@OnChanged" Disabled="@IsProcessing">Start</RadzenButton>
+        <RadzenButton Click="@OnChanged" Disabled="@_isProcessing">Start</RadzenButton>
 
-        @if (IsProcessing)
+        @if (_isProcessing)
         {
             <RadzenButton Click="OnCancel" ButtonStyle="ButtonStyle.Danger">Cancel</RadzenButton>
         }
@@ -33,9 +33,7 @@
     [Parameter] 
     public string Url { get; set; } = "https://";
 
-    [Parameter] 
-    public bool IsProcessing { get; set; }
-
+    private bool _isProcessing;
     private string _errorMessage = "";
 
     private void ChangeUrl(string url)
@@ -46,16 +44,12 @@
     private async Task OnChanged()
     {
         _errorMessage = "";
-
-        if (string.IsNullOrWhiteSpace(Url))
-        {
-            return;
-        }
-
+        _isProcessing = true;
+        
         try
         {
             Url.TrimEnd('/');
-            
+
             Uri uri = new Uri(Url, UriKind.Absolute);
             await WebsiteActionStarted.InvokeAsync(uri);
         }
@@ -63,6 +57,9 @@
         {
             _errorMessage = "The URL entered is not in a valid format.";
         }
+        finally
+        {
+            _isProcessing = false;
+        }
     }
-
 }

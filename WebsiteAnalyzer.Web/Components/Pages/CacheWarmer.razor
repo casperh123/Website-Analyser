@@ -28,8 +28,12 @@
 
 <CacheWarmIntroText />
 
-<WebsiteInput Url="@_url" IsProcessing="IsProcessing" LinksChecked="_linksChecked" LinksEnqueued="_linksEnqueued"
-              OnCancel="CancelProcessing" WebsiteActionStarted="StartWarm"/>
+<WebsiteInput 
+    Url="@_url" 
+    LinksChecked="_linksChecked" 
+    LinksEnqueued="_linksEnqueued"
+    OnCancel="CancelProcessing" 
+    WebsiteActionStarted="StartWarm"/>
 
 <AuthorizeView>
     <Authorized>
@@ -64,7 +68,7 @@
     private int _linksEnqueued;
     private string _url = "https://";
     private ApplicationUser? _user;
-    private IList<CacheWarm> _cacheWarms = [];
+    private IEnumerable<CacheWarm> _cacheWarms = [];
 
     protected override async Task OnInitializedAsync()
     {
