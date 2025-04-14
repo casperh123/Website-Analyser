@@ -1,12 +1,15 @@
+@using WebsiteAnalyzer.Core.Enums
+@using WebsiteAnalyzer.Web.Components.Status
 @if (CompletedSuccessfully)
 {
-    <RadzenBadge BadgeStyle="BadgeStyle.Success" Style="width: fit-content">Completed</RadzenBadge>
+    <StatusBadge Status="Status.Completed" />
 }
 else
 {
-    <RadzenBadge BadgeStyle="BadgeStyle.Warning" Style="width: fit-content">Encountered Error</RadzenBadge>
+    <StatusBadge Status="Status.Failed" />
 }
 
 @code {
-    [Parameter] public bool CompletedSuccessfully { get; set; }
+    [Parameter] 
+    public bool CompletedSuccessfully { get; set; }
 }

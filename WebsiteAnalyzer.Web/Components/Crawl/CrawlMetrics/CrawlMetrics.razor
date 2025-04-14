@@ -1,36 +1,30 @@
+@using Core.Entities
+@using WebsiteAnalyzer.Core.Enums
+
 <RadzenStack class="rz-mt-6">
     <RadzenCardGroup>
-        @if (InProgress)
-        {
-            <RadzenCard>
-                <RadzenText>Status:</RadzenText>
-                <RadzenBadge BadgeStyle="BadgeStyle.Success">In Progress</RadzenBadge>
-            </RadzenCard>
-        }
+        <RadzenCard>
+            <RadzenText>Status:</RadzenText>
+            <RadzenBadge BadgeStyle="BadgeStyle.Success">In Progress</RadzenBadge>
+        </RadzenCard>
+            
+        <RadzenCard>
+            <RadzenText>Links Checked:</RadzenText>
+            <RadzenText>@LinksChecked</RadzenText>
+        </RadzenCard>
 
-        @if (LinksChecked > 0)
-        {
-            <RadzenCard>
-                <RadzenText>Links Checked:</RadzenText>
-                <RadzenText>@LinksChecked</RadzenText>
-            </RadzenCard>
-        }
-
-        @if (LinksEnqueued > 0)
-        {
-            <RadzenCard>
-                <RadzenText>Links Enqueued:</RadzenText>
-                <RadzenText>@LinksEnqueued</RadzenText>
-            </RadzenCard>
-        }
+        <RadzenCard>
+            <RadzenText>Links Enqueued:</RadzenText>
+            <RadzenText>@LinksEnqueued</RadzenText>
+        </RadzenCard>
     </RadzenCardGroup>
 </RadzenStack>
 
 @code {
 
-    [Parameter] public required int LinksChecked { get; set; }
+    [Parameter, EditorRequired]
+    public required int LinksChecked { get; set; }
 
-    [Parameter] public required int LinksEnqueued { get; set; }
-
-    private bool InProgress => LinksEnqueued > 0;
+    [Parameter, EditorRequired]
+    public required int LinksEnqueued { get; set; }
 }

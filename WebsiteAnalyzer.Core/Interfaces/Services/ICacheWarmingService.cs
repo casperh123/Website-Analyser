@@ -11,5 +11,5 @@ public interface ICacheWarmingService
     Task WarmCache(string url, CancellationToken cancellationToken = default);
     Task WarmCacheWithoutMetrics(string url, Guid userId, CancellationToken cancellationToken = default);
     Task<ICollection<CacheWarm>> GetCacheWarmsAsync();
-    Task<ICollection<CacheWarm>> GetCacheWarmsByUserAsync(Guid userId);
+    Task<ICollection<CacheWarm>> GetCacheWarmsByUserAsync(Guid? userId);
 }

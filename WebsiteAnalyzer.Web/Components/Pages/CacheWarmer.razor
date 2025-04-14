@@ -28,8 +28,9 @@
 
 <CacheWarmIntroText />
 
-<WebsiteInput 
-    Url="@_url" 
+<WebsiteInput
+    Url="@_url"
+    IsProcessing="IsProcessing"
     LinksChecked="_linksChecked" 
     LinksEnqueued="_linksEnqueued"
     OnCancel="CancelProcessing" 
@@ -40,7 +41,7 @@
         <RadzenTabs class="rz-mt-12" TabPosition="TabPosition.Top" RenderMode="TabRenderMode.Server">
             <Tabs>
                 <RadzenTabsItem Text="Previous Warms">
-                    <CacheWarmList OnRerunCacheWarm="RerunWarmCache" User="_user" CacheWarms="_cacheWarms"
+                    <CacheWarmList OnRerunCacheWarm="StartWarm" User="_user" CacheWarms="_cacheWarms"
                                    IsProcessing="IsProcessing"/>
                 </RadzenTabsItem>
                 <RadzenTabsItem Text="Schedule">
@@ -73,25 +74,15 @@
     protected override async Task OnInitializedAsync()
     {
         CacheWarmingService.ProgressUpdated += HandleProgressUpdate;
+        
         _user = await UserService.GetCurrentUserAsync();
-
-        if (_user is not null)
-        {
-            ICollection<CacheWarm> cacheWarms = await CacheWarmingService.GetCacheWarmsByUserAsync(_user.Id);
-            _cacheWarms = cacheWarms.ToList();
-        }
+        _cacheWarms = await CacheWarmingService.GetCacheWarmsByUserAsync(_user?.Id);
         
         if (Url is not null)
         {
             _url = Url;
             await StartWarm(new Uri(_url));
         }
-    }
-
-    private async Task RerunWarmCache(string websiteUrl)
-    {
-        _url = websiteUrl;
-        await StartWarm(new Uri(_url));
     }
 
     public async Task StartWarm(Uri url)

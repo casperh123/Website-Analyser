@@ -5,5 +5,6 @@ public enum Status
     Scheduled,
     InProgress,
     Completed,
+    Stopped,
     Failed
 }

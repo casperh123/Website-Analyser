@@ -20,7 +20,7 @@
             Your website's performance directly impacts user experience and search engine rankings.
             Our specialized tools help you identify and fix common issues that could be holding your site back.
         </RadzenText>
-        <WebsiteInput Url="@_url" WebsiteActionStarted="AnalyseWebsite"/>
+        <WebsiteInput WebsiteActionStarted="AnalyseWebsite"/>
     </RadzenColumn>
     <RadzenColumn class="rz-display-none rz-display-sm-block">
         <RadzenImage Path="./images/undraw_programming.png" Style="height: 100%; width:  100%; border-radius: 3px;"></RadzenImage>
@@ -83,11 +83,10 @@
 </RadzenStack>
 
 @code {
-    private string _url = "https://";
-    private string _selectedUrl = "/cache-warmer";
+    private string _selectedMode = "/cache-warmer";
     
     private void AnalyseWebsite(Uri url)
     {
-        NavManager.NavigateTo(_selectedUrl + "?Url=" + UrlEncoder.Default.Encode(url.ToString()));
+        NavManager.NavigateTo(_selectedMode + "?Url=" + UrlEncoder.Default.Encode(url.ToString()));
     }
 }

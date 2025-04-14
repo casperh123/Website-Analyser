@@ -100,9 +100,14 @@ public class CacheWarmingService : ICacheWarmingService
         return await _cacheWarmRepository.GetAllAsync();
     }
 
-    public async Task<ICollection<CacheWarm>> GetCacheWarmsByUserAsync(Guid userId)
+    public async Task<ICollection<CacheWarm>> GetCacheWarmsByUserAsync(Guid? userId)
     {
-        return await _cacheWarmRepository.GetCacheWarmsByUserAsync(userId);
+        if (!userId.HasValue)
+        {
+            return [];
+        }
+        
+        return await _cacheWarmRepository.GetCacheWarmsByUserAsync(userId.Value);
     }
 
     private async Task UpdateCacheWarmResults(CacheWarm cacheWarm, int linksChecked)

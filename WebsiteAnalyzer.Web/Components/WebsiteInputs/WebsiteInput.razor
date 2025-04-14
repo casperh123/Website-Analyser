@@ -5,19 +5,28 @@
     <RadzenStack>
         <RadzenLabel Component="url-input">Select Url</RadzenLabel>
         <RadzenTextBox Value="@Url" Change="ChangeUrl" AutoCompleteType="AutoCompleteType.Url" />
-        <RadzenButton Click="@OnChanged" Disabled="@_isProcessing">Start</RadzenButton>
+        <RadzenButton Click="@OnChanged" Disabled="@IsProcessing">Start</RadzenButton>
 
-        @if (_isProcessing)
+        @if (IsProcessing)
         {
             <RadzenButton Click="OnCancel" ButtonStyle="ButtonStyle.Danger">Cancel</RadzenButton>
         }
     </RadzenStack>
     
     <ErrorMessage Message="@_errorMessage"/>
-    <CrawlMetrics LinksChecked="LinksChecked" LinksEnqueued="LinksEnqueued"/>
+    @if (IsProcessing)
+    {
+        <CrawlMetrics LinksChecked="LinksChecked" LinksEnqueued="LinksEnqueued"/>   
+    }
 </RadzenCard>
 
 @code {
+    [Parameter, EditorRequired]
+    public bool IsProcessing { get; set; }
+    
+    [Parameter, EditorRequired]
+    public string Url { get; set; } = "https://";
+    
     [Parameter] 
     public EventCallback<Uri> WebsiteActionStarted { get; set; }
 
@@ -29,11 +38,7 @@
 
     [Parameter] 
     public int LinksEnqueued { get; set; }
-
-    [Parameter] 
-    public string Url { get; set; } = "https://";
-
-    private bool _isProcessing;
+    
     private string _errorMessage = "";
 
     private void ChangeUrl(string url)
@@ -44,7 +49,6 @@
     private async Task OnChanged()
     {
         _errorMessage = "";
-        _isProcessing = true;
         
         try
         {
@@ -54,10 +58,6 @@
         catch (UriFormatException e)
         {
             _errorMessage = e.Message;
-        }
-        finally
-        {
-            _isProcessing = false;
         }
     }
 }
