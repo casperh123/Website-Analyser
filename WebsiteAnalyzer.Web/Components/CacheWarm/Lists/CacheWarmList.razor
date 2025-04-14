@@ -15,7 +15,7 @@
         AllowPaging="true"
         ShowPagingSummary="true"
         Data="CacheWarms"
-        FilterMode="FilterMode.CheckBoxList">
+        FilterMode="FilterMode.Simple">
         <Columns>
             <RadzenDataGridColumn Property="@nameof(CacheWarm.WebsiteUrl)" Title="Website" MinWidth="400px"
                                   Sortable="true" Filterable="true">
@@ -32,7 +32,7 @@
                     </RadzenStack>
                 </Template>
             </RadzenDataGridColumn>
-            <RadzenDataGridColumn Property="@nameof(CacheWarm.TotalTime)" Title="Total Time" Filterable="false">
+            <RadzenDataGridColumn Property="@nameof(CacheWarm.TotalTime)" Title="Total Time" Width="100px" Filterable="false">
                 <Template Context="cacheWarm">
                     @cacheWarm.TotalTime.ToString(@"hh\:mm\:ss")
                 </Template>
@@ -51,7 +51,7 @@
     public required ApplicationUser User { get; set; }
 
     [Parameter] 
-    public required IList<CacheWarm> CacheWarms { get; set; }
+    public required IEnumerable<CacheWarm> CacheWarms { get; set; }
 
     [Parameter] 
     public required bool IsProcessing { get; set; }
