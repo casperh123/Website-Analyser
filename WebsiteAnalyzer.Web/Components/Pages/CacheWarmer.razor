@@ -93,9 +93,6 @@
 
     private async Task WarmCache(Uri url, CancellationToken cancellationToken)
     {
-        _linksChecked = 0;
-        _linksEnqueued = 0;
-        
         if (_user is null)
         {
             await CacheWarmingService.WarmCache(
@@ -107,17 +104,13 @@
 
         await CacheWarmingService.WarmCacheWithSaveAsync(url.ToString(), _user.Id, cancellationToken);
 
-        ICollection<CacheWarm> cacheWarms = await CacheWarmingService.GetCacheWarmsByUserAsync(_user.Id);
-        _cacheWarms = cacheWarms.ToList();
+        _cacheWarms = await CacheWarmingService.GetCacheWarmsByUserAsync(_user?.Id);
     }
 
-    private async void HandleProgressUpdate(object? sender, CrawlProgressEventArgs args)
+    private void HandleProgressUpdate(object? sender, CrawlProgressEventArgs args)
     {
-        await InvokeAsync(() =>
-        {
-            _linksEnqueued = args.LinksEnqueued;
-            _linksChecked = args.LinksChecked;
-            StateHasChanged();
-        });
+        _linksEnqueued = args.LinksEnqueued;
+        _linksChecked = args.LinksChecked;
+        StateHasChanged();
     }
 }
