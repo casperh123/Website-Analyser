@@ -9,7 +9,7 @@
 
         @if (IsProcessing)
         {
-            <RadzenButton Click="(async () => await OnCancel.InvokeAsync())" Style="background-color: red">Cancel</RadzenButton>
+            <RadzenButton Click="OnCancel" Style="background-color: red">Cancel</RadzenButton>
         }
     </RadzenStack>
     <ErrorMessage Message="@_errorMessage"/>
