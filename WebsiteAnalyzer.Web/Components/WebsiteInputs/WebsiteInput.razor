@@ -48,14 +48,12 @@
         
         try
         {
-            Url.TrimEnd('/');
-
             Uri uri = new Uri(Url, UriKind.Absolute);
             await WebsiteActionStarted.InvokeAsync(uri);
         }
-        catch (UriFormatException)
+        catch (UriFormatException e)
         {
-            _errorMessage = "The URL entered is not in a valid format.";
+            _errorMessage = e.Message;
         }
         finally
         {
