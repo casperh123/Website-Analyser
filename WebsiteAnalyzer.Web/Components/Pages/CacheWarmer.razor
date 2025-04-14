@@ -107,10 +107,13 @@
         _cacheWarms = await CacheWarmingService.GetCacheWarmsByUserAsync(_user?.Id);
     }
 
-    private void HandleProgressUpdate(object? sender, CrawlProgressEventArgs args)
+    private async void HandleProgressUpdate(object? sender, CrawlProgressEventArgs args)
     {
-        _linksEnqueued = args.LinksEnqueued;
-        _linksChecked = args.LinksChecked;
-        StateHasChanged();
+        await InvokeAsync(() =>
+        {
+            _linksEnqueued = args.LinksEnqueued;
+            _linksChecked = args.LinksChecked;
+            StateHasChanged();
+        });
     }
 }
