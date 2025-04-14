@@ -1,29 +1,31 @@
-﻿<!DOCTYPE html>
+﻿@using Radzen
+@using Radzen.Blazor
+
+<!DOCTYPE html>
 <html lang="en">
 
 <head>
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <base href="/"/>
+    
     <HeadOutlet @rendermode="InteractiveServer"/>
-    <RadzenTheme Theme="@InitialTheme" @rendermode="InteractiveServer"/>
+    <RadzenTheme Theme="@InitialTheme" @rendermode="PageRenderMode"/>
+    
     <link rel="stylesheet" href="@Assets["app.css"]"/>
     <link rel="stylesheet" href="@Assets["lib/bootstrap/dist/css/bootstrap.min.css"]"/>
     <link rel="stylesheet" href="@Assets["WebsiteAnalyzer.Web.styles.css"]"/>
     <ImportMap/>
     <link rel="icon" type="image/png" href="favicon.ico"/>
 
+    <script src="_content/Radzen.Blazor/Radzen.Blazor.js?v=@(typeof(Radzen.Colors).Assembly.GetName().Version)"></script>
     <script src="_framework/blazor.web.js"></script>
     <script src="lib/website-analyzer.js"></script>
-    <script src="_content/Radzen.Blazor/Radzen.Blazor.js?v=@(typeof(Radzen.Colors).Assembly.GetName().Version)"></script>
-
 </head>
 
 <body>
-
-<Routes @rendermode="PageRenderMode"/>
-<persist-component-state />
-
+    <Routes @rendermode="PageRenderMode"/>
+    <persist-component-state />
 </body>
 
 </html>
@@ -38,7 +40,6 @@
     [Inject]
     private ThemeService ThemeService { get; set; }
 
-    // Add this property to get the initial theme
     private string InitialTheme
     {
         get
@@ -47,20 +48,7 @@
             {
                 return theme;
             }
-            return "standard"; // or whatever your default theme is
-        }
-    }
-
-    protected override void OnInitialized()
-    {
-        // This is still useful for syncing the ThemeService
-        if (HttpContext != null)
-        {
-            string? theme = HttpContext.Request.Cookies["WebsiteAnalyzerTheme"];
-            if (!string.IsNullOrEmpty(theme))
-            {
-                ThemeService.SetTheme(theme, false);
-            }
+            return "standard";
         }
     }
 }

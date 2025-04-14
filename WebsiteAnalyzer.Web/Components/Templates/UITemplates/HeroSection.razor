@@ -1,0 +1,14 @@
+<RadzenColumn SizeXS="6" Style="justify-content: space-between">
+    @SecondColumn
+</RadzenColumn>
+<RadzenColumn SizeXS="6" Style="justify-content: space-between">
+    @SecondColumn
+</RadzenColumn>
+
+@code {
+    [Parameter, EditorRequired]
+    public required RenderFragment FirstColumn { get; set; }
+    
+    [Parameter, EditorRequired]
+    public required RenderFragment SecondColumn { get; set; }
+}
