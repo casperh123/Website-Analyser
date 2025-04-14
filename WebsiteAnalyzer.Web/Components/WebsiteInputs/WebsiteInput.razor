@@ -9,9 +9,10 @@
 
         @if (IsProcessing)
         {
-            <RadzenButton Click="OnCancel" Style="background-color: red">Cancel</RadzenButton>
+            <RadzenButton Click="OnCancel" ButtonStyle="ButtonStyle.Danger">Cancel</RadzenButton>
         }
     </RadzenStack>
+    
     <ErrorMessage Message="@_errorMessage"/>
     <CrawlMetrics LinksChecked="LinksChecked" LinksEnqueued="LinksEnqueued"/>
 </RadzenCard>
