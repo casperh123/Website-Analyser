@@ -1,4 +1,4 @@
-@if (!string.IsNullOrEmpty(Message))
+@if (Visible)
 {
     <RadzenAlert AlertStyle="AlertStyle.Danger" Text="@Message" bind-Visible="Visible"/>
 }

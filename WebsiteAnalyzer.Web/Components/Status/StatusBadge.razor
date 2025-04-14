@@ -1,0 +1,18 @@
+@using WebsiteAnalyzer.Core.Enums
+
+<RadzenBadge BadgeStyle="BadgeStyle" Style="width: fit-content">@Status.ToString()</RadzenBadge>
+
+@code {
+    [Parameter, EditorRequired]
+    public required Status Status { get; set; }
+
+    private BadgeStyle BadgeStyle => Status switch
+    {
+        Status.Completed => BadgeStyle.Success,
+        Status.InProgress => BadgeStyle.Success,
+        Status.Failed => BadgeStyle.Danger,
+        Status.Stopped => BadgeStyle.Warning,
+        Status.Scheduled => BadgeStyle.Info
+    };
+
+}

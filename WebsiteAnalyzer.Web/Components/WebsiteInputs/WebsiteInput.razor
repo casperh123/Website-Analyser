@@ -9,14 +9,24 @@
 
         @if (IsProcessing)
         {
-            <RadzenButton Click="(async () => await OnCancel.InvokeAsync())" Style="background-color: red">Cancel</RadzenButton>
+            <RadzenButton Click="OnCancel" ButtonStyle="ButtonStyle.Danger">Cancel</RadzenButton>
         }
     </RadzenStack>
+    
     <ErrorMessage Message="@_errorMessage"/>
-    <CrawlMetrics LinksChecked="LinksChecked" LinksEnqueued="LinksEnqueued"/>
+    @if (IsProcessing)
+    {
+        <CrawlMetrics LinksChecked="LinksChecked" LinksEnqueued="LinksEnqueued"/>   
+    }
 </RadzenCard>
 
 @code {
+    [Parameter, EditorRequired]
+    public bool IsProcessing { get; set; }
+    
+    [Parameter, EditorRequired]
+    public string Url { get; set; } = "https://";
+    
     [Parameter] 
     public EventCallback<Uri> WebsiteActionStarted { get; set; }
 
@@ -28,13 +38,7 @@
 
     [Parameter] 
     public int LinksEnqueued { get; set; }
-
-    [Parameter] 
-    public string Url { get; set; } = "https://";
-
-    [Parameter] 
-    public bool IsProcessing { get; set; }
-
+    
     private string _errorMessage = "";
 
     private void ChangeUrl(string url)
@@ -45,23 +49,15 @@
     private async Task OnChanged()
     {
         _errorMessage = "";
-
-        if (string.IsNullOrWhiteSpace(Url))
-        {
-            return;
-        }
-
+        
         try
         {
-            Url.TrimEnd('/');
-            
             Uri uri = new Uri(Url, UriKind.Absolute);
             await WebsiteActionStarted.InvokeAsync(uri);
         }
-        catch (UriFormatException)
+        catch (UriFormatException e)
         {
-            _errorMessage = "The URL entered is not in a valid format.";
+            _errorMessage = e.Message;
         }
     }
-
 }

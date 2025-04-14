@@ -45,7 +45,7 @@
 
 @code {
     [Parameter] 
-    public required EventCallback<string> OnRerunCacheWarm { get; set; }
+    public required EventCallback<Uri> OnRerunCacheWarm { get; set; }
 
     [Parameter] 
     public required ApplicationUser User { get; set; }
@@ -61,7 +61,7 @@
         if (OnRerunCacheWarm.HasDelegate)
         {
             await JsRuntime.InvokeVoidAsync("backToTop");
-            await OnRerunCacheWarm.InvokeAsync(cacheWarm.WebsiteUrl);
+            await OnRerunCacheWarm.InvokeAsync(new Uri(cacheWarm.WebsiteUrl));
         }
     }
 

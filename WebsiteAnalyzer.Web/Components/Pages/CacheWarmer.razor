@@ -28,15 +28,20 @@
 
 <CacheWarmIntroText />
 
-<WebsiteInput Url="@_url" IsProcessing="IsProcessing" LinksChecked="_linksChecked" LinksEnqueued="_linksEnqueued"
-              OnCancel="CancelProcessing" WebsiteActionStarted="StartWarm"/>
+<WebsiteInput
+    Url="@_url"
+    IsProcessing="IsProcessing"
+    LinksChecked="_linksChecked" 
+    LinksEnqueued="_linksEnqueued"
+    OnCancel="CancelProcessing" 
+    WebsiteActionStarted="StartWarm"/>
 
 <AuthorizeView>
     <Authorized>
         <RadzenTabs class="rz-mt-12" TabPosition="TabPosition.Top" RenderMode="TabRenderMode.Server">
             <Tabs>
                 <RadzenTabsItem Text="Previous Warms">
-                    <CacheWarmList OnRerunCacheWarm="RerunWarmCache" User="_user" CacheWarms="_cacheWarms"
+                    <CacheWarmList OnRerunCacheWarm="StartWarm" User="_user" CacheWarms="_cacheWarms"
                                    IsProcessing="IsProcessing"/>
                 </RadzenTabsItem>
                 <RadzenTabsItem Text="Schedule">
@@ -64,30 +69,20 @@
     private int _linksEnqueued;
     private string _url = "https://";
     private ApplicationUser? _user;
-    private IList<CacheWarm> _cacheWarms = [];
+    private IEnumerable<CacheWarm> _cacheWarms = [];
 
     protected override async Task OnInitializedAsync()
     {
         CacheWarmingService.ProgressUpdated += HandleProgressUpdate;
+        
         _user = await UserService.GetCurrentUserAsync();
-
-        if (_user is not null)
-        {
-            ICollection<CacheWarm> cacheWarms = await CacheWarmingService.GetCacheWarmsByUserAsync(_user.Id);
-            _cacheWarms = cacheWarms.ToList();
-        }
+        _cacheWarms = await CacheWarmingService.GetCacheWarmsByUserAsync(_user?.Id);
         
         if (Url is not null)
         {
             _url = Url;
             await StartWarm(new Uri(_url));
         }
-    }
-
-    private async Task RerunWarmCache(string websiteUrl)
-    {
-        _url = websiteUrl;
-        await StartWarm(new Uri(_url));
     }
 
     public async Task StartWarm(Uri url)
@@ -98,9 +93,6 @@
 
     private async Task WarmCache(Uri url, CancellationToken cancellationToken)
     {
-        _linksChecked = 0;
-        _linksEnqueued = 0;
-        
         if (_user is null)
         {
             await CacheWarmingService.WarmCache(
@@ -112,17 +104,13 @@
 
         await CacheWarmingService.WarmCacheWithSaveAsync(url.ToString(), _user.Id, cancellationToken);
 
-        ICollection<CacheWarm> cacheWarms = await CacheWarmingService.GetCacheWarmsByUserAsync(_user.Id);
-        _cacheWarms = cacheWarms.ToList();
+        _cacheWarms = await CacheWarmingService.GetCacheWarmsByUserAsync(_user?.Id);
     }
 
-    private async void HandleProgressUpdate(object? sender, CrawlProgressEventArgs args)
+    private void HandleProgressUpdate(object? sender, CrawlProgressEventArgs args)
     {
-        await InvokeAsync(() =>
-        {
-            _linksEnqueued = args.LinksEnqueued;
-            _linksChecked = args.LinksChecked;
-            StateHasChanged();
-        });
+        _linksEnqueued = args.LinksEnqueued;
+        _linksChecked = args.LinksChecked;
+        StateHasChanged();
     }
 }

@@ -35,6 +35,8 @@ builder.Services.AddTransient<IEmailSender, MailSenderProvider>();
 
 builder.Services.AddScoped<IUserService, UserService>();
 
+builder.Services.AddScoped<StateService>();
+
 builder.Services.AddLogging(logging =>
 {
     logging.ClearProviders();
