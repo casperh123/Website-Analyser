@@ -7,14 +7,16 @@ namespace WebsiteAnalyzer.Infrastructure.Repositories;
 
 public class BrokenLinkRepository : BaseRepository<BrokenLink>, IBrokenLinkRepository
 {
-    public BrokenLinkRepository(ApplicationDbContext dbContext) : base(dbContext)
+    public BrokenLinkRepository(IDbContextFactory<ApplicationDbContext> dbContextFactory) : base(dbContextFactory)
     {
         
     }
 
     public async Task<IEnumerable<BrokenLink>> GetBrokenLinksByCrawlAsync(Guid brokenLinkCrawlId)
     {
-        return await DbSet
+        await using ApplicationDbContext dbContext = await DbContextFactory.CreateDbContextAsync();
+
+        return await dbContext.BrokenLinks
             .Where(bl => bl.BrokenLinkCrawlId == brokenLinkCrawlId)
             .ToListAsync();
     }

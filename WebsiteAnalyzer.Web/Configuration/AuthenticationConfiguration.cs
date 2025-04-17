@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using WebsiteAnalyzer.Infrastructure;
 using WebsiteAnalyzer.Infrastructure.Data;
 using WebsiteAnalyzer.Web.Components.Account;
@@ -22,7 +23,7 @@ public static class AuthenticationConfiguration
         }).AddIdentityCookies();
 
         services.AddIdentityCore<ApplicationUser>(options => options.SignIn.RequireConfirmedAccount = true)
-            .AddEntityFrameworkStores<ApplicationDbContext>()
+            .AddEntityFrameworkStores<ApplicationIdentityDbContext>()
             .AddSignInManager()
             .AddDefaultTokenProviders();
 

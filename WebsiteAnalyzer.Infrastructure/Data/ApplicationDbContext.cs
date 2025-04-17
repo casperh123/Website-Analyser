@@ -7,7 +7,7 @@ using WebsiteAnalyzer.Core.Entities.Website;
 
 namespace WebsiteAnalyzer.Infrastructure.Data;
 
-public class ApplicationDbContext : IdentityDbContext<ApplicationUser, IdentityRole<Guid>, Guid>
+public class ApplicationDbContext : DbContext
 {
     public ApplicationDbContext(
         DbContextOptions<ApplicationDbContext> options)
@@ -27,7 +27,6 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser, IdentityR
     {
         base.OnModelCreating(builder);
 
-        // Configure Website entity
         builder.Entity<Website>()
             .HasKey(w =>
                 new
@@ -36,7 +35,6 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser, IdentityR
                     w.UserId
                 });
 
-        // Configure CacheWarm and Website relationship
         builder.Entity<CacheWarm>()
             .HasKey(cw => cw.Id);
 
@@ -45,15 +43,5 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser, IdentityR
 
         builder.Entity<BrokenLinkCrawl>()
             .HasKey(blc => new { blc.Id });
-
-        // Configure Identity entities to use GUID
-        builder.Entity<IdentityUserLogin<Guid>>()
-            .HasKey(l => new { l.LoginProvider, l.ProviderKey });
-
-        builder.Entity<IdentityUserRole<Guid>>()
-            .HasKey(r => new { r.UserId, r.RoleId });
-
-        builder.Entity<IdentityUserToken<Guid>>()
-            .HasKey(t => new { t.UserId, t.LoginProvider, t.Name });
     }
 }

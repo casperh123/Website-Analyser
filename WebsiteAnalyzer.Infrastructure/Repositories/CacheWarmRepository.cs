@@ -7,20 +7,24 @@ namespace WebsiteAnalyzer.Infrastructure.Repositories;
 
 public class CacheWarmRepository : BaseRepository<CacheWarm>, ICacheWarmRepository
 {
-    public CacheWarmRepository(ApplicationDbContext dbContext) : base(dbContext)
+    public CacheWarmRepository(IDbContextFactory<ApplicationDbContext> dbContextFactory) : base(dbContextFactory)
     {
     }
 
     public new async Task<ICollection<CacheWarm>> GetAllAsync()
     {
-        return await DbContext.CacheWarms
+        await using ApplicationDbContext dbContext = await DbContextFactory.CreateDbContextAsync();
+
+        return await dbContext.CacheWarms
             .OrderByDescending(cw => cw.StartTime)
-            .ToListAsync().ConfigureAwait(false);
+            .ToListAsync();
     }
 
     public async Task<ICollection<CacheWarm>> GetCacheWarmsByUserAsync(Guid id)
     {
-        return await DbContext.CacheWarms
+        await using ApplicationDbContext dbContext = await DbContextFactory.CreateDbContextAsync();
+
+        return await dbContext.CacheWarms
             .Where(cw => cw.UserId == id)
             .OrderByDescending(cw => cw.StartTime)
             .ToListAsync();
