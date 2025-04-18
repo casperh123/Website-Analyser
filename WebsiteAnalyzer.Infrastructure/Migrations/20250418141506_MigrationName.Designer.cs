@@ -11,7 +11,7 @@ using WebsiteAnalyzer.Infrastructure.Data;
 namespace WebsiteAnalyzer.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250210145813_MigrationName")]
+    [Migration("20250418141506_MigrationName")]
     partial class MigrationName
     {
         /// <inheritdoc />
