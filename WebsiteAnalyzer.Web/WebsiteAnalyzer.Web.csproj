@@ -24,5 +24,9 @@
         <ProjectReference Include="..\WebsiteAnalyzer.Infrastructure\WebsiteAnalyzer.Infrastructure.csproj"/>
         <ProjectReference Include="..\WebsiteAnalyzer.Application\WebsiteAnalyzer.Application.csproj"/>
     </ItemGroup>
+    
+    <ItemGroup>
+        <Folder Include="Data\"/>
+    </ItemGroup>
 
 </Project>

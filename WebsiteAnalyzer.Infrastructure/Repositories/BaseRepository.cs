@@ -6,58 +6,47 @@ namespace WebsiteAnalyzer.Infrastructure.Repositories;
 
 public class BaseRepository<T> : IBaseRepository<T> where T : class
 {
-    protected readonly IDbContextFactory<ApplicationDbContext> DbContextFactory;
+    protected readonly ApplicationDbContext DbContext;
+    protected readonly DbSet<T> DbSet;
 
-    public BaseRepository(IDbContextFactory<ApplicationDbContext> dbContextFactory)
+    public BaseRepository(ApplicationDbContext dbContext)
     {
-        DbContextFactory = dbContextFactory;
+        DbContext = dbContext;
+        DbSet = dbContext.Set<T>();
     }
 
     public async Task<T?> GetByIdAsync(Guid id)
     {
-        await using ApplicationDbContext dbContext = await DbContextFactory.CreateDbContextAsync();
-        
-        return await dbContext.Set<T>()
-            .FindAsync(id);
+        return await DbSet
+            .FindAsync(id)
+            .ConfigureAwait(false);
     }
 
     public async Task<ICollection<T>> GetAllAsync()
     {
-        await using ApplicationDbContext dbContext = await DbContextFactory.CreateDbContextAsync();
-        
-        return await dbContext.Set<T>()
-            .ToListAsync();
+        return await DbSet
+            .ToListAsync()
+            .ConfigureAwait(false);
     }
 
     public async Task AddAsync(T entity)
     {
-        await using ApplicationDbContext dbContext = await DbContextFactory.CreateDbContextAsync();
-        
-        await dbContext.Set<T>()
-            .AddAsync(entity);
-        
-        await dbContext.SaveChangesAsync();
+        await DbSet.AddAsync(entity);
+        await DbContext.SaveChangesAsync();
     }
 
     public async Task UpdateAsync(T entity)
     {
-        await using ApplicationDbContext dbContext = await DbContextFactory.CreateDbContextAsync();
-        
-        dbContext.Set<T>()
-            .Update(entity);
-        
-        await dbContext
-            .SaveChangesAsync();
+        DbSet.Update(entity);
+        await DbContext
+            .SaveChangesAsync()
+            .ConfigureAwait(false);
     }
 
     public async Task DeleteAsync(T entity)
     {
-        await using ApplicationDbContext dbContext = await DbContextFactory.CreateDbContextAsync();
-   
-        dbContext.Set<T>()
-            .Remove(entity);
-        
-        await dbContext
-            .SaveChangesAsync();
+        DbSet.Remove(entity);
+        await DbContext.SaveChangesAsync()
+            .ConfigureAwait(false);
     }
 }

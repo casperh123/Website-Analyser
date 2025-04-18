@@ -8,25 +8,21 @@ namespace WebsiteAnalyzer.Infrastructure.Repositories;
 
 public class CrawlSheduleRepository : BaseRepository<CrawlSchedule>, ICrawlScheduleRepository
 {
-    public CrawlSheduleRepository(IDbContextFactory<ApplicationDbContext> dbContextFactory) : base(dbContextFactory)
+    public CrawlSheduleRepository(ApplicationDbContext dbContext) : base(dbContext)
     {
     }
 
 
     public async Task<ICollection<CrawlSchedule>> GetCrawlSchedulesByUserIdAsync(Guid userId)
     {
-        await using ApplicationDbContext dbContext = await DbContextFactory.CreateDbContextAsync();
-
-        return await dbContext.CrawlSchedules
+        return await DbContext.CrawlSchedules
             .Where(cs => cs.UserId == userId)
             .ToListAsync();
     }
 
     public async Task<ICollection<CrawlSchedule>> GetCrawlSchedulesByUserIdAndTypeAsync(Guid userId, CrawlAction action)
     {
-        await using ApplicationDbContext dbContext = await DbContextFactory.CreateDbContextAsync();
-
-        return await dbContext.CrawlSchedules
+        return await DbContext.CrawlSchedules
             .Where(cs => cs.UserId == userId)
             .Where(cs => cs.Action == action)
             .ToListAsync();
@@ -34,18 +30,14 @@ public class CrawlSheduleRepository : BaseRepository<CrawlSchedule>, ICrawlSched
 
     public async Task<ICollection<CrawlSchedule>> GetByAction(CrawlAction action)
     {
-        await using ApplicationDbContext dbContext = await DbContextFactory.CreateDbContextAsync();
-
-        return await dbContext.CrawlSchedules
+        return await DbContext.CrawlSchedules
             .Where(cs => cs.Action == action)
             .ToListAsync();
     }
 
     public async Task<CrawlSchedule?> GetCrawlScheduleBy(string url, Guid userId, CrawlAction action)
     {
-        await using ApplicationDbContext dbContext = await DbContextFactory.CreateDbContextAsync();
-
-        return await dbContext.CrawlSchedules
+        return await DbContext.CrawlSchedules
             .Where(cs => cs.Url == url)
             .Where(cs => cs.UserId == userId)
             .Where(cs => cs.Action == action)
