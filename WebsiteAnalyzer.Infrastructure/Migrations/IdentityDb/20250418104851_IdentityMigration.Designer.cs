@@ -11,7 +11,7 @@ using WebsiteAnalyzer.Infrastructure.Data;
 namespace WebsiteAnalyzer.Infrastructure.Migrations.IdentityDb
 {
     [DbContext(typeof(ApplicationIdentityDbContext))]
-    [Migration("20250417094348_IdentityMigration")]
+    [Migration("20250418104851_IdentityMigration")]
     partial class IdentityMigration
     {
         /// <inheritdoc />
