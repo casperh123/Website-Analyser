@@ -1,21 +1,18 @@
 #!/bin/bash
 
 # Define paths
-DB_DIR="./WebsiteAnalyzer.Web/Data"
-APP_DB_FILE="$DB_DIR/app.db"
-IDENTITY_DB_FILE="$DB_DIR/identity.db"  # You can use the same path as app.db if they share a database
+DB_DIR="./WebsiteAnalyzer.Web/Data"  # or "./WebsiteAnalyzer.Infrastructure/Data"
+DB_FILE="$DB_DIR/app.db"
 
-# Remove existing migrations and databases
+# Remove existing migrations and database
 rm -rf ./WebsiteAnalyzer.Infrastructure/Migrations
-rm -f "$APP_DB_FILE"
-rm -f "$IDENTITY_DB_FILE"  # Remove if using separate files
+rm -f "$DB_FILE"
 
 # Create empty database directory if it doesn't exist
 mkdir -p "$DB_DIR"
 
-# Create empty databases
-sqlite3 "$APP_DB_FILE" ".quit"
-sqlite3 "$IDENTITY_DB_FILE" ".quit"  # Create if using separate files
+# Create empty database
+sqlite3 "$DB_FILE" ".quit"
 
 # Create tool manifest (toolbox) if it doesn't exist
 if [ ! -f ".config/dotnet-tools.json" ]; then
@@ -33,33 +30,13 @@ fi
 echo "Restoring tools from manifest..."
 dotnet tool restore
 
-# Generate and apply migrations for Application DbContext
-echo "Generating new migration for Application context..."
-dotnet ef migrations add ApplicationMigration \
-    --context ApplicationDbContext \
-    --output-dir Migrations/ApplicationDb \
+# Generate and apply migrations
+echo "Generating new migration..."
+dotnet ef migrations add MigrationName \
     --startup-project ./WebsiteAnalyzer.Web/WebsiteAnalyzer.Web.csproj \
     --project ./WebsiteAnalyzer.Infrastructure/WebsiteAnalyzer.Infrastructure.csproj
 
-echo "Updating Application database..."
+echo "Updating database..."
 dotnet ef database update \
-    --context ApplicationDbContext \
     --startup-project ./WebsiteAnalyzer.Web/WebsiteAnalyzer.Web.csproj \
     --project ./WebsiteAnalyzer.Infrastructure/WebsiteAnalyzer.Infrastructure.csproj
-
-# Generate and apply migrations for Identity DbContext
-# Make sure to use the exact context name you registered
-echo "Generating new migration for Identity context..."
-dotnet ef migrations add IdentityMigration \
-    --context ApplicationIdentityDbContext \
-    --output-dir Migrations/IdentityDb \
-    --startup-project ./WebsiteAnalyzer.Web/WebsiteAnalyzer.Web.csproj \
-    --project ./WebsiteAnalyzer.Infrastructure/WebsiteAnalyzer.Infrastructure.csproj
-
-echo "Updating Identity database..."
-dotnet ef database update \
-    --context ApplicationIdentityDbContext \
-    --startup-project ./WebsiteAnalyzer.Web/WebsiteAnalyzer.Web.csproj \
-    --project ./WebsiteAnalyzer.Infrastructure/WebsiteAnalyzer.Infrastructure.csproj
-
-echo "Migration process completed!"
