@@ -25,7 +25,6 @@ public static class DatabaseConfiguration
     
         return services;
     
-        // Local function to avoid duplication
         static void ConfigureDatabase(DbContextOptionsBuilder options, IConfiguration configuration)
         {
             string? environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
