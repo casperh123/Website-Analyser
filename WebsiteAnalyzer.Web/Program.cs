@@ -12,6 +12,8 @@ var builder = WebApplication.CreateBuilder(args);
 // Configure the server settings (Kestrel, etc.)
 builder.ConfigureServer();
 
+builder.Configuration.AddEnvironmentVariables();
+
 // Add core Blazor services
 builder.Services
     .AddRazorComponents()
@@ -28,8 +30,6 @@ builder.Services
     .AddBackgroundServices()
     .AddHttpContextAccessor()
     .AddDefaultSitemapServices<HttpContextBaseUrlProvider>();
-
-builder.Configuration.AddEnvironmentVariables();
 
 builder.Services.AddTransient<IEmailSender, MailSenderProvider>();
 
