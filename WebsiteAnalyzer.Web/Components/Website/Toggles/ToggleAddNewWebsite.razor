@@ -1,0 +1,50 @@
+@using WebsiteAnalyzer.Web.Models
+@using WebsiteAnalyzer.Web.Components.ErrorHandling
+
+@if (_open)
+{
+    <RadzenStack Gap="20" Style="max-width: 600px;">
+        <RadzenTextBox @bind-Value="@_url" Placeholder="Url"/>
+        <RadzenTextBox @bind-Value="@_name" Placeholder="Name"/>                
+        <RadzenButton Click="AddWebsite">Add</RadzenButton>
+        <RadzenButton Click="@(() => _open = !_open)" 
+                      ButtonStyle="ButtonStyle.Danger">Cancel</RadzenButton>
+    </RadzenStack>
+    
+    <ErrorMessage Message="@_message"></ErrorMessage>
+}
+else
+{
+    <RadzenButton Click="@(() => _open = !_open)">Add New</RadzenButton>
+}
+
+@code {
+    [Parameter]
+    public EventCallback<AddWebsiteModel> WebsiteAdded { get; set; }
+
+    private bool _open = false;
+    private string _url = "https://";
+    private string _name;
+    private string _message;
+
+    private async Task AddWebsite()
+    {
+        _message = "";
+        
+        AddWebsiteModel newWebsite = new AddWebsiteModel(_name, _url);
+
+        if (WebsiteAdded.HasDelegate)
+        {
+            try
+            {
+                await WebsiteAdded.InvokeAsync(newWebsite);
+            }
+            catch (Exception e)
+            {
+                _message = e.Message;
+            }
+        }
+
+        _open = false;
+    }
+}

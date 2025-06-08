@@ -1,0 +1,28 @@
+@page "/Website/{WebsiteId:guid}"
+
+@using WebsiteAnalyzer.Core.Entities.Website
+@using WebsiteAnalyzer.Core.Interfaces.Services
+@using WebsiteAnalyzer.Infrastructure
+@using WebsiteAnalyzer.Web.Services
+
+@inject IUserService UserService
+@inject IWebsiteService WebsiteService
+
+<RadzenText TextStyle="TextStyle.DisplayH1">@Website?.Name</RadzenText>
+
+@code {
+    [Parameter]
+    public Guid WebsiteId { get; set; }
+
+    private Website? Website;
+    private ApplicationUser? _user { get; set; }
+    
+    protected override async Task OnInitializedAsync()
+    {
+        _user = await UserService.GetCurrentUserAsync();
+        if (_user != null)
+        {
+            Website = await WebsiteService.GetWebsiteByIdAndUserId(WebsiteId, _user.Id);
+        }
+    }
+}

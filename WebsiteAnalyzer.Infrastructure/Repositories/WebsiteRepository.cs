@@ -27,4 +27,27 @@ public class WebsiteRepository : BaseRepository<Website>, IWebsiteRepository
             .AnyAsync(w => w.Url == url)
             .ConfigureAwait(false);
     }
+
+    public async Task<ICollection<Website>> GetAllByUserId(Guid userId)
+    {
+        return await DbContext.Websites
+            .Where(w => w.UserId == userId)
+            .ToListAsync();
+    }
+
+    public async Task<Website?> GetByIdAndUserId(Guid id, Guid userId)
+    {
+        return await DbContext.Websites
+            .Where(w => w.Id == id)
+            .Where(w => w.UserId == userId)
+            .FirstAsync();
+    }
+
+    public async Task DeleteByUrlAndUserId(string url, Guid userId)
+    {
+        await DbContext.Websites
+            .Where(w => w.Url == url)
+            .Where(w => w.UserId == userId)
+            .ExecuteDeleteAsync();
+    }
 }

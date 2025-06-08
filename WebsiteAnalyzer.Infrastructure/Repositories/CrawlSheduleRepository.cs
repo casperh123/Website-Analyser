@@ -43,4 +43,12 @@ public class CrawlSheduleRepository : BaseRepository<CrawlSchedule>, ICrawlSched
             .Where(cs => cs.Action == action)
             .FirstOrDefaultAsync();
     }
+
+    public async Task DeleteByUrlAndUserId(string url, Guid userId)
+    {
+        await DbContext.CrawlSchedules
+            .Where(w => w.Url == url)
+            .Where(w => w.UserId == userId)
+            .ExecuteDeleteAsync();
+    }
 }

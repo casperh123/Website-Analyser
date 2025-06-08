@@ -196,7 +196,15 @@ namespace WebsiteAnalyzer.Infrastructure.Migrations
                     b.Property<Guid>("UserId")
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("WebsiteUrl")
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid?>("WebsiteUserId")
+                        .HasColumnType("TEXT");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("WebsiteUrl", "WebsiteUserId");
 
                     b.ToTable("BrokenLinkCrawls");
                 });
@@ -278,6 +286,12 @@ namespace WebsiteAnalyzer.Infrastructure.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<Guid?>("ApplicationUserId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid>("Id")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Name")
                         .HasColumnType("TEXT");
 
                     b.HasKey("Url", "UserId");
@@ -412,6 +426,13 @@ namespace WebsiteAnalyzer.Infrastructure.Migrations
                     b.Navigation("BrokenLinkCrawl");
                 });
 
+            modelBuilder.Entity("WebsiteAnalyzer.Core.Entities.BrokenLink.BrokenLinkCrawl", b =>
+                {
+                    b.HasOne("WebsiteAnalyzer.Core.Entities.Website.Website", null)
+                        .WithMany("BrokenLinkCrawls")
+                        .HasForeignKey("WebsiteUrl", "WebsiteUserId");
+                });
+
             modelBuilder.Entity("WebsiteAnalyzer.Core.Entities.CacheWarm", b =>
                 {
                     b.HasOne("WebsiteAnalyzer.Core.Entities.Website.Website", null)
@@ -439,6 +460,8 @@ namespace WebsiteAnalyzer.Infrastructure.Migrations
 
             modelBuilder.Entity("WebsiteAnalyzer.Core.Entities.Website.Website", b =>
                 {
+                    b.Navigation("BrokenLinkCrawls");
+
                     b.Navigation("CacheWarmRuns");
                 });
 

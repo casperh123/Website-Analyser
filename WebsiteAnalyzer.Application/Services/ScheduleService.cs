@@ -11,19 +11,13 @@ namespace WebsiteAnalyzer.Application.Services;
 public class ScheduleService : IScheduleService
 {
     private readonly ICrawlScheduleRepository _scheduleRepository;
-    private readonly ICacheWarmingService _cacheWarmingService;
-    private readonly IBrokenLinkService _brokenLinkService;
     private readonly HttpClient _httpClient;
 
     public ScheduleService(
         ICrawlScheduleRepository scheduleRepository,
-        ICacheWarmingService cacheWarmingService,
-        IBrokenLinkService brokenLinkService,
         HttpClient httpClient)
     {
         _scheduleRepository = scheduleRepository;
-        _cacheWarmingService = cacheWarmingService;
-        _brokenLinkService = brokenLinkService;
         _httpClient = httpClient;
     }
 
@@ -57,19 +51,6 @@ public class ScheduleService : IScheduleService
         await _scheduleRepository.DeleteAsync(scheduledTask).ConfigureAwait(false);
     }
 
-    public async Task RunScheduledTask(CrawlSchedule schedule)
-    {
-        switch (schedule.Action)
-        {
-            case CrawlAction.BrokenLink:
-                //TODO IMPLEMENT
-                break;
-            case CrawlAction.CacheWarm:
-                await _cacheWarmingService.WarmCacheWithoutMetrics(schedule.Url, schedule.UserId);
-                break;
-        }
-    }
-
     public async Task<ICollection<CrawlSchedule>> GetScheduledTasksByUserIdAndTypeAsync(Guid? userId, CrawlAction action)
     {
         if (!userId.HasValue)
@@ -78,6 +59,11 @@ public class ScheduleService : IScheduleService
         }
         
         return await _scheduleRepository.GetCrawlSchedulesByUserIdAndTypeAsync(userId.Value, action);
+    }
+
+    public async Task DeleteTasksByUrlAndUserId(string url, Guid userId)
+    {
+        await _scheduleRepository.DeleteByUrlAndUserId(url, userId);
     }
 
     private async Task VerifyCrawl(string url, Guid userId, CrawlAction action)

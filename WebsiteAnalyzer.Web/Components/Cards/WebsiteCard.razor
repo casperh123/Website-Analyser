@@ -1,0 +1,34 @@
+@using WebsiteAnalyzer.Core.Entities.Website
+
+<RadzenCard>
+    <RadzenRow AlignItems="AlignItems.Center" JustifyContent="JustifyContent.SpaceBetween">
+        <RadzenStack>
+            <RadzenText>@Website.Name</RadzenText>
+            <RadzenLink Target="_blank" Path="@Website.Url">@Website.Url</RadzenLink>
+        </RadzenStack>
+        
+        <RadzenRow>
+            <RadzenLink Path="@($"/website/{Website.Id}")">
+                <RadzenButton>Go To</RadzenButton>
+            </RadzenLink>
+            
+            <RadzenButton Click="@DeleteWebsite"  ButtonStyle="ButtonStyle.Danger">Delete</RadzenButton>
+        </RadzenRow>
+    </RadzenRow>
+</RadzenCard>
+
+@code {
+    [EditorRequired, Parameter]
+    public required Website Website { get; set; }
+    
+    [Parameter]
+    public EventCallback<Website> WebsiteDeleted { get; set; }
+
+    private async Task DeleteWebsite()
+    {
+        if (WebsiteDeleted.HasDelegate)
+        {
+            await WebsiteDeleted.InvokeAsync(Website);
+        }
+    }
+}

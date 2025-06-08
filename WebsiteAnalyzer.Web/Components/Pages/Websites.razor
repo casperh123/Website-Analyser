@@ -1,0 +1,62 @@
+@page "/Websites"
+
+@using WebsiteAnalyzer.Core.Entities.Website
+@using WebsiteAnalyzer.Core.Interfaces.Services
+@using WebsiteAnalyzer.Infrastructure
+@using WebsiteAnalyzer.Web.Services
+@using WebsiteAnalyzer.Web.Components.Cards
+@using WebsiteAnalyzer.Web.Components.Website.Toggles
+@using WebsiteAnalyzer.Web.Models
+
+@inject IUserService UserService
+@inject IWebsiteService WebsiteService
+
+<AuthorizeView>
+    <Authorized>
+        <RadzenText TextStyle="TextStyle.DisplayH1">Websites</RadzenText>
+        
+        <ToggleAddNewWebsite WebsiteAdded="AddWebsite" />
+
+        <RadzenStack Gap="20" Style="margin: 20px 0;">
+            @if (_websites.Count == 0)
+            {
+                <RadzenText>No websites are being monitored.</RadzenText>
+            }
+            else
+            {
+                @foreach (Website website in _websites)
+                {
+                    <WebsiteCard Website="@website" WebsiteDeleted="DeleteWebsite"/>
+                }   
+            }
+        </RadzenStack>
+    </Authorized>
+    <NotAuthorized>
+        <RadzenText>You need to be logged in to view Websites.</RadzenText>
+    </NotAuthorized>
+</AuthorizeView>
+
+@code {
+    private ApplicationUser? _user;
+    private ICollection<Website> _websites = [];
+
+    protected override async Task OnInitializedAsync()
+    {
+        _user = await UserService.GetCurrentUserAsync();
+        _websites = await WebsiteService.GetWebsitesByUserId(_user?.Id);
+    }
+
+    private async Task AddWebsite(AddWebsiteModel newWebsiteModel)
+    {
+        Website addedWebsite = await WebsiteService.AddWebsite(newWebsiteModel.Url, _user.Id, newWebsiteModel.Name); 
+        
+        _websites.Add(addedWebsite);
+        
+        await InvokeAsync(StateHasChanged);
+    }
+
+    private async Task DeleteWebsite(Website website)
+    {
+        await WebsiteService.DeleteWebsite(website.Url, website.UserId);
+    }
+}

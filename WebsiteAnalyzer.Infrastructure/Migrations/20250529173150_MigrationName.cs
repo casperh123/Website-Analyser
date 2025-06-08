@@ -51,21 +51,6 @@ namespace WebsiteAnalyzer.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "BrokenLinkCrawls",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "TEXT", nullable: false),
-                    UserId = table.Column<Guid>(type: "TEXT", nullable: false),
-                    Url = table.Column<string>(type: "TEXT", nullable: false),
-                    LinksChecked = table.Column<int>(type: "INTEGER", nullable: false),
-                    Date = table.Column<DateTime>(type: "TEXT", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_BrokenLinkCrawls", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "CrawlSchedules",
                 columns: table => new
                 {
@@ -193,6 +178,8 @@ namespace WebsiteAnalyzer.Infrastructure.Migrations
                 {
                     Url = table.Column<string>(type: "TEXT", nullable: false),
                     UserId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    Id = table.Column<Guid>(type: "TEXT", nullable: false),
+                    Name = table.Column<string>(type: "TEXT", nullable: true),
                     ApplicationUserId = table.Column<Guid>(type: "TEXT", nullable: true)
                 },
                 constraints: table =>
@@ -206,25 +193,25 @@ namespace WebsiteAnalyzer.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "BrokenLinks",
+                name: "BrokenLinkCrawls",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "TEXT", nullable: false),
-                    BrokenLinkCrawlId = table.Column<Guid>(type: "TEXT", nullable: true),
-                    TargetPage = table.Column<string>(type: "TEXT", nullable: false),
-                    ReferringPage = table.Column<string>(type: "TEXT", nullable: false),
-                    AnchorText = table.Column<string>(type: "TEXT", nullable: false),
-                    Line = table.Column<int>(type: "INTEGER", nullable: false),
-                    StatusCode = table.Column<int>(type: "INTEGER", nullable: false)
+                    UserId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    Url = table.Column<string>(type: "TEXT", nullable: false),
+                    LinksChecked = table.Column<int>(type: "INTEGER", nullable: false),
+                    Date = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    WebsiteUrl = table.Column<string>(type: "TEXT", nullable: true),
+                    WebsiteUserId = table.Column<Guid>(type: "TEXT", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_BrokenLinks", x => x.Id);
+                    table.PrimaryKey("PK_BrokenLinkCrawls", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_BrokenLinks_BrokenLinkCrawls_BrokenLinkCrawlId",
-                        column: x => x.BrokenLinkCrawlId,
-                        principalTable: "BrokenLinkCrawls",
-                        principalColumn: "Id");
+                        name: "FK_BrokenLinkCrawls_Websites_WebsiteUrl_WebsiteUserId",
+                        columns: x => new { x.WebsiteUrl, x.WebsiteUserId },
+                        principalTable: "Websites",
+                        principalColumns: new[] { "Url", "UserId" });
                 });
 
             migrationBuilder.CreateTable(
@@ -255,6 +242,28 @@ namespace WebsiteAnalyzer.Infrastructure.Migrations
                         columns: x => new { x.WebsiteUrl, x.WebsiteUserId },
                         principalTable: "Websites",
                         principalColumns: new[] { "Url", "UserId" });
+                });
+
+            migrationBuilder.CreateTable(
+                name: "BrokenLinks",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "TEXT", nullable: false),
+                    BrokenLinkCrawlId = table.Column<Guid>(type: "TEXT", nullable: true),
+                    TargetPage = table.Column<string>(type: "TEXT", nullable: false),
+                    ReferringPage = table.Column<string>(type: "TEXT", nullable: false),
+                    AnchorText = table.Column<string>(type: "TEXT", nullable: false),
+                    Line = table.Column<int>(type: "INTEGER", nullable: false),
+                    StatusCode = table.Column<int>(type: "INTEGER", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_BrokenLinks", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_BrokenLinks_BrokenLinkCrawls_BrokenLinkCrawlId",
+                        column: x => x.BrokenLinkCrawlId,
+                        principalTable: "BrokenLinkCrawls",
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateIndex(
@@ -293,6 +302,11 @@ namespace WebsiteAnalyzer.Infrastructure.Migrations
                 table: "AspNetUsers",
                 column: "NormalizedUserName",
                 unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_BrokenLinkCrawls_WebsiteUrl_WebsiteUserId",
+                table: "BrokenLinkCrawls",
+                columns: new[] { "WebsiteUrl", "WebsiteUserId" });
 
             migrationBuilder.CreateIndex(
                 name: "IX_BrokenLinks_BrokenLinkCrawlId",
