@@ -1,0 +1,37 @@
+@using WebsiteAnalyzer.Core.Entities.Website
+
+<RadzenLink Path="/websites" >
+    <RadzenButton Icon="keyboard_arrow_left" Size="ButtonSize.Medium" Style="margin-bottom: 40px;"/>
+</RadzenLink>
+
+@if (Website is not null)
+{
+    <RadzenStack Style="margin-bottom: 40px;" Gap="0">
+        <RadzenText TextStyle="TextStyle.DisplayH1" Style="margin-bottom: 0;">@Website?.Name</RadzenText>
+        <RadzenLink>@Website.Url</RadzenLink>
+    </RadzenStack>  
+    
+    <RadzenRow>
+        <RadzenStack>
+            <WebsiteStatsMenu Website="Website"/>
+        </RadzenStack>
+
+        <RadzenColumn>
+            <RadzenStack>
+                @ChildContent
+            </RadzenStack>
+        </RadzenColumn>
+    </RadzenRow>
+}
+else
+{
+    <RadzenText>Could not find website</RadzenText>
+}
+
+@code {
+    [Parameter, EditorRequired]
+    public required Website? Website { get; set; }
+    
+    [Parameter]
+    public RenderFragment ChildContent { get; set; }
+}

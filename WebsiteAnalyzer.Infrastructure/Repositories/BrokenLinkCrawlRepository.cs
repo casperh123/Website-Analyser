@@ -28,4 +28,12 @@ public class BrokenLinkCrawlRepository : BaseRepository<BrokenLinkCrawl>, IBroke
             .Where(crawl => crawl.Url == url)
             .FirstAsync();
     }
+
+    public async Task<ICollection<BrokenLinkCrawl>> GetByUrlUserId(string url, Guid userId)
+    {
+        return await DbContext.BrokenLinkCrawls
+            .Where(crawl => crawl.Url == url)
+            .Where(crawl => crawl.UserId == userId)
+            .ToListAsync();
+    }
 }

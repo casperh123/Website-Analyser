@@ -15,7 +15,7 @@
     <Authorized>
         <RadzenText TextStyle="TextStyle.DisplayH1">Websites</RadzenText>
         
-        <ToggleAddNewWebsite WebsiteAdded="AddWebsite" />
+        <ToggleAddNewWebsite WebsiteAdded="AddWebsite" StartOpen="_startOpen"/>
 
         <RadzenStack Gap="20" Style="margin: 20px 0;">
             @if (_websites.Count == 0)
@@ -24,7 +24,7 @@
             }
             else
             {
-                @foreach (Website website in _websites)
+                @foreach (Core.Entities.Website.Website website in _websites)
                 {
                     <WebsiteCard Website="@website" WebsiteDeleted="DeleteWebsite"/>
                 }   
@@ -38,24 +38,30 @@
 
 @code {
     private ApplicationUser? _user;
-    private ICollection<Website> _websites = [];
+    private ICollection<Core.Entities.Website.Website> _websites = [];
+    private bool _startOpen;
 
     protected override async Task OnInitializedAsync()
     {
         _user = await UserService.GetCurrentUserAsync();
         _websites = await WebsiteService.GetWebsitesByUserId(_user?.Id);
+
+        if (_websites.Count == 0)
+        {
+            _startOpen = true;
+        }
     }
 
     private async Task AddWebsite(AddWebsiteModel newWebsiteModel)
     {
-        Website addedWebsite = await WebsiteService.AddWebsite(newWebsiteModel.Url, _user.Id, newWebsiteModel.Name); 
+        Core.Entities.Website.Website addedWebsite = await WebsiteService.AddWebsite(newWebsiteModel.Url, _user.Id, newWebsiteModel.Name); 
         
         _websites.Add(addedWebsite);
         
         await InvokeAsync(StateHasChanged);
     }
 
-    private async Task DeleteWebsite(Website website)
+    private async Task DeleteWebsite(Core.Entities.Website.Website website)
     {
         await WebsiteService.DeleteWebsite(website.Url, website.UserId);
     }

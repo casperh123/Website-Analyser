@@ -3,11 +3,14 @@
 
 @if (_open)
 {
+        
     <RadzenStack Gap="20" Style="max-width: 600px;">
+        <RadzenText TextStyle="TextStyle.Subtitle1">Add new website</RadzenText>
+
         <RadzenTextBox @bind-Value="@_url" Placeholder="Url"/>
-        <RadzenTextBox @bind-Value="@_name" Placeholder="Name"/>                
+        <RadzenTextBox @bind-Value="@_name" Placeholder="Name"/>
         <RadzenButton Click="AddWebsite">Add</RadzenButton>
-        <RadzenButton Click="@(() => _open = !_open)" 
+        <RadzenButton Click="@(() => _open = !_open)"
                       ButtonStyle="ButtonStyle.Danger">Cancel</RadzenButton>
     </RadzenStack>
     
@@ -21,11 +24,19 @@ else
 @code {
     [Parameter]
     public EventCallback<AddWebsiteModel> WebsiteAdded { get; set; }
+    
+    [Parameter]
+    public bool StartOpen { get; set; }
 
-    private bool _open = false;
+    private bool _open;
     private string _url = "https://";
     private string _name;
     private string _message;
+
+    protected override void OnInitialized()
+    {
+        _open = StartOpen;
+    }
 
     private async Task AddWebsite()
     {

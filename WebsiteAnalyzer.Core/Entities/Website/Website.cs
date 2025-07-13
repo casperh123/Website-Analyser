@@ -14,6 +14,8 @@ public record Website
     public Website()
     {
         Id = Guid.NewGuid();
+        CacheWarmRuns = [];
+        BrokenLinkCrawls = [];
     }
 
     public Website(string url, Guid userId, string? name = null)

@@ -19,7 +19,7 @@ public abstract class CrawlBackgroundServiceBase : IHostedService
         IServiceProvider serviceprovider,
         CrawlAction crawlAction)
     {
-        _timer = new HourlyTimer();
+        _timer = new MinuteTimer();
         Logger = logger;
         _serviceProvider = serviceprovider;
         _crawlAction = crawlAction;

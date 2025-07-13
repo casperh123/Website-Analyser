@@ -1,0 +1,13 @@
+@using WebsiteAnalyzer.Core.Entities.Website
+
+<RadzenCard>
+    <RadzenPanelMenu>
+        <RadzenPanelMenuItem Text="General" Path="@($"/website/{Website.Id}")" Match="NavLinkMatch.All"/>
+        <RadzenPanelMenuItem Text="Broken Links" Path="@($"/website/{Website.Id}/brokenlinks")" Match="NavLinkMatch.All"/>
+    </RadzenPanelMenu>
+</RadzenCard>
+
+@code {
+    [Parameter, EditorRequired]
+    public required Website Website { get; set; }
+}
