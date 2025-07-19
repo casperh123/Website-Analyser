@@ -11,7 +11,7 @@ using WebsiteAnalyzer.Infrastructure.Data;
 namespace WebsiteAnalyzer.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250713215833_MigrationName")]
+    [Migration("20250717224016_MigrationName")]
     partial class MigrationName
     {
         /// <inheritdoc />
@@ -221,46 +221,24 @@ namespace WebsiteAnalyzer.Infrastructure.Migrations
                     b.Property<DateTime>("EndTime")
                         .HasColumnType("TEXT");
 
-                    b.Property<int?>("ScheduleAction")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("ScheduleUrl")
-                        .HasColumnType("TEXT");
-
-                    b.Property<Guid?>("ScheduleUserId")
-                        .HasColumnType("TEXT");
-
                     b.Property<DateTime>("StartTime")
-                        .HasColumnType("TEXT");
-
-                    b.Property<Guid?>("UserId")
                         .HasColumnType("TEXT");
 
                     b.Property<int>("VisitedPages")
                         .HasColumnType("INTEGER");
 
-                    b.Property<string>("WebsiteUrl")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<Guid?>("WebsiteUserId")
+                    b.Property<Guid>("WebsiteId")
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("WebsiteUrl", "WebsiteUserId");
-
-                    b.HasIndex("ScheduleUserId", "ScheduleUrl", "ScheduleAction");
-
                     b.ToTable("CacheWarms");
                 });
 
-            modelBuilder.Entity("WebsiteAnalyzer.Core.Entities.CrawlSchedule", b =>
+            modelBuilder.Entity("WebsiteAnalyzer.Core.Entities.ScheduledAction", b =>
                 {
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("Url")
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("TEXT");
 
                     b.Property<int>("Action")
@@ -275,9 +253,21 @@ namespace WebsiteAnalyzer.Infrastructure.Migrations
                     b.Property<int>("Status")
                         .HasColumnType("INTEGER");
 
-                    b.HasKey("UserId", "Url", "Action");
+                    b.Property<Guid>("WebsiteId")
+                        .HasColumnType("TEXT");
 
-                    b.ToTable("CrawlSchedules");
+                    b.Property<string>("WebsiteUrl")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid>("WebsiteUserId")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("WebsiteUrl", "WebsiteUserId");
+
+                    b.ToTable("ScheduledActions");
                 });
 
             modelBuilder.Entity("WebsiteAnalyzer.Core.Entities.Website.Website", b =>
@@ -288,9 +278,6 @@ namespace WebsiteAnalyzer.Infrastructure.Migrations
                     b.Property<Guid>("UserId")
                         .HasColumnType("TEXT");
 
-                    b.Property<Guid?>("ApplicationUserId")
-                        .HasColumnType("TEXT");
-
                     b.Property<Guid>("Id")
                         .HasColumnType("TEXT");
 
@@ -298,8 +285,6 @@ namespace WebsiteAnalyzer.Infrastructure.Migrations
                         .HasColumnType("TEXT");
 
                     b.HasKey("Url", "UserId");
-
-                    b.HasIndex("ApplicationUserId");
 
                     b.ToTable("Websites");
                 });
@@ -436,24 +421,15 @@ namespace WebsiteAnalyzer.Infrastructure.Migrations
                         .HasForeignKey("WebsiteUrl", "WebsiteUserId");
                 });
 
-            modelBuilder.Entity("WebsiteAnalyzer.Core.Entities.CacheWarm", b =>
+            modelBuilder.Entity("WebsiteAnalyzer.Core.Entities.ScheduledAction", b =>
                 {
-                    b.HasOne("WebsiteAnalyzer.Core.Entities.Website.Website", null)
-                        .WithMany("CacheWarmRuns")
-                        .HasForeignKey("WebsiteUrl", "WebsiteUserId");
-
-                    b.HasOne("WebsiteAnalyzer.Core.Entities.CrawlSchedule", "Schedule")
+                    b.HasOne("WebsiteAnalyzer.Core.Entities.Website.Website", "Website")
                         .WithMany()
-                        .HasForeignKey("ScheduleUserId", "ScheduleUrl", "ScheduleAction");
+                        .HasForeignKey("WebsiteUrl", "WebsiteUserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
-                    b.Navigation("Schedule");
-                });
-
-            modelBuilder.Entity("WebsiteAnalyzer.Core.Entities.Website.Website", b =>
-                {
-                    b.HasOne("WebsiteAnalyzer.Infrastructure.ApplicationUser", null)
-                        .WithMany("Websites")
-                        .HasForeignKey("ApplicationUserId");
+                    b.Navigation("Website");
                 });
 
             modelBuilder.Entity("WebsiteAnalyzer.Core.Entities.BrokenLink.BrokenLinkCrawl", b =>
@@ -464,13 +440,6 @@ namespace WebsiteAnalyzer.Infrastructure.Migrations
             modelBuilder.Entity("WebsiteAnalyzer.Core.Entities.Website.Website", b =>
                 {
                     b.Navigation("BrokenLinkCrawls");
-
-                    b.Navigation("CacheWarmRuns");
-                });
-
-            modelBuilder.Entity("WebsiteAnalyzer.Infrastructure.ApplicationUser", b =>
-                {
-                    b.Navigation("Websites");
                 });
 #pragma warning restore 612, 618
         }

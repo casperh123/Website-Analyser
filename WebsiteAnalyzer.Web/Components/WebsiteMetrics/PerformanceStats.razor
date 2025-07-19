@@ -27,7 +27,7 @@
 <Paginator State="pagination"/>
 
 @code {
-    [Parameter] public ICollection<PageStat> VisitedPages { get; set; }
+    [Parameter] public ICollection<PageStat> VisitedPages { get; set; } = [];
 
     private string SelectedResourceType { get; set; } = "All";
     private string SearchTerm { get; set; } = string.Empty;

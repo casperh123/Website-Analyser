@@ -12,7 +12,6 @@ namespace WebsiteAnalyzer.Application.Services;
 
 public class CacheWarmingService : ICacheWarmingService
 {
-    private readonly IWebsiteService _websiteService;
     private readonly ICacheWarmRepository _cacheWarmRepository;
     private readonly ModularCrawler<Link> _linkCrawler;
 
@@ -20,12 +19,10 @@ public class CacheWarmingService : ICacheWarmingService
 
     public CacheWarmingService(
         ICacheWarmRepository cacheWarmRepository,
-        IWebsiteService websiteService,
         HttpClient httpClient
     )
     {
         _cacheWarmRepository = cacheWarmRepository;
-        _websiteService = websiteService;
         _linkCrawler = new ModularCrawler<Link>(new LinkProcessor(httpClient));
     }
 
@@ -37,16 +34,15 @@ public class CacheWarmingService : ICacheWarmingService
         }
     }
 
-    public async Task WarmCacheWithoutMetrics(string url, Guid userId, CancellationToken cancellationToken = default)
+    public async Task WarmCacheWithoutMetrics(Website website, CancellationToken cancellationToken = default)
     {
-        Website website = await _websiteService.GetOrAddWebsite(url, userId).ConfigureAwait(false);
-        CacheWarm cacheWarm = await CreateCacheWarmEntry(website, userId).ConfigureAwait(false);
+        CacheWarm cacheWarm = await CreateCacheWarmEntry(website);
 
         int linksChecked = 0;
         
         try
         {
-            IAsyncEnumerable<CrawlProgress<Link>> crawlProgress = _linkCrawler.CrawlWebsiteAsync(new Link(url), cancellationToken);
+            IAsyncEnumerable<CrawlProgress<Link>> crawlProgress = _linkCrawler.CrawlWebsiteAsync(new Link(website.Url), cancellationToken);
 
             await foreach (CrawlProgress<Link> progress in crawlProgress)
             {
@@ -59,11 +55,9 @@ public class CacheWarmingService : ICacheWarmingService
         }
     }
 
-
-    public async Task<CacheWarm> WarmCacheWithSaveAsync(string url, Guid userId, CancellationToken cancellationToken = default)
+    public async Task<CacheWarm> WarmCacheWithSaveAsync(string url, Website website, CancellationToken cancellationToken = default)
     {
-        Website website = await _websiteService.GetOrAddWebsite(url, userId).ConfigureAwait(false);
-        CacheWarm cacheWarm = await CreateCacheWarmEntry(website, userId).ConfigureAwait(false);
+        CacheWarm cacheWarm = await CreateCacheWarmEntry(website);
 
         int linksChecked = 0;
         
@@ -80,40 +74,32 @@ public class CacheWarmingService : ICacheWarmingService
         return cacheWarm;
     }
 
-    private async Task<CacheWarm> CreateCacheWarmEntry(Website website, Guid userId)
+    public async Task<ICollection<CacheWarm>> GetCacheWarmsByWebsiteId(Guid websiteId)
     {
-        var cacheWarm = new CacheWarm
-        {
-            Id = Guid.NewGuid(),
-            UserId = userId,
-            WebsiteUrl = website.Url
-        };
-    
-        cacheWarm.Start();
-
-        await _cacheWarmRepository.AddAsync(cacheWarm).ConfigureAwait(false);
-        return cacheWarm;
+        return await _cacheWarmRepository.GetByWebsiteId(websiteId);
     }
 
-    public async Task<ICollection<CacheWarm>> GetCacheWarmsAsync()
+
+    private async Task<CacheWarm> CreateCacheWarmEntry(Website website)
     {
-        return await _cacheWarmRepository.GetAllAsync();
+        CacheWarm cacheWarm = new CacheWarm(website);
+    
+        cacheWarm.SetStartTime();
+        
+        await _cacheWarmRepository.AddAsync(cacheWarm);
+        
+        return cacheWarm;
     }
 
     public async Task<ICollection<CacheWarm>> GetCacheWarmsByUserAsync(Guid? userId)
     {
-        if (!userId.HasValue)
-        {
-            return [];
-        }
-        
-        return await _cacheWarmRepository.GetCacheWarmsByUserAsync(userId.Value);
+        return [];
     }
 
     private async Task UpdateCacheWarmResults(CacheWarm cacheWarm, int linksChecked)
     {
         cacheWarm.VisitedPages = linksChecked;
-        cacheWarm.Complete();
+        cacheWarm.SetEndTime();
     
         await _cacheWarmRepository.UpdateAsync(cacheWarm);
     }

@@ -10,11 +10,13 @@ public class WebsiteService : IWebsiteService
 {
     private readonly IWebsiteRepository _websiteRepository;
     private readonly IScheduleService _scheduleService;
+    private readonly HttpClient _httpClient;
 
-    public WebsiteService(IWebsiteRepository websiteRepository, IScheduleService scheduleService)
+    public WebsiteService(IWebsiteRepository websiteRepository, IScheduleService scheduleService, HttpClient httpClient)
     {
         _websiteRepository = websiteRepository;
         _scheduleService = scheduleService;
+        _httpClient = httpClient;
     }
 
     public async Task<Website> GetOrAddWebsite(string url, Guid userId)
@@ -36,11 +38,13 @@ public class WebsiteService : IWebsiteService
         {
             throw new AlreadyExistsException($"{url} is already added");
         }
+
+        await VerifyWebsite(url);
         
         Website website = new Website(url, userId, name);
         
         await _websiteRepository.AddAsync(website);
-        await AddScheduledTasks(url, userId);
+        await AddScheduledTasks(website);
 
         return website;
     }
@@ -71,9 +75,21 @@ public class WebsiteService : IWebsiteService
         await _websiteRepository.DeleteByUrlAndUserId(url, userId);
     }
 
-    private async Task AddScheduledTasks(string url, Guid userId)
+    private async Task VerifyWebsite(string url)
     {
-        await _scheduleService.ScheduleTask(url, userId, CrawlAction.BrokenLink, Frequency.Daily);
-        await _scheduleService.ScheduleTask(url, userId, CrawlAction.CacheWarm, Frequency.Daily);
+        try
+        {
+            await _httpClient.GetAsync(url);
+        }
+        catch (Exception e)
+        {
+            throw new UrlException($"Could not verify URL: {url}");
+        }
+    }
+
+    private async Task AddScheduledTasks(Website website)
+    {
+        await _scheduleService.ScheduleTask(website, CrawlAction.BrokenLink, Frequency.Daily);
+        await _scheduleService.ScheduleTask(website, CrawlAction.CacheWarm, Frequency.Daily);
     }
 }

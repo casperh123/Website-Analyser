@@ -18,7 +18,7 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser, IdentityR
 
     public DbSet<Website> Websites { get; set; }
     public DbSet<CacheWarm> CacheWarms { get; set; }
-    public DbSet<CrawlSchedule> CrawlSchedules { get; set; }
+    public DbSet<ScheduledAction> ScheduledActions { get; set; }
     public DbSet<BrokenLinkCrawl> BrokenLinkCrawls { get; set; }
     public DbSet<BrokenLink> BrokenLinks { get; set; }
     
@@ -39,9 +39,6 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser, IdentityR
         // Configure CacheWarm and Website relationship
         builder.Entity<CacheWarm>()
             .HasKey(cw => cw.Id);
-
-        builder.Entity<CrawlSchedule>()
-            .HasKey(cs => new { cs.UserId, cs.Url, cs.Action });
 
         builder.Entity<BrokenLinkCrawl>()
             .HasKey(blc => new { blc.Id });

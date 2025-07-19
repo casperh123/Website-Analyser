@@ -17,13 +17,12 @@
 </RadzenStack>
 
 @code {
-    [Parameter]
-    public ICollection<BrokenLinkCrawlDTO> BrokenLinkCrawls { get; set; }
+    [Parameter] 
+    public ICollection<BrokenLinkCrawlDTO> BrokenLinkCrawls { get; set; } = [];
 
     [Parameter]
     public bool IsProcessing { get; set; }
     
     [Parameter]
     public EventCallback<string> OnRerun { get; set; }
-
 }

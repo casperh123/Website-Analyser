@@ -76,7 +76,7 @@
         CacheWarmingService.ProgressUpdated += HandleProgressUpdate;
         
         _user = await UserService.GetCurrentUserAsync();
-        _cacheWarms = await CacheWarmingService.GetCacheWarmsByUserAsync(_user?.Id);
+        _cacheWarms = [];
         
         if (Url is not null)
         {
@@ -102,7 +102,7 @@
             return;
         }
 
-        await CacheWarmingService.WarmCacheWithSaveAsync(url.ToString(), _user.Id, cancellationToken);
+        //await CacheWarmingService.WarmCacheWithSaveAsync(url.ToString(), _user.Id, cancellationToken);
 
         _cacheWarms = await CacheWarmingService.GetCacheWarmsByUserAsync(_user?.Id);
     }

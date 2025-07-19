@@ -15,14 +15,13 @@ public class CacheWarmRepository : BaseRepository<CacheWarm>, ICacheWarmReposito
     {
         return await DbContext.CacheWarms
             .OrderByDescending(cw => cw.StartTime)
-            .ToListAsync().ConfigureAwait(false);
+            .ToListAsync();
     }
 
-    public async Task<ICollection<CacheWarm>> GetCacheWarmsByUserAsync(Guid id)
+    public async Task<ICollection<CacheWarm>> GetByWebsiteId(Guid id)
     {
         return await DbContext.CacheWarms
-            .Where(cw => cw.UserId == id)
-            .OrderByDescending(cw => cw.StartTime)
+            .Where(cw => cw.WebsiteId == id)
             .ToListAsync();
     }
 }

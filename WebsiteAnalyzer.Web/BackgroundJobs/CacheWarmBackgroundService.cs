@@ -13,11 +13,11 @@ public class CacheWarmBackgroundService : CrawlBackgroundServiceBase
     }
 
     protected override async Task ExecuteCrawlTaskAsync(
-        CrawlSchedule schedule,
+        ScheduledAction action,
         IServiceScope scope,
         CancellationToken token)
     {
         ICacheWarmingService cacheWarmingService = scope.ServiceProvider.GetService<ICacheWarmingService>()!;
-        await cacheWarmingService.WarmCacheWithoutMetrics(schedule.Url, schedule.UserId, token);
+        await cacheWarmingService.WarmCacheWithoutMetrics(action.Website, token);
     }
 }

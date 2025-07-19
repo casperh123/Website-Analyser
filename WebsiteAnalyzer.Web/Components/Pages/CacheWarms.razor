@@ -1,0 +1,46 @@
+@page "/Website/{WebsiteId:guid}/cachewarms"
+
+@using WebsiteAnalyzer.Core.Entities
+@using WebsiteAnalyzer.Core.Interfaces.Services
+@using WebsiteAnalyzer.Web.Components.Layout
+@using WebsiteAnalyzer.Web.Components.CacheWarm.Cards
+
+@inherits WebsiteAnalyzer.Web.Components.Templates.WebsiteComponent
+
+@inject ICacheWarmingService CacheWarmingService
+
+<WebsiteStatsLayout Website="Website">
+    
+    <RadzenColumn>
+        <RadzenText TextStyle="TextStyle.DisplayH3">Cache Warms</RadzenText>
+        <RadzenButton Click="WarmCache">Warm Now</RadzenButton>
+    </RadzenColumn>
+    
+    <RadzenStack Gap="20px" Style="margin-top: 20px;">
+        @foreach (CacheWarm cacheWarm in _cacheWarms)
+        {
+            <CacheWarmCard CacheWarm="cacheWarm" />
+        }
+    </RadzenStack>
+    
+</WebsiteStatsLayout>
+
+@code {
+
+    private ICollection<CacheWarm> _cacheWarms = [];
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+
+        if (Website is not null)
+        {
+            _cacheWarms = await CacheWarmingService.GetCacheWarmsByWebsiteId(Website.Id);   
+        }
+    }
+
+    public async Task WarmCache()
+    {
+        await CacheWarmingService.WarmCacheWithoutMetrics(Website);
+    } 
+}

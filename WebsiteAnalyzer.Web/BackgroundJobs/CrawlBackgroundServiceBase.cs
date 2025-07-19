@@ -51,11 +51,11 @@ public abstract class CrawlBackgroundServiceBase : IHostedService
         try
         {
             using IServiceScope scope = _serviceProvider.CreateScope();
-            ICrawlScheduleRepository repository = scope.ServiceProvider.GetRequiredService<ICrawlScheduleRepository>();
+            IScheduledActionRepository repository = scope.ServiceProvider.GetRequiredService<IScheduledActionRepository>();
             
             // Get schedules that need processing
-            ICollection<CrawlSchedule> schedules = await repository.GetByAction(_crawlAction);
-            List<CrawlSchedule> dueSchedules = schedules
+            ICollection<ScheduledAction> schedules = await repository.GetByAction(_crawlAction);
+            List<ScheduledAction> dueSchedules = schedules
                 .Where(cs => cs.IsDue() && cs.Action == _crawlAction)
                 .ToList();
 
@@ -65,7 +65,7 @@ public abstract class CrawlBackgroundServiceBase : IHostedService
             await Parallel.ForEachAsync(dueSchedules, 
                 new ParallelOptions 
                 { 
-                    MaxDegreeOfParallelism = 3,
+                    MaxDegreeOfParallelism = 5,
                     CancellationToken = cancellationToken 
                 }, 
                 async (schedule, token) => {
@@ -80,34 +80,33 @@ public abstract class CrawlBackgroundServiceBase : IHostedService
     }
 
     private async ValueTask ProcessScheduleAsync(
-        CrawlSchedule schedule, 
+        ScheduledAction scheduledAction, 
         IServiceScope scope, 
         CancellationToken token)
     {
-        ICrawlScheduleRepository repository = scope.ServiceProvider.GetRequiredService<ICrawlScheduleRepository>();
+        IScheduledActionRepository repository = scope.ServiceProvider.GetRequiredService<IScheduledActionRepository>();
         
         try
         {
-            schedule.Status = Status.InProgress;
-            schedule.LastCrawlDate = DateTime.UtcNow;
-            await repository.UpdateAsync(schedule);
+            scheduledAction.StartAction();
+            await repository.UpdateAsync(scheduledAction);
 
-            await ExecuteCrawlTaskAsync(schedule, scope, token);
+            await ExecuteCrawlTaskAsync(scheduledAction, scope, token);
 
-            schedule.Status = Status.Completed;
-            await repository.UpdateAsync(schedule);
+            scheduledAction.Status = Status.Completed;
+            await repository.UpdateAsync(scheduledAction);
         }
         catch (Exception ex)
         {
-            Logger.LogError(ex, "Failed {Action} for {Url}", _crawlAction, schedule.Url);
+            Logger.LogError(ex, "Failed {Action} for {Url}", _crawlAction, scheduledAction.Website.Url);
             
-            schedule.Status = Status.Failed;
-            await repository.UpdateAsync(schedule);
+            scheduledAction.Status = Status.Failed;
+            await repository.UpdateAsync(scheduledAction);
         }
     }
 
     protected abstract Task ExecuteCrawlTaskAsync(
-        CrawlSchedule schedule, 
+        ScheduledAction schedule, 
         IServiceScope scope, 
         CancellationToken token);
 

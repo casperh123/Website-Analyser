@@ -6,11 +6,11 @@ namespace WebsiteAnalyzer.WebTests.Services;
 
 public class MailSenderProviderTests
 {
-    private IEmailSender _emailSender { get; set; }
+    private IEmailSender EmailSender { get; set; }
 
     public MailSenderProviderTests()
     {
-        _emailSender = new MailSenderProvider();
+        EmailSender = new MailSenderProvider();
     }
 
     [Fact]
@@ -20,7 +20,7 @@ public class MailSenderProviderTests
         string subject = "test email";
         string message = "<p>message</p>";
         
-        await _emailSender.SendEmailAsync(email, subject, message);
+        await EmailSender.SendEmailAsync(email, subject, message);
         
         Assert.True(true);
     }
