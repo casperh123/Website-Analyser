@@ -1,3 +1,4 @@
+@using Humanizer
 @using WebsiteAnalyzer.Core.Entities
 @using WebsiteAnalyzer.Web.Components.CacheWarm.Badges
 
@@ -16,13 +17,13 @@
         {
             <RadzenStack>
                 <RadzenText>Time to completion</RadzenText>
-                <RadzenText>@CacheWarm.TotalTime.TotalMinutes</RadzenText>
+                <RadzenText>@CacheWarm.TotalTime.ToString(@"mm\:ss")</RadzenText>
             </RadzenStack>
         }
         
         <RadzenStack>
             <RadzenText>Visited Pages</RadzenText>
-            <RadzenText>@CacheWarm.VisitedPages minutes</RadzenText>
+            <RadzenText>@CacheWarm.VisitedPages</RadzenText>
         </RadzenStack>
     </RadzenRow>
 </RadzenCard>

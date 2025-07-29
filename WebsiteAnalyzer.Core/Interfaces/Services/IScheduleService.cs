@@ -6,7 +6,7 @@ namespace WebsiteAnalyzer.Core.Interfaces.Services;
 
 public interface IScheduleService
 {
-    Task<ScheduledAction> ScheduleTask(Website website, CrawlAction action, Frequency frequency);
+    Task<ScheduledAction> ScheduleTask(Website website, CrawlAction action, Frequency frequency, DateTime firstCrawl);
     Task UpdateScheduledTask(ScheduledAction scheduledTask, Frequency frequency);
     Task DeleteScheduledTask(ScheduledAction scheduledTask);
     Task<ICollection<ScheduledAction>> GetScheduledTasksByUserIdAndTypeAsync(Guid? userId, CrawlAction action);

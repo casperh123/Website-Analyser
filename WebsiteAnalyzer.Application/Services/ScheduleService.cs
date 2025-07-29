@@ -22,12 +22,13 @@ public class ScheduleService : IScheduleService
         _httpClient = httpClient;
     }
 
-    public async Task<ScheduledAction> ScheduleTask(Website website, CrawlAction action, Frequency frequency)
+    public async Task<ScheduledAction> ScheduleTask(Website website, CrawlAction action, Frequency frequency, DateTime firstCrawl)
     {
         ScheduledAction scheduledAction = new ScheduledAction(
             website,
             frequency,
-            action
+            action,
+            firstCrawl
         );
 
         await _scheduleRepository.AddAsync(scheduledAction);

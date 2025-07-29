@@ -17,15 +17,16 @@ public record ScheduledAction
     public ScheduledAction(
         Website.Website website,
         Frequency frequency,
-        CrawlAction action
-    )
+        CrawlAction action,
+        DateTime firstCrawl
+        )
     {
         Id = Guid.NewGuid();
         WebsiteId = website.Id;
         Website = website;
         Frequency = frequency;
         Action = action;
-        LastCrawlDate = DateTime.Today.Subtract(TimeSpan.FromDays(14));
+        LastCrawlDate = firstCrawl;
         Status = Status.Scheduled;
     }
 

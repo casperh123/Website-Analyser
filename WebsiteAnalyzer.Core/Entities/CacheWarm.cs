@@ -9,6 +9,7 @@ public record CacheWarm
     public DateTime EndTime { get; private set; }
     public bool IsCompleted => EndTime != DateTime.MinValue;
     public TimeSpan TotalTime => IsCompleted ? (EndTime - StartTime) : TimeSpan.Zero;
+    
 
     public void SetStartTime()
     {
