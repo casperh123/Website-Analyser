@@ -89,12 +89,12 @@ public class WebsiteService : IWebsiteService
 
     private async Task AddScheduledTasks(Website website)
     {
-        const int cacheWarmDelayMinutes = 10;
+        const int cacheWarmDelayMinutes = 15;
     
         DateTime cacheWarmTime = DateTime.UtcNow;
         DateTime brokenLinkTime = cacheWarmTime.AddMinutes(cacheWarmDelayMinutes);
     
-        await _scheduleService.ScheduleTask(website, CrawlAction.CacheWarm, Frequency.Daily, cacheWarmTime);
+        await _scheduleService.ScheduleTask(website, CrawlAction.CacheWarm, Frequency.SixHourly, cacheWarmTime);
         await _scheduleService.ScheduleTask(website, CrawlAction.BrokenLink, Frequency.Daily, brokenLinkTime);
     }
 }
