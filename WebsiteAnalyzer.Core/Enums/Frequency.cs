@@ -23,5 +23,14 @@ namespace WebsiteAnalyzer.Core.Enums
                 ? descriptionAttributes[0].Description
                 : frequency.ToString();
         }
+
+        public static TimeSpan ToTimeSpan(Frequency frequency) => frequency switch
+        {
+            Frequency.SixHourly => TimeSpan.FromHours(6),
+            Frequency.TwelveHourly => TimeSpan.FromHours(12),
+            Frequency.Daily => TimeSpan.FromDays(1),
+            Frequency.Weekly => TimeSpan.FromDays(7),
+            _ => throw new ArgumentOutOfRangeException(nameof(frequency), frequency, null)
+        };
     }
 }

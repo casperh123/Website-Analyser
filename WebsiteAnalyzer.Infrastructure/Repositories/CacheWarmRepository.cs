@@ -22,6 +22,7 @@ public class CacheWarmRepository : BaseRepository<CacheWarm>, ICacheWarmReposito
     {
         return await DbContext.CacheWarms
             .Where(cw => cw.WebsiteId == id)
+            .OrderByDescending(cw => cw.EndTime)
             .ToListAsync();
     }
 }

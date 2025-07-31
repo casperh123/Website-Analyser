@@ -55,25 +55,6 @@ public class CacheWarmingService : ICacheWarmingService
         }
     }
 
-    public async Task<CacheWarm> WarmCacheWithSaveAsync(string url, Website website, CancellationToken cancellationToken = default)
-    {
-        CacheWarm cacheWarm = await CreateCacheWarmEntry(website);
-
-        int linksChecked = 0;
-        
-        IAsyncEnumerable<CrawlProgress<Link>> crawlProgress = _linkCrawler.CrawlWebsiteAsync(new Link(url), cancellationToken);
-
-        await foreach (CrawlProgress<Link> progress in crawlProgress)
-        {
-            linksChecked = progress.LinksChecked;
-            UpdateProgress(progress);
-        }
-        
-        await UpdateCacheWarmResults(cacheWarm, linksChecked);
-
-        return cacheWarm;
-    }
-
     public async Task<ICollection<CacheWarm>> GetCacheWarmsByWebsiteId(Guid websiteId)
     {
         return await _cacheWarmRepository.GetByWebsiteId(websiteId);

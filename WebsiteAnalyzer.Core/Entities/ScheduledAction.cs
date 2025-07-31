@@ -11,8 +11,9 @@ public record ScheduledAction
     public Frequency Frequency { get; set; }
     public CrawlAction Action { get; set; }
     public Status Status { get; set; }
+    public DateTime NextCrawl => LastCrawlDate.Add(FrequencyExtensions.ToTimeSpan(Frequency));
     
-    public ScheduledAction() {}
+    private ScheduledAction() {}
 
     public ScheduledAction(
         Website.Website website,
@@ -30,28 +31,28 @@ public record ScheduledAction
         Status = Status.Scheduled;
     }
 
-    public bool IsDue()
+    public bool IsDueForExecution()
     {
-        if (Status is Status.InProgress)
-        {
-            return false;
-        }
+        if (Status is Status.InProgress) return false;
+        
+        DateTime currentTime = DateTime.Now;
+        DateTime nextDueTime = CalculateNextDueTime();
 
-        DateTime currentDate = DateTime.UtcNow;
-
-        return Frequency switch
-        {
-            Frequency.SixHourly => LastCrawlDate.AddHours(6) <= currentDate,
-            Frequency.TwelveHourly => LastCrawlDate.AddHours(12) <= currentDate,
-            Frequency.Daily => LastCrawlDate.AddDays(1) <= currentDate,
-            Frequency.Weekly => LastCrawlDate.AddDays(7) <= currentDate,
-            _ => false
-        };
+        return currentTime >= nextDueTime;
     }
+
+    private DateTime CalculateNextDueTime() => Frequency switch
+    {
+        Frequency.SixHourly => LastCrawlDate.AddHours(6),
+        Frequency.TwelveHourly => LastCrawlDate.AddHours(12),
+        Frequency.Daily => LastCrawlDate.AddDays(1),
+        Frequency.Weekly => LastCrawlDate.AddDays(7),
+        _ => throw new InvalidOperationException($"Unsupported frequency: {Frequency}")
+    };
 
     public void StartAction()
     {
         Status = Status.InProgress;
-        LastCrawlDate = DateTime.UtcNow;
+        LastCrawlDate = DateTime.Now;
     }
 }

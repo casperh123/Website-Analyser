@@ -56,7 +56,7 @@ public abstract class CrawlBackgroundServiceBase : IHostedService
             // Get schedules that need processing
             ICollection<ScheduledAction> schedules = await repository.GetByAction(_crawlAction);
             List<ScheduledAction> dueSchedules = schedules
-                .Where(cs => cs.IsDue() && cs.Action == _crawlAction)
+                .Where(cs => cs.IsDueForExecution() && cs.Action == _crawlAction)
                 .ToList();
 
             Logger.LogInformation("Processing {Count} due {Action} schedules", 

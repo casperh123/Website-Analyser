@@ -19,26 +19,8 @@ public class WebsiteService : IWebsiteService
         _httpClient = httpClient;
     }
 
-    public async Task<Website> GetOrAddWebsite(string url, Guid userId)
-    {
-        if (await _websiteRepository.ExistsUrlWithUserAsync(url, userId).ConfigureAwait(false))
-        {
-            return await _websiteRepository.GetWebsiteByUrlAndUserAsync(url, userId).ConfigureAwait(false);
-        }
-
-        Website website = new Website(url, userId);
-
-        await _websiteRepository.AddAsync(website).ConfigureAwait(false);
-        return website;
-    }
-
     public async Task<Website> AddWebsite(string url, Guid userId, string? name)
     {
-        if (await _websiteRepository.ExistsUrlWithUserAsync(url, userId))
-        {
-            throw new AlreadyExistsException($"{url} is already added");
-        }
-
         await VerifyWebsite(url);
         
         Website website = new Website(url, userId, name);
@@ -51,22 +33,15 @@ public class WebsiteService : IWebsiteService
 
     public async Task<ICollection<Website>> GetWebsitesByUserId(Guid? userId)
     {
-        if (userId is null)
-        {
-            return [];
-        }
-            
-        ICollection<Website> websites = await _websiteRepository.GetAllByUserId(userId.Value);
-
-        return websites;
+        if (userId is null) return [];
+        
+        return await _websiteRepository.GetAllByUserId(userId.Value);
     }
 
     public async Task<Website> GetWebsiteByIdAndUserId(Guid id, Guid userId)
     {
-        Website website = await _websiteRepository.GetByIdAndUserId(id, userId) 
+        return await _websiteRepository.GetByIdAndUserId(id, userId) 
                 ?? throw new NotFoundException($"Website with ID: {id} not found.");
-        
-        return website;
     }
 
     public async Task DeleteWebsite(string url, Guid userId)
@@ -91,7 +66,7 @@ public class WebsiteService : IWebsiteService
     {
         const int cacheWarmDelayMinutes = 15;
     
-        DateTime cacheWarmTime = DateTime.UtcNow;
+        DateTime cacheWarmTime = DateTime.Now;
         DateTime brokenLinkTime = cacheWarmTime.AddMinutes(cacheWarmDelayMinutes);
     
         await _scheduleService.ScheduleTask(website, CrawlAction.CacheWarm, Frequency.SixHourly, cacheWarmTime);

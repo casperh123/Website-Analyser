@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using WebsiteAnalyzer.Core.Exceptions;
 using WebsiteAnalyzer.Core.Interfaces.Repositories;
 using WebsiteAnalyzer.Infrastructure.Data;
 
@@ -31,8 +32,15 @@ public class BaseRepository<T> : IBaseRepository<T> where T : class
 
     public async Task AddAsync(T entity)
     {
-        await DbSet.AddAsync(entity);
-        await DbContext.SaveChangesAsync();
+        try 
+        {
+            await DbSet.AddAsync(entity);
+            await DbContext.SaveChangesAsync();
+        }
+        catch (DbUpdateException ex)
+        {
+            throw new AlreadyExistsException($"Entity already exists");
+        }
     }
 
     public async Task UpdateAsync(T entity)
