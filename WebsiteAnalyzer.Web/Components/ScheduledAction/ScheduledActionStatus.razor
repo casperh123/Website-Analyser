@@ -1,0 +1,24 @@
+@using WebsiteAnalyzer.Core.Entities
+@using WebsiteAnalyzer.Core.Enums
+@using WebsiteAnalyzer.Web.Components.Status
+
+<RadzenRow>
+    <RadzenStack>
+        <RadzenText>Status:</RadzenText>
+        <StatusBadge Status="@ScheduledAction.Status" />
+    </RadzenStack>
+    
+    @if (ScheduledAction.Status != Status.InProgress)
+    {
+        <RadzenStack>
+            <RadzenText>Next check:</RadzenText>
+            <RadzenText>@ScheduledAction.NextCrawl</RadzenText>
+        </RadzenStack>
+    }
+</RadzenRow>
+
+
+@code {
+    [Parameter, EditorRequired]
+    public required ScheduledAction ScheduledAction { get; set; }
+}

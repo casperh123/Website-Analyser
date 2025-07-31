@@ -5,9 +5,8 @@ namespace WebsiteAnalyzer.Core.Interfaces.Repositories;
 
 public interface IScheduledActionRepository : IBaseRepository<ScheduledAction>
 {
-    Task<ICollection<ScheduledAction>> GetCrawlSchedulesByUserIdAsync(Guid userId);
     Task<ICollection<ScheduledAction>> GetCrawlSchedulesByUserIdAndTypeAsync(Guid userId, CrawlAction action);
     Task<ICollection<ScheduledAction>> GetByAction(CrawlAction action);
-    Task<ScheduledAction?> GetCrawlScheduleBy(string url, Guid userId, CrawlAction action);
     Task DeleteByUrlAndUserId(string url, Guid userId);
+    Task<ScheduledAction> GetActionByWebsiteId(Guid websiteId);
 }

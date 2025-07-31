@@ -12,17 +12,15 @@ namespace WebsiteAnalyzer.Application.Services;
 public class ScheduleService : IScheduleService
 {
     private readonly IScheduledActionRepository _scheduleRepository;
-    private readonly HttpClient _httpClient;
 
     public ScheduleService(
-        IScheduledActionRepository scheduleRepository,
-        HttpClient httpClient)
+        IScheduledActionRepository scheduleRepository 
+        )
     {
         _scheduleRepository = scheduleRepository;
-        _httpClient = httpClient;
     }
 
-    public async Task<ScheduledAction> ScheduleTask(Website website, CrawlAction action, Frequency frequency, DateTime firstCrawl)
+    public async Task<ScheduledAction> ScheduleAction(Website website, CrawlAction action, Frequency frequency, DateTime firstCrawl)
     {
         ScheduledAction scheduledAction = new ScheduledAction(
             website,
@@ -36,14 +34,19 @@ public class ScheduleService : IScheduleService
         return scheduledAction;
     }
 
-    public async Task UpdateScheduledTask(ScheduledAction scheduledTask, Frequency frequency)
+    public async Task<ScheduledAction> GetActionByWebsiteId(Guid websiteId)
+    {
+        return await _scheduleRepository.GetActionByWebsiteId(websiteId);
+    }
+
+    public async Task UpdateActionFrequency(ScheduledAction scheduledTask, Frequency frequency)
     {
         scheduledTask.Frequency = frequency;
 
         await _scheduleRepository.UpdateAsync(scheduledTask);
     }
 
-    public async Task DeleteScheduledTask(ScheduledAction scheduledTask)
+    public async Task DeleteAction(ScheduledAction scheduledTask)
     {
         await _scheduleRepository.DeleteAsync(scheduledTask).ConfigureAwait(false);
     }

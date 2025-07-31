@@ -1,42 +1,72 @@
 @page "/Website/{WebsiteId:guid}/cachewarms"
 
 @using WebsiteAnalyzer.Core.Entities
+@using WebsiteAnalyzer.Core.Enums
 @using WebsiteAnalyzer.Core.Interfaces.Services
 @using WebsiteAnalyzer.Web.Components.Layout
-@using WebsiteAnalyzer.Web.Components.CacheWarm.Cards
+@using WebsiteAnalyzer.Web.Components.ScheduledAction
 
 @inherits WebsiteAnalyzer.Web.Components.Templates.WebsiteComponent
 
 @inject ICacheWarmingService CacheWarmingService
+@inject IScheduleService ScheduleService
 
 <WebsiteStatsLayout Website="Website">
-    
-    <RadzenColumn>
-        <RadzenText TextStyle="TextStyle.DisplayH3">Cache Warms</RadzenText>
-        <RadzenButton Click="WarmCache">Warm Now</RadzenButton>
-    </RadzenColumn>
-    
-    <RadzenStack Gap="20px" Style="margin-top: 20px;">
-        @foreach (CacheWarm cacheWarm in _cacheWarms)
-        {
-            <CacheWarmCard CacheWarm="cacheWarm" />
-        }
-    </RadzenStack>
-    
+    <RadzenCard>
+        <RadzenStack>
+        <RadzenText TextStyle="TextStyle.DisplayH4">Cache Warms</RadzenText>
+        <RadzenCard>
+
+            <RadzenRow AlignItems="AlignItems.Center" JustifyContent="JustifyContent.SpaceBetween">
+                <ScheduledActionStatus ScheduledAction="_scheduledAction"/>
+
+                @if (_scheduledAction.Status != Status.InProgress)
+                {
+                    <RadzenStack>
+                        <RadzenButton Click="WarmCache">Warm Now</RadzenButton>
+                    </RadzenStack>
+                }
+            </RadzenRow>
+        </RadzenCard>
+
+        <RadzenDataGrid
+            AllowFiltering="true"
+            AllowSorting="true"
+            PageSize="15"
+            AllowPaging="true"
+            ShowPagingSummary="true"
+            Data="@_cacheWarms"
+            FilterMode="FilterMode.Simple">
+            <Columns>
+                <RadzenDataGridColumn Property="@nameof(CacheWarm.TotalTime)" Title="Total Time" Width="100px" Filterable="false">
+                    <Template Context="cacheWarm">
+                        @cacheWarm.TotalTime.ToString(@"hh\:mm\:ss")
+                    </Template>
+                </RadzenDataGridColumn>
+                <RadzenDataGridColumn Property="@nameof(CacheWarm.StartTime)" Title="Start Time" Width="200px" Filterable="false"/>
+                <RadzenDataGridColumn Property="@nameof(CacheWarm.VisitedPages)" Title="Visited Pages" Width="200px" Filterable="false"/>
+            </Columns>
+        </RadzenDataGrid>
+        </RadzenStack>
+    </RadzenCard>
 </WebsiteStatsLayout>
 
 @code {
 
     private ICollection<CacheWarm> _cacheWarms = [];
+    private ScheduledAction _scheduledAction;
 
     protected override async Task OnInitializedAsync()
     {
         await base.OnInitializedAsync();
 
-        if (Website is not null)
+        if (Website is null)
         {
-            _cacheWarms = await CacheWarmingService.GetCacheWarmsByWebsiteId(Website.Id);   
+            return;
         }
+        
+        _cacheWarms = await CacheWarmingService.GetCacheWarmsByWebsiteId(Website.Id);
+        _scheduledAction = await ScheduleService.GetActionByWebsiteId(Website.Id);
     }
 
     public async Task WarmCache()

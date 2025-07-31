@@ -69,7 +69,7 @@ public class WebsiteService : IWebsiteService
         DateTime cacheWarmTime = DateTime.Now;
         DateTime brokenLinkTime = cacheWarmTime.AddMinutes(cacheWarmDelayMinutes);
     
-        await _scheduleService.ScheduleTask(website, CrawlAction.CacheWarm, Frequency.SixHourly, cacheWarmTime);
-        await _scheduleService.ScheduleTask(website, CrawlAction.BrokenLink, Frequency.Daily, brokenLinkTime);
+        await _scheduleService.ScheduleAction(website, CrawlAction.CacheWarm, Frequency.SixHourly, cacheWarmTime);
+        await _scheduleService.ScheduleAction(website, CrawlAction.BrokenLink, Frequency.Daily, brokenLinkTime);
     }
 }
