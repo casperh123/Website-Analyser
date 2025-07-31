@@ -45,6 +45,11 @@
                 </RadzenDataGridColumn>
                 <RadzenDataGridColumn Property="@nameof(CacheWarm.StartTime)" Title="Start Time" Width="200px" Filterable="false"/>
                 <RadzenDataGridColumn Property="@nameof(CacheWarm.VisitedPages)" Title="Visited Pages" Width="200px" Filterable="false"/>
+                <RadzenDataGridColumn Property="@nameof(CacheWarm.AveragePageTime)" Title="Average TTFB" Filterable="false">
+                    <Template Context="cacheWarm">
+                        @cacheWarm.AveragePageTime ms
+                    </Template>
+                </RadzenDataGridColumn>
             </Columns>
         </RadzenDataGrid>
         </RadzenStack>

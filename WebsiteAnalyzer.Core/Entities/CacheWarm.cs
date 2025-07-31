@@ -7,6 +7,7 @@ public record CacheWarm
     public int VisitedPages { get; set; }
     public DateTime StartTime { get; private set; }
     public DateTime EndTime { get; private set; }
+    public int AveragePageTime => (int)(VisitedPages > 0 ? TotalTime.TotalMilliseconds / VisitedPages : 0);
     public bool IsCompleted => EndTime != DateTime.MinValue;
     public TimeSpan TotalTime => IsCompleted ? (EndTime - StartTime) : TimeSpan.Zero;
     
