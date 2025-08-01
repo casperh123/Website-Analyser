@@ -57,7 +57,7 @@ namespace WebsiteAnalyzer.Infrastructure.Migrations
                     Id = table.Column<Guid>(type: "TEXT", nullable: false),
                     WebsiteId = table.Column<Guid>(type: "TEXT", nullable: false),
                     VisitedPages = table.Column<int>(type: "INTEGER", nullable: false),
-                    StartTime = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    StartTimeUtc = table.Column<DateTime>(type: "TEXT", nullable: false),
                     EndTime = table.Column<DateTime>(type: "TEXT", nullable: false)
                 },
                 constraints: table =>
@@ -215,9 +215,9 @@ namespace WebsiteAnalyzer.Infrastructure.Migrations
                     WebsiteId = table.Column<Guid>(type: "TEXT", nullable: false),
                     WebsiteUrl = table.Column<string>(type: "TEXT", nullable: false),
                     WebsiteUserId = table.Column<Guid>(type: "TEXT", nullable: false),
-                    LastCrawlDate = table.Column<DateTime>(type: "TEXT", nullable: false),
                     Frequency = table.Column<int>(type: "INTEGER", nullable: false),
                     Action = table.Column<int>(type: "INTEGER", nullable: false),
+                    LastCrawlDateUtc = table.Column<DateTime>(type: "TEXT", nullable: false),
                     Status = table.Column<int>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
