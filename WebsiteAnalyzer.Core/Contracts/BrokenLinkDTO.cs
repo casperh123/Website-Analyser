@@ -2,7 +2,7 @@ using System.Net;
 using BrokenLinkChecker.Models.Links;
 using WebsiteAnalyzer.Core.Entities.BrokenLink;
 
-namespace WebsiteAnalyzer.Core.DataTransferObject;
+namespace WebsiteAnalyzer.Core.Contracts;
 
 public record BrokenLinkDTO
 {

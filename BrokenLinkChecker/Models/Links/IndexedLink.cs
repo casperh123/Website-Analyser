@@ -22,6 +22,8 @@ public class IndexedLink : Link
         StatusCode = statuscode;
     }
 
+    public IndexedLink(string target) : base(target) {}
+
     public string ReferringPage { get; set; }
     public string AnchorText { get; set; }
     public int Line { get; set; }

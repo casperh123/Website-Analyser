@@ -1,3 +1,4 @@
+@using WebsiteAnalyzer.Core.Domain
 @using WebsiteAnalyzer.Core.Entities
 @using WebsiteAnalyzer.Core.Enums
 @using WebsiteAnalyzer.Web.Components.Status
@@ -12,7 +13,7 @@
     {
         <RadzenStack>
             <RadzenText>Next check:</RadzenText>
-            <RadzenText>@ScheduledAction.NextCrawl</RadzenText>
+            <RadzenText>@ScheduledAction.NextCrawlLocal</RadzenText>
         </RadzenStack>
     }
 </RadzenRow>

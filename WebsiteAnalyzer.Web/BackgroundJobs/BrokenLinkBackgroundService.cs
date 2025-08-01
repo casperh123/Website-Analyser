@@ -1,4 +1,5 @@
-using WebsiteAnalyzer.Core.DataTransferObject;
+using WebsiteAnalyzer.Core.Contracts;
+using WebsiteAnalyzer.Core.Domain;
 using WebsiteAnalyzer.Core.Entities;
 using WebsiteAnalyzer.Core.Enums;
 using WebsiteAnalyzer.Core.Events;

@@ -1,3 +1,4 @@
+using WebsiteAnalyzer.Core.Domain;
 using WebsiteAnalyzer.Core.Entities;
 using WebsiteAnalyzer.Core.Entities.Website;
 using WebsiteAnalyzer.Core.Enums;
@@ -20,7 +21,7 @@ public class ScheduleService : IScheduleService
         _scheduleRepository = scheduleRepository;
     }
 
-    public async Task<ScheduledAction> ScheduleAction(Website website, CrawlAction action, Frequency frequency, DateTime firstCrawl)
+    public async Task<ScheduledAction> ScheduleAction(Website website, CrawlAction action, Frequency frequency)
     {
         ScheduledAction scheduledAction = new ScheduledAction(
             website,

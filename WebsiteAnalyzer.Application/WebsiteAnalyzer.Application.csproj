@@ -10,8 +10,4 @@
       <ProjectReference Include="..\WebsiteAnalyzer.Core\WebsiteAnalyzer.Core.csproj" />
     </ItemGroup>
 
-    <ItemGroup>
-      <Folder Include="Services\DTO\" />
-    </ItemGroup>
-
 </Project>

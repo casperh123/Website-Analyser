@@ -1,3 +1,4 @@
+@using WebsiteAnalyzer.Core.Domain
 @using WebsiteAnalyzer.Core.Entities
 @using WebsiteAnalyzer.Core.Enums
 
@@ -15,7 +16,7 @@
             </RadzenDataGridColumn>
             <RadzenDataGridColumn Title="Action" Property="@nameof(ScheduledAction.Action)"/>
             <RadzenDataGridColumn Title="Status" Property="@nameof(ScheduledAction.Status)"/>
-            <RadzenDataGridColumn Title="Last Check" Property="@nameof(ScheduledAction.LastCrawlDate)"/>
+            <RadzenDataGridColumn Title="Last Check" Property="@nameof(ScheduledAction.LastCrawlDateUtc)"/>
             <RadzenDataGridColumn>
                 <Template Context="schedule">
                     <RadzenButton Icon="delete"

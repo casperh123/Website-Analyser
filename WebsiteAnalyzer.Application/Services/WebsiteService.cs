@@ -66,7 +66,7 @@ public class WebsiteService : IWebsiteService
     {
         const int cacheWarmDelayMinutes = 15;
     
-        DateTime cacheWarmTime = DateTime.Now;
+        DateTime cacheWarmTime = DateTime.UtcNow;
         DateTime brokenLinkTime = cacheWarmTime.AddMinutes(cacheWarmDelayMinutes);
     
         await _scheduleService.ScheduleAction(website, CrawlAction.CacheWarm, Frequency.SixHourly, cacheWarmTime);
