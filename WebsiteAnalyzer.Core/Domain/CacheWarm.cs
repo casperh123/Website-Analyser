@@ -5,16 +5,18 @@ public record CacheWarm
     public Guid Id { get; set; }
     public Guid WebsiteId { get; set; }
     public int VisitedPages { get; set; }
-    public DateTime StartTime { get; private set; }
+    public DateTime StartTimeUtc { get; private set; }
     public DateTime EndTime { get; private set; }
     public int AveragePageTime => (int)(VisitedPages > 0 ? TotalTime.TotalMilliseconds / VisitedPages : 0);
     public bool IsCompleted => EndTime != DateTime.MinValue;
-    public TimeSpan TotalTime => IsCompleted ? (EndTime - StartTime) : TimeSpan.Zero;
+    public TimeSpan TotalTime => IsCompleted ? (EndTime - StartTimeUtc) : TimeSpan.Zero;
+    public DateTime StartTimeLocal => StartTimeUtc.ToLocalTime();
+
     
 
     public void SetStartTime()
     {
-        StartTime = DateTime.UtcNow;
+        StartTimeUtc = DateTime.UtcNow;
     }
 
     public void SetEndTime()
@@ -24,7 +26,7 @@ public record CacheWarm
     
     public CacheWarm()
     {
-        StartTime = DateTime.MinValue.ToUniversalTime();
+        StartTimeUtc = DateTime.MinValue.ToUniversalTime();
         EndTime = DateTime.MinValue.ToUniversalTime();
     }
 

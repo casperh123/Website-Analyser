@@ -21,7 +21,7 @@ public class ScheduleService : IScheduleService
         _scheduleRepository = scheduleRepository;
     }
 
-    public async Task<ScheduledAction> ScheduleAction(Website website, CrawlAction action, Frequency frequency)
+    public async Task<ScheduledAction> ScheduleAction(Website website, CrawlAction action, Frequency frequency, DateTime firstCrawl)
     {
         ScheduledAction scheduledAction = new ScheduledAction(
             website,

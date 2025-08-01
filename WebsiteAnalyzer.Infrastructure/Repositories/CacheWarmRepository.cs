@@ -14,7 +14,7 @@ public class CacheWarmRepository : BaseRepository<CacheWarm>, ICacheWarmReposito
     public new async Task<ICollection<CacheWarm>> GetAllAsync()
     {
         return await DbContext.CacheWarms
-            .OrderByDescending(cw => cw.StartTime)
+            .OrderByDescending(cw => cw.StartTimeUtc)
             .ToListAsync();
     }
 
