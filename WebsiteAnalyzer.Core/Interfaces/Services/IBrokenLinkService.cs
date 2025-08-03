@@ -1,4 +1,5 @@
 using WebsiteAnalyzer.Core.Contracts;
+using WebsiteAnalyzer.Core.Contracts.BrokenLink;
 using WebsiteAnalyzer.Core.Events;
 
 namespace WebsiteAnalyzer.Core.Interfaces.Services;

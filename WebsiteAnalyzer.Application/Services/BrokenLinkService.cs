@@ -5,6 +5,7 @@ using BrokenLinkChecker.DocumentParsing.LinkProcessors;
 using BrokenLinkChecker.Models.Links;
 using BrokenLinkChecker.models.Result;
 using WebsiteAnalyzer.Core.Contracts;
+using WebsiteAnalyzer.Core.Contracts.BrokenLink;
 using WebsiteAnalyzer.Core.Entities.BrokenLink;
 using WebsiteAnalyzer.Core.Events;
 using WebsiteAnalyzer.Core.Interfaces.Repositories;

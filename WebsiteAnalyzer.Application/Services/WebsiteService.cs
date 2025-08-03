@@ -64,12 +64,9 @@ public class WebsiteService : IWebsiteService
 
     private async Task AddScheduledTasks(Website website)
     {
-        const int cacheWarmDelayMinutes = 15;
+        TimeSpan brokenLinkOffset = TimeSpan.FromMinutes(15);
     
-        DateTime cacheWarmTime = DateTime.UtcNow;
-        DateTime brokenLinkTime = cacheWarmTime.AddMinutes(cacheWarmDelayMinutes);
-    
-        await _scheduleService.ScheduleAction(website, CrawlAction.CacheWarm, Frequency.SixHourly, cacheWarmTime);
-        await _scheduleService.ScheduleAction(website, CrawlAction.BrokenLink, Frequency.Daily, brokenLinkTime);
+        await _scheduleService.ScheduleAction(website, CrawlAction.CacheWarm, Frequency.SixHourly);
+        await _scheduleService.ScheduleAction(website, CrawlAction.BrokenLink, Frequency.Daily, brokenLinkOffset);
     }
 }

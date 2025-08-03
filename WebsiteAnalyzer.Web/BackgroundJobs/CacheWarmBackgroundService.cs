@@ -19,6 +19,6 @@ public class CacheWarmBackgroundService : CrawlBackgroundServiceBase
         CancellationToken token)
     {
         ICacheWarmingService cacheWarmingService = scope.ServiceProvider.GetService<ICacheWarmingService>()!;
-        await cacheWarmingService.WarmCacheWithoutMetrics(action.Website, token);
+        await cacheWarmingService.WarmCache(action.Website, token);
     }
 }

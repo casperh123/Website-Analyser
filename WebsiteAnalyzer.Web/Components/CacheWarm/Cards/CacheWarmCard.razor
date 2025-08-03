@@ -1,34 +1,31 @@
-@using WebsiteAnalyzer.Core.Entities
-@using WebsiteAnalyzer.Web.Components.CacheWarm.Badges
+@using WebsiteAnalyzer.Core.Contracts.CacheWarm
 
 <RadzenCard>
     <RadzenRow>
-        <RadzenStack JustifyContent="JustifyContent.Center">
-            <RadzenText>Status</RadzenText>
-            <CacheWarmCompletion CompletedSuccessfully="CacheWarm.IsCompleted"/>
-        </RadzenStack>
         <RadzenStack>
             <RadzenText>Start Time</RadzenText>
-            <RadzenText>@CacheWarm.StartTimeUtc</RadzenText>
+            <RadzenText>@CacheWarm.StartTime</RadzenText>
         </RadzenStack>
         
-        @if (CacheWarm.IsCompleted)
-        {
-            <RadzenStack>
-                <RadzenText>Time to completion</RadzenText>
-                <RadzenText>@CacheWarm.TotalTime.ToString(@"mm\:ss") minutes</RadzenText>
-            </RadzenStack>
-        }
+        <RadzenStack>
+            <RadzenText>Total Time</RadzenText>
+            <RadzenText>@CacheWarm.TotalTime.ToString(@"hh\:mm\:ss") minutes</RadzenText>
+        </RadzenStack>
         
         <RadzenStack>
             <RadzenText>Visited Pages</RadzenText>
             <RadzenText>@CacheWarm.VisitedPages</RadzenText>
+        </RadzenStack>
+        
+        <RadzenStack>
+            <RadzenText>Average TTFB</RadzenText>
+            <RadzenText>@CacheWarm.AveragePageTimeMs ms</RadzenText>
         </RadzenStack>
     </RadzenRow>
 </RadzenCard>
 
 
 @code {
-    [Parameter] 
-    public required CacheWarm CacheWarm { get; set; }
+    [Parameter, EditorRequired] 
+    public required AnonymousCacheWarm CacheWarm { get; set; }
 }

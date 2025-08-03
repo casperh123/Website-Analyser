@@ -1,3 +1,4 @@
+using WebsiteAnalyzer.Core.Contracts.BrokenLink;
 using WebsiteAnalyzer.Core.Entities.BrokenLink;
 
 namespace WebsiteAnalyzer.Core.Contracts;

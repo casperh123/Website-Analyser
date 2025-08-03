@@ -1,4 +1,4 @@
-namespace WebsiteAnalyzer.Core.Entities;
+namespace WebsiteAnalyzer.Core.Domain;
 
 public record CacheWarm
 {
@@ -24,15 +24,25 @@ public record CacheWarm
         EndTime = DateTime.UtcNow;
     }
     
-    public CacheWarm()
-    {
-        StartTimeUtc = DateTime.MinValue.ToUniversalTime();
-        EndTime = DateTime.MinValue.ToUniversalTime();
-    }
+    private CacheWarm() {}
 
-    public CacheWarm(Website.Website website)
+    public CacheWarm(Entities.Website.Website website)
     {
         Id = Guid.NewGuid();
         WebsiteId = website.Id;
+    }
+    
+    public CacheWarm(
+        Entities.Website.Website website, 
+        int linksChecked, 
+        DateTime startTime, 
+        DateTime endTime
+        )
+    {
+        Id = Guid.NewGuid();
+        WebsiteId = website.Id;
+        VisitedPages = linksChecked;
+        StartTimeUtc = startTime;
+        EndTime = endTime;
     }
 }

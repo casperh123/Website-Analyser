@@ -3,24 +3,18 @@
 @* default *@
 @attribute [Sitemap]
 
+@using global::BrokenLinkChecker.models.Links
+@using global::BrokenLinkChecker.models.Result
 @using Sidio.Sitemap.Blazor
-@using WebsiteAnalyzer.Core.Enums
-@using WebsiteAnalyzer.Core.Events
+@using WebsiteAnalyzer.Core.Contracts.CacheWarm
 @using WebsiteAnalyzer.Core.Interfaces.Services
-@using WebsiteAnalyzer.Infrastructure
 @using WebsiteAnalyzer.Web.Components.WebsiteInputs
-@using WebsiteAnalyzer.Web.Components.CacheWarm.Lists
-@using WebsiteAnalyzer.Web.Services
-@using WebsiteAnalyzer.Web.Components.Schedule
-@using WebsiteAnalyzer.Web.Components.User
 @using WebsiteAnalyzer.Web.Components.CacheWarm.Seo
-@using CacheWarm = global::WebsiteAnalyzer.Core.Entities.CacheWarm
+@using WebsiteAnalyzer.Web.Components.CacheWarm.Cards
 
 @inherits WebsiteAnalyzer.Web.Components.Templates.ProcessingComponentBase
 
-
 @inject ICacheWarmingService CacheWarmingService
-@inject IUserService UserService
 
 <PageTitle>Cache Warmer</PageTitle>
 
@@ -28,32 +22,23 @@
 
 <CacheWarmIntroText />
 
-<WebsiteInput
-    Url="@_url"
-    IsProcessing="IsProcessing"
-    LinksChecked="_linksChecked" 
-    LinksEnqueued="_linksEnqueued"
-    OnCancel="CancelProcessing" 
-    WebsiteActionStarted="StartWarm"/>
+<RadzenStack Gap="20">
+    <WebsiteInput
+        Url="@_url"
+        IsProcessing="IsProcessing"
+        LinksChecked="_linksChecked" 
+        LinksEnqueued="_linksEnqueued"
+        OnCancel="CancelProcessing" 
+        WebsiteActionStarted="StartWarm"/>
 
-<AuthorizeView>
-    <Authorized>
-        <RadzenTabs class="rz-mt-12" TabPosition="TabPosition.Top" RenderMode="TabRenderMode.Server">
-            <Tabs>
-                <RadzenTabsItem Text="Previous Warms">
-                    <CacheWarmList OnRerunCacheWarm="StartWarm" User="_user" CacheWarms="_cacheWarms"
-                                   IsProcessing="IsProcessing"/>
-                </RadzenTabsItem>
-                <RadzenTabsItem Text="Schedule">
-                    <WebsiteScheduler Action="CrawlAction.CacheWarm" User="_user"/>
-                </RadzenTabsItem>
-            </Tabs>
-        </RadzenTabs>
-    </Authorized>
-    <NotAuthorized>
-        <SignUp User="_user"/>
-    </NotAuthorized>
-</AuthorizeView>
+    @if (_latestCrawl is not null)
+    {
+        <RadzenStack>
+            <RadzenText TextStyle="TextStyle.DisplayH4">Last Crawl</RadzenText>
+            <CacheWarmCard CacheWarm="_latestCrawl"/>
+        </RadzenStack>
+    }
+</RadzenStack>
 
 <HeadContent>
     <meta name="description" content="Boost website performance with automated cache warming. Proactively load pages into your server's cache, eliminate first-load delays, and maintain lightning-fast speeds for all visitors.">
@@ -68,15 +53,18 @@
     private int _linksChecked;
     private int _linksEnqueued;
     private string _url = "https://";
-    private ApplicationUser? _user;
-    private IEnumerable<CacheWarm> _cacheWarms = [];
+    private AnonymousCacheWarm? _latestCrawl;
+    private IProgress<CrawlProgress<Link>> progress;
 
     protected override async Task OnInitializedAsync()
     {
-        CacheWarmingService.ProgressUpdated += HandleProgressUpdate;
-        
-        _user = await UserService.GetCurrentUserAsync();
-        _cacheWarms = [];
+        progress = new Progress<CrawlProgress<Link>>(p =>
+            {
+                _linksChecked = p.LinksChecked;
+                _linksEnqueued = p.LinksEnqueued;
+                InvokeAsync(StateHasChanged);
+            }
+        );
         
         if (Url is not null)
         {
@@ -93,27 +81,10 @@
 
     private async Task WarmCache(Uri url, CancellationToken cancellationToken)
     {
-        if (_user is null)
-        {
-            await CacheWarmingService.WarmCache(
-                url.ToString(),
-                cancellationToken
-            );
-            return;
-        }
-
-        //await CacheWarmingService.WarmCacheWithSaveAsync(url.ToString(), _user.Id, cancellationToken);
-
-        _cacheWarms = await CacheWarmingService.GetCacheWarmsByUserAsync(_user?.Id);
-    }
-
-    private async void HandleProgressUpdate(object? sender, CrawlProgressEventArgs args)
-    {
-        await InvokeAsync(() =>
-        {
-            _linksEnqueued = args.LinksEnqueued;
-            _linksChecked = args.LinksChecked;
-            StateHasChanged();
-        });
+        _latestCrawl = await CacheWarmingService.WarmCacheAnonymous(
+            url.ToString(),
+            progress,
+            cancellationToken
+        );
     }
 }

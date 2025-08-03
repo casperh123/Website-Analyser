@@ -1,6 +1,4 @@
-using WebsiteAnalyzer.Core.Entities.BrokenLink;
-
-namespace WebsiteAnalyzer.Core.Contracts;
+namespace WebsiteAnalyzer.Core.Contracts.BrokenLink;
 
 public class BrokenLinkCrawlSession
 {

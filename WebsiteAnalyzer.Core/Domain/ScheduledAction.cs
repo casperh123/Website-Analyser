@@ -4,11 +4,11 @@ namespace WebsiteAnalyzer.Core.Domain;
 
 public record ScheduledAction
 {
-    public Guid Id { get; set; }
-    public Guid WebsiteId { get; set; }
-    public Entities.Website.Website Website { get; set; }
+    public Guid Id { get; init; }
+    public Guid WebsiteId { get; init; }
+    public Entities.Website.Website Website { get; init; }
     public Frequency Frequency { get; set; }
-    public CrawlAction Action { get; set; }
+    public CrawlAction Action { get; init; }
     
     public DateTime LastCrawlDateUtc { get; set; }
     public Status Status { get; set; }
@@ -25,7 +25,7 @@ public record ScheduledAction
         Entities.Website.Website website,
         Frequency frequency,
         CrawlAction action,
-        DateTime firstCrawl
+        TimeSpan offset
         )
     {
         Id = Guid.NewGuid();
@@ -33,7 +33,7 @@ public record ScheduledAction
         Website = website;
         Frequency = frequency;
         Action = action;
-        LastCrawlDateUtc = DateTime.UtcNow;
+        LastCrawlDateUtc = CalculateFirstCrawl(offset);
         Status = Status.Scheduled;
     }
 
@@ -41,5 +41,13 @@ public record ScheduledAction
     {
         Status = Status.InProgress;
         LastCrawlDateUtc = DateTime.UtcNow;
+    }
+
+    private DateTime CalculateFirstCrawl(TimeSpan offset)
+    {
+        DateTime currentTime = DateTime.UtcNow;
+        DateTime firstCrawl = currentTime.Subtract(FrequencyExtensions.ToTimeSpan(Frequency));
+
+        return firstCrawl.Add(offset);
     }
 }

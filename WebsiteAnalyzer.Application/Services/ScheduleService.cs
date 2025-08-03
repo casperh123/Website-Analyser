@@ -21,13 +21,17 @@ public class ScheduleService : IScheduleService
         _scheduleRepository = scheduleRepository;
     }
 
-    public async Task<ScheduledAction> ScheduleAction(Website website, CrawlAction action, Frequency frequency, DateTime firstCrawl)
+    public async Task<ScheduledAction> ScheduleAction(
+        Website website, 
+        CrawlAction action, 
+        Frequency frequency, 
+        TimeSpan negativeOffset = default)
     {
         ScheduledAction scheduledAction = new ScheduledAction(
             website,
             frequency,
             action,
-            firstCrawl
+            negativeOffset
         );
 
         await _scheduleRepository.AddAsync(scheduledAction);
