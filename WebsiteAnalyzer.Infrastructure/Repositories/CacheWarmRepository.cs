@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using WebsiteAnalyzer.Core.Domain;
 using WebsiteAnalyzer.Core.Entities;
 using WebsiteAnalyzer.Core.Interfaces.Repositories;
 using WebsiteAnalyzer.Infrastructure.Data;
@@ -14,15 +15,15 @@ public class CacheWarmRepository : BaseRepository<CacheWarm>, ICacheWarmReposito
     public new async Task<ICollection<CacheWarm>> GetAllAsync()
     {
         return await DbContext.CacheWarms
-            .OrderByDescending(cw => cw.StartTime)
-            .ToListAsync().ConfigureAwait(false);
+            .OrderByDescending(cw => cw.StartTimeUtc)
+            .ToListAsync();
     }
 
-    public async Task<ICollection<CacheWarm>> GetCacheWarmsByUserAsync(Guid id)
+    public async Task<ICollection<CacheWarm>> GetByWebsiteId(Guid id)
     {
         return await DbContext.CacheWarms
-            .Where(cw => cw.UserId == id)
-            .OrderByDescending(cw => cw.StartTime)
+            .Where(cw => cw.WebsiteId == id)
+            .OrderByDescending(cw => cw.EndTime)
             .ToListAsync();
     }
 }

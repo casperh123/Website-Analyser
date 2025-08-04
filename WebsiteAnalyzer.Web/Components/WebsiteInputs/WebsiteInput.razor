@@ -25,7 +25,7 @@
     public bool IsProcessing { get; set; }
     
     [Parameter, EditorRequired]
-    public string Url { get; set; } = "https://";
+    public required string Url { get; set; }
     
     [Parameter] 
     public EventCallback<Uri> WebsiteActionStarted { get; set; }

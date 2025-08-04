@@ -51,19 +51,32 @@ namespace WebsiteAnalyzer.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "CrawlSchedules",
+                name: "CacheWarms",
                 columns: table => new
                 {
-                    UserId = table.Column<Guid>(type: "TEXT", nullable: false),
-                    Url = table.Column<string>(type: "TEXT", nullable: false),
-                    Action = table.Column<int>(type: "INTEGER", nullable: false),
-                    LastCrawlDate = table.Column<DateTime>(type: "TEXT", nullable: false),
-                    Frequency = table.Column<int>(type: "INTEGER", nullable: false),
-                    Status = table.Column<int>(type: "INTEGER", nullable: false)
+                    Id = table.Column<Guid>(type: "TEXT", nullable: false),
+                    WebsiteId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    VisitedPages = table.Column<int>(type: "INTEGER", nullable: false),
+                    StartTimeUtc = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    EndTime = table.Column<DateTime>(type: "TEXT", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_CrawlSchedules", x => new { x.UserId, x.Url, x.Action });
+                    table.PrimaryKey("PK_CacheWarms", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Websites",
+                columns: table => new
+                {
+                    Url = table.Column<string>(type: "TEXT", nullable: false),
+                    UserId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    Id = table.Column<Guid>(type: "TEXT", nullable: false),
+                    Name = table.Column<string>(type: "TEXT", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Websites", x => new { x.Url, x.UserId });
                 });
 
             migrationBuilder.CreateTable(
@@ -173,26 +186,6 @@ namespace WebsiteAnalyzer.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Websites",
-                columns: table => new
-                {
-                    Url = table.Column<string>(type: "TEXT", nullable: false),
-                    UserId = table.Column<Guid>(type: "TEXT", nullable: false),
-                    Id = table.Column<Guid>(type: "TEXT", nullable: false),
-                    Name = table.Column<string>(type: "TEXT", nullable: true),
-                    ApplicationUserId = table.Column<Guid>(type: "TEXT", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Websites", x => new { x.Url, x.UserId });
-                    table.ForeignKey(
-                        name: "FK_Websites_AspNetUsers_ApplicationUserId",
-                        column: x => x.ApplicationUserId,
-                        principalTable: "AspNetUsers",
-                        principalColumn: "Id");
-                });
-
-            migrationBuilder.CreateTable(
                 name: "BrokenLinkCrawls",
                 columns: table => new
                 {
@@ -215,33 +208,27 @@ namespace WebsiteAnalyzer.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "CacheWarms",
+                name: "ScheduledActions",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "TEXT", nullable: false),
-                    UserId = table.Column<Guid>(type: "TEXT", nullable: true),
+                    WebsiteId = table.Column<Guid>(type: "TEXT", nullable: false),
                     WebsiteUrl = table.Column<string>(type: "TEXT", nullable: false),
-                    VisitedPages = table.Column<int>(type: "INTEGER", nullable: false),
-                    StartTime = table.Column<DateTime>(type: "TEXT", nullable: false),
-                    EndTime = table.Column<DateTime>(type: "TEXT", nullable: false),
-                    ScheduleUserId = table.Column<Guid>(type: "TEXT", nullable: true),
-                    ScheduleUrl = table.Column<string>(type: "TEXT", nullable: true),
-                    ScheduleAction = table.Column<int>(type: "INTEGER", nullable: true),
-                    WebsiteUserId = table.Column<Guid>(type: "TEXT", nullable: true)
+                    WebsiteUserId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    Frequency = table.Column<int>(type: "INTEGER", nullable: false),
+                    Action = table.Column<int>(type: "INTEGER", nullable: false),
+                    LastCrawlDateUtc = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    Status = table.Column<int>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_CacheWarms", x => x.Id);
+                    table.PrimaryKey("PK_ScheduledActions", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_CacheWarms_CrawlSchedules_ScheduleUserId_ScheduleUrl_ScheduleAction",
-                        columns: x => new { x.ScheduleUserId, x.ScheduleUrl, x.ScheduleAction },
-                        principalTable: "CrawlSchedules",
-                        principalColumns: new[] { "UserId", "Url", "Action" });
-                    table.ForeignKey(
-                        name: "FK_CacheWarms_Websites_WebsiteUrl_WebsiteUserId",
+                        name: "FK_ScheduledActions_Websites_WebsiteUrl_WebsiteUserId",
                         columns: x => new { x.WebsiteUrl, x.WebsiteUserId },
                         principalTable: "Websites",
-                        principalColumns: new[] { "Url", "UserId" });
+                        principalColumns: new[] { "Url", "UserId" },
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -314,19 +301,9 @@ namespace WebsiteAnalyzer.Infrastructure.Migrations
                 column: "BrokenLinkCrawlId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_CacheWarms_ScheduleUserId_ScheduleUrl_ScheduleAction",
-                table: "CacheWarms",
-                columns: new[] { "ScheduleUserId", "ScheduleUrl", "ScheduleAction" });
-
-            migrationBuilder.CreateIndex(
-                name: "IX_CacheWarms_WebsiteUrl_WebsiteUserId",
-                table: "CacheWarms",
+                name: "IX_ScheduledActions_WebsiteUrl_WebsiteUserId",
+                table: "ScheduledActions",
                 columns: new[] { "WebsiteUrl", "WebsiteUserId" });
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Websites_ApplicationUserId",
-                table: "Websites",
-                column: "ApplicationUserId");
         }
 
         /// <inheritdoc />
@@ -354,19 +331,19 @@ namespace WebsiteAnalyzer.Infrastructure.Migrations
                 name: "CacheWarms");
 
             migrationBuilder.DropTable(
+                name: "ScheduledActions");
+
+            migrationBuilder.DropTable(
                 name: "AspNetRoles");
+
+            migrationBuilder.DropTable(
+                name: "AspNetUsers");
 
             migrationBuilder.DropTable(
                 name: "BrokenLinkCrawls");
 
             migrationBuilder.DropTable(
-                name: "CrawlSchedules");
-
-            migrationBuilder.DropTable(
                 name: "Websites");
-
-            migrationBuilder.DropTable(
-                name: "AspNetUsers");
         }
     }
 }

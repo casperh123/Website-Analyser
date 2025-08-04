@@ -1,7 +1,7 @@
 @using WebsiteAnalyzer.Core.Interfaces.Services
 @using WebsiteAnalyzer.Infrastructure
 @using WebsiteAnalyzer.Web.Components.CacheWarm.Badges
-@using CacheWarm = global::WebsiteAnalyzer.Core.Entities.CacheWarm
+@using CacheWarm = global::WebsiteAnalyzer.Core.Domain.CacheWarm
 
 @inject ICacheWarmingService CacheWarmingService
 @inject IJSRuntime JsRuntime
@@ -17,27 +17,12 @@
         Data="CacheWarms"
         FilterMode="FilterMode.Simple">
         <Columns>
-            <RadzenDataGridColumn Property="@nameof(CacheWarm.WebsiteUrl)" Title="Website" MinWidth="400px"
-                                  Sortable="true" Filterable="true">
-                <Template Context="cacheWarm">
-                    <RadzenStack>
-                        <RadzenRow AlignItems="AlignItems.Center">
-                            <RadzenText TextStyle="TextStyle.H6" Style="margin-bottom: 0">
-                                @cacheWarm.WebsiteUrl
-                            </RadzenText>
-                            <RadzenButton Disabled="IsProcessing" Size="ButtonSize.ExtraSmall"
-                                          Click="@(() => OnCacheWarmRerun(cacheWarm))" Icon="restart_alt"/>
-                        </RadzenRow>
-                        <CacheWarmCompletion CompletedSuccessfully="cacheWarm.IsCompleted"/>
-                    </RadzenStack>
-                </Template>
-            </RadzenDataGridColumn>
             <RadzenDataGridColumn Property="@nameof(CacheWarm.TotalTime)" Title="Total Time" Width="100px" Filterable="false">
                 <Template Context="cacheWarm">
                     @cacheWarm.TotalTime.ToString(@"hh\:mm\:ss")
                 </Template>
             </RadzenDataGridColumn>
-            <RadzenDataGridColumn Property="@nameof(CacheWarm.StartTime)" Title="Start Time" Width="200px" Filterable="false"/>
+            <RadzenDataGridColumn Property="@nameof(CacheWarm.StartTimeUtc)" Title="Start Time" Width="200px" Filterable="false"/>
             <RadzenDataGridColumn Property="@nameof(CacheWarm.VisitedPages)" Title="Visited Pages" Width="200px" Filterable="false"/>
         </Columns>
     </RadzenDataGrid>
@@ -61,7 +46,6 @@
         if (OnRerunCacheWarm.HasDelegate)
         {
             await JsRuntime.InvokeVoidAsync("backToTop");
-            await OnRerunCacheWarm.InvokeAsync(new Uri(cacheWarm.WebsiteUrl));
         }
     }
 

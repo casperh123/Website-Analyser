@@ -9,10 +9,11 @@
     private BadgeStyle BadgeStyle => Status switch
     {
         Status.Completed => BadgeStyle.Success,
-        Status.InProgress => BadgeStyle.Success,
+        Status.InProgress => BadgeStyle.Warning,
         Status.Failed => BadgeStyle.Danger,
         Status.Stopped => BadgeStyle.Warning,
-        Status.Scheduled => BadgeStyle.Info
+        Status.Scheduled => BadgeStyle.Info,
+        _ => throw new ArgumentOutOfRangeException()
     };
 
 }

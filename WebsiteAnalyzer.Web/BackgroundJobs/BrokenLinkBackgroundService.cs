@@ -1,4 +1,6 @@
-using WebsiteAnalyzer.Core.DataTransferObject;
+using WebsiteAnalyzer.Core.Contracts;
+using WebsiteAnalyzer.Core.Contracts.BrokenLink;
+using WebsiteAnalyzer.Core.Domain;
 using WebsiteAnalyzer.Core.Entities;
 using WebsiteAnalyzer.Core.Enums;
 using WebsiteAnalyzer.Core.Events;
@@ -16,7 +18,7 @@ public class BrokenLinkBackgroundService : CrawlBackgroundServiceBase
     }
 
     protected override async Task ExecuteCrawlTaskAsync(
-        CrawlSchedule schedule, 
+        ScheduledAction scheduledAction, 
         IServiceScope scope, 
         CancellationToken token)
     {
@@ -34,7 +36,7 @@ public class BrokenLinkBackgroundService : CrawlBackgroundServiceBase
         try
         {
             BrokenLinkCrawlDTO brokenLinkCrawl = 
-                await brokenLinkService.StartCrawl(schedule.Url, schedule.UserId);
+                await brokenLinkService.StartCrawl(scheduledAction.Website.Url, scheduledAction.Website.UserId);
 
             brokenLinkService.ProgressUpdated += OnProgressUpdated;
 
@@ -46,11 +48,11 @@ public class BrokenLinkBackgroundService : CrawlBackgroundServiceBase
                 brokenLinks++;
             }
 
-            await brokenLinkService.EndCrawl(brokenLinkCrawl, totalLinks, schedule.UserId);
+            await brokenLinkService.EndCrawl(brokenLinkCrawl, totalLinks, scheduledAction.Website.UserId);
             
             Logger.LogInformation(
                 "Completed crawl of {Url}. Found {BrokenCount} broken links out of {TotalCount} total links",
-                schedule.Url,
+                scheduledAction.Website.Url,
                 brokenLinks,
                 totalLinks);
         }

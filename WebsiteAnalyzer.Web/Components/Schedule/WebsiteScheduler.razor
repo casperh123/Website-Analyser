@@ -1,3 +1,4 @@
+@using WebsiteAnalyzer.Core.Domain
 @using WebsiteAnalyzer.Core.Entities
 @using WebsiteAnalyzer.Core.Enums
 @using WebsiteAnalyzer.Core.Exceptions
@@ -81,7 +82,7 @@
 
     private ScheduleTaskModel _scheduleTask = new();
     private IEnumerable<Frequency> Frequencies => Enum.GetValues(typeof(Frequency)).Cast<Frequency>();
-    private IList<CrawlSchedule> _scheduledTasks = [];
+    private IList<ScheduledAction> _scheduledTasks = [];
     private string _errorMessage = string.Empty;
     private bool _addNew;
     private string _urlRegex = @"[(http(s)?):\/\/(www\.)?a-zA-Z0-9@:%._\-+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)";
@@ -98,17 +99,17 @@
 
     private async Task LoadScheduledTasks()
     {
-        ICollection<CrawlSchedule> scheduledItems = await ScheduleService.GetScheduledTasksByUserIdAndTypeAsync(User?.Id, Action);
+        ICollection<ScheduledAction> scheduledItems = await ScheduleService.GetScheduledTasksByUserIdAndTypeAsync(User?.Id, Action);
         _scheduledTasks = scheduledItems.ToList();
     }
 
     private async Task HandleValidSubmit()
     {
         _errorMessage = string.Empty;
-
+/*
         try
         {
-            CrawlSchedule scheduledTask = await ScheduleService.ScheduleTask(
+            ScheduledAction scheduledTask = await ScheduleService.ScheduleTask(
                 _scheduleTask.WebsiteUrl,
                 User.Id,
                 Action,
@@ -116,7 +117,7 @@
             );
 
             _scheduledTasks.Add(scheduledTask);
-            _scheduledTasks = new List<CrawlSchedule>(_scheduledTasks);
+            _scheduledTasks = new List<ScheduledAction>(_scheduledTasks);
 
             ToggleAddNew();
             _scheduleTask = new();
@@ -132,14 +133,14 @@
         catch (Exception)
         {
             _errorMessage = "An error occurred";
-        }
+        }*/
     }
 
-    private async Task DeleteTask(CrawlSchedule schedule)
+    private async Task DeleteTask(ScheduledAction schedule)
     {
-            await ScheduleService.DeleteScheduledTask(schedule);
+            await ScheduleService.DeleteAction(schedule);
             _scheduledTasks.Remove(schedule);
-            _scheduledTasks = new List<CrawlSchedule>(_scheduledTasks);
+            _scheduledTasks = new List<ScheduledAction>(_scheduledTasks);
     }
 
 }

@@ -1,44 +1,31 @@
-@using WebsiteAnalyzer.Web.Components.CacheWarm.Badges
-@using WebsiteAnalyzer.Web.Services
-@using CacheWarm = global::WebsiteAnalyzer.Core.Entities.CacheWarm
-
-@inject StateService StateService
-@inject IJSRuntime JsRuntime
+@using WebsiteAnalyzer.Core.Contracts.CacheWarm
 
 <RadzenCard>
-    <RadzenRow AlignItems="AlignItems.Center" JustifyContent="JustifyContent.SpaceBetween">
-        <RadzenRow AlignItems="AlignItems.Center">
-            <RadzenText TextStyle="TextStyle.H6" Style="margin-bottom: 0">
-                @CacheWarm.WebsiteUrl
-            </RadzenText>
-            <RadzenButton Disabled="StateService.IsProcessing" Click="HandleOnClick" Icon="restart_alt"/>
-        </RadzenRow>
-        <CacheWarmCompletion CompletedSuccessfully="CacheWarm.IsCompleted"/>
+    <RadzenRow>
+        <RadzenStack>
+            <RadzenText>Start Time</RadzenText>
+            <RadzenText>@CacheWarm.StartTime</RadzenText>
+        </RadzenStack>
+        
+        <RadzenStack>
+            <RadzenText>Total Time</RadzenText>
+            <RadzenText>@CacheWarm.TotalTime.ToString(@"hh\:mm\:ss") minutes</RadzenText>
+        </RadzenStack>
+        
+        <RadzenStack>
+            <RadzenText>Visited Pages</RadzenText>
+            <RadzenText>@CacheWarm.VisitedPages</RadzenText>
+        </RadzenStack>
+        
+        <RadzenStack>
+            <RadzenText>Average TTFB</RadzenText>
+            <RadzenText>@CacheWarm.AveragePageTimeMs ms</RadzenText>
+        </RadzenStack>
     </RadzenRow>
-    <RadzenText>Start Time: @CacheWarm.StartTime</RadzenText>
-    <RadzenText>Completed Successfully: @CacheWarm.IsCompleted</RadzenText>
-    @if (CacheWarm.IsCompleted)
-    {
-        <RadzenText>Time to completion: @CacheWarm.TotalTime</RadzenText>
-    }
-    <RadzenText>Visited Pages: @CacheWarm.VisitedPages</RadzenText>
 </RadzenCard>
 
+
 @code {
-    [Parameter] 
-    public required CacheWarm CacheWarm { get; set; }
-
-    [Parameter] 
-    public required EventCallback<CacheWarm> OnRerunWarm { get; set; }
-
-    public async Task HandleOnClick()
-    {
-        if (OnRerunWarm.HasDelegate)
-        {
-            await JsRuntime.InvokeVoidAsync("backToTop");
-
-            await OnRerunWarm.InvokeAsync(CacheWarm);
-        }
-    }
-
+    [Parameter, EditorRequired] 
+    public required AnonymousCacheWarm CacheWarm { get; set; }
 }

@@ -13,7 +13,7 @@ public static class ServiceCollectionExtensions
     {
         services.AddScoped<IWebsiteRepository, WebsiteRepository>();
         services.AddScoped<ICacheWarmRepository, CacheWarmRepository>();
-        services.AddScoped<ICrawlScheduleRepository, CrawlSheduleRepository>();
+        services.AddScoped<IScheduledActionRepository, ScheduledActionRepository>();
         services.AddScoped<IBrokenLinkRepository, BrokenLinkRepository>();
         services.AddScoped<IBrokenLinkCrawlRepository, BrokenLinkCrawlRepository>();
         

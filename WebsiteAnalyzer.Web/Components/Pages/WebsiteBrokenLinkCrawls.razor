@@ -1,6 +1,7 @@
 @page "/Website/{WebsiteId:guid}/brokenlinks"
 
-@using WebsiteAnalyzer.Core.DataTransferObject
+@using WebsiteAnalyzer.Core.Contracts
+@using WebsiteAnalyzer.Core.Contracts.BrokenLink
 @using WebsiteAnalyzer.Core.Interfaces.Services
 @using WebsiteAnalyzer.Web.Components.BrokenLink.Cards
 @using WebsiteAnalyzer.Web.Components.Layout
@@ -11,17 +12,19 @@
 
 <WebsiteStatsLayout Website="Website">
     
-    <RadzenStack>
+    <RadzenColumn>
         <RadzenText TextStyle="TextStyle.DisplayH3">Broken Link Crawls</RadzenText>
         <RadzenButton Click="CheckBrokenLinks">Check For Broken Links</RadzenButton>
-    </RadzenStack>
+    </RadzenColumn>
 
     @if (_brokenLinkCrawls.Any())
     {
-        @foreach (BrokenLinkCrawlDTO brokenLink in _brokenLinkCrawls)
-        {
-            <BrokenLinkCrawlCard Crawl="brokenLink"></BrokenLinkCrawlCard>
-        }
+        <RadzenStack Gap="20px" Style="margin-top: 20px;">
+            @foreach (BrokenLinkCrawlDTO brokenLink in _brokenLinkCrawls)
+            {
+                <BrokenLinkCrawlCard Crawl="brokenLink"></BrokenLinkCrawlCard>
+            }
+        </RadzenStack>
     }
     else
     {

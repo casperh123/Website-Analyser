@@ -4,7 +4,6 @@ namespace WebsiteAnalyzer.Core.Interfaces.Services;
 
 public interface IWebsiteService
 {
-    Task<Website> GetOrAddWebsite(string url, Guid userId);
     Task<Website> AddWebsite(string url, Guid userId, string? name);
     Task<ICollection<Website>> GetWebsitesByUserId(Guid? userId);
     Task<Website> GetWebsiteByIdAndUserId(Guid id, Guid userId);

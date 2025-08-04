@@ -1,3 +1,4 @@
+using WebsiteAnalyzer.Core.Domain;
 using WebsiteAnalyzer.Core.Entities;
 using WebsiteAnalyzer.Core.Enums;
 using WebsiteAnalyzer.Core.Interfaces.Services;
@@ -13,11 +14,11 @@ public class CacheWarmBackgroundService : CrawlBackgroundServiceBase
     }
 
     protected override async Task ExecuteCrawlTaskAsync(
-        CrawlSchedule schedule,
+        ScheduledAction action,
         IServiceScope scope,
         CancellationToken token)
     {
         ICacheWarmingService cacheWarmingService = scope.ServiceProvider.GetService<ICacheWarmingService>()!;
-        await cacheWarmingService.WarmCacheWithoutMetrics(schedule.Url, schedule.UserId, token);
+        await cacheWarmingService.WarmCache(action.Website, token);
     }
 }

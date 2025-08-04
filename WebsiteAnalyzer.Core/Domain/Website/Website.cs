@@ -8,13 +8,12 @@ public record Website
     public string Url { get; private set; }
     public string? Name { get; set; }
     public Guid UserId { get; private set; }
-    public ICollection<CacheWarm> CacheWarmRuns { get; set; }
     public ICollection<BrokenLinkCrawl> BrokenLinkCrawls { get; set; }
 
     public Website()
     {
         Id = Guid.NewGuid();
-        CacheWarmRuns = [];
+        Url = "";
         BrokenLinkCrawls = [];
     }
 
@@ -24,7 +23,6 @@ public record Website
         Url = url;
         Name = name ?? Url;
         UserId = userId;
-        CacheWarmRuns = [];
         BrokenLinkCrawls = [];
     }
 }

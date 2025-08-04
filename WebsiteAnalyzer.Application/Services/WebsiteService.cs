@@ -10,59 +10,38 @@ public class WebsiteService : IWebsiteService
 {
     private readonly IWebsiteRepository _websiteRepository;
     private readonly IScheduleService _scheduleService;
+    private readonly HttpClient _httpClient;
 
-    public WebsiteService(IWebsiteRepository websiteRepository, IScheduleService scheduleService)
+    public WebsiteService(IWebsiteRepository websiteRepository, IScheduleService scheduleService, HttpClient httpClient)
     {
         _websiteRepository = websiteRepository;
         _scheduleService = scheduleService;
-    }
-
-    public async Task<Website> GetOrAddWebsite(string url, Guid userId)
-    {
-        if (await _websiteRepository.ExistsUrlWithUserAsync(url, userId).ConfigureAwait(false))
-        {
-            return await _websiteRepository.GetWebsiteByUrlAndUserAsync(url, userId).ConfigureAwait(false);
-        }
-
-        Website website = new Website(url, userId);
-
-        await _websiteRepository.AddAsync(website).ConfigureAwait(false);
-        return website;
+        _httpClient = httpClient;
     }
 
     public async Task<Website> AddWebsite(string url, Guid userId, string? name)
     {
-        if (await _websiteRepository.ExistsUrlWithUserAsync(url, userId))
-        {
-            throw new AlreadyExistsException($"{url} is already added");
-        }
+        await VerifyWebsite(url);
         
         Website website = new Website(url, userId, name);
         
         await _websiteRepository.AddAsync(website);
-        await AddScheduledTasks(url, userId);
+        await AddScheduledTasks(website);
 
         return website;
     }
 
     public async Task<ICollection<Website>> GetWebsitesByUserId(Guid? userId)
     {
-        if (userId is null)
-        {
-            return [];
-        }
-            
-        ICollection<Website> websites = await _websiteRepository.GetAllByUserId(userId.Value);
-
-        return websites;
+        if (userId is null) return [];
+        
+        return await _websiteRepository.GetAllByUserId(userId.Value);
     }
 
     public async Task<Website> GetWebsiteByIdAndUserId(Guid id, Guid userId)
     {
-        Website website = await _websiteRepository.GetByIdAndUserId(id, userId) 
+        return await _websiteRepository.GetByIdAndUserId(id, userId) 
                 ?? throw new NotFoundException($"Website with ID: {id} not found.");
-        
-        return website;
     }
 
     public async Task DeleteWebsite(string url, Guid userId)
@@ -71,9 +50,23 @@ public class WebsiteService : IWebsiteService
         await _websiteRepository.DeleteByUrlAndUserId(url, userId);
     }
 
-    private async Task AddScheduledTasks(string url, Guid userId)
+    private async Task VerifyWebsite(string url)
     {
-        await _scheduleService.ScheduleTask(url, userId, CrawlAction.BrokenLink, Frequency.Daily);
-        await _scheduleService.ScheduleTask(url, userId, CrawlAction.CacheWarm, Frequency.Daily);
+        try
+        {
+            await _httpClient.GetAsync(url);
+        }
+        catch (Exception e)
+        {
+            throw new UrlException($"Could not verify URL: {url}");
+        }
+    }
+
+    private async Task AddScheduledTasks(Website website)
+    {
+        TimeSpan brokenLinkOffset = TimeSpan.FromMinutes(15);
+    
+        await _scheduleService.ScheduleAction(website, CrawlAction.CacheWarm, Frequency.SixHourly);
+        await _scheduleService.ScheduleAction(website, CrawlAction.BrokenLink, Frequency.Daily, brokenLinkOffset);
     }
 }

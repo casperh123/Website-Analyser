@@ -1,8 +1,7 @@
 using System.Net;
 using BrokenLinkChecker.Models.Links;
-using WebsiteAnalyzer.Core.Entities.BrokenLink;
 
-namespace WebsiteAnalyzer.Core.DataTransferObject;
+namespace WebsiteAnalyzer.Core.Contracts.BrokenLink;
 
 public record BrokenLinkDTO
 {
@@ -23,9 +22,9 @@ public record BrokenLinkDTO
     
     public string NormalizedAnchorText() => string.IsNullOrEmpty(AnchorText) ? "N/A" : AnchorText;
 
-    public BrokenLink ToBrokenLink()
+    public Entities.BrokenLink.BrokenLink ToBrokenLink()
     {
-        return new BrokenLink
+        return new Entities.BrokenLink.BrokenLink
         {
             TargetPage = TargetPage,
             ReferringPage = ReferringPage,
@@ -36,5 +35,5 @@ public record BrokenLinkDTO
     }
     
     public static BrokenLinkDTO FromIndexedLink(IndexedLink link) => new BrokenLinkDTO(link.Target, link.ReferringPage, link.AnchorText, link.Line, link.StatusCode);
-    public static BrokenLinkDTO FromBrokenLink(BrokenLink link) => new BrokenLinkDTO(link.TargetPage, link.ReferringPage, link.AnchorText, link.Line, link.StatusCode);
+    public static BrokenLinkDTO FromBrokenLink(Entities.BrokenLink.BrokenLink link) => new BrokenLinkDTO(link.TargetPage, link.ReferringPage, link.AnchorText, link.Line, link.StatusCode);
 }

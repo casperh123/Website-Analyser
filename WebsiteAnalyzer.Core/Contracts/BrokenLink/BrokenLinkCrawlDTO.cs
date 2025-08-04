@@ -1,6 +1,7 @@
+using WebsiteAnalyzer.Core.Contracts.BrokenLink;
 using WebsiteAnalyzer.Core.Entities.BrokenLink;
 
-namespace WebsiteAnalyzer.Core.DataTransferObject;
+namespace WebsiteAnalyzer.Core.Contracts;
 
 public record BrokenLinkCrawlDTO
 {
@@ -12,11 +13,11 @@ public record BrokenLinkCrawlDTO
 
     public BrokenLinkCrawlDTO() {}
     
-    public BrokenLinkCrawlDTO(string url, DateTime time)
+    public BrokenLinkCrawlDTO(string url)
     {
         Id = Guid.NewGuid();
         Url = url;
-        Time = time;
+        Time = DateTime.UtcNow;
         BrokenLinks = [];
     }
 

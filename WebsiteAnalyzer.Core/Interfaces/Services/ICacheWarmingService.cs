@@ -1,15 +1,17 @@
-using WebsiteAnalyzer.Core.Entities;
-using WebsiteAnalyzer.Core.Events;
+using BrokenLinkChecker.models.Links;
+using BrokenLinkChecker.models.Result;
+using WebsiteAnalyzer.Core.Contracts.CacheWarm;
+using WebsiteAnalyzer.Core.Domain;
+using WebsiteAnalyzer.Core.Entities.Website;
 
 namespace WebsiteAnalyzer.Core.Interfaces.Services;
 
 public interface ICacheWarmingService
 {
-    event EventHandler<CrawlProgressEventArgs> ProgressUpdated;
-    
-    Task<CacheWarm> WarmCacheWithSaveAsync(string url, Guid userId, CancellationToken cancellationToken = default);
-    Task WarmCache(string url, CancellationToken cancellationToken = default);
-    Task WarmCacheWithoutMetrics(string url, Guid userId, CancellationToken cancellationToken = default);
-    Task<ICollection<CacheWarm>> GetCacheWarmsAsync();
-    Task<ICollection<CacheWarm>> GetCacheWarmsByUserAsync(Guid? userId);
+    Task<AnonymousCacheWarm> WarmCacheAnonymous(string url, 
+        IProgress<CrawlProgress<Link>>? progress = null, 
+        CancellationToken cancellationToken = default);
+    Task WarmCache(Website website, IProgress<CrawlProgress<Link>>? progress = null, CancellationToken cancellationToken = default);
+    Task WarmCache(Website website, CancellationToken cancellationToken = default);
+    Task<ICollection<CacheWarm>> GetCacheWarmsByWebsiteId(Guid websiteId);
 }
