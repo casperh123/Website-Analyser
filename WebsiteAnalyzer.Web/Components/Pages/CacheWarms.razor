@@ -1,10 +1,13 @@
 @page "/Website/{WebsiteId:guid}/cachewarms"
 
+@using global::BrokenLinkChecker.models.Links
+@using global::BrokenLinkChecker.models.Result
 @using WebsiteAnalyzer.Core.Domain
 @using WebsiteAnalyzer.Core.Enums
 @using WebsiteAnalyzer.Core.Interfaces.Services
 @using WebsiteAnalyzer.Web.Components.Layout
 @using WebsiteAnalyzer.Web.Components.ScheduledAction
+@using WebsiteAnalyzer.Web.Components.WebsiteInputs
 
 @inherits WebsiteAnalyzer.Web.Components.Templates.WebsiteComponent
 
@@ -22,9 +25,15 @@
 
                 @if (_scheduledAction.Status != Status.InProgress)
                 {
-                    <RadzenStack>
-                        <RadzenButton Click="WarmCache">Warm Now</RadzenButton>
-                    </RadzenStack>
+                    <WebsiteInput 
+                        IsProcessing="IsProcessing"
+                        LinksChecked="_linksChecked"
+                        LinksEnqueued="_linksEnqueued"
+                        OnCancel="CancelProcessing"
+                        ShowUrl="false"
+                        Url="@Website?.Url"
+                        WebsiteActionStarted="WarmCache"
+                        ButtonText="Warm Now"/>
                 }
             </RadzenRow>
         </RadzenCard>
@@ -61,6 +70,10 @@
     private ICollection<CacheWarm> _cacheWarms = [];
     private ScheduledAction _scheduledAction;
 
+    private int _linksChecked;
+    private int _linksEnqueued;
+    private IProgress<CrawlProgress<Link>> progress;
+
     protected override async Task OnInitializedAsync()
     {
         await base.OnInitializedAsync();
@@ -72,10 +85,26 @@
         
         _cacheWarms = await CacheWarmingService.GetCacheWarmsByWebsiteId(Website.Id);
         _scheduledAction = await ScheduleService.GetActionByWebsiteId(Website.Id);
+        
+        progress = new Progress<CrawlProgress<Link>>(p =>
+            {
+                _linksChecked = p.LinksChecked;
+                _linksEnqueued = p.LinksEnqueued;
+                InvokeAsync(StateHasChanged);
+            }
+        );    
     }
 
-    public async Task WarmCache()
+    public async Task WarmCache(Uri uri)
     {
-        await CacheWarmingService.WarmCache(Website, CancellationToken.None);
-    } 
+        await StartProcessingAsync(async (token) =>
+        {
+            _linksChecked = 0;
+            _linksEnqueued = 0;
+            await CacheWarmingService.WarmCache(Website, progress, token);
+        });
+        
+        _cacheWarms = await CacheWarmingService.GetCacheWarmsByWebsiteId(Website.Id);
+    }
+    
 }
