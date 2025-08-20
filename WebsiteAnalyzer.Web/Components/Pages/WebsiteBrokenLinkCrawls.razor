@@ -10,7 +10,7 @@
 
 @inject IBrokenLinkService BrokenLinkService
 
-<WebsiteStatsLayout Website="Website">
+<WebsiteStatsLayout Website="Website" Websites="Websites">
     
     <RadzenColumn>
         <RadzenText TextStyle="TextStyle.DisplayH3">Broken Link Crawls</RadzenText>
@@ -33,7 +33,6 @@
 </WebsiteStatsLayout>
 
 @code {
-
     private ICollection<BrokenLinkCrawlDTO> _brokenLinkCrawls = [];
 
     protected override async Task OnInitializedAsync()

@@ -1,8 +1,13 @@
 @using WebsiteAnalyzer.Core.Entities.Website
 
-<RadzenLink Path="/websites" >
-    <RadzenButton Icon="keyboard_arrow_left" Size="ButtonSize.Medium" Style="margin-bottom: 40px;"/>
-</RadzenLink>
+@inject NavigationManager NavigationManager
+
+<RadzenRow>
+    <RadzenLink Path="/websites" >
+        <RadzenButton Icon="keyboard_arrow_left" Size="ButtonSize.Medium" Style="margin-bottom: 40px;"/>
+    </RadzenLink>
+    <RadzenDropDown Data="Websites" Value="Website" TValue="Website" TextProperty="@nameof(Website.Name)" ValueChanged="@((website) => NavigateToWebsite(website))"/>
+</RadzenRow>
 
 @if (Website is not null)
 {
@@ -31,7 +36,16 @@ else
 @code {
     [Parameter, EditorRequired]
     public required Website? Website { get; set; }
+
+    [Parameter, EditorRequired]
+    public required IEnumerable<Website> Websites { get; set; }
     
     [Parameter]
     public RenderFragment ChildContent { get; set; }
+
+    public void NavigateToWebsite(Website? website)
+    {
+        string newUrl = NavigationManager.Uri.Replace($"/website/{Website?.Id}", $"/website/{website?.Id}");
+        NavigationManager.NavigateTo(newUrl, forceLoad: true);
+    }
 }
