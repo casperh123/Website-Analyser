@@ -6,49 +6,50 @@ using BrokenLinkChecker.Models.Links;
 using BrokenLinkChecker.models.Result;
 using WebsiteAnalyzer.Core.Contracts;
 using WebsiteAnalyzer.Core.Contracts.BrokenLink;
+using WebsiteAnalyzer.Core.Domain.BrokenLink;
 using WebsiteAnalyzer.Core.Entities.BrokenLink;
-using WebsiteAnalyzer.Core.Events;
+using WebsiteAnalyzer.Core.Entities.Website;
 using WebsiteAnalyzer.Core.Interfaces.Repositories;
 using WebsiteAnalyzer.Core.Interfaces.Services;
 
 namespace WebsiteAnalyzer.Application.Services;
 
-public class BrokenLinkService : IBrokenLinkService
+public class BrokenLinkService(
+    HttpClient httpClient,
+    IBrokenLinkCrawlRepository crawlRepository,
+    IBrokenLinkRepository brokenLinkRepository)
+    : IBrokenLinkService
 {
-    private readonly HttpClient _httpClient;
-    private readonly IBrokenLinkCrawlRepository _crawlRepository;
-    private readonly IBrokenLinkRepository _brokenLinkRepository;
-
-    public event EventHandler<CrawlProgressEventArgs>? ProgressUpdated;
-
-    public BrokenLinkService(
-        HttpClient httpClient,
-        IBrokenLinkCrawlRepository crawlRepository,
-        IBrokenLinkRepository brokenLinkRepository)
-    {
-        _httpClient = httpClient;
-        _crawlRepository = crawlRepository;
-        _brokenLinkRepository = brokenLinkRepository;
-    }
-
-    public async Task<BrokenLinkCrawlSession> StreamBrokenLinks(
-        string url, 
-        Guid? userId, 
+    public async IAsyncEnumerable<BrokenLinkDTO> FindBrokenLinks(
+        Website website, 
         IProgress<Progress>? progress = null,
-        CancellationToken cancellationToken = default)
+        [EnumeratorCancellation] CancellationToken cancellationToken = default)
     {
-        // Create the crawl entity first
-        BrokenLinkCrawlDTO crawl = await CreateCrawlEntity(url, userId);
+        BrokenLinkCrawl? crawl = await CreateCrawlEntity(website.Url, website.UserId);
+        IAsyncEnumerable<BrokenLinkDTO> brokenLinks = StreamBrokenLinksInternal(crawl, website.Url, progress, cancellationToken);
+
+        await foreach (BrokenLinkDTO brokenLink in brokenLinks)
+        {
+            yield return brokenLink;
+        }
+
+        await SaveBrokenLinkCrawl(crawl);
+    }
     
-        return new BrokenLinkCrawlSession
-        (
-            crawl,
-            StreamBrokenLinksInternal(crawl, url, progress, cancellationToken)
-        );
+    public async IAsyncEnumerable<BrokenLinkDTO> FindBrokenLinksAnonymus(
+        string url, IProgress<Progress>? progress = null,
+        [EnumeratorCancellation] CancellationToken cancellationToken = default)
+    {
+        IAsyncEnumerable<BrokenLinkDTO> brokenLinks = StreamBrokenLinksInternal(null, url, progress, cancellationToken);
+
+        await foreach (BrokenLinkDTO brokenLink in brokenLinks)
+        {
+            yield return brokenLink;
+        }    
     }
 
     private async IAsyncEnumerable<BrokenLinkDTO> StreamBrokenLinksInternal(
-        BrokenLinkCrawlDTO crawl,
+        BrokenLinkCrawl? crawl,
         string url,
         IProgress<Progress>? progress,
         [EnumeratorCancellation] CancellationToken cancellationToken)
@@ -60,6 +61,11 @@ public class BrokenLinkService : IBrokenLinkService
             IndexedLink link = step.Link;
         
             progress?.Report(new Progress(step.LinksEnqueued, step.LinksChecked));
+            
+            if (crawl is not null)
+            {
+                crawl.LinksChecked = step.LinksChecked;    
+            }
         
             if (link.StatusCode is HttpStatusCode.OK or HttpStatusCode.MovedPermanently)
             {
@@ -68,74 +74,11 @@ public class BrokenLinkService : IBrokenLinkService
 
             if (crawl is not null)
             {
-                //await SaveBrokenLinkAsync(crawl, link);   
+                await SaveBrokenLinkAsync(crawl, link);
             }
             
             yield return BrokenLinkDTO.FromIndexedLink(link);
         }
-    }
-
-    public async IAsyncEnumerable<BrokenLinkDTO> FindBrokenLinks(
-        string url,
-        Guid? crawlId,
-        [EnumeratorCancellation] CancellationToken cancellationToken = default)
-    {
-        BrokenLinkProcessor linkProcessor = new BrokenLinkProcessor(_httpClient);
-        ModularCrawler<IndexedLink> crawler = new ModularCrawler<IndexedLink>(linkProcessor);
-        IndexedLink startLink = new IndexedLink(url);
-        IAsyncEnumerable<CrawlProgress<IndexedLink>> crawlProgress = crawler.CrawlWebsiteAsync(startLink, cancellationToken);
-
-        BrokenLinkCrawl? crawl = await GetByCrawlByIdAsync(crawlId);
-        
-        await foreach (CrawlProgress<IndexedLink> progress in crawlProgress)
-        {
-            IndexedLink link = progress.Link;
-            UpdateProgress(progress);
-            
-            if (link.StatusCode is HttpStatusCode.OK or HttpStatusCode.MovedPermanently)
-            {
-                continue;
-            }
-
-            if (crawl is not null)
-            {
-                await SaveBrokenLinkAsync(
-                    crawl,
-                    link
-                );
-            }
-
-            yield return BrokenLinkDTO.FromIndexedLink(link);
-        }
-    }
-
-    public async Task<BrokenLinkCrawlDTO> StartCrawl(string url, Guid? userId)
-    {
-        if (!userId.HasValue)
-        {
-            return new BrokenLinkCrawlDTO(url);
-        }
-
-        BrokenLinkCrawl crawl = await SaveBrokenLinkCrawl(url, userId.Value);
-        
-        return new BrokenLinkCrawlDTO(crawl.Id, url, DateTime.UtcNow);
-    }
-    
-    public async Task<BrokenLinkCrawlDTO> EndCrawl(BrokenLinkCrawlDTO crawlDto, int linksChecked, Guid? userId)
-    {
-        if (!userId.HasValue || !crawlDto.Id.HasValue)
-        {
-            crawlDto.LinksChecked = linksChecked;
-            return crawlDto;
-        }
-
-        BrokenLinkCrawl crawl = await _crawlRepository.GetByIdAsync(crawlDto.Id.Value);
-        
-        crawl.LinksChecked = linksChecked;
-        crawlDto.LinksChecked = crawl.LinksChecked;
-        
-        await _crawlRepository.UpdateAsync(crawl);
-        return crawlDto;
     }
 
     public async Task<ICollection<BrokenLinkCrawlDTO>> GetCrawlsByUserAsync(Guid? userId)
@@ -145,14 +88,14 @@ public class BrokenLinkService : IBrokenLinkService
             return [];
         }
         
-        ICollection<BrokenLinkCrawl> brokenLinkCrawls = await _crawlRepository.GetByUserAsync(userId) ?? [];
+        ICollection<BrokenLinkCrawl> brokenLinkCrawls = await crawlRepository.GetByUserAsync(userId) ?? [];
 
         return brokenLinkCrawls.Select(BrokenLinkCrawlDTO.From).ToList();
     }
 
     public async Task<ICollection<BrokenLinkDTO>> GetBrokenLinksByCrawlIdAsync(Guid crawlId)
     {
-        IEnumerable<BrokenLink> brokenLinks = await _brokenLinkRepository.GetBrokenLinksByCrawlAsync(crawlId);
+        IEnumerable<BrokenLink> brokenLinks = await brokenLinkRepository.GetBrokenLinksByCrawlAsync(crawlId);
         
         return brokenLinks
             .Select(BrokenLinkDTO.FromBrokenLink)
@@ -161,7 +104,7 @@ public class BrokenLinkService : IBrokenLinkService
 
     public async Task<ICollection<BrokenLinkCrawlDTO>> GetBrokenLinkCrawlsByUrlAndUserId(string url, Guid userId)
     {
-        IEnumerable<BrokenLinkCrawl> crawls = await _crawlRepository.GetByUrlUserId(url, userId);
+        IEnumerable<BrokenLinkCrawl> crawls = await crawlRepository.GetByUrlUserId(url, userId);
 
         return crawls
             .Select(BrokenLinkCrawlDTO.From)
@@ -179,15 +122,12 @@ public class BrokenLinkService : IBrokenLinkService
             link.StatusCode
         );
 
-        await _brokenLinkRepository.AddAsync(brokenLink);
+        await brokenLinkRepository.AddAsync(brokenLink);
     }
     
-
-    private async Task<BrokenLinkCrawl> SaveBrokenLinkCrawl(string url, Guid userId)
+    private async Task SaveBrokenLinkCrawl(BrokenLinkCrawl crawl)
     {
-        BrokenLinkCrawl crawl = new BrokenLinkCrawl(userId, url);
-        await _crawlRepository.AddAsync(crawl);
-        return crawl;
+        await crawlRepository.UpdateAsync(crawl);
     }
 
     private async Task<BrokenLinkCrawl?> GetByCrawlByIdAsync(Guid? crawlId)
@@ -197,36 +137,23 @@ public class BrokenLinkService : IBrokenLinkService
             return null;
         }
 
-        return await _crawlRepository.GetByIdAsync(crawlId.Value);
+        return await crawlRepository.GetByIdAsync(crawlId.Value);
     }
-
-    private void UpdateProgress(CrawlProgress<IndexedLink> progress)
-    {
-        ProgressUpdated?.Invoke(
-            this, 
-            new CrawlProgressEventArgs(
-                progress.LinksEnqueued,
-                progress.LinksChecked
-            )
-        );
-    }
-
+    
     private IAsyncEnumerable<CrawlProgress<IndexedLink>> StartCrawler(string url, CancellationToken cancellationToken)
     {
-        BrokenLinkProcessor linkProcessor = new BrokenLinkProcessor(_httpClient);
+        BrokenLinkProcessor linkProcessor = new BrokenLinkProcessor(httpClient);
         ModularCrawler<IndexedLink> crawler = new ModularCrawler<IndexedLink>(linkProcessor);
         IndexedLink startLink = new IndexedLink(url);
         
         return crawler.CrawlWebsiteAsync(startLink, cancellationToken);
     }
 
-    private async Task<BrokenLinkCrawlDTO> CreateCrawlEntity(string url, Guid? userId)
+    private async Task<BrokenLinkCrawl> CreateCrawlEntity(string url, Guid userId)
     {
-        if (!userId.HasValue) return new BrokenLinkCrawlDTO(url);
+        BrokenLinkCrawl crawl = new BrokenLinkCrawl(userId, url);
+        await crawlRepository.AddAsync(crawl);
 
-        BrokenLinkCrawl crawl = new BrokenLinkCrawl(userId.Value, url);
-        await _crawlRepository.AddAsync(crawl);
-    
-        return BrokenLinkCrawlDTO.From(crawl);
+        return crawl;
     }
 }

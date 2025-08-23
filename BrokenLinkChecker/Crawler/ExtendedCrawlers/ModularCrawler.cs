@@ -19,7 +19,7 @@ public class ModularCrawler<T>(ILinkProcessor<T> linkProcessor)
 
         linkQueue.Enqueue(startPage);
 
-        while (linkQueue.TryDequeue(out var link) && !token.IsCancellationRequested)
+        while (linkQueue.TryDequeue(out T? link) && !token.IsCancellationRequested)
         {
             IEnumerable<T> foundLinks = await linkProcessor.ProcessLinkAsync(link).ConfigureAwait(false);
 

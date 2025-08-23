@@ -16,7 +16,7 @@ public class CrawlTimer
     public CrawlTimerResult Complete()
     {
         _stopWatch.Stop();
-        var endTime = _startTime.Add(_stopWatch.Elapsed);
+        DateTime endTime = _startTime.Add(_stopWatch.Elapsed);
         return new CrawlTimerResult(_startTime, endTime, _stopWatch.Elapsed);
     }
 }

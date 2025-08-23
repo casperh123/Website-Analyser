@@ -2,54 +2,102 @@
 
 @using WebsiteAnalyzer.Core.Contracts
 @using WebsiteAnalyzer.Core.Contracts.BrokenLink
+@using WebsiteAnalyzer.Core.Domain
+@using WebsiteAnalyzer.Core.Enums
 @using WebsiteAnalyzer.Core.Interfaces.Services
 @using WebsiteAnalyzer.Web.Components.BrokenLink.Cards
 @using WebsiteAnalyzer.Web.Components.Layout
+@using WebsiteAnalyzer.Web.Components.ScheduledAction
+@using WebsiteAnalyzer.Web.Components.WebsiteInputs
 
 @inherits WebsiteAnalyzer.Web.Components.Templates.WebsiteComponent
 
 @inject IBrokenLinkService BrokenLinkService
+@inject IScheduleService ScheduledActionService
 
 <WebsiteStatsLayout Website="Website" Websites="Websites">
     
-    <RadzenColumn>
-        <RadzenText TextStyle="TextStyle.DisplayH3">Broken Link Crawls</RadzenText>
-        <RadzenButton Click="CheckBrokenLinks">Check For Broken Links</RadzenButton>
-    </RadzenColumn>
+    <RadzenCard>
+        <RadzenStack>
+            <RadzenText TextStyle="TextStyle.DisplayH4">Broken Link Crawls</RadzenText>
+            <RadzenCard>
+                <RadzenRow AlignItems="AlignItems.Center" JustifyContent="JustifyContent.SpaceBetween">
+                    <ScheduledActionStatus ScheduledAction="_scheduledAction"/>
 
-    @if (_brokenLinkCrawls.Any())
-    {
-        <RadzenStack Gap="20px" Style="margin-top: 20px;">
-            @foreach (BrokenLinkCrawlDTO brokenLink in _brokenLinkCrawls)
+                    @if (_scheduledAction.Status != Status.InProgress)
+                    {
+                        <WebsiteInput 
+                            IsProcessing="IsProcessing"
+                            LinksChecked="_linksChecked"
+                            LinksEnqueued="_linksEnqueued"
+                            OnCancel="CancelProcessing"
+                            Variant="Variant.Text"
+                            ShowUrl="false"
+                            Url="@Website?.Url"
+                            WebsiteActionStarted="FindBrokenLinks"
+                            ButtonText="Find broken links"/>
+                    }
+                </RadzenRow>
+            </RadzenCard>
+
+            @if (_brokenLinkCrawls.Any())
             {
-                <BrokenLinkCrawlCard Crawl="brokenLink"></BrokenLinkCrawlCard>
+                <RadzenStack Gap="20px" Style="margin-top: 20px;">
+                    @foreach (BrokenLinkCrawlDTO brokenLink in _brokenLinkCrawls)
+                    {
+                        <BrokenLinkCrawlCard Crawl="brokenLink"></BrokenLinkCrawlCard>
+                    }
+                </RadzenStack>
+            }
+            else
+            {
+                <RadzenText>There are no broken link crawls yet.</RadzenText>
             }
         </RadzenStack>
-    }
-    else
-    {
-        <RadzenText>There are no broken link crawls yet.</RadzenText>
-    }
+    </RadzenCard>
 </WebsiteStatsLayout>
 
 @code {
     private ICollection<BrokenLinkCrawlDTO> _brokenLinkCrawls = [];
+    private ScheduledAction _scheduledAction;
+    private int _linksEnqueued;
+    private int _linksChecked;
+    private IProgress<Progress> _progress;
 
     protected override async Task OnInitializedAsync()
     {
         await base.OnInitializedAsync();
 
+        if (Website is null)
+        {
+            return;
+        }
+
+        _progress = new Progress<Progress>(p =>
+        {
+            _linksChecked = p.LinksChecked;
+            _linksEnqueued = p.LinksEnqueued;
+            InvokeAsync(StateHasChanged);
+        });
+
+        _scheduledAction = await ScheduledActionService.GetActionByWebsiteIdAndType(Website.Id, CrawlAction.BrokenLink);
         _brokenLinkCrawls = await BrokenLinkService.GetBrokenLinkCrawlsByUrlAndUserId(Website.Url, User.Id);
     }
 
-    public async Task CheckBrokenLinks()
+    public async Task FindBrokenLinks()
     {
-        BrokenLinkCrawlDTO crawl = await BrokenLinkService.StartCrawl(Website.Url, User.Id);
-        IAsyncEnumerable<BrokenLinkDTO> brokenLinks = BrokenLinkService.FindBrokenLinks(Website.Url, crawl.Id);
-
-        await foreach (BrokenLinkDTO brokenlink in brokenLinks)
+        await StartProcessingAsync(async token =>
         {
-        }
+            _linksChecked = 0;
+            _linksEnqueued = 0;
+            
+            IAsyncEnumerable<BrokenLinkDTO> brokenLinks = BrokenLinkService.FindBrokenLinks(Website, _progress, token);
+
+            await foreach (BrokenLinkDTO brokenLink in brokenLinks) { }
+        });
+        
+        _brokenLinkCrawls = await BrokenLinkService.GetBrokenLinkCrawlsByUrlAndUserId(Website.Url, User.Id);
     }
+    
 
 }

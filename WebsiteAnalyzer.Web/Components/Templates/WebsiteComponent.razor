@@ -14,7 +14,7 @@
     
     protected Website? Website { get; set; }
     protected ApplicationUser? User { get; set; }
-    protected ICollection<Website> Websites { get; set; }
+    protected ICollection<Website> Websites { get; set; } = [];
     
     protected override async Task OnInitializedAsync()
     {

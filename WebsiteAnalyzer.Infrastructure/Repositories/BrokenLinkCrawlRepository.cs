@@ -35,6 +35,7 @@ public class BrokenLinkCrawlRepository : BaseRepository<BrokenLinkCrawl>, IBroke
             .Where(crawl => crawl.Url == url)
             .Where(crawl => crawl.UserId == userId)
             .Include(crawl => crawl.BrokenLinks)
+            .OrderByDescending(crawl => crawl.Date)
             .ToListAsync();
     }
 }

@@ -1,7 +1,7 @@
 @using WebsiteAnalyzer.Core.Entities.Website
 
 <RadzenCard>
-    <RadzenPanelMenu>
+    <RadzenPanelMenu >
         <RadzenPanelMenuItem Text="General" Path="@($"/website/{Website.Id}")" Match="NavLinkMatch.All"/>
         <RadzenPanelMenuItem Text="Broken Links" Path="@($"/website/{Website.Id}/brokenlinks")" Match="NavLinkMatch.All"/>
         <RadzenPanelMenuItem Text="Cache Warms" Path="@($"/website/{Website.Id}/cachewarms")" Match="NavLinkMatch.All"/>

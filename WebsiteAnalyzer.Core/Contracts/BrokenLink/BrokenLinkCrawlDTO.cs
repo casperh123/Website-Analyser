@@ -1,13 +1,13 @@
-using WebsiteAnalyzer.Core.Contracts.BrokenLink;
 using WebsiteAnalyzer.Core.Entities.BrokenLink;
 
-namespace WebsiteAnalyzer.Core.Contracts;
+namespace WebsiteAnalyzer.Core.Contracts.BrokenLink;
 
 public record BrokenLinkCrawlDTO
 {
     public Guid? Id { get; set; }
     public string Url { get; set; }
     public DateTime Time { get; set; }
+    public DateTime LocalTime => Time.ToLocalTime();
     public int LinksChecked { get; set; }
     public ICollection<BrokenLinkDTO> BrokenLinks { get; set; } = [];
 

@@ -19,7 +19,6 @@
         <RadzenStack>
         <RadzenText TextStyle="TextStyle.DisplayH4">Cache Warms</RadzenText>
         <RadzenCard>
-
             <RadzenRow AlignItems="AlignItems.Center" JustifyContent="JustifyContent.SpaceBetween">
                 <ScheduledActionStatus ScheduledAction="_scheduledAction"/>
 
@@ -85,7 +84,7 @@
         }
         
         _cacheWarms = await CacheWarmingService.GetCacheWarmsByWebsiteId(Website.Id);
-        _scheduledAction = await ScheduleService.GetActionByWebsiteId(Website.Id);
+        _scheduledAction = await ScheduleService.GetActionByWebsiteIdAndType(Website.Id, CrawlAction.CacheWarm);
         
         progress = new Progress<CrawlProgress<Link>>(p =>
             {

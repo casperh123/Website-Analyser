@@ -2,7 +2,7 @@ using BrokenLinkChecker.models.Links;
 
 namespace BrokenLinkChecker.models.Result;
 
-public record CrawlProgress<T> where T : Link
+public record CrawlProgress<T>
 {
     public CrawlProgress(T link, int linksChecked, int linksEnqueued)
     {

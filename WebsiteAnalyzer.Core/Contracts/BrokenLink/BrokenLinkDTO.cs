@@ -22,9 +22,9 @@ public record BrokenLinkDTO
     
     public string NormalizedAnchorText() => string.IsNullOrEmpty(AnchorText) ? "N/A" : AnchorText;
 
-    public Entities.BrokenLink.BrokenLink ToBrokenLink()
+    public Domain.BrokenLink.BrokenLink ToBrokenLink()
     {
-        return new Entities.BrokenLink.BrokenLink
+        return new Domain.BrokenLink.BrokenLink
         {
             TargetPage = TargetPage,
             ReferringPage = ReferringPage,
@@ -35,5 +35,5 @@ public record BrokenLinkDTO
     }
     
     public static BrokenLinkDTO FromIndexedLink(IndexedLink link) => new BrokenLinkDTO(link.Target, link.ReferringPage, link.AnchorText, link.Line, link.StatusCode);
-    public static BrokenLinkDTO FromBrokenLink(Entities.BrokenLink.BrokenLink link) => new BrokenLinkDTO(link.TargetPage, link.ReferringPage, link.AnchorText, link.Line, link.StatusCode);
+    public static BrokenLinkDTO FromBrokenLink(Domain.BrokenLink.BrokenLink link) => new BrokenLinkDTO(link.TargetPage, link.ReferringPage, link.AnchorText, link.Line, link.StatusCode);
 }
