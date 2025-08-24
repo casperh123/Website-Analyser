@@ -1,11 +1,8 @@
 using WebsiteAnalyzer.Core.Domain;
-using WebsiteAnalyzer.Core.Entities;
 using WebsiteAnalyzer.Core.Entities.Website;
 using WebsiteAnalyzer.Core.Enums;
-using WebsiteAnalyzer.Core.Exceptions;
 using WebsiteAnalyzer.Core.Interfaces.Repositories;
 using WebsiteAnalyzer.Core.Interfaces.Services;
-using ICacheWarmingService = WebsiteAnalyzer.Core.Interfaces.Services.ICacheWarmingService;
 
 namespace WebsiteAnalyzer.Application.Services;
 
@@ -39,16 +36,9 @@ public class ScheduleService : IScheduleService
         return scheduledAction;
     }
 
-    public async Task<ScheduledAction> GetActionByWebsiteId(Guid websiteId)
+    public async Task<ScheduledAction> GetActionByWebsiteIdAndType(Guid websiteId, CrawlAction type)
     {
-        return await _scheduleRepository.GetActionByWebsiteId(websiteId);
-    }
-
-    public async Task UpdateActionFrequency(ScheduledAction scheduledTask, Frequency frequency)
-    {
-        scheduledTask.Frequency = frequency;
-
-        await _scheduleRepository.UpdateAsync(scheduledTask);
+        return await _scheduleRepository.GetByWebsiteIdAndType(websiteId, type);
     }
 
     public async Task DeleteAction(ScheduledAction scheduledTask)

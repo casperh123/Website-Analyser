@@ -1,11 +1,14 @@
 @using WebsiteAnalyzer.Web.Components.ErrorHandling
 @using WebsiteAnalyzer.Web.Components.Crawl.CrawlMetrics
 
-<RadzenCard Style="max-width: 600px" class="rz-mt-12">
+<RadzenCard Style="max-width: 600px" Variant="Variant">
     <RadzenStack>
-        <RadzenLabel Component="url-input">Select Url</RadzenLabel>
-        <RadzenTextBox Value="@Url" Change="ChangeUrl" AutoCompleteType="AutoCompleteType.Url" />
-        <RadzenButton Click="@OnChanged" Disabled="@IsProcessing">Start</RadzenButton>
+        @if (ShowUrl)
+        {
+            <RadzenLabel Component="url-input">Select Url</RadzenLabel>
+            <RadzenTextBox Value="@Url" Change="ChangeUrl" AutoCompleteType="AutoCompleteType.Url" />
+        }
+        <RadzenButton Click="@OnChanged" Disabled="@IsProcessing">@ButtonText</RadzenButton>
 
         @if (IsProcessing)
         {
@@ -14,6 +17,7 @@
     </RadzenStack>
     
     <ErrorMessage Message="@_errorMessage"/>
+    
     @if (IsProcessing)
     {
         <CrawlMetrics LinksChecked="LinksChecked" LinksEnqueued="LinksEnqueued"/>   
@@ -27,17 +31,26 @@
     [Parameter, EditorRequired]
     public required string Url { get; set; }
     
-    [Parameter] 
+    [Parameter, EditorRequired] 
     public EventCallback<Uri> WebsiteActionStarted { get; set; }
 
-    [Parameter] 
+    [Parameter, EditorRequired] 
     public EventCallback OnCancel { get; set; }
 
-    [Parameter] 
+    [Parameter]
     public int LinksChecked { get; set; }
 
     [Parameter] 
     public int LinksEnqueued { get; set; }
+
+    [Parameter] 
+    public bool ShowUrl { get; set; } = true;
+
+    [Parameter] 
+    public string ButtonText { get; set; } = "Start";
+
+    [Parameter] 
+    public Variant Variant { get; set; } = Variant.Filled;
     
     private string _errorMessage = "";
 

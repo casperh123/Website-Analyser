@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using WebsiteAnalyzer.Core.Domain.BrokenLink;
 using WebsiteAnalyzer.Core.Entities.BrokenLink;
 using WebsiteAnalyzer.Core.Interfaces.Repositories;
 using WebsiteAnalyzer.Infrastructure.Data;

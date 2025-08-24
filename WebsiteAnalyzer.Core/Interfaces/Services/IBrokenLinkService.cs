@@ -1,25 +1,22 @@
 using WebsiteAnalyzer.Core.Contracts;
 using WebsiteAnalyzer.Core.Contracts.BrokenLink;
-using WebsiteAnalyzer.Core.Events;
+using WebsiteAnalyzer.Core.Entities.Website;
 
 namespace WebsiteAnalyzer.Core.Interfaces.Services;
 
 public interface IBrokenLinkService
 {
-    event EventHandler<CrawlProgressEventArgs> ProgressUpdated;
-
-    Task<BrokenLinkCrawlSession> StreamBrokenLinks(
-        string url, 
-        Guid? userId,
-        IProgress<Progress> progress,
-        CancellationToken cancellationToken = default);
-
-    IAsyncEnumerable<BrokenLinkDTO> FindBrokenLinks(string url,
-        Guid? crawlId,
-        CancellationToken cancellationToken = default);
-
-    Task<BrokenLinkCrawlDTO> StartCrawl(string url, Guid? userId);
-    Task<BrokenLinkCrawlDTO> EndCrawl(BrokenLinkCrawlDTO crawl, int linksChecked, Guid? userId);
+    IAsyncEnumerable<BrokenLinkDTO> FindBrokenLinks(
+        Website website,
+        IProgress<Progress>? progress = null,
+        CancellationToken cancellationToken = default
+    );
+    
+    IAsyncEnumerable<BrokenLinkDTO> FindBrokenLinksAnonymus(
+        string url,
+        IProgress<Progress>? progress = null,
+        CancellationToken cancellationToken = default
+    );
     
     Task<ICollection<BrokenLinkCrawlDTO>> GetCrawlsByUserAsync(Guid? userId);
     Task<ICollection<BrokenLinkDTO>> GetBrokenLinksByCrawlIdAsync(Guid crawlId);

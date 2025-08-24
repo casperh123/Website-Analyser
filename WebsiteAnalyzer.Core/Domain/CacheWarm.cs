@@ -11,18 +11,6 @@ public record CacheWarm
     public bool IsCompleted => EndTime != DateTime.MinValue;
     public TimeSpan TotalTime => IsCompleted ? (EndTime - StartTimeUtc) : TimeSpan.Zero;
     public DateTime StartTimeLocal => StartTimeUtc.ToLocalTime();
-
-    
-
-    public void SetStartTime()
-    {
-        StartTimeUtc = DateTime.UtcNow;
-    }
-
-    public void SetEndTime()
-    {
-        EndTime = DateTime.UtcNow;
-    }
     
     private CacheWarm() {}
 

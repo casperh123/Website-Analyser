@@ -1,3 +1,4 @@
+using WebsiteAnalyzer.Core.Domain.BrokenLink;
 using WebsiteAnalyzer.Core.Entities.BrokenLink;
 
 namespace WebsiteAnalyzer.Core.Interfaces.Repositories;

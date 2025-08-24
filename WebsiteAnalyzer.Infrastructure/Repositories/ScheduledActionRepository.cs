@@ -13,12 +13,11 @@ public class ScheduledActionRepository : BaseRepository<ScheduledAction>, ISched
     {
     }
 
-
-    public async Task<ICollection<ScheduledAction>> GetCrawlSchedulesByUserIdAsync(Guid userId)
+    public async Task<ScheduledAction> GetByWebsiteIdAndType(Guid websiteId, CrawlAction type)
     {
         return await DbContext.ScheduledActions
-            .Where(cs => cs.Website.UserId == userId)
-            .ToListAsync();
+            .Where(sa => sa.Action == type)
+            .FirstAsync();
     }
 
     public async Task<ICollection<ScheduledAction>> GetCrawlSchedulesByUserIdAndTypeAsync(Guid userId, CrawlAction action)

@@ -1,6 +1,7 @@
 using System.Net;
+using WebsiteAnalyzer.Core.Entities.BrokenLink;
 
-namespace WebsiteAnalyzer.Core.Entities.BrokenLink;
+namespace WebsiteAnalyzer.Core.Domain.BrokenLink;
 
 public record BrokenLink
 {

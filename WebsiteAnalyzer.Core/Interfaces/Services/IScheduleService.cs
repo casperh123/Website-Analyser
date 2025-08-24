@@ -1,5 +1,4 @@
 using WebsiteAnalyzer.Core.Domain;
-using WebsiteAnalyzer.Core.Entities;
 using WebsiteAnalyzer.Core.Entities.Website;
 using WebsiteAnalyzer.Core.Enums;
 
@@ -7,7 +6,7 @@ namespace WebsiteAnalyzer.Core.Interfaces.Services;
 
 public interface IScheduleService
 {
-    Task<ScheduledAction> GetActionByWebsiteId(Guid websiteId);
+    Task<ScheduledAction> GetActionByWebsiteIdAndType(Guid websiteId, CrawlAction type);
 
     Task<ScheduledAction> ScheduleAction(
         Website website,
