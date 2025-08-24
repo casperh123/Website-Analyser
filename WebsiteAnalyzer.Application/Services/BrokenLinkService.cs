@@ -32,7 +32,7 @@ public class BrokenLinkService(
         {
             yield return brokenLink;
         }
-
+        
         await SaveBrokenLinkCrawl(crawl);
     }
     

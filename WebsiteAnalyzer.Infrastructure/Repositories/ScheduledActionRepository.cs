@@ -17,6 +17,7 @@ public class ScheduledActionRepository : BaseRepository<ScheduledAction>, ISched
     {
         return await DbContext.ScheduledActions
             .Where(sa => sa.Action == type)
+            .Where(sa => sa.WebsiteId == websiteId)
             .FirstAsync();
     }
 

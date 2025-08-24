@@ -86,23 +86,28 @@ public abstract class CrawlBackgroundServiceBase : IHostedService
         CancellationToken token)
     {
         IScheduledActionRepository repository = scope.ServiceProvider.GetRequiredService<IScheduledActionRepository>();
-        
+
         try
         {
             scheduledAction.StartAction();
             await repository.UpdateAsync(scheduledAction);
 
             await ExecuteCrawlTaskAsync(scheduledAction, scope, token);
-
-            scheduledAction.Status = Status.Completed;
-            await repository.UpdateAsync(scheduledAction);
         }
         catch (Exception ex)
         {
             Logger.LogError(ex, "Failed {Action} for {Url}", _crawlAction, scheduledAction.Website.Url);
-            
+
             scheduledAction.Status = Status.Failed;
             await repository.UpdateAsync(scheduledAction);
+        }
+        finally
+        {
+            if (scheduledAction.Status != Status.Failed)
+            {
+                scheduledAction.Status = Status.Completed;
+                await repository.UpdateAsync(scheduledAction);
+            }
         }
     }
 
