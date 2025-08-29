@@ -19,32 +19,15 @@ public class BrokenLinkBackgroundService(
         IBrokenLinkService brokenLinkService = 
             scope.ServiceProvider.GetRequiredService<IBrokenLinkService>();
 
-        int brokenLinks = 0;
-        int totalLinks = 0;
+        IAsyncEnumerable<BrokenLinkDTO> linksFound =
+            brokenLinkService.FindBrokenLinks(scheduledAction.Website, null, token);
 
-        IProgress<Progress> progress = new Progress<Progress>(p =>
-        {
-            totalLinks = p.LinksChecked;
-        });
-
-        try
-        {
-            IAsyncEnumerable<BrokenLinkDTO> linksFound =
-                brokenLinkService.FindBrokenLinks(scheduledAction.Website, progress, token);
-
-            await foreach (BrokenLinkDTO unused in linksFound)
-            {
-                brokenLinks++;
-            }
-            
-            Logger.LogInformation(
-                "Completed crawl of {Url}. Found {BrokenCount} broken links out of {TotalCount} total links",
-                scheduledAction.Website.Url,
-                brokenLinks,
-                totalLinks);
-        }
-        catch (Exception e)
+        await foreach (BrokenLinkDTO unused in linksFound)
         {
         }
+        
+        Logger.LogInformation(
+            "Completed crawl of {Url}.",
+            scheduledAction.Website.Url);
     }
 }
