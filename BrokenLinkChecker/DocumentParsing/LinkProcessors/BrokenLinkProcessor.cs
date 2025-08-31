@@ -30,23 +30,16 @@ public class BrokenLinkProcessor : ILinkProcessor<IndexedLink>
 
         if (!_visitedResources.TryGetValue(link.Target, out HttpStatusCode statusCode))
         {
-            try
-            {
-                using HttpResponseMessage response =
-                    await _httpClient.GetAsync(link.Target, HttpCompletionOption.ResponseHeadersRead);
-                
-                statusCode = response.StatusCode;
-                _visitedResources[link.Target] = statusCode;
+            using HttpResponseMessage response =
+                await _httpClient.GetAsync(link.Target, HttpCompletionOption.ResponseHeadersRead);
+            
+            statusCode = response.StatusCode;
+            _visitedResources[link.Target] = statusCode;
 
-                if (response.IsSuccessStatusCode)
-                {
-                    await using Stream responseStream = await response.Content.ReadAsStreamAsync();
-                    links = await _linkExtractor.GetLinksFromStream(responseStream, link).ConfigureAwait(false);
-                }
-            }
-            finally
+            if (response.IsSuccessStatusCode)
             {
-                _visitedResources[link.Target] = statusCode;
+                await using Stream responseStream = await response.Content.ReadAsStreamAsync();
+                links = await _linkExtractor.GetLinksFromStream(responseStream, link);
             }
         }
 

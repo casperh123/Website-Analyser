@@ -10,7 +10,7 @@ public class IndexedLinkExtractor(HtmlParser parser) : AbstractLinkExtractor<Ind
     protected override IEnumerable<IndexedLink> GetLinksFromDocument(IDocument document, IndexedLink referringUrl)
     {
         List<IndexedLink> links = [];
-        var thisUrl = new Uri(referringUrl.Target);
+        Uri thisUrl = new Uri(referringUrl.Target);
 
         foreach (var link in document.Links)
         {

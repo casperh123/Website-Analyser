@@ -61,12 +61,7 @@ public class BrokenLinkService(
             IndexedLink link = step.Link;
         
             progress?.Report(new Progress(step.LinksEnqueued, step.LinksChecked));
-            
-            if (crawl is not null)
-            {
-                crawl.LinksChecked = step.LinksChecked;    
-            }
-        
+
             if (link.StatusCode is HttpStatusCode.OK or HttpStatusCode.MovedPermanently)
             {
                 continue;
@@ -75,6 +70,7 @@ public class BrokenLinkService(
             if (crawl is not null)
             {
                 await SaveBrokenLinkAsync(crawl, link);
+                crawl.LinksChecked = step.LinksChecked;    
             }
             
             yield return BrokenLinkDTO.FromIndexedLink(link);
