@@ -24,6 +24,7 @@ public class BrokenLinkBackgroundService(
 
         await foreach (BrokenLinkDTO unused in linksFound)
         {
+            _ = unused;
         }
         
         Logger.LogInformation(
