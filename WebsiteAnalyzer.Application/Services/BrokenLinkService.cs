@@ -26,14 +26,18 @@ public class BrokenLinkService(
         [EnumeratorCancellation] CancellationToken cancellationToken = default)
     {
         BrokenLinkCrawl? crawl = await CreateCrawlEntity(website.Url, website.UserId);
-        IAsyncEnumerable<BrokenLinkDTO> brokenLinks = StreamBrokenLinksInternal(crawl, website.Url, progress, cancellationToken);
-
-        await foreach (BrokenLinkDTO brokenLink in brokenLinks)
+    
+        try
         {
-            yield return brokenLink;
+            await foreach (BrokenLinkDTO brokenLink in StreamBrokenLinksInternal(crawl, website.Url, progress, cancellationToken))
+            {
+                yield return brokenLink;
+            }
         }
-
-        await SaveBrokenLinkCrawl(crawl);
+        finally
+        {
+            await SaveBrokenLinkCrawl(crawl);
+        }
     }
     
     public async IAsyncEnumerable<BrokenLinkDTO> FindBrokenLinksAnonymus(
@@ -70,7 +74,7 @@ public class BrokenLinkService(
             if (crawl is not null)
             {
                 await SaveBrokenLinkAsync(crawl, link);
-                crawl.LinksChecked = step.LinksChecked;    
+                crawl.LinksChecked = step.LinksChecked;
             }
             
             yield return BrokenLinkDTO.FromIndexedLink(link);
