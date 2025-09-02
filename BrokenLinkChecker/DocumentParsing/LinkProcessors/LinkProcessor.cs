@@ -53,7 +53,7 @@ public class LinkProcessor : ILinkProcessor<Link>
         }
         catch (HttpRequestException)
         {
-            links = Array.Empty<Link>();
+            links = [];
         }
 
         return links;

@@ -93,7 +93,10 @@
             
             IAsyncEnumerable<BrokenLinkDTO> brokenLinks = BrokenLinkService.FindBrokenLinks(Website, _progress, token);
 
-            await foreach (BrokenLinkDTO brokenLink in brokenLinks) { }
+            await foreach (BrokenLinkDTO brokenLink in brokenLinks)
+            {
+                _ = brokenLink;
+            }
         });
         
         _brokenLinkCrawls = await BrokenLinkService.GetBrokenLinkCrawlsByUrlAndUserId(Website.Url, User.Id);
