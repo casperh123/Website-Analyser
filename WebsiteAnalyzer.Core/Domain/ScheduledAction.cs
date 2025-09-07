@@ -6,7 +6,7 @@ public record ScheduledAction
 {
     public Guid Id { get; init; }
     public Guid WebsiteId { get; init; }
-    public Entities.Website.Website Website { get; init; }
+    public Website.Website Website { get; init; }
     public Frequency Frequency { get; set; }
     public CrawlAction Action { get; init; }
     
@@ -22,7 +22,7 @@ public record ScheduledAction
     private ScheduledAction() {}
 
     public ScheduledAction(
-        Entities.Website.Website website,
+        Website.Website website,
         Frequency frequency,
         CrawlAction action,
         TimeSpan offset
@@ -35,12 +35,6 @@ public record ScheduledAction
         Action = action;
         LastCrawlDateUtc = CalculateFirstCrawl(offset);
         Status = Status.Scheduled;
-    }
-
-    public void StartAction()
-    {
-        Status = Status.InProgress;
-        LastCrawlDateUtc = DateTime.UtcNow;
     }
 
     private DateTime CalculateFirstCrawl(TimeSpan offset)

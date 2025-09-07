@@ -2,6 +2,7 @@ using WebsiteAnalyzer.Core.Domain;
 using WebsiteAnalyzer.Core.Entities;
 using WebsiteAnalyzer.Core.Enums;
 using WebsiteAnalyzer.Core.Interfaces.Repositories;
+using WebsiteAnalyzer.Core.Interfaces.Services;
 using WebsiteAnalyzer.Web.BackgroundJobs.Timers;
 
 namespace WebsiteAnalyzer.Web.BackgroundJobs;
@@ -85,16 +86,15 @@ public abstract class CrawlBackgroundServiceBase : IHostedService
         IServiceScope scope, 
         CancellationToken token)
     {
-        IScheduledActionRepository repository = scope.ServiceProvider.GetRequiredService<IScheduledActionRepository>();
+        IScheduleService scheduleService = scope.ServiceProvider.GetRequiredService<IScheduleService>();
 
         try
         {
-            scheduledAction.StartAction();
-            await repository.UpdateAsync(scheduledAction);
+            await scheduleService.StartAction(scheduledAction);
 
             await ExecuteCrawlTaskAsync(scheduledAction, scope, token);
 
-            scheduledAction.Status = Status.Completed;
+            await scheduleService.StartAction(scheduledAction);
         }
         catch (Exception ex)
         {
@@ -104,7 +104,7 @@ public abstract class CrawlBackgroundServiceBase : IHostedService
         }
         finally
         {
-            await repository.UpdateAsync(scheduledAction);
+            await scheduleService.FailAction(scheduledAction);
         }
     }
 

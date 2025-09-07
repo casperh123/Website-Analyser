@@ -1,5 +1,5 @@
 using WebsiteAnalyzer.Core.Domain;
-using WebsiteAnalyzer.Core.Entities.Website;
+using WebsiteAnalyzer.Core.Domain.Website;
 using WebsiteAnalyzer.Core.Enums;
 using WebsiteAnalyzer.Core.Interfaces.Repositories;
 using WebsiteAnalyzer.Core.Interfaces.Services;
@@ -19,9 +19,9 @@ public class ScheduleService : IScheduleService
     }
 
     public async Task<ScheduledAction> ScheduleAction(
-        Website website, 
-        CrawlAction action, 
-        Frequency frequency, 
+        Website website,
+        CrawlAction action,
+        Frequency frequency,
         TimeSpan negativeOffset = default)
     {
         ScheduledAction scheduledAction = new ScheduledAction(
@@ -59,5 +59,40 @@ public class ScheduleService : IScheduleService
     public async Task DeleteTasksByUrlAndUserId(string url, Guid userId)
     {
         await _scheduleRepository.DeleteByUrlAndUserId(url, userId);
+    }
+
+    public async Task UpdateStatus(ScheduledAction action, Status status)
+    {
+        action.Status = status;
+
+        await _scheduleRepository.UpdateAsync(action);
+    }
+
+    public async Task StartAction(ScheduledAction action)
+    {
+
+        action.Status = Status.InProgress;
+        action.LastCrawlDateUtc = DateTime.UtcNow;
+
+        await UpdateAction(action);
+    }
+
+    public async Task CompleteAction(ScheduledAction action)
+    {
+        action.Status = Status.Completed;
+
+        await UpdateAction(action);
+    }
+
+    public async Task FailAction(ScheduledAction action)
+    {
+        action.Status = Status.Failed;
+
+        await UpdateAction(action);
+    }
+
+    private async Task UpdateAction(ScheduledAction action)
+    {
+        await _scheduleRepository.UpdateAsync(action);
     }
 }

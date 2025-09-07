@@ -1,6 +1,6 @@
 using WebsiteAnalyzer.Core.Contracts;
 using WebsiteAnalyzer.Core.Contracts.BrokenLink;
-using WebsiteAnalyzer.Core.Entities.Website;
+using WebsiteAnalyzer.Core.Domain.Website;
 
 namespace WebsiteAnalyzer.Core.Interfaces.Services;
 

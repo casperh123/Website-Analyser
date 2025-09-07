@@ -3,9 +3,9 @@ using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using WebsiteAnalyzer.Core.Domain;
 using WebsiteAnalyzer.Core.Domain.BrokenLink;
+using WebsiteAnalyzer.Core.Domain.Website;
 using WebsiteAnalyzer.Core.Entities;
 using WebsiteAnalyzer.Core.Entities.BrokenLink;
-using WebsiteAnalyzer.Core.Entities.Website;
 
 namespace WebsiteAnalyzer.Infrastructure.Data;
 

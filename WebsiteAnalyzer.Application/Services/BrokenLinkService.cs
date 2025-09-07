@@ -7,8 +7,8 @@ using BrokenLinkChecker.models.Result;
 using WebsiteAnalyzer.Core.Contracts;
 using WebsiteAnalyzer.Core.Contracts.BrokenLink;
 using WebsiteAnalyzer.Core.Domain.BrokenLink;
+using WebsiteAnalyzer.Core.Domain.Website;
 using WebsiteAnalyzer.Core.Entities.BrokenLink;
-using WebsiteAnalyzer.Core.Entities.Website;
 using WebsiteAnalyzer.Core.Interfaces.Repositories;
 using WebsiteAnalyzer.Core.Interfaces.Services;
 

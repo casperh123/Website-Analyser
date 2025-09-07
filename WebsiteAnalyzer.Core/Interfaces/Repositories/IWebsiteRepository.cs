@@ -1,4 +1,4 @@
-using WebsiteAnalyzer.Core.Entities.Website;
+using WebsiteAnalyzer.Core.Domain.Website;
 
 namespace WebsiteAnalyzer.Core.Interfaces.Repositories;
 

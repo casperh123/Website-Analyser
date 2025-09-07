@@ -1,4 +1,4 @@
-using WebsiteAnalyzer.Core.Entities.Website;
+using WebsiteAnalyzer.Core.Domain.Website;
 using WebsiteAnalyzer.Core.Enums;
 using WebsiteAnalyzer.Core.Exceptions;
 using WebsiteAnalyzer.Core.Interfaces.Repositories;

@@ -2,7 +2,7 @@ using BrokenLinkChecker.models.Links;
 using BrokenLinkChecker.models.Result;
 using WebsiteAnalyzer.Core.Contracts.CacheWarm;
 using WebsiteAnalyzer.Core.Domain;
-using WebsiteAnalyzer.Core.Entities.Website;
+using WebsiteAnalyzer.Core.Domain.Website;
 
 namespace WebsiteAnalyzer.Core.Interfaces.Services;
 

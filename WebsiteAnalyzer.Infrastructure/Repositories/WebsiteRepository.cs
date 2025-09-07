@@ -1,5 +1,5 @@
 using Microsoft.EntityFrameworkCore;
-using WebsiteAnalyzer.Core.Entities.Website;
+using WebsiteAnalyzer.Core.Domain.Website;
 using WebsiteAnalyzer.Core.Interfaces.Repositories;
 using WebsiteAnalyzer.Infrastructure.Data;
 
