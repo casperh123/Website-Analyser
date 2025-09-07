@@ -94,7 +94,7 @@ public abstract class CrawlBackgroundServiceBase : IHostedService
 
             await ExecuteCrawlTaskAsync(scheduledAction, scope, token);
 
-            await scheduleService.StartAction(scheduledAction);
+            await scheduleService.CompleteAction(scheduledAction);
         }
         catch (Exception ex)
         {
