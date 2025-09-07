@@ -49,13 +49,14 @@ else
             try
             {
                 await WebsiteAdded.InvokeAsync(newWebsite);
+                _open = false;
+                _name = "";
+                _message = "";
             }
             catch (Exception e)
             {
                 _message = e.Message;
             }
         }
-
-        _open = false;
     }
 }
