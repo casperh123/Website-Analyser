@@ -5,9 +5,9 @@ public class MinuteTimer : IPeriodicTimer
     private readonly PeriodicTimer _timer;
     private bool _firstTick = true;
 
-    public MinuteTimer()
+    public MinuteTimer(int minutes)
     {
-        _timer = new PeriodicTimer(TimeSpan.FromMinutes(3));
+        _timer = new PeriodicTimer(TimeSpan.FromMinutes(minutes));
     }
 
     public async ValueTask<bool> WaitForNextTickAsync(CancellationToken cancellationToken = default)
