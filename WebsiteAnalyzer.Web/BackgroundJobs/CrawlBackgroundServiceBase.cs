@@ -50,35 +50,28 @@ public abstract class CrawlBackgroundServiceBase : IHostedService
 
     private async Task ProcessDueSchedulesAsync(CancellationToken cancellationToken)
     {
-        try
-        {
-            using IServiceScope scope = _serviceProvider.CreateScope();
-            IScheduledActionRepository repository = scope.ServiceProvider.GetRequiredService<IScheduledActionRepository>();
-            
-            // Get schedules that need processing
-            ICollection<ScheduledAction> schedules = await repository.GetByAction(_crawlAction);
-            List<ScheduledAction> dueSchedules = schedules
-                .Where(cs => cs.IsDueForExecution && cs.Action == _crawlAction)
-                .ToList();
+        using IServiceScope scope = _serviceProvider.CreateScope();
+        IScheduledActionRepository repository = scope.ServiceProvider.GetRequiredService<IScheduledActionRepository>();
+        
+        // Get schedules that need processing
+        ICollection<ScheduledAction> schedules = await repository.GetByAction(_crawlAction);
+        List<ScheduledAction> dueSchedules = schedules
+            .Where(cs => cs.IsDueForExecution && cs.Action == _crawlAction)
+            .ToList();
 
-            Logger.LogInformation("Processing {Count} due {Action} schedules", 
-                dueSchedules.Count, _crawlAction);
-            
-            await Parallel.ForEachAsync(dueSchedules, 
-                new ParallelOptions 
-                { 
-                    MaxDegreeOfParallelism = 10,
-                    CancellationToken = cancellationToken 
-                }, 
-                async (schedule, token) => {
-                    using IServiceScope operationScope = _serviceProvider.CreateScope();
-                    await ProcessScheduleAsync(schedule, operationScope, token);
-                });
-        }
-        catch (Exception ex)
-        {
-            Logger.LogError(ex, "Error processing scheduled {Action} tasks", _crawlAction);
-        }
+        Logger.LogInformation("Processing {Count} due {Action} schedules", 
+            dueSchedules.Count, _crawlAction);
+        
+        await Parallel.ForEachAsync(dueSchedules, 
+            new ParallelOptions 
+            { 
+                CancellationToken = cancellationToken, 
+            }, 
+            async (schedule, token) => {
+                using IServiceScope operationScope = _serviceProvider.CreateScope();
+                await ProcessScheduleAsync(schedule, operationScope, token);
+            });
+        
     }
 
     private async ValueTask ProcessScheduleAsync(
