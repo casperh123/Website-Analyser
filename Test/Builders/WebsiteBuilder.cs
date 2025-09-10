@@ -1,3 +1,4 @@
+using Test.Builders;
 using test.Utilities;
 using WebsiteAnalyzer.Core.Domain.Website;
 using WebsiteAnalyzer.Core.Entities.BrokenLink;
@@ -7,14 +8,12 @@ namespace test.Builders;
 
 public class WebsiteBuilder : EntityBuilder<Website>
 {
-    private Website _website { get; set; }
-
     public WebsiteBuilder(
         ApplicationDbContext dbContext, 
         Guid userId,
         string url) : base(dbContext)
     {
-        _website = new Website(
+        Entity = new Website(
             url: url,
             userId: userId,
             name: $"{StringGenerator.Generate(7)}"

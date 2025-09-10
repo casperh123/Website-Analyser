@@ -1,5 +1,7 @@
 using WebsiteAnalyzer.Infrastructure.Data;
 
+namespace Test.Builders;
+
 public abstract class EntityBuilder<T> where T : class
 {
     protected readonly ApplicationDbContext Context;

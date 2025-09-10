@@ -100,10 +100,6 @@ public abstract class CrawlBackgroundServiceBase : IHostedService
         {
             Logger.LogError(ex, "Failed {Action} for {Url}", _crawlAction, scheduledAction.Website.Url);
 
-            scheduledAction.Status = Status.Failed;
-        }
-        finally
-        {
             await scheduleService.FailAction(scheduledAction);
         }
     }
