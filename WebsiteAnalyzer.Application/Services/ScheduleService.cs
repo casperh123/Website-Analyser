@@ -68,6 +68,15 @@ public class ScheduleService : IScheduleService
         await _scheduleRepository.UpdateAsync(action);
     }
 
+    public async Task<ICollection<ScheduledAction>> GetDueSchedulesBy(CrawlAction action)
+    {
+        ICollection<ScheduledAction> schedules = await _scheduleRepository.GetByAction(action);
+
+        return schedules
+            .Where(cs => cs.IsDueForExecution)
+            .ToList();;
+    }
+
     public async Task StartAction(ScheduledAction action)
     {
 

@@ -1,7 +1,5 @@
 using WebsiteAnalyzer.Core.Domain;
-using WebsiteAnalyzer.Core.Entities;
 using WebsiteAnalyzer.Core.Enums;
-using WebsiteAnalyzer.Core.Interfaces.Repositories;
 using WebsiteAnalyzer.Core.Interfaces.Services;
 using WebsiteAnalyzer.Web.BackgroundJobs.Timers;
 
@@ -51,18 +49,14 @@ public abstract class CrawlBackgroundServiceBase : IHostedService
     private async Task ProcessDueSchedulesAsync(CancellationToken cancellationToken)
     {
         using IServiceScope scope = _serviceProvider.CreateScope();
-        IScheduledActionRepository repository = scope.ServiceProvider.GetRequiredService<IScheduledActionRepository>();
+        IScheduleService scheduleService = scope.ServiceProvider.GetRequiredService<IScheduleService>();
         
-        // Get schedules that need processing
-        ICollection<ScheduledAction> schedules = await repository.GetByAction(_crawlAction);
-        List<ScheduledAction> dueSchedules = schedules
-            .Where(cs => cs.IsDueForExecution && cs.Action == _crawlAction)
-            .ToList();
+        ICollection<ScheduledAction> dueScheduledActions = await scheduleService.GetDueSchedulesBy(_crawlAction);
 
         Logger.LogInformation("Processing {Count} due {Action} schedules", 
-            dueSchedules.Count, _crawlAction);
+            dueScheduledActions.Count, _crawlAction);
         
-        await Parallel.ForEachAsync(dueSchedules, 
+        await Parallel.ForEachAsync(dueScheduledActions, 
             new ParallelOptions 
             { 
                 CancellationToken = cancellationToken, 
