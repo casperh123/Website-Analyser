@@ -1,6 +1,6 @@
 namespace WebsiteAnalyzer.Core.Interfaces.Services;
 
-public class IUptimeService
+public interface IUptimeService
 {
     
 }

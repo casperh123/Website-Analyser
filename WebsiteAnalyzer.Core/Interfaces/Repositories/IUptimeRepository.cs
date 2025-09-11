@@ -1,6 +1,8 @@
+using WebsiteAnalyzer.Core.Domain.Uptime;
+
 namespace WebsiteAnalyzer.Core.Interfaces.Repositories;
 
-public class IUptimeRepository
+public interface IUptimeRepository : IBaseRepository<UptimeMonitor>
 {
     
 }

@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using WebsiteAnalyzer.Core.Domain;
 using WebsiteAnalyzer.Core.Domain.BrokenLink;
+using WebsiteAnalyzer.Core.Domain.Uptime;
 using WebsiteAnalyzer.Core.Domain.Website;
 using WebsiteAnalyzer.Core.Entities;
 using WebsiteAnalyzer.Core.Entities.BrokenLink;
@@ -44,6 +45,9 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser, IdentityR
 
         builder.Entity<BrokenLinkCrawl>()
             .HasKey(blc => new { blc.Id });
+
+        builder.Entity<UptimeMonitor>()
+            .HasKey(um => new{ um.WebsiteUrl, um.UserId } );
 
         // Configure Identity entities to use GUID
         builder.Entity<IdentityUserLogin<Guid>>()
