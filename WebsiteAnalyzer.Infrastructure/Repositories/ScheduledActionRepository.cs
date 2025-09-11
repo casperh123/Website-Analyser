@@ -16,6 +16,7 @@ public class ScheduledActionRepository : BaseRepository<ScheduledAction>, ISched
     public async Task<ScheduledAction> GetByWebsiteIdAndType(Guid websiteId, CrawlAction type)
     {
         return await DbContext.ScheduledActions
+            .Where(sa => sa.WebsiteId == websiteId)
             .Where(sa => sa.Action == type)
             .FirstAsync();
     }
