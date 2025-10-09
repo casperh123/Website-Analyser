@@ -154,4 +154,43 @@ public class WebsiteRepositoryTests : TestBase
         // Assert
         Assert.Null(retrievedWebsite);
     }
+
+    [Fact]
+    public async Task DeleteByUrlAndUserId_DeletesWebsite()
+    {
+        // Arrange
+        Guid userId = Guid.NewGuid();
+        string url = "http://website.dk";
+        Website website = await WebsiteScenarios.DefaultWebsite(userId, url);
+    
+        // Act
+        await _sut.DeleteByUrlAndUserId(url, userId);
+    
+        // Assert
+        Website? deleted = await _sut.GetByIdAndUserId(website.Id, userId);
+        Assert.Null(deleted);
+    }
+    
+    [Fact]
+    public async Task DeleteByUrlAndUserId_DeletesOnlyTargetWebsite()
+    {
+        // Arrange
+        Guid userId = Guid.NewGuid();
+        string targetUrl = "http://website1.dk";
+        string keepUrl = "http://website2.dk";
+
+        await WebsiteScenarios.DefaultWebsite(userId, targetUrl);
+        Website keepWebsite = await WebsiteScenarios.DefaultWebsite(userId, keepUrl);
+    
+        // Act
+        await _sut.DeleteByUrlAndUserId(targetUrl, userId);
+    
+        // Assert
+        ICollection<Website> remaining = await _sut.GetAllByUserId(userId);
+        Assert.Single(remaining);
+        Assert.Equal(keepUrl, remaining.First().Url);
+    }
+    
+    // TODO: Cannot delete others website
+    // TODO: Delete non-existant webstie
 }
