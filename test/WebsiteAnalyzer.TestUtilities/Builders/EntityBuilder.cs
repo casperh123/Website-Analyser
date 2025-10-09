@@ -1,6 +1,6 @@
 using WebsiteAnalyzer.Infrastructure.Data;
 
-namespace Test.Builders;
+namespace WebsiteAnalyzer.TestUtilities.Builders;
 
 public abstract class EntityBuilder<T> where T : class
 {

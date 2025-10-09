@@ -180,4 +180,8 @@
       <Content Include="bin\Debug\net9.0\zh-Hant\Microsoft.VisualStudio.TestPlatform.ObjectModel.resources.dll" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="Testing\" />
+    </ItemGroup>
+
 </Project>
