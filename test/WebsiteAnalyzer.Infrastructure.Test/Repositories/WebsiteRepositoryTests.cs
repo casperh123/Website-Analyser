@@ -105,4 +105,53 @@ public class WebsiteRepositoryTests : TestBase
         Assert.Equal(userId, retrievedWebsite.UserId);
         Assert.Equal(websiteId, retrievedWebsite.Id);
     }
+    
+    [Fact]
+    public async Task GetByIdAndUserId_ReturnsWebsite_WhenMultipleUsersAndWebsites()
+    {
+        // Arrange
+        Guid userId = Guid.NewGuid();
+        Guid otherUserId = Guid.NewGuid();
+        Website website = await WebsiteScenarios.DefaultWebsite(userId, "http://website.dk");
+        Guid websiteId = website.Id;
+        await WebsiteScenarios.DefaultWebsite(otherUserId, "http://website2.dk");
+
+        // Act
+        Website? retrievedWebsite = await _sut.GetByIdAndUserId(websiteId, userId);
+        
+        // Assert
+        Assert.NotNull(retrievedWebsite);
+        Assert.Equal(userId, retrievedWebsite.UserId);
+        Assert.Equal(websiteId, retrievedWebsite.Id);
+    }
+    
+    [Fact]
+    public async Task GetByIdAndUserId_ReturnsNothing_WhenQueryingOtherUserWebsite()
+    {
+        // Arrange
+        Guid userId = Guid.NewGuid();
+        Guid otherUserId = Guid.NewGuid();
+        Website website = await WebsiteScenarios.DefaultWebsite(userId, "http://website.dk");
+        Guid websiteId = website.Id;
+
+        // Act
+        Website? retrievedWebsite = await _sut.GetByIdAndUserId(websiteId, otherUserId);
+        
+        // Assert
+        Assert.Null(retrievedWebsite);
+    }
+    
+    [Fact]
+    public async Task GetByIdAndUserId_ReturnsNull_WhenWebsiteDoesNotExist()
+    {
+        // Arrange
+        Guid userId = Guid.NewGuid();
+        Guid nonExistentWebsiteId = Guid.NewGuid();
+    
+        // Act
+        Website? retrievedWebsite = await _sut.GetByIdAndUserId(nonExistentWebsiteId, userId);
+    
+        // Assert
+        Assert.Null(retrievedWebsite);
+    }
 }
