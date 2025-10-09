@@ -4,15 +4,10 @@ namespace WebsiteAnalyzer.Core.Contracts.BrokenLink;
 
 public record BrokenLinkCrawlDTO
 {
-    public Guid? Id { get; set; }
-    public string Url { get; set; }
-    public DateTime Time { get; set; }
-    public DateTime LocalTime => Time.ToLocalTime();
-    public int LinksChecked { get; set; }
-    public ICollection<BrokenLinkDTO> BrokenLinks { get; set; } = [];
+    public BrokenLinkCrawlDTO()
+    {
+    }
 
-    public BrokenLinkCrawlDTO() {}
-    
     public BrokenLinkCrawlDTO(string url)
     {
         Id = Guid.NewGuid();
@@ -28,6 +23,13 @@ public record BrokenLinkCrawlDTO
         Time = time;
     }
 
+    public Guid? Id { get; set; }
+    public string Url { get; set; }
+    public DateTime Time { get; set; }
+    public DateTime LocalTime => Time.ToLocalTime();
+    public int LinksChecked { get; set; }
+    public ICollection<BrokenLinkDTO> BrokenLinks { get; set; } = [];
+
     public static BrokenLinkCrawlDTO From(BrokenLinkCrawl crawl)
     {
         return new BrokenLinkCrawlDTO
@@ -39,16 +41,17 @@ public record BrokenLinkCrawlDTO
             Time = crawl.Date
         };
     }
-    
-    public BrokenLinkCrawl ToBrokenLink(Guid userId) {
-         return new BrokenLinkCrawl
-         {
-             Id = Id.Value,
-             UserId = userId,
-             Url = Url,
-             BrokenLinks = BrokenLinks.Select(link => link.ToBrokenLink()).ToList(),
-             LinksChecked = LinksChecked,
-             Date = Time
-         };
+
+    public BrokenLinkCrawl ToBrokenLink(Guid userId)
+    {
+        return new BrokenLinkCrawl
+        {
+            Id = Id.Value,
+            UserId = userId,
+            Url = Url,
+            BrokenLinks = BrokenLinks.Select(link => link.ToBrokenLink()).ToList(),
+            LinksChecked = LinksChecked,
+            Date = Time
+        };
     }
 }

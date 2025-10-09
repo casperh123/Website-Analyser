@@ -4,8 +4,8 @@ namespace WebsiteAnalyzer.Core.Contracts.Crawl;
 
 public class CrawlTimer
 {
-    private readonly Stopwatch _stopWatch;
     private readonly DateTime _startTime;
+    private readonly Stopwatch _stopWatch;
 
     public CrawlTimer()
     {
@@ -23,14 +23,14 @@ public class CrawlTimer
 
 public class CrawlTimerResult
 {
-    public DateTime StartTime { get; }
-    public DateTime EndTime { get; }
-    public TimeSpan Duration { get; }
-
     public CrawlTimerResult(DateTime startTime, DateTime endTime, TimeSpan duration)
     {
         StartTime = startTime;
         EndTime = endTime;
         Duration = duration;
     }
+
+    public DateTime StartTime { get; }
+    public DateTime EndTime { get; }
+    public TimeSpan Duration { get; }
 }

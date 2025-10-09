@@ -5,7 +5,8 @@ namespace WebsiteAnalyzer.Core.Contracts.BrokenLink;
 
 public record BrokenLinkDTO
 {
-    public BrokenLinkDTO(string targetPage, string referringPage, string anchorText, int line, HttpStatusCode statusCode)
+    public BrokenLinkDTO(string targetPage, string referringPage, string anchorText, int line,
+        HttpStatusCode statusCode)
     {
         TargetPage = targetPage;
         ReferringPage = referringPage;
@@ -13,14 +14,17 @@ public record BrokenLinkDTO
         Line = line;
         StatusCode = statusCode;
     }
-    
+
     public string TargetPage { get; set; }
     public string ReferringPage { get; set; }
     public string AnchorText { get; set; }
     public int Line { get; set; }
     public HttpStatusCode StatusCode { get; set; }
-    
-    public string NormalizedAnchorText() => string.IsNullOrEmpty(AnchorText) ? "N/A" : AnchorText;
+
+    public string NormalizedAnchorText()
+    {
+        return string.IsNullOrEmpty(AnchorText) ? "N/A" : AnchorText;
+    }
 
     public Domain.BrokenLink.BrokenLink ToBrokenLink()
     {
@@ -33,7 +37,14 @@ public record BrokenLinkDTO
             StatusCode = StatusCode
         };
     }
-    
-    public static BrokenLinkDTO FromIndexedLink(IndexedLink link) => new BrokenLinkDTO(link.Target, link.ReferringPage, link.AnchorText, link.Line, link.StatusCode);
-    public static BrokenLinkDTO FromBrokenLink(Domain.BrokenLink.BrokenLink link) => new BrokenLinkDTO(link.TargetPage, link.ReferringPage, link.AnchorText, link.Line, link.StatusCode);
+
+    public static BrokenLinkDTO FromIndexedLink(IndexedLink link)
+    {
+        return new BrokenLinkDTO(link.Target, link.ReferringPage, link.AnchorText, link.Line, link.StatusCode);
+    }
+
+    public static BrokenLinkDTO FromBrokenLink(Domain.BrokenLink.BrokenLink link)
+    {
+        return new BrokenLinkDTO(link.TargetPage, link.ReferringPage, link.AnchorText, link.Line, link.StatusCode);
+    }
 }

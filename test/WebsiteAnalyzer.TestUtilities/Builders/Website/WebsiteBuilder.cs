@@ -1,3 +1,5 @@
+using System;
+using System.Collections.Generic;
 using Test.Builders;
 using WebsiteAnalyzer.Core.Domain.BrokenLink;
 using WebsiteAnalyzer.Infrastructure.Data;

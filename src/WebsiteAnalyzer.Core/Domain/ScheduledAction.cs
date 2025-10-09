@@ -4,29 +4,16 @@ namespace WebsiteAnalyzer.Core.Domain;
 
 public record ScheduledAction
 {
-    public Guid Id { get; init; }
-    public Guid WebsiteId { get; init; }
-    public Website.Website Website { get; init; }
-    public Frequency Frequency { get; set; }
-    public CrawlAction Action { get; init; }
-    
-    public DateTime LastCrawlDateUtc { get; set; }
-    public Status Status { get; set; }
-    
-    public DateTime NextCrawlUtc => LastCrawlDateUtc.Add(FrequencyExtensions.ToTimeSpan(Frequency));
-    public DateTime NextCrawlLocal => NextCrawlUtc.ToLocalTime();
-    public DateTime LastCrawlLocal => LastCrawlDateUtc.ToLocalTime();
-    
-    public bool IsDueForExecution => Status != Status.InProgress && DateTime.UtcNow >= NextCrawlUtc;
-    
-    private ScheduledAction() {}
+    private ScheduledAction()
+    {
+    }
 
     public ScheduledAction(
         Website.Website website,
         Frequency frequency,
         CrawlAction action,
         TimeSpan offset
-        )
+    )
     {
         Id = Guid.NewGuid();
         WebsiteId = website.Id;
@@ -36,6 +23,21 @@ public record ScheduledAction
         LastCrawlDateUtc = CalculateFirstCrawl(offset);
         Status = Status.Scheduled;
     }
+
+    public Guid Id { get; init; }
+    public Guid WebsiteId { get; init; }
+    public Website.Website Website { get; init; }
+    public Frequency Frequency { get; set; }
+    public CrawlAction Action { get; init; }
+
+    public DateTime LastCrawlDateUtc { get; set; }
+    public Status Status { get; set; }
+
+    public DateTime NextCrawlUtc => LastCrawlDateUtc.Add(FrequencyExtensions.ToTimeSpan(Frequency));
+    public DateTime NextCrawlLocal => NextCrawlUtc.ToLocalTime();
+    public DateTime LastCrawlLocal => LastCrawlDateUtc.ToLocalTime();
+
+    public bool IsDueForExecution => Status != Status.InProgress && DateTime.UtcNow >= NextCrawlUtc;
 
     private DateTime CalculateFirstCrawl(TimeSpan offset)
     {

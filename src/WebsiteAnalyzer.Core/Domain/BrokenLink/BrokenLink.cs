@@ -4,7 +4,8 @@ namespace WebsiteAnalyzer.Core.Domain.BrokenLink;
 
 public record BrokenLink
 {
-    public BrokenLink(BrokenLinkCrawl? brokenLinkCrawl, string targetPage, string referringPage, string anchorText, int line, HttpStatusCode statusCode)
+    public BrokenLink(BrokenLinkCrawl? brokenLinkCrawl, string targetPage, string referringPage, string anchorText,
+        int line, HttpStatusCode statusCode)
     {
         Id = Guid.NewGuid();
         BrokenLinkCrawlId = brokenLinkCrawl?.Id;
@@ -18,7 +19,6 @@ public record BrokenLink
 
     public BrokenLink()
     {
-        
     }
 
     public Guid Id { get; set; }
@@ -29,6 +29,4 @@ public record BrokenLink
     public string AnchorText { get; set; }
     public int Line { get; set; }
     public HttpStatusCode StatusCode { get; set; }
-    
-    
 }
