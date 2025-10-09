@@ -1,19 +1,16 @@
 using Test.Builders;
-using test.Utilities;
-using WebsiteAnalyzer.Core.Domain.Website;
 using WebsiteAnalyzer.Core.Entities.BrokenLink;
-using WebsiteAnalyzer.Infrastructure.Data;
 
-namespace test.Builders;
+namespace WebsiteAnalyzer.Core.Domain.Builders.Website;
 
-public class WebsiteBuilder : EntityBuilder<Website>
+public class WebsiteBuilder : EntityBuilder<Domain.Website.Website>
 {
     public WebsiteBuilder(
         ApplicationDbContext dbContext, 
         Guid userId,
         string url) : base(dbContext)
     {
-        Entity = new Website(
+        Entity = new Domain.Website.Website(
             url: url,
             userId: userId,
             name: $"{StringGenerator.Generate(7)}"

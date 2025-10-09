@@ -2,7 +2,7 @@ using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using WebsiteAnalyzer.Infrastructure.Data;
 
-namespace test.Database;
+namespace WebsiteAnalyzer.TestUtilities.Database;
 
 public class DatabaseFixture : IDisposable
 {

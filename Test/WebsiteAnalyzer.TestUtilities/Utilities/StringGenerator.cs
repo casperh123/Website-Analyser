@@ -1,4 +1,4 @@
-namespace test.Utilities;
+namespace WebsiteAnalyzer.TestUtilities.Utilities;
 
 public static class StringGenerator
 {

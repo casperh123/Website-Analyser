@@ -1,16 +1,14 @@
-:.:using test.Builders;
-using test.Database;
 using WebsiteAnalyzer.Application.Services;
 using WebsiteAnalyzer.Core.Domain;
+using WebsiteAnalyzer.Core.Domain.Builders.Website;
 using WebsiteAnalyzer.Core.Domain.Website;
 using WebsiteAnalyzer.Core.Enums;
 using WebsiteAnalyzer.Core.Interfaces.Repositories;
 using WebsiteAnalyzer.Infrastructure.Data;
 using WebsiteAnalyzer.Infrastructure.Repositories;
-using Xunit;
-using Assert = Xunit.Assert;
+using WebsiteAnalyzer.TestUtilities.Database;
 
-namespace Test.WebsiteAnalyzer.Application.Test.Services;
+namespace WebsiteAnalyzer.Application.Test.Services;
 
 public class ScheduleServiceTests : IClassFixture<DatabaseFixture>
 {
@@ -53,7 +51,7 @@ public class ScheduleServiceTests : IClassFixture<DatabaseFixture>
         ).BuildAndSave();
 
         //Act
-        ScheduledAction scheduledAction = _scheduleService.ScheduleAction(website, CrawlAction.CacheWarm, Frequency.SixHourly, TimeSpan.FromHours(1));
+        ScheduledAction scheduledAction = await _scheduleService.ScheduleAction(website, CrawlAction.CacheWarm, Frequency.SixHourly, TimeSpan.FromHours(1));
         
         //Assert
         Assert.False(scheduledAction.IsDueForExecution);
