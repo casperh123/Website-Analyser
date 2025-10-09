@@ -40,7 +40,7 @@ public class WebsiteRepository : BaseRepository<Website>, IWebsiteRepository
         return await DbContext.Websites
             .Where(w => w.Id == id)
             .Where(w => w.UserId == userId)
-            .FirstAsync();
+            .FirstOrDefaultAsync();
     }
 
     public async Task DeleteByUrlAndUserId(string url, Guid userId)

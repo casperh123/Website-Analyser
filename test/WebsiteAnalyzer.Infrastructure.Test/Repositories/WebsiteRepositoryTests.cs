@@ -71,4 +71,38 @@ public class WebsiteRepositoryTests : TestBase
         // Assert
         Assert.Empty(retrievedWebsite);
     }
+
+    [Fact]
+    public async Task GetByIdAndUserId_ReturnsUserAndIdWebsite()
+    {
+        // Arrange
+        Guid userId = Guid.NewGuid();
+        Website website = await WebsiteScenarios.DefaultWebsite(userId, "http://website.dk");
+        Guid websiteId = website.Id;
+        
+        // Act
+        Website? retrievedWebsite = await _sut.GetByIdAndUserId(websiteId, userId);
+
+        Assert.NotNull(retrievedWebsite);
+        Assert.Equal(userId, retrievedWebsite.UserId);
+        Assert.Equal(websiteId, retrievedWebsite.Id);
+    }
+
+    [Fact]
+    public async Task GetByIdAndUserId_ReturnsWebsite_WhenMultipleWebsites()
+    {
+        // Arrange
+        Guid userId = Guid.NewGuid();
+        Website website = await WebsiteScenarios.DefaultWebsite(userId, "http://website.dk");
+        Guid websiteId = website.Id;
+        await WebsiteScenarios.DefaultWebsite(userId, "http://website2.dk");
+
+        // Act
+        Website? retrievedWebsite = await _sut.GetByIdAndUserId(websiteId, userId);
+        
+        // Assert
+        Assert.NotNull(retrievedWebsite);
+        Assert.Equal(userId, retrievedWebsite.UserId);
+        Assert.Equal(websiteId, retrievedWebsite.Id);
+    }
 }
