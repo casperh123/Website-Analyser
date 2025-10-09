@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("WebsiteAnalyzer.Web")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+9c947fdeaf12ed309384e80165649bf1c9310035")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+4128af0f5c7292bd862727efbabd3c4a3a8bb580")]
 [assembly: System.Reflection.AssemblyProductAttribute("WebsiteAnalyzer.Web")]
 [assembly: System.Reflection.AssemblyTitleAttribute("WebsiteAnalyzer.Web")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
