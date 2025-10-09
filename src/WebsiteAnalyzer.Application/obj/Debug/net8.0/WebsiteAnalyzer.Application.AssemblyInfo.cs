@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("WebsiteAnalyzer.Application")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+4128af0f5c7292bd862727efbabd3c4a3a8bb580")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+800c6fbd106a7a44e4fcd826181c89534e5fe03f")]
 [assembly: System.Reflection.AssemblyProductAttribute("WebsiteAnalyzer.Application")]
 [assembly: System.Reflection.AssemblyTitleAttribute("WebsiteAnalyzer.Application")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
