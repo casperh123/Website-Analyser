@@ -3,23 +3,22 @@ using WebsiteAnalyzer.Core.Domain;
 using WebsiteAnalyzer.Core.Domain.Website;
 using WebsiteAnalyzer.Core.Enums;
 using WebsiteAnalyzer.Core.Interfaces.Repositories;
-using WebsiteAnalyzer.Infrastructure.Data;
 using WebsiteAnalyzer.Infrastructure.Repositories;
 using WebsiteAnalyzer.TestUtilities.Database;
 using WebsiteAnalyzer.TestUtilities.Scenarios;
+using WebsiteAnalyzer.TestUtilities.Testing;
 
 namespace WebsiteAnalyzer.Application.Test.Services;
 
-public class ScheduleServiceTests : IClassFixture<DatabaseFixture>
+public class ScheduleServiceTests : TestBase
 {
     private readonly ScheduleService _scheduleService;
     private readonly WebsiteScenarios _websiteScenarios;
     
-    public ScheduleServiceTests(DatabaseFixture fixture)
+    public ScheduleServiceTests(DatabaseFixture fixture) : base(fixture)
     {
-        ApplicationDbContext dbContext = fixture.CreateContext();
-        _websiteScenarios = new WebsiteScenarios(dbContext);
-        IScheduledActionRepository scheduleRepository = new ScheduledActionRepository(dbContext);
+        _websiteScenarios = new WebsiteScenarios(Context);
+        IScheduledActionRepository scheduleRepository = new ScheduledActionRepository(Context);
         _scheduleService = new ScheduleService(scheduleRepository);
     }
 
