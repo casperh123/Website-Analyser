@@ -1,11 +1,11 @@
 using WebsiteAnalyzer.Application.Services;
 using WebsiteAnalyzer.Core.Domain;
-using WebsiteAnalyzer.Core.Domain.Builders.Website;
 using WebsiteAnalyzer.Core.Domain.Website;
 using WebsiteAnalyzer.Core.Enums;
 using WebsiteAnalyzer.Core.Interfaces.Repositories;
 using WebsiteAnalyzer.Infrastructure.Data;
 using WebsiteAnalyzer.Infrastructure.Repositories;
+using WebsiteAnalyzer.TestUtilities.Builders.Website;
 using WebsiteAnalyzer.TestUtilities.Database;
 
 namespace WebsiteAnalyzer.Application.Test.Services;

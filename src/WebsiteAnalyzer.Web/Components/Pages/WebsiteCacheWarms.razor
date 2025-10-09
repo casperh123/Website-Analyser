@@ -1,0 +1,109 @@
+@page "/Website/{WebsiteId:guid}/cachewarms"
+@using global::BrokenLinkChecker.Models.Links
+@using global::BrokenLinkChecker.Models.Result
+@using WebsiteAnalyzer.Core.Domain
+@using WebsiteAnalyzer.Core.Enums
+@using WebsiteAnalyzer.Core.Interfaces.Services
+@using WebsiteAnalyzer.Web.Components.Layout
+@using WebsiteAnalyzer.Web.Components.ScheduledAction
+@using WebsiteAnalyzer.Web.Components.WebsiteInputs
+
+@inherits WebsiteAnalyzer.Web.Components.Templates.WebsiteComponent
+
+@inject ICacheWarmingService CacheWarmingService
+@inject IScheduleService ScheduleService
+
+<WebsiteStatsLayout Website="Website" Websites="Websites">
+    <RadzenCard>
+        <RadzenStack>
+        <RadzenText TextStyle="TextStyle.DisplayH4">Cache Warms</RadzenText>
+        <RadzenCard>
+            <RadzenRow AlignItems="AlignItems.Center" JustifyContent="JustifyContent.SpaceBetween">
+                <ScheduledActionStatus ScheduledAction="_scheduledAction"/>
+
+                @if (_scheduledAction.Status != Status.InProgress)
+                {
+                    <WebsiteInput 
+                        IsProcessing="IsProcessing"
+                        LinksChecked="_linksChecked"
+                        LinksEnqueued="_linksEnqueued"
+                        OnCancel="CancelProcessing"
+                        Variant="Variant.Text"
+                        ShowUrl="false"
+                        Url="@Website?.Url"
+                        WebsiteActionStarted="WarmCache"
+                        ButtonText="Warm Now"/>
+                }
+            </RadzenRow>
+        </RadzenCard>
+
+        <RadzenDataGrid
+            AllowFiltering="true"
+            AllowSorting="true"
+            PageSize="15"
+            AllowPaging="true"
+            ShowPagingSummary="true"
+            Data="@_cacheWarms"
+            FilterMode="FilterMode.Simple">
+            <Columns>
+                <RadzenDataGridColumn Property="@nameof(CacheWarm.TotalTime)" Title="Total Time" Width="100px" Filterable="false">
+                    <Template Context="cacheWarm">
+                        @cacheWarm.TotalTime.ToString(@"hh\:mm\:ss")
+                    </Template>
+                </RadzenDataGridColumn>
+                <RadzenDataGridColumn Property="@nameof(CacheWarm.StartTimeLocal)" Title="Start Time" Width="200px" Filterable="false"/>
+                <RadzenDataGridColumn Property="@nameof(CacheWarm.VisitedPages)" Title="Visited Pages" Width="200px" Filterable="false"/>
+                <RadzenDataGridColumn Property="@nameof(CacheWarm.AveragePageTime)" Title="Average TTFB" Filterable="false">
+                    <Template Context="cacheWarm">
+                        @cacheWarm.AveragePageTime ms
+                    </Template>
+                </RadzenDataGridColumn>
+            </Columns>
+        </RadzenDataGrid>
+        </RadzenStack>
+    </RadzenCard>
+</WebsiteStatsLayout>
+
+@code {
+
+    private ICollection<CacheWarm> _cacheWarms = [];
+    private ScheduledAction _scheduledAction;
+
+    private int _linksChecked;
+    private int _linksEnqueued;
+    private IProgress<CrawlProgress<Link>> progress;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+
+        if (Website is null)
+        {
+            return;
+        }
+        
+        _cacheWarms = await CacheWarmingService.GetCacheWarmsByWebsiteId(Website.Id);
+        _scheduledAction = await ScheduleService.GetActionByWebsiteIdAndType(Website.Id, CrawlAction.CacheWarm);
+        
+        progress = new Progress<CrawlProgress<Link>>(p =>
+            {
+                _linksChecked = p.LinksChecked;
+                _linksEnqueued = p.LinksEnqueued;
+                InvokeAsync(StateHasChanged);
+            }
+        );    
+    }
+
+    public async Task WarmCache(Uri uri)
+    {
+        await StartProcessingAsync(async (token) =>
+        {
+            _linksChecked = 0;
+            _linksEnqueued = 0;
+            await CacheWarmingService.WarmCache(Website, progress, token);
+        });
+        
+        _cacheWarms = await CacheWarmingService.GetCacheWarmsByWebsiteId(Website.Id);
+    }
+    
+}

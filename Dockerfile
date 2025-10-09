@@ -1,12 +1,10 @@
-ARG NEW_RELIC_LICENSE_KEY
-
 # SDK stage
 FROM mcr.microsoft.com/dotnet/sdk:9.0-noble AS build-env
 WORKDIR /src
-COPY ./ .
+COPY ./src .
 
-RUN dotnet restore "./WebsiteAnalyzer.Web/WebsiteAnalyzer.Web.csproj" \
-    && dotnet publish "./WebsiteAnalyzer.Web/WebsiteAnalyzer.Web.csproj" \
+RUN dotnet restore "WebsiteAnalyzer.Web/WebsiteAnalyzer.Web.csproj" \
+    && dotnet publish "WebsiteAnalyzer.Web/WebsiteAnalyzer.Web.csproj" \
     -c Release \
     -o /app/publish \
     --no-restore \
@@ -19,18 +17,17 @@ WORKDIR /app
 
 COPY --from=build-env /app/publish .
 
+# Install libmsquic for HTTP/3 support
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
         curl \
         wget \
         gnupg \
-        libc6 \
     && wget -O - https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor -o /usr/share/keyrings/microsoft-archive-keyring.gpg \
-    && echo "deb [arch=amd64 signed-by=/usr/share/keyrings/microsoft-archive-keyring.gpg] https://packages.microsoft.com/debian/12/prod bookworm main" > /etc/apt/sources.list.d/microsoft.list \
+    && echo "deb [arch=amd64 signed-by=/usr/share/keyrings/microsoft-archive-keyring.gpg] https://packages.microsoft.com/ubuntu/24.04/prod noble main" > /etc/apt/sources.list.d/microsoft.list \
     && apt-get update \
-    && apt-get install -y --no-install-recommends \
-        libmsquic \
-    && rm -rf /var/lib/apt/lists/* \
+    && apt-get install -y --no-install-recommends libmsquic \
+    && rm -rf /var/lib/apt/lists/*
 
 ENV DOTNET_gcServer=1 \
     ASPNETCORE_ENVIRONMENT=Production

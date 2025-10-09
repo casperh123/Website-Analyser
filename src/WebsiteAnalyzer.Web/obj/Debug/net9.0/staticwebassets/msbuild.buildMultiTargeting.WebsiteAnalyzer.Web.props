@@ -1,0 +1,3 @@
+﻿<Project>
+  <Import Project="../build/WebsiteAnalyzer.Web.props" />
+</Project>

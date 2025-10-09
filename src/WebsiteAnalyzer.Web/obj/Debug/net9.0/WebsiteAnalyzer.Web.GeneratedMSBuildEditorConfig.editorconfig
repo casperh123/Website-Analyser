@@ -1,0 +1,371 @@
+is_global = true
+build_property.TargetFramework = net9.0
+build_property.TargetFramework = net9.0
+build_property.TargetPlatformMinVersion = 
+build_property.TargetPlatformMinVersion = 
+build_property.UsingMicrosoftNETSdkWeb = true
+build_property.UsingMicrosoftNETSdkWeb = true
+build_property.ProjectTypeGuids = 
+build_property.ProjectTypeGuids = 
+build_property.InvariantGlobalization = 
+build_property.InvariantGlobalization = 
+build_property.PlatformNeutralAssembly = 
+build_property.PlatformNeutralAssembly = 
+build_property.EnforceExtendedAnalyzerRules = 
+build_property.EnforceExtendedAnalyzerRules = 
+build_property._SupportedPlatformList = Linux,macOS,Windows
+build_property._SupportedPlatformList = Linux,macOS,Windows
+build_property.TargetFrameworkIdentifier = .NETCoreApp
+build_property.TargetFrameworkVersion = v9.0
+build_property.RootNamespace = WebsiteAnalyzer.Web
+build_property.RootNamespace = WebsiteAnalyzer.Web
+build_property.ProjectDir = /home/casperh/GitHub/Website-Analyser/src/WebsiteAnalyzer.Web/
+build_property.EnableComHosting = 
+build_property.EnableGeneratedComInterfaceComImportInterop = 
+build_property.RazorLangVersion = 9.0
+build_property.SupportLocalizedComponentNames = 
+build_property.GenerateRazorMetadataSourceChecksumAttributes = 
+build_property.MSBuildProjectDirectory = /home/casperh/GitHub/Website-Analyser/src/WebsiteAnalyzer.Web
+build_property._RazorSourceGeneratorDebug = 
+build_property.EffectiveAnalysisLevelStyle = 9.0
+build_property.EnableCodeStyleSeverity = 
+
+[/home/casperh/GitHub/Website-Analyser/src/WebsiteAnalyzer.Web/Components/Account/Pages/AccessDenied.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9BY2NvdW50L1BhZ2VzL0FjY2Vzc0RlbmllZC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/casperh/GitHub/Website-Analyser/src/WebsiteAnalyzer.Web/Components/Account/Pages/ConfirmEmail.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9BY2NvdW50L1BhZ2VzL0NvbmZpcm1FbWFpbC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/casperh/GitHub/Website-Analyser/src/WebsiteAnalyzer.Web/Components/Account/Pages/ConfirmEmailChange.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9BY2NvdW50L1BhZ2VzL0NvbmZpcm1FbWFpbENoYW5nZS5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/casperh/GitHub/Website-Analyser/src/WebsiteAnalyzer.Web/Components/Account/Pages/ExternalLogin.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9BY2NvdW50L1BhZ2VzL0V4dGVybmFsTG9naW4ucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/casperh/GitHub/Website-Analyser/src/WebsiteAnalyzer.Web/Components/Account/Pages/ForgotPassword.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9BY2NvdW50L1BhZ2VzL0ZvcmdvdFBhc3N3b3JkLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/casperh/GitHub/Website-Analyser/src/WebsiteAnalyzer.Web/Components/Account/Pages/ForgotPasswordConfirmation.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9BY2NvdW50L1BhZ2VzL0ZvcmdvdFBhc3N3b3JkQ29uZmlybWF0aW9uLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/casperh/GitHub/Website-Analyser/src/WebsiteAnalyzer.Web/Components/Account/Pages/InvalidPasswordReset.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9BY2NvdW50L1BhZ2VzL0ludmFsaWRQYXNzd29yZFJlc2V0LnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/casperh/GitHub/Website-Analyser/src/WebsiteAnalyzer.Web/Components/Account/Pages/InvalidUser.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9BY2NvdW50L1BhZ2VzL0ludmFsaWRVc2VyLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/casperh/GitHub/Website-Analyser/src/WebsiteAnalyzer.Web/Components/Account/Pages/Lockout.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9BY2NvdW50L1BhZ2VzL0xvY2tvdXQucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/casperh/GitHub/Website-Analyser/src/WebsiteAnalyzer.Web/Components/Account/Pages/Login.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9BY2NvdW50L1BhZ2VzL0xvZ2luLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/casperh/GitHub/Website-Analyser/src/WebsiteAnalyzer.Web/Components/Account/Pages/LoginWith2fa.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9BY2NvdW50L1BhZ2VzL0xvZ2luV2l0aDJmYS5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/casperh/GitHub/Website-Analyser/src/WebsiteAnalyzer.Web/Components/Account/Pages/LoginWithRecoveryCode.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9BY2NvdW50L1BhZ2VzL0xvZ2luV2l0aFJlY292ZXJ5Q29kZS5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/casperh/GitHub/Website-Analyser/src/WebsiteAnalyzer.Web/Components/Account/Pages/Manage/ChangePassword.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9BY2NvdW50L1BhZ2VzL01hbmFnZS9DaGFuZ2VQYXNzd29yZC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/casperh/GitHub/Website-Analyser/src/WebsiteAnalyzer.Web/Components/Account/Pages/Manage/DeletePersonalData.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9BY2NvdW50L1BhZ2VzL01hbmFnZS9EZWxldGVQZXJzb25hbERhdGEucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/casperh/GitHub/Website-Analyser/src/WebsiteAnalyzer.Web/Components/Account/Pages/Manage/Disable2fa.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9BY2NvdW50L1BhZ2VzL01hbmFnZS9EaXNhYmxlMmZhLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/casperh/GitHub/Website-Analyser/src/WebsiteAnalyzer.Web/Components/Account/Pages/Manage/Email.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9BY2NvdW50L1BhZ2VzL01hbmFnZS9FbWFpbC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/casperh/GitHub/Website-Analyser/src/WebsiteAnalyzer.Web/Components/Account/Pages/Manage/EnableAuthenticator.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9BY2NvdW50L1BhZ2VzL01hbmFnZS9FbmFibGVBdXRoZW50aWNhdG9yLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/casperh/GitHub/Website-Analyser/src/WebsiteAnalyzer.Web/Components/Account/Pages/Manage/ExternalLogins.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9BY2NvdW50L1BhZ2VzL01hbmFnZS9FeHRlcm5hbExvZ2lucy5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/casperh/GitHub/Website-Analyser/src/WebsiteAnalyzer.Web/Components/Account/Pages/Manage/GenerateRecoveryCodes.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9BY2NvdW50L1BhZ2VzL01hbmFnZS9HZW5lcmF0ZVJlY292ZXJ5Q29kZXMucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/casperh/GitHub/Website-Analyser/src/WebsiteAnalyzer.Web/Components/Account/Pages/Manage/Index.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9BY2NvdW50L1BhZ2VzL01hbmFnZS9JbmRleC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/casperh/GitHub/Website-Analyser/src/WebsiteAnalyzer.Web/Components/Account/Pages/Manage/PersonalData.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9BY2NvdW50L1BhZ2VzL01hbmFnZS9QZXJzb25hbERhdGEucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/casperh/GitHub/Website-Analyser/src/WebsiteAnalyzer.Web/Components/Account/Pages/Manage/ResetAuthenticator.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9BY2NvdW50L1BhZ2VzL01hbmFnZS9SZXNldEF1dGhlbnRpY2F0b3IucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/casperh/GitHub/Website-Analyser/src/WebsiteAnalyzer.Web/Components/Account/Pages/Manage/SetPassword.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9BY2NvdW50L1BhZ2VzL01hbmFnZS9TZXRQYXNzd29yZC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/casperh/GitHub/Website-Analyser/src/WebsiteAnalyzer.Web/Components/Account/Pages/Manage/TwoFactorAuthentication.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9BY2NvdW50L1BhZ2VzL01hbmFnZS9Ud29GYWN0b3JBdXRoZW50aWNhdGlvbi5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/casperh/GitHub/Website-Analyser/src/WebsiteAnalyzer.Web/Components/Account/Pages/Manage/_Imports.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9BY2NvdW50L1BhZ2VzL01hbmFnZS9fSW1wb3J0cy5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/casperh/GitHub/Website-Analyser/src/WebsiteAnalyzer.Web/Components/Account/Pages/Register.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9BY2NvdW50L1BhZ2VzL1JlZ2lzdGVyLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/casperh/GitHub/Website-Analyser/src/WebsiteAnalyzer.Web/Components/Account/Pages/RegisterConfirmation.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9BY2NvdW50L1BhZ2VzL1JlZ2lzdGVyQ29uZmlybWF0aW9uLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/casperh/GitHub/Website-Analyser/src/WebsiteAnalyzer.Web/Components/Account/Pages/ResendEmailConfirmation.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9BY2NvdW50L1BhZ2VzL1Jlc2VuZEVtYWlsQ29uZmlybWF0aW9uLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/casperh/GitHub/Website-Analyser/src/WebsiteAnalyzer.Web/Components/Account/Pages/ResetPassword.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9BY2NvdW50L1BhZ2VzL1Jlc2V0UGFzc3dvcmQucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/casperh/GitHub/Website-Analyser/src/WebsiteAnalyzer.Web/Components/Account/Pages/ResetPasswordConfirmation.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9BY2NvdW50L1BhZ2VzL1Jlc2V0UGFzc3dvcmRDb25maXJtYXRpb24ucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/casperh/GitHub/Website-Analyser/src/WebsiteAnalyzer.Web/Components/Account/Pages/_Imports.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9BY2NvdW50L1BhZ2VzL19JbXBvcnRzLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/casperh/GitHub/Website-Analyser/src/WebsiteAnalyzer.Web/Components/Account/Shared/AccountLayout.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9BY2NvdW50L1NoYXJlZC9BY2NvdW50TGF5b3V0LnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/casperh/GitHub/Website-Analyser/src/WebsiteAnalyzer.Web/Components/Account/Shared/ExternalLoginPicker.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9BY2NvdW50L1NoYXJlZC9FeHRlcm5hbExvZ2luUGlja2VyLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/casperh/GitHub/Website-Analyser/src/WebsiteAnalyzer.Web/Components/Account/Shared/ManageLayout.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9BY2NvdW50L1NoYXJlZC9NYW5hZ2VMYXlvdXQucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/casperh/GitHub/Website-Analyser/src/WebsiteAnalyzer.Web/Components/Account/Shared/ManageNavMenu.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9BY2NvdW50L1NoYXJlZC9NYW5hZ2VOYXZNZW51LnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/casperh/GitHub/Website-Analyser/src/WebsiteAnalyzer.Web/Components/Account/Shared/RedirectToLogin.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9BY2NvdW50L1NoYXJlZC9SZWRpcmVjdFRvTG9naW4ucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/casperh/GitHub/Website-Analyser/src/WebsiteAnalyzer.Web/Components/Account/Shared/ShowRecoveryCodes.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9BY2NvdW50L1NoYXJlZC9TaG93UmVjb3ZlcnlDb2Rlcy5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/casperh/GitHub/Website-Analyser/src/WebsiteAnalyzer.Web/Components/Account/Shared/StatusMessage.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9BY2NvdW50L1NoYXJlZC9TdGF0dXNNZXNzYWdlLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/casperh/GitHub/Website-Analyser/src/WebsiteAnalyzer.Web/Components/App.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9BcHAucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/casperh/GitHub/Website-Analyser/src/WebsiteAnalyzer.Web/Components/BrokenLink/Cards/BrokenLinkCard.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9Ccm9rZW5MaW5rL0NhcmRzL0Jyb2tlbkxpbmtDYXJkLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/casperh/GitHub/Website-Analyser/src/WebsiteAnalyzer.Web/Components/BrokenLink/Cards/BrokenLinkCrawlCard.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9Ccm9rZW5MaW5rL0NhcmRzL0Jyb2tlbkxpbmtDcmF3bENhcmQucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/casperh/GitHub/Website-Analyser/src/WebsiteAnalyzer.Web/Components/BrokenLink/Lists/BrokenLinkCrawlHistory.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9Ccm9rZW5MaW5rL0xpc3RzL0Jyb2tlbkxpbmtDcmF3bEhpc3RvcnkucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/casperh/GitHub/Website-Analyser/src/WebsiteAnalyzer.Web/Components/BrokenLink/Lists/BrokenLinkCrawlLinkList.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9Ccm9rZW5MaW5rL0xpc3RzL0Jyb2tlbkxpbmtDcmF3bExpbmtMaXN0LnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/casperh/GitHub/Website-Analyser/src/WebsiteAnalyzer.Web/Components/CacheWarm/Badges/CacheWarmCompletion.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9DYWNoZVdhcm0vQmFkZ2VzL0NhY2hlV2FybUNvbXBsZXRpb24ucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/casperh/GitHub/Website-Analyser/src/WebsiteAnalyzer.Web/Components/CacheWarm/Cards/CacheWarmCard.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9DYWNoZVdhcm0vQ2FyZHMvQ2FjaGVXYXJtQ2FyZC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/casperh/GitHub/Website-Analyser/src/WebsiteAnalyzer.Web/Components/CacheWarm/Lists/CacheWarmList.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9DYWNoZVdhcm0vTGlzdHMvQ2FjaGVXYXJtTGlzdC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/casperh/GitHub/Website-Analyser/src/WebsiteAnalyzer.Web/Components/CacheWarm/Seo/CacheWarmIntroText.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9DYWNoZVdhcm0vU2VvL0NhY2hlV2FybUludHJvVGV4dC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/casperh/GitHub/Website-Analyser/src/WebsiteAnalyzer.Web/Components/CacheWarm/Seo/CacheWarmSeoText.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9DYWNoZVdhcm0vU2VvL0NhY2hlV2FybVNlb1RleHQucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/casperh/GitHub/Website-Analyser/src/WebsiteAnalyzer.Web/Components/Cards/CollapsableCacheCard.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9DYXJkcy9Db2xsYXBzYWJsZUNhY2hlQ2FyZC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/casperh/GitHub/Website-Analyser/src/WebsiteAnalyzer.Web/Components/Cards/WebsiteCard.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9DYXJkcy9XZWJzaXRlQ2FyZC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/casperh/GitHub/Website-Analyser/src/WebsiteAnalyzer.Web/Components/Crawl/CrawlMetrics/CrawlMetrics.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9DcmF3bC9DcmF3bE1ldHJpY3MvQ3Jhd2xNZXRyaWNzLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/casperh/GitHub/Website-Analyser/src/WebsiteAnalyzer.Web/Components/ErrorHandling/ErrorMessage.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9FcnJvckhhbmRsaW5nL0Vycm9yTWVzc2FnZS5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/casperh/GitHub/Website-Analyser/src/WebsiteAnalyzer.Web/Components/General/Lists/PaginatedList.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9HZW5lcmFsL0xpc3RzL1BhZ2luYXRlZExpc3QucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/casperh/GitHub/Website-Analyser/src/WebsiteAnalyzer.Web/Components/Layout/WebsiteStatsLayout.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9MYXlvdXQvV2Vic2l0ZVN0YXRzTGF5b3V0LnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/casperh/GitHub/Website-Analyser/src/WebsiteAnalyzer.Web/Components/Layout/WebsiteStatsMenu.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9MYXlvdXQvV2Vic2l0ZVN0YXRzTWVudS5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/casperh/GitHub/Website-Analyser/src/WebsiteAnalyzer.Web/Components/Pages/BrokenLinkChecker.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9QYWdlcy9Ccm9rZW5MaW5rQ2hlY2tlci5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/casperh/GitHub/Website-Analyser/src/WebsiteAnalyzer.Web/Components/Pages/CacheWarmer.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9QYWdlcy9DYWNoZVdhcm1lci5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/casperh/GitHub/Website-Analyser/src/WebsiteAnalyzer.Web/Components/Pages/Error.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9QYWdlcy9FcnJvci5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/casperh/GitHub/Website-Analyser/src/WebsiteAnalyzer.Web/Components/Pages/Home.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9QYWdlcy9Ib21lLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/casperh/GitHub/Website-Analyser/src/WebsiteAnalyzer.Web/Components/Pages/ModularWebsiteAnalyser.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9QYWdlcy9Nb2R1bGFyV2Vic2l0ZUFuYWx5c2VyLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/casperh/GitHub/Website-Analyser/src/WebsiteAnalyzer.Web/Components/Pages/WebsiteAnalyser.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9QYWdlcy9XZWJzaXRlQW5hbHlzZXIucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/casperh/GitHub/Website-Analyser/src/WebsiteAnalyzer.Web/Components/Pages/WebsiteBrokenLinkCrawls.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9QYWdlcy9XZWJzaXRlQnJva2VuTGlua0NyYXdscy5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/casperh/GitHub/Website-Analyser/src/WebsiteAnalyzer.Web/Components/Pages/WebsiteCacheWarms.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9QYWdlcy9XZWJzaXRlQ2FjaGVXYXJtcy5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/casperh/GitHub/Website-Analyser/src/WebsiteAnalyzer.Web/Components/Pages/WebsiteDashboard.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9QYWdlcy9XZWJzaXRlRGFzaGJvYXJkLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/casperh/GitHub/Website-Analyser/src/WebsiteAnalyzer.Web/Components/Pages/Websites.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9QYWdlcy9XZWJzaXRlcy5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/casperh/GitHub/Website-Analyser/src/WebsiteAnalyzer.Web/Components/Routes.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9Sb3V0ZXMucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/casperh/GitHub/Website-Analyser/src/WebsiteAnalyzer.Web/Components/Schedule/Lists/ScheduledTaskDataGrid.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9TY2hlZHVsZS9MaXN0cy9TY2hlZHVsZWRUYXNrRGF0YUdyaWQucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/casperh/GitHub/Website-Analyser/src/WebsiteAnalyzer.Web/Components/Schedule/WebsiteScheduler.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9TY2hlZHVsZS9XZWJzaXRlU2NoZWR1bGVyLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/casperh/GitHub/Website-Analyser/src/WebsiteAnalyzer.Web/Components/ScheduledAction/ScheduledActionStatus.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9TY2hlZHVsZWRBY3Rpb24vU2NoZWR1bGVkQWN0aW9uU3RhdHVzLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/casperh/GitHub/Website-Analyser/src/WebsiteAnalyzer.Web/Components/Search/SearchBar.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9TZWFyY2gvU2VhcmNoQmFyLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/casperh/GitHub/Website-Analyser/src/WebsiteAnalyzer.Web/Components/Status/StatusBadge.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9TdGF0dXMvU3RhdHVzQmFkZ2UucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/casperh/GitHub/Website-Analyser/src/WebsiteAnalyzer.Web/Components/Templates/UITemplates/CTACard.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9UZW1wbGF0ZXMvVUlUZW1wbGF0ZXMvQ1RBQ2FyZC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/casperh/GitHub/Website-Analyser/src/WebsiteAnalyzer.Web/Components/Templates/UITemplates/HeroSection.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9UZW1wbGF0ZXMvVUlUZW1wbGF0ZXMvSGVyb1NlY3Rpb24ucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/casperh/GitHub/Website-Analyser/src/WebsiteAnalyzer.Web/Components/Templates/WebsiteComponent.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9UZW1wbGF0ZXMvV2Vic2l0ZUNvbXBvbmVudC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/casperh/GitHub/Website-Analyser/src/WebsiteAnalyzer.Web/Components/Toggles/ToggleButtonChevron.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9Ub2dnbGVzL1RvZ2dsZUJ1dHRvbkNoZXZyb24ucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/casperh/GitHub/Website-Analyser/src/WebsiteAnalyzer.Web/Components/User/SignUp.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9Vc2VyL1NpZ25VcC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/casperh/GitHub/Website-Analyser/src/WebsiteAnalyzer.Web/Components/Website/Toggles/ToggleAddNewWebsite.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9XZWJzaXRlL1RvZ2dsZXMvVG9nZ2xlQWRkTmV3V2Vic2l0ZS5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/casperh/GitHub/Website-Analyser/src/WebsiteAnalyzer.Web/Components/WebsiteInputs/WebsiteInput.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9XZWJzaXRlSW5wdXRzL1dlYnNpdGVJbnB1dC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/casperh/GitHub/Website-Analyser/src/WebsiteAnalyzer.Web/Components/WebsiteMetrics/BrokenLinksStats.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9XZWJzaXRlTWV0cmljcy9Ccm9rZW5MaW5rc1N0YXRzLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/casperh/GitHub/Website-Analyser/src/WebsiteAnalyzer.Web/Components/WebsiteMetrics/PageHeaders.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9XZWJzaXRlTWV0cmljcy9QYWdlSGVhZGVycy5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/casperh/GitHub/Website-Analyser/src/WebsiteAnalyzer.Web/Components/WebsiteMetrics/PerformanceStats.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9XZWJzaXRlTWV0cmljcy9QZXJmb3JtYW5jZVN0YXRzLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/casperh/GitHub/Website-Analyser/src/WebsiteAnalyzer.Web/Components/WebsiteMetrics/StateButtons.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9XZWJzaXRlTWV0cmljcy9TdGF0ZUJ1dHRvbnMucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/casperh/GitHub/Website-Analyser/src/WebsiteAnalyzer.Web/Components/_Imports.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9fSW1wb3J0cy5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/casperh/GitHub/Website-Analyser/src/WebsiteAnalyzer.Web/Components/Layout/MainLayout.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9MYXlvdXQvTWFpbkxheW91dC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = b-ppami68ezy
+
+[/home/casperh/GitHub/Website-Analyser/src/WebsiteAnalyzer.Web/Components/Layout/NavMenu.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9MYXlvdXQvTmF2TWVudS5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = b-8b2o0ava35

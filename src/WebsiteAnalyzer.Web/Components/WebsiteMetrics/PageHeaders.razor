@@ -1,0 +1,25 @@
+@using BrokenLinkChecker.Models
+@using Microsoft.AspNetCore.Components.QuickGrid
+@using WebsiteAnalyzer.Web.Components.Cards
+<h3>Page Headers</h3>
+
+@if (VisitedPages.Count > 0)
+{
+    <QuickGrid Items="@VisitedPages.AsQueryable()" Pagination="pagination">
+        <PropertyColumn Property="@(page => page.Url)" Sortable="true"/>
+        <PropertyColumn Property="@(page => page.Headers.ContentEncoding)" Sortable="true"/>
+        <PropertyColumn Property="@(page => page.Headers.Server)" Sortable="true"/>
+        <TemplateColumn Title="Cache" Sortable="true">
+            <CollapsableCacheCard Cache="context.Headers.Cache"></CollapsableCacheCard>
+        </TemplateColumn>
+        <PropertyColumn Property="@(page => page.Headers.LastModified)" Sortable="true"/>
+    </QuickGrid>
+
+    <Paginator State="pagination"/>
+}
+
+@code {
+    [Parameter] public ICollection<PageStat> VisitedPages { get; set; }
+
+    PaginationState pagination = new() { ItemsPerPage = 20 };
+}

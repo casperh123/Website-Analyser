@@ -1,0 +1,10 @@
+{
+  "version": 2,
+  "dgSpecHash": "H8KhTfFa8L4=",
+  "success": true,
+  "projectFilePath": "/home/casperh/GitHub/Website-Analyser/WebsiteAnalyzer.Application/WebsiteAnalyzer.Application.csproj",
+  "expectedPackageFiles": [
+    "/home/casperh/.nuget/packages/anglesharp/1.3.0/anglesharp.1.3.0.nupkg.sha512"
+  ],
+  "logs": []
+}

@@ -1,0 +1,140 @@
+@page "/website-analyser-legacy"
+@using global::BrokenLinkChecker.Crawler.BaseCrawler
+@using global::BrokenLinkChecker.Models
+@using global::BrokenLinkChecker.Models.Links
+@using WebsiteAnalyzer.Web.Components.WebsiteInputs
+@using WebsiteAnalyzer.Web.Components.WebsiteMetrics
+@rendermode InteractiveServer
+
+@inject HttpClient HttpClient
+
+<h2>Website Analyser</h2>
+
+<WebsiteInput 
+    WebsiteActionStarted="@CheckBrokenLinks" 
+    LinksChecked="_linksChecked" 
+    LinksEnqueued="_linksEnqueued" />
+
+<RadzenCard Style="margin: 20px 0; max-width: 600px; display: flex; flex-direction: column">
+    <RadzenLabel>Concurrent Requests:</RadzenLabel>
+    <RadzenNumeric @bind-Value="_concurrentRequests"/>
+</RadzenCard>
+
+@if (_linksChecked > 0)
+{
+    <div class="padding-m round-corners box-shadow">
+        <h2>Website metrics</h2>
+
+        <StateButtons PageStateChanged="ChangePageState"/>
+
+        @switch (_currentStatus)
+        {
+            case PageStatState.DisplayPerformance:
+                <PerformanceStats VisitedPages="VisitedPages"/>
+                break;
+            case PageStatState.DisplayBrokenLinks:
+                //<BrokenLinksStats BrokenLinks="BrokenLinks"/>
+                break;
+            case PageStatState.DisplayHeaders:
+                <PageHeaders VisitedPages="VisitedPages"/>
+                break;
+            case PageStatState.Error:
+                <p>Error encountered during the process. Please try again.</p>
+                break;
+        }
+    </div>
+}
+
+@code {
+    private bool IsChecking { get; set; }
+    private int _linksChecked;
+    private int _linksEnqueued;
+    private int _concurrentRequests = 1;
+
+    public IList<IndexedLink> BrokenLinks { get; set; } = new List<IndexedLink>();
+    public ICollection<PageStat> VisitedPages { get; set; } = new List<PageStat>();
+
+    private PageStatState _currentStatus = PageStatState.DisplayPerformance;
+
+    public CrawlMode CrawlMode { get; set; } = CrawlMode.SiteStats; // Initialize default crawl mode
+
+    private async Task CheckBrokenLinks(Uri url)
+    {
+        try
+        {
+            IsChecking = true;
+            ResetResults();
+
+            var crawlerState = new CrawlerConfig(_concurrentRequests, CrawlMode);
+            var crawlResult = InitializeCrawlResult();
+
+            var crawler = new Crawler(HttpClient, crawlerState, crawlResult);
+
+            await crawler.CrawlWebsiteAsync(url);
+        }
+        catch (Exception e)
+        {
+            _currentStatus = PageStatState.Error;
+        }
+        finally
+        {
+            IsChecking = false;
+            StateHasChanged();
+        }
+    }
+
+    private void OnCrawlModeChanged(CrawlMode newMode)
+    {
+        CrawlMode = newMode;
+    }
+
+    private void ResetResults()
+    {
+        BrokenLinks.Clear();
+        VisitedPages.Clear();
+        _linksChecked = 0;
+        _linksEnqueued = 0;
+    }
+
+    private CrawlResult InitializeCrawlResult()
+    {
+        var crawlResult = new CrawlResult();
+
+        crawlResult.OnLinksEnqueued += UpdateLinksEnqueued;
+        crawlResult.OnLinksChecked += UpdateLinksChecked;
+        crawlResult.OnBrokenLinks += UpdateBrokenLinks;
+        crawlResult.OnPageVisited += UpdateVisitedPages;
+
+        return crawlResult;
+    }
+
+    private void UpdateLinksEnqueued(int count)
+    {
+        _linksEnqueued = count;
+        InvokeAsync(StateHasChanged);
+    }
+
+    private void UpdateLinksChecked(int count)
+    {
+        _linksChecked = count;
+        InvokeAsync(StateHasChanged);
+    }
+
+    private void UpdateBrokenLinks(IndexedLink link)
+    {
+        BrokenLinks.Add(link);
+        InvokeAsync(StateHasChanged);
+    }
+
+    private void UpdateVisitedPages(PageStat page)
+    {
+        VisitedPages.Add(page);
+        InvokeAsync(StateHasChanged);
+    }
+
+    private void ChangePageState(PageStatState newState)
+    {
+        _currentStatus = newState;
+    }
+
+}

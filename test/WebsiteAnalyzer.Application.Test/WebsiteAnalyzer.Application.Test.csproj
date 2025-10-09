@@ -19,6 +19,9 @@
     </ItemGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\..\src\WebsiteAnalyzer.Application\WebsiteAnalyzer.Application.csproj" />
+      <ProjectReference Include="..\..\src\WebsiteAnalyzer.Core\WebsiteAnalyzer.Core.csproj" />
+      <ProjectReference Include="..\..\src\WebsiteAnalyzer.Infrastructure\WebsiteAnalyzer.Infrastructure.csproj" />
       <ProjectReference Include="..\..\WebsiteAnalyzer.Application\WebsiteAnalyzer.Application.csproj" />
       <ProjectReference Include="..\..\WebsiteAnalyzer.Core\WebsiteAnalyzer.Core.csproj" />
       <ProjectReference Include="..\..\WebsiteAnalyzer.Infrastructure\WebsiteAnalyzer.Infrastructure.csproj" />
