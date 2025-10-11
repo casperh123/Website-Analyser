@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using WebsiteAnalyzer.Core.Domain.BrokenLink;
+using WebsiteAnalyzer.Core.Interfaces.Repositories;
 using WebsiteAnalyzer.Infrastructure.Data;
 using WebsiteAnalyzer.TestUtilities.Utilities;
 
@@ -9,7 +10,7 @@ namespace WebsiteAnalyzer.TestUtilities.Builders.Website;
 public class WebsiteBuilder : EntityBuilder<Core.Domain.Website.Website>
 {
     public WebsiteBuilder(
-        ApplicationDbContext dbContext,
+        IWebsiteRepository dbContext,
         Guid userId,
         string url) : base(dbContext)
     {

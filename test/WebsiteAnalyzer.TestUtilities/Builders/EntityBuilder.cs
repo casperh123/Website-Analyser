@@ -1,21 +1,20 @@
-using WebsiteAnalyzer.Infrastructure.Data;
+using WebsiteAnalyzer.Core.Interfaces.Repositories;
 
 namespace WebsiteAnalyzer.TestUtilities.Builders;
 
 public abstract class EntityBuilder<T> where T : class
 {
-    protected readonly ApplicationDbContext Context;
+    protected readonly IBaseRepository<T> Repository;
     protected T Entity;
 
-    protected EntityBuilder(ApplicationDbContext context)
+    protected EntityBuilder(IBaseRepository<T> repository)
     {
-        Context = context;
+        Repository = repository;
     }
     
     public async Task<T> BuildAndSave()
     {
-        Context.Set<T>().Add(Entity);
-        await Context.SaveChangesAsync();
+        await Repository.AddAsync(Entity);
         return Entity;
     }
 
