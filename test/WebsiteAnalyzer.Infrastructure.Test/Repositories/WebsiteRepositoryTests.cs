@@ -180,7 +180,7 @@ public class WebsiteRepositoryTests : TestBase
         string keepUrl = "http://website2.dk";
 
         await WebsiteScenarios.DefaultWebsite(userId, targetUrl);
-        Website keepWebsite = await WebsiteScenarios.DefaultWebsite(userId, keepUrl);
+        await WebsiteScenarios.DefaultWebsite(userId, keepUrl);
     
         // Act
         await _sut.DeleteByUrlAndUserId(targetUrl, userId);
@@ -191,6 +191,59 @@ public class WebsiteRepositoryTests : TestBase
         Assert.Equal(keepUrl, remaining.First().Url);
     }
     
-    // TODO: Cannot delete others website
-    // TODO: Delete non-existant webstie
+    [Fact]
+    public async Task DeleteByUrlAndUserId_DeletesOnlyUserWebsite()
+    {
+        // Arrange
+        Guid userId = Guid.NewGuid();
+        Guid otherUserId = Guid.NewGuid();
+        string userWebsiteUrl = "http://website1.dk";
+        string otherUserWebsiteUrl = "http://website2.dk";
+
+        await WebsiteScenarios.DefaultWebsite(userId, userWebsiteUrl);
+        Website websiteThatShouldPersist =await WebsiteScenarios.DefaultWebsite(otherUserId, otherUserWebsiteUrl);
+        
+        // Act
+        await _sut.DeleteByUrlAndUserId(otherUserWebsiteUrl, userId);
+
+        Website? retrievedWebsite = await _sut.GetByIdAndUserId(websiteThatShouldPersist.Id, otherUserId);
+
+        // Assert
+        Assert.NotNull(retrievedWebsite);
+        Assert.Equal(otherUserId, retrievedWebsite.UserId);
+        Assert.Equal(otherUserWebsiteUrl, retrievedWebsite.Url);
+    }
+    
+    [Fact]
+    public async Task DeleteByUrlAndUserId_CanOnlyDeleteUserWebsites()
+    {
+        // Arrange
+        Guid userId = Guid.NewGuid();
+        Guid otherUserId = Guid.NewGuid();
+        string websiteUrl = "http://website1.dk";
+
+        await WebsiteScenarios.DefaultWebsite(userId, websiteUrl);
+        Website websiteThatShouldPersist = await WebsiteScenarios.DefaultWebsite(otherUserId, websiteUrl);
+        
+        // Act
+        await _sut.DeleteByUrlAndUserId(websiteUrl, userId);
+
+        Website? retrievedWebsite = await _sut.GetByIdAndUserId(websiteThatShouldPersist.Id, otherUserId);
+
+        // Assert
+        Assert.NotNull(retrievedWebsite);
+        Assert.Equal(otherUserId, retrievedWebsite.UserId);
+        Assert.Equal(websiteUrl, retrievedWebsite.Url);
+    }
+    
+    [Fact]
+    public async Task DeleteByUrlAndUserId_Suceeds_WhenWebsiteDoesntExist()
+    {
+        // Arrange
+        Guid userId = Guid.NewGuid();
+        string websiteUrl = "http://website.dk";
+        
+        // Act
+        await _sut.DeleteByUrlAndUserId(websiteUrl, userId);
+    }
 }
