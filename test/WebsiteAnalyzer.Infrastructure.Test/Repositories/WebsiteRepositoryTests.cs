@@ -24,8 +24,7 @@ public class WebsiteRepositoryTests : TestBase
     public async Task GetAllByUserId_ReturnsExpectedWebsitesForEachUser(int userWebsitesCount, int otherUserWebsitesCount)
     {
         // Arrange
-        Guid userId = Guid.NewGuid();
-        Guid otherUserId = Guid.NewGuid();
+        (Guid userId, Guid otherUserId) = TwoUserIds();
 
         await WebsiteScenarios.CreateMultipleForUser(userId, userWebsitesCount);
         await WebsiteScenarios.CreateMultipleForUser(otherUserId, otherUserWebsitesCount);
@@ -68,8 +67,7 @@ public class WebsiteRepositoryTests : TestBase
     public async Task GetByIdAndUserId_ReturnsNothing_WhenQueryingOtherUserWebsite()
     {
         // Arrange
-        Guid userId = Guid.NewGuid();
-        Guid otherUserId = Guid.NewGuid();
+        (Guid userId, Guid otherUserId) = TwoUserIds();
         Website website = await WebsiteScenarios.CreateDefault(userId, "http://website.dk");
         Guid websiteId = website.Id;
 
@@ -134,8 +132,7 @@ public class WebsiteRepositoryTests : TestBase
     public async Task DeleteByUrlAndUserId_DeletesOnlyUserWebsite()
     {
         // Arrange
-        Guid userId = Guid.NewGuid();
-        Guid otherUserId = Guid.NewGuid();
+        (Guid userId, Guid otherUserId) = TwoUserIds();
         string userWebsiteUrl = "http://website1.dk";
         string otherUserWebsiteUrl = "http://website2.dk";
 
@@ -157,8 +154,7 @@ public class WebsiteRepositoryTests : TestBase
     public async Task DeleteByUrlAndUserId_CanOnlyDeleteUserWebsites()
     {
         // Arrange
-        Guid userId = Guid.NewGuid();
-        Guid otherUserId = Guid.NewGuid();
+        (Guid userId, Guid otherUserId) = TwoUserIds();
         string websiteUrl = "http://website1.dk";
 
         await WebsiteScenarios.CreateDefault(userId, websiteUrl);
