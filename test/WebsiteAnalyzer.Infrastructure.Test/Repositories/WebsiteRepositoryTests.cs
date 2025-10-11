@@ -15,114 +15,53 @@ public class WebsiteRepositoryTests : TestBase
         _sut = new WebsiteRepository(Context);
     }
 
-    [Fact]
-    public async Task GetAllByUserId_ReturnsUserWebsites()
-    {
-        // Arrange
-        Guid userId = Guid.NewGuid();
-
-        string website1Url = "http://website1.dk";
-        string website2Url = "http://website2.dk";
-        string website3Url = "http://website3.dk";
-
-        await WebsiteScenarios.DefaultWebsite(userId, website1Url);
-        await WebsiteScenarios.DefaultWebsite(userId, website2Url);
-        await WebsiteScenarios.DefaultWebsite(userId, website3Url);
-
-        // Act
-        ICollection<Website> retrievedWebsites = await _sut.GetAllByUserId(userId);
-
-        // Assert
-        Assert.Equal(3, retrievedWebsites.Count);
-        Assert.All(retrievedWebsites, w => Assert.Equal(userId, w.UserId));
-        Assert.Contains(retrievedWebsites, w => w.Url == website1Url);
-        Assert.Contains(retrievedWebsites, w => w.Url == website2Url);
-        Assert.Contains(retrievedWebsites, w => w.Url == website3Url);
-    }
-
-    [Fact]
-    public async Task GetAllByUserId_ReturnsOnlyUserWebsites()
+    [Theory]
+    [InlineData(3, 0)]
+    [InlineData(3, 1)]
+    [InlineData(10, 9)]
+    [InlineData(0, 5)]
+    [InlineData(0, 0)]
+    public async Task GetAllByUserId_ReturnsExpectedWebsitesForEachUser(int userWebsitesCount, int otherUserWebsitesCount)
     {
         // Arrange
         Guid userId = Guid.NewGuid();
         Guid otherUserId = Guid.NewGuid();
 
-        await WebsiteScenarios.DefaultWebsite(userId, "http://userwebsite.dk");
-        await WebsiteScenarios.DefaultWebsite(userId, "http://userwebsite2.dk");
-        await WebsiteScenarios.DefaultWebsite(otherUserId, "http://otheruserwebsite.dk");
-
-        // Act 
-        ICollection<Website> retrievedWebsites = await _sut.GetAllByUserId(userId);
-
-        // Assert
-        Assert.Equal(2, retrievedWebsites.Count);
-        Assert.All(retrievedWebsites, w => Assert.Equal(userId, w.UserId));
-    }
-
-    [Fact]
-    public async Task GetAllByUserId_ReturnsEmpty_WhenUserHasNoWebsites()
-    {
-        // Arrange
-        Guid userId = Guid.NewGuid();
+        await WebsiteScenarios.CreateMultipleForUser(userId, userWebsitesCount);
+        await WebsiteScenarios.CreateMultipleForUser(otherUserId, otherUserWebsitesCount);
         
         // Act
-        ICollection<Website> retrievedWebsite = await _sut.GetAllByUserId(userId);
+        ICollection<Website> retrievedUserWebsites = await _sut.GetAllByUserId(userId);
+        ICollection<Website> retrievedOtherUserWebsites = await _sut.GetAllByUserId(otherUserId);
         
-        // Assert
-        Assert.Empty(retrievedWebsite);
-    }
-
-    [Fact]
-    public async Task GetByIdAndUserId_ReturnsUserAndIdWebsite()
-    {
-        // Arrange
-        Guid userId = Guid.NewGuid();
-        Website website = await WebsiteScenarios.DefaultWebsite(userId, "http://website.dk");
-        Guid websiteId = website.Id;
-        
-        // Act
-        Website? retrievedWebsite = await _sut.GetByIdAndUserId(websiteId, userId);
-
-        Assert.NotNull(retrievedWebsite);
-        Assert.Equal(userId, retrievedWebsite.UserId);
-        Assert.Equal(websiteId, retrievedWebsite.Id);
-    }
-
-    [Fact]
-    public async Task GetByIdAndUserId_ReturnsWebsite_WhenMultipleWebsites()
-    {
-        // Arrange
-        Guid userId = Guid.NewGuid();
-        Website website = await WebsiteScenarios.DefaultWebsite(userId, "http://website.dk");
-        Guid websiteId = website.Id;
-        await WebsiteScenarios.DefaultWebsite(userId, "http://website2.dk");
-
-        // Act
-        Website? retrievedWebsite = await _sut.GetByIdAndUserId(websiteId, userId);
-        
-        // Assert
-        Assert.NotNull(retrievedWebsite);
-        Assert.Equal(userId, retrievedWebsite.UserId);
-        Assert.Equal(websiteId, retrievedWebsite.Id);
+        Assert.Equal(userWebsitesCount, retrievedUserWebsites.Count);
+        Assert.Equal(otherUserWebsitesCount, retrievedOtherUserWebsites.Count);
+        Assert.All(retrievedUserWebsites, w => Assert.Equal(userId, w.UserId));
+        Assert.All(retrievedOtherUserWebsites, w => Assert.Equal(otherUserId, w.UserId));
     }
     
-    [Fact]
-    public async Task GetByIdAndUserId_ReturnsWebsite_WhenMultipleUsersAndWebsites()
+    [Theory]
+    [InlineData(1, 0)]
+    [InlineData(3, 0)]
+    [InlineData(3, 3)]
+    public async Task GetByIdAndUserId_ReturnsCorrectWebsite(int userWebsiteCount, int otherUserWebsiteCount)
     {
         // Arrange
-        Guid userId = Guid.NewGuid();
-        Guid otherUserId = Guid.NewGuid();
-        Website website = await WebsiteScenarios.DefaultWebsite(userId, "http://website.dk");
-        Guid websiteId = website.Id;
-        await WebsiteScenarios.DefaultWebsite(otherUserId, "http://website2.dk");
+        (Guid userId, Guid otherUserId) = TwoUserIds();
 
-        // Act
-        Website? retrievedWebsite = await _sut.GetByIdAndUserId(websiteId, userId);
+        ICollection<Website> userWebsites = await WebsiteScenarios.CreateMultipleForUser(userId, userWebsiteCount);
+        ICollection<Website> otherUserWebsites =
+            await WebsiteScenarios.CreateMultipleForUser(otherUserId, otherUserWebsiteCount);
+
+        Website websiteToFetch = userWebsites.First();
         
+        // Act
+        Website? retrievedWebsite = await _sut.GetByIdAndUserId(websiteToFetch.Id, userId);
+
         // Assert
         Assert.NotNull(retrievedWebsite);
         Assert.Equal(userId, retrievedWebsite.UserId);
-        Assert.Equal(websiteId, retrievedWebsite.Id);
+        Assert.Equal(websiteToFetch.Id, retrievedWebsite.Id);
     }
     
     [Fact]
@@ -131,7 +70,7 @@ public class WebsiteRepositoryTests : TestBase
         // Arrange
         Guid userId = Guid.NewGuid();
         Guid otherUserId = Guid.NewGuid();
-        Website website = await WebsiteScenarios.DefaultWebsite(userId, "http://website.dk");
+        Website website = await WebsiteScenarios.CreateDefault(userId, "http://website.dk");
         Guid websiteId = website.Id;
 
         // Act
@@ -161,7 +100,7 @@ public class WebsiteRepositoryTests : TestBase
         // Arrange
         Guid userId = Guid.NewGuid();
         string url = "http://website.dk";
-        Website website = await WebsiteScenarios.DefaultWebsite(userId, url);
+        Website website = await WebsiteScenarios.CreateDefault(userId, url);
     
         // Act
         await _sut.DeleteByUrlAndUserId(url, userId);
@@ -179,8 +118,8 @@ public class WebsiteRepositoryTests : TestBase
         string targetUrl = "http://website1.dk";
         string keepUrl = "http://website2.dk";
 
-        await WebsiteScenarios.DefaultWebsite(userId, targetUrl);
-        await WebsiteScenarios.DefaultWebsite(userId, keepUrl);
+        await WebsiteScenarios.CreateDefault(userId, targetUrl);
+        await WebsiteScenarios.CreateDefault(userId, keepUrl);
     
         // Act
         await _sut.DeleteByUrlAndUserId(targetUrl, userId);
@@ -200,8 +139,8 @@ public class WebsiteRepositoryTests : TestBase
         string userWebsiteUrl = "http://website1.dk";
         string otherUserWebsiteUrl = "http://website2.dk";
 
-        await WebsiteScenarios.DefaultWebsite(userId, userWebsiteUrl);
-        Website websiteThatShouldPersist =await WebsiteScenarios.DefaultWebsite(otherUserId, otherUserWebsiteUrl);
+        await WebsiteScenarios.CreateDefault(userId, userWebsiteUrl);
+        Website websiteThatShouldPersist =await WebsiteScenarios.CreateDefault(otherUserId, otherUserWebsiteUrl);
         
         // Act
         await _sut.DeleteByUrlAndUserId(otherUserWebsiteUrl, userId);
@@ -222,8 +161,8 @@ public class WebsiteRepositoryTests : TestBase
         Guid otherUserId = Guid.NewGuid();
         string websiteUrl = "http://website1.dk";
 
-        await WebsiteScenarios.DefaultWebsite(userId, websiteUrl);
-        Website websiteThatShouldPersist = await WebsiteScenarios.DefaultWebsite(otherUserId, websiteUrl);
+        await WebsiteScenarios.CreateDefault(userId, websiteUrl);
+        Website websiteThatShouldPersist = await WebsiteScenarios.CreateDefault(otherUserId, websiteUrl);
         
         // Act
         await _sut.DeleteByUrlAndUserId(websiteUrl, userId);

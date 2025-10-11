@@ -26,7 +26,7 @@ public class ScheduleServiceTests : TestBase
     public async Task ScheduledTask_IsDueToExecution_Immediately()
     {
         //Arrange
-        Website website = await _websiteScenarios.DefaultWebsite(Guid.NewGuid(), "https://testwebsite.dk");
+        Website website = await _websiteScenarios.CreateDefault(Guid.NewGuid(), "https://testwebsite.dk");
 
         //Act
         ScheduledAction scheduledAction = await _scheduleService.ScheduleAction(website, CrawlAction.CacheWarm, Frequency.SixHourly);
@@ -39,7 +39,7 @@ public class ScheduleServiceTests : TestBase
     public async Task ScheduledTask_IsNotDueForExecution_WhenNotPassedFrequency()
     {
         //Arrange
-        Website website = await _websiteScenarios.DefaultWebsite(Guid.NewGuid(), "https://testwebsite.dk");
+        Website website = await _websiteScenarios.CreateDefault(Guid.NewGuid(), "https://testwebsite.dk");
 
         //Act
         ScheduledAction scheduledAction = await _scheduleService.ScheduleAction(website, CrawlAction.CacheWarm, Frequency.SixHourly, TimeSpan.FromHours(1));

@@ -11,4 +11,9 @@ public class TestBase(DatabaseFixture fixture) : IClassFixture<DatabaseFixture>
     private WebsiteScenarios? _websiteScenarios;
 
     protected WebsiteScenarios WebsiteScenarios => _websiteScenarios ??= new WebsiteScenarios(Context);
+
+    protected (Guid, Guid) TwoUserIds()
+    {
+        return (Guid.NewGuid(), Guid.NewGuid());
+    }
 }
