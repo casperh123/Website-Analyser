@@ -20,6 +20,8 @@ public interface IScheduleService
 
     Task UpdateStatus(ScheduledAction action, Status status);
 
+    Task ResetActionStatus(Guid actionId);
+
     Task<ICollection<ScheduledAction>> GetDueSchedulesBy(CrawlAction action);
 
     Task StartAction(ScheduledAction action);

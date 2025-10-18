@@ -10,9 +10,9 @@ namespace WebsiteAnalyzer.TestUtilities.Builders.Website;
 public class WebsiteBuilder : EntityBuilder<Core.Domain.Website.Website>
 {
     public WebsiteBuilder(
-        IWebsiteRepository dbContext,
+        IWebsiteRepository websiteRepository,
         Guid userId,
-        string url) : base(dbContext)
+        string url) : base(websiteRepository)
     {
         Entity = new Core.Domain.Website.Website(
             url: url,
@@ -28,7 +28,7 @@ public class WebsiteBuilder : EntityBuilder<Core.Domain.Website.Website>
         return this;
     }
 
-    public WebsiteBuilder WithBrokenLinkCrawle(ICollection<BrokenLinkCrawl> brokenLinkCrawls)
+    public WebsiteBuilder WithBrokenLinkCrawls(ICollection<BrokenLinkCrawl> brokenLinkCrawls)
     {
         Entity.BrokenLinkCrawls = brokenLinkCrawls;
         return this;

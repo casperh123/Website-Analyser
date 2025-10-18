@@ -79,7 +79,6 @@ public class ScheduleService : IScheduleService
 
     public async Task StartAction(ScheduledAction action)
     {
-
         action.Status = Status.InProgress;
         action.LastCrawlDateUtc = DateTime.UtcNow;
 
