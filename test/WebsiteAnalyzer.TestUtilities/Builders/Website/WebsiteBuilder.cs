@@ -9,16 +9,27 @@ namespace WebsiteAnalyzer.TestUtilities.Builders.Website;
 
 public class WebsiteBuilder : EntityBuilder<Core.Domain.Website.Website>
 {
-    public WebsiteBuilder(
-        IWebsiteRepository websiteRepository,
-        Guid userId,
-        string url) : base(websiteRepository)
+    public WebsiteBuilder(IWebsiteRepository websiteRepository) : base(websiteRepository)
     {
         Entity = new Core.Domain.Website.Website(
-            url: url,
-            userId: userId,
+            url: $"http://{StringGenerator.Generate(7)}.dk",
+            userId: Guid.NewGuid(),
             name: $"{StringGenerator.Generate(7)}"
         );
+    }
+
+    public WebsiteBuilder WithUserId(Guid userId)
+    {
+        Entity.UserId = userId;
+
+        return this;
+    }
+
+    public WebsiteBuilder WithUrl(string url)
+    {
+        Entity.Url = url;
+
+        return this;
     }
 
     public WebsiteBuilder WithName(string name)

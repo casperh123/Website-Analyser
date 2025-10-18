@@ -5,31 +5,28 @@ using WebsiteAnalyzer.Core.Enums;
 using WebsiteAnalyzer.Core.Interfaces.Repositories;
 using WebsiteAnalyzer.Infrastructure.Repositories;
 using WebsiteAnalyzer.TestUtilities.Database;
-using WebsiteAnalyzer.TestUtilities.Scenarios;
 using WebsiteAnalyzer.TestUtilities.Testing;
 
 namespace WebsiteAnalyzer.Application.Test.Services;
 
 public class ScheduleServiceTests : TestBase
 {
-    private readonly ScheduleService _scheduleService;
-    private readonly WebsiteScenarios _websiteScenarios;
+    private readonly ScheduleService _sut;
     
     public ScheduleServiceTests(DatabaseFixture fixture) : base(fixture)
     {
-        _websiteScenarios = new WebsiteScenarios(Context);
         IScheduledActionRepository scheduleRepository = new ScheduledActionRepository(Context);
-        _scheduleService = new ScheduleService(scheduleRepository);
+        _sut = new ScheduleService(scheduleRepository);
     }
 
     [Fact]
     public async Task ScheduledTask_IsDueToExecution_Immediately()
     {
         //Arrange
-        Website website = await _websiteScenarios.CreateDefault(Guid.NewGuid(), "https://testwebsite.dk");
+        Website website = await WebsiteScenarios.CreateDefault(Guid.NewGuid(), "https://testwebsite.dk");
 
         //Act
-        ScheduledAction scheduledAction = await _scheduleService.ScheduleAction(website, CrawlAction.CacheWarm, Frequency.SixHourly);
+        ScheduledAction scheduledAction = await _sut.ScheduleAction(website, CrawlAction.CacheWarm, Frequency.SixHourly);
 
         //Assert
         Assert.True(scheduledAction.IsDueForExecution);
@@ -39,13 +36,42 @@ public class ScheduleServiceTests : TestBase
     public async Task ScheduledTask_IsNotDueForExecution_WhenNotPassedFrequency()
     {
         //Arrange
-        Website website = await _websiteScenarios.CreateDefault(Guid.NewGuid(), "https://testwebsite.dk");
+        Website website = await WebsiteScenarios.CreateDefault(Guid.NewGuid(), "https://testwebsite.dk");
 
         //Act
-        ScheduledAction scheduledAction = await _scheduleService.ScheduleAction(website, CrawlAction.CacheWarm, Frequency.SixHourly, TimeSpan.FromHours(1));
+        ScheduledAction scheduledAction = await _sut.ScheduleAction(website, CrawlAction.CacheWarm, Frequency.SixHourly, TimeSpan.FromHours(1));
         
         //Assert
         Assert.False(scheduledAction.IsDueForExecution);
         Assert.True(scheduledAction.NextCrawlUtc <= DateTime.UtcNow.Add(TimeSpan.FromHours(1)));
+    }
+
+    [Fact]
+    public async Task GetDueSchedulesByAction_Returns_ScheduledItems()
+    {
+        // Arrange
+        Guid userId = Guid.NewGuid();
+        Website website = await WebsiteScenarios.CreateDefault(userId, "http://website.dk");
+        ICollection<ScheduledAction> scheduledActions = await ScheduledActionScenarios.CreateActionCombinations(website);
+        
+        // Act
+        ICollection<ScheduledAction> dueActions = await _sut.GetDueSchedulesBy(CrawlAction.BrokenLink);
+
+        // Assert
+        Assert.Single(dueActions);
+    }
+
+    [Fact]
+    public async Task ResetActionStatus_ResetStatus()
+    {
+        // Arrange
+        ScheduledAction scheduledAction = await ScheduledActionScenarios.CreateWithStatus(Status.InProgress);
+        
+        // Act
+        await _sut.ResetActionStatus(scheduledAction);
+        ScheduledAction retrievedAction = await _sut.GetById(scheduledAction.Id);
+
+        // Assert
+        Assert.Equal(Status.Scheduled, scheduledAction.Status);
     }
 }

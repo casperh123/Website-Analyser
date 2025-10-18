@@ -9,8 +9,10 @@ public class TestBase(DatabaseFixture fixture) : IClassFixture<DatabaseFixture>
     protected readonly ApplicationDbContext Context = fixture.CreateContext();
 
     private WebsiteScenarios? _websiteScenarios;
+    private ScheduledActionScenarios? _scheduledActionScenarios;
 
     protected WebsiteScenarios WebsiteScenarios => _websiteScenarios ??= new WebsiteScenarios(Context);
+    protected ScheduledActionScenarios ScheduledActionScenarios => _scheduledActionScenarios ??= new ScheduledActionScenarios(Context);
 
     protected (Guid, Guid) TwoUserIds()
     {

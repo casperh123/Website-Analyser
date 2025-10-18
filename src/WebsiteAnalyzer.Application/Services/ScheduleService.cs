@@ -36,6 +36,11 @@ public class ScheduleService : IScheduleService
         return scheduledAction;
     }
 
+    public async Task<ScheduledAction> GetById(Guid id)
+    {
+        return await _scheduleRepository.GetByIdAsync(id);
+    }
+
     public async Task<ScheduledAction> GetActionByWebsiteIdAndType(Guid websiteId, CrawlAction type)
     {
         return await _scheduleRepository.GetByWebsiteIdAndType(websiteId, type);
@@ -68,6 +73,13 @@ public class ScheduleService : IScheduleService
         await _scheduleRepository.UpdateAsync(action);
     }
 
+    public async Task ResetActionStatus(ScheduledAction action)
+    {
+        action.ResetStatus();
+
+        await _scheduleRepository.UpdateAsync(action);
+    }
+
     public async Task<ICollection<ScheduledAction>> GetDueSchedulesBy(CrawlAction action)
     {
         ICollection<ScheduledAction> schedules = await _scheduleRepository.GetByAction(action);
@@ -79,22 +91,21 @@ public class ScheduleService : IScheduleService
 
     public async Task StartAction(ScheduledAction action)
     {
-        action.Status = Status.InProgress;
-        action.LastCrawlDateUtc = DateTime.UtcNow;
+        action.StartAction();
 
         await UpdateAction(action);
     }
 
     public async Task CompleteAction(ScheduledAction action)
     {
-        action.Status = Status.Completed;
+        action.CompleteAction();
 
         await UpdateAction(action);
     }
 
     public async Task FailAction(ScheduledAction action)
     {
-        action.Status = Status.Failed;
+        action.FailAction();
 
         await UpdateAction(action);
     }

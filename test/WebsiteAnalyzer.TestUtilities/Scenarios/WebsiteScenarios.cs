@@ -17,7 +17,9 @@ public class WebsiteScenarios
 
     public async Task<Website> CreateDefault(Guid userId, string websiteUrl)
     {
-        return await new WebsiteBuilder(_websiteRepository, userId, websiteUrl)
+        return await new WebsiteBuilder(_websiteRepository)
+            .WithUserId(userId)
+            .WithUrl(websiteUrl)
             .BuildAndSave();
     }
 

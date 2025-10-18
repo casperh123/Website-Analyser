@@ -36,15 +36,6 @@ public class ScheduledActionRepository : BaseRepository<ScheduledAction>, ISched
             .ToListAsync();
     }
 
-    public async Task<ScheduledAction?> GetCrawlScheduleBy(string url, Guid userId, CrawlAction action)
-    {
-        return await DbContext.ScheduledActions
-            .Where(cs => cs.Website.Url == url)
-            .Where(cs => cs.Website.UserId == userId)
-            .Where(cs => cs.Action == action)
-            .FirstOrDefaultAsync();
-    }
-
     public async Task DeleteByUrlAndUserId(string url, Guid userId)
     {
         await DbContext.ScheduledActions

@@ -4,9 +4,7 @@ namespace WebsiteAnalyzer.Core.Domain;
 
 public record ScheduledAction
 {
-    private ScheduledAction()
-    {
-    }
+    private ScheduledAction() {}
 
     public ScheduledAction(
         Website.Website website,
@@ -38,6 +36,27 @@ public record ScheduledAction
     public DateTime LastCrawlLocal => LastCrawlDateUtc.ToLocalTime();
 
     public bool IsDueForExecution => Status != Status.InProgress && DateTime.UtcNow >= NextCrawlUtc;
+
+    public void ResetStatus()
+    {
+        Status = Status.Scheduled;
+    }
+
+    public void StartAction()
+    {
+        Status = Status.InProgress;
+        LastCrawlDateUtc = DateTime.UtcNow;
+    }
+
+    public void CompleteAction()
+    {
+        Status = Status.Completed;
+    }
+
+    public void FailAction()
+    {
+        Status = Status.Failed;
+    }
 
     private DateTime CalculateFirstCrawl(TimeSpan offset)
     {

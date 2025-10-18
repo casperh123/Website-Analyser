@@ -21,8 +21,8 @@ public record Website
     }
 
     public Guid Id { get; private set; }
-    public string Url { get; private set; }
+    public string Url { get; set; }
     public string? Name { get; set; }
-    public Guid UserId { get; private set; }
+    public Guid UserId { get; set; }
     public ICollection<BrokenLinkCrawl> BrokenLinkCrawls { get; set; }
 }
