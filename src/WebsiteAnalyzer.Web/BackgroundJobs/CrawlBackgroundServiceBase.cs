@@ -92,9 +92,6 @@ public abstract class CrawlBackgroundServiceBase : IHostedService
         {
             Logger.LogWarning("Crawl task timed out after 5 minutes for {Url}", 
                 scheduledAction.Website.Url);
-        
-            IScheduleService scheduleService = scope.ServiceProvider.GetRequiredService<IScheduleService>();
-            await scheduleService.FailAction(scheduledAction);
         }
     }
 
