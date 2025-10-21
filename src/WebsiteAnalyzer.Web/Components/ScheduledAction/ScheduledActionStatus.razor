@@ -1,11 +1,19 @@
 @using WebsiteAnalyzer.Core.Domain
 @using WebsiteAnalyzer.Core.Enums
+@using WebsiteAnalyzer.Core.Interfaces.Services
 @using WebsiteAnalyzer.Web.Components.Status
+
+@inject IScheduleService ScheduleService
 
 <RadzenRow>
     <RadzenStack>
         <RadzenText>Status:</RadzenText>
         <StatusBadge Status="@ScheduledAction.Status" />
+        
+        @if (ScheduledAction.Status is Status.InProgress)
+        {
+            <RadzenButton Click="ResetActionStatus" ButtonStyle="ButtonStyle.Warning">Reset status</RadzenButton>   
+        }
     </RadzenStack>
     
     @if (ScheduledAction.Status != Status.InProgress)
@@ -21,4 +29,9 @@
 @code {
     [Parameter, EditorRequired]
     public required ScheduledAction ScheduledAction { get; set; }
+    
+    public async Task ResetActionStatus()
+    {
+        await ScheduleService.ResetActionStatus(ScheduledAction);
+    }
 }

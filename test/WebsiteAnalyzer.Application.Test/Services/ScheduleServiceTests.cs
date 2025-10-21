@@ -3,6 +3,7 @@ using WebsiteAnalyzer.Core.Domain;
 using WebsiteAnalyzer.Core.Domain.Website;
 using WebsiteAnalyzer.Core.Enums;
 using WebsiteAnalyzer.Core.Interfaces.Repositories;
+using WebsiteAnalyzer.Core.Interfaces.Services;
 using WebsiteAnalyzer.Infrastructure.Repositories;
 using WebsiteAnalyzer.TestUtilities.Database;
 using WebsiteAnalyzer.TestUtilities.Testing;
@@ -11,7 +12,7 @@ namespace WebsiteAnalyzer.Application.Test.Services;
 
 public class ScheduleServiceTests : TestBase
 {
-    private readonly ScheduleService _sut;
+    private readonly IScheduleService _sut;
     
     public ScheduleServiceTests(DatabaseFixture fixture) : base(fixture)
     {
