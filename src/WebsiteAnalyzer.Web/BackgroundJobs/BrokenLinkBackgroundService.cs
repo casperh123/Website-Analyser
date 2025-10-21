@@ -11,7 +11,7 @@ public class BrokenLinkBackgroundService(
     IServiceProvider serviceProvider)
     : CrawlBackgroundServiceBase(logger, serviceProvider, CrawlAction.BrokenLink)
 {
-    protected override async Task ExecuteCrawlTaskAsync(
+    protected override async Task ExecuteTaskAsync(
         ScheduledAction scheduledAction, 
         IServiceScope scope, 
         CancellationToken token)

@@ -16,6 +16,7 @@ public static class BackgroundServiceConfiguration
         // Register the background service
         services.AddHostedService<CacheWarmBackgroundService>();
         services.AddHostedService<BrokenLinkBackgroundService>();
+        services.AddHostedService<UptimeMonitorBackgroundService>();
 
         return services;
     }

@@ -22,6 +22,7 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser, IdentityR
     public DbSet<ScheduledAction> ScheduledActions { get; set; }
     public DbSet<BrokenLinkCrawl> BrokenLinkCrawls { get; set; }
     public DbSet<BrokenLink> BrokenLinks { get; set; }
+    public DbSet<DownTimePing> DownTimePings { get; set; }
     
     
     protected override void OnModelCreating(ModelBuilder builder)
@@ -44,8 +45,8 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser, IdentityR
         builder.Entity<BrokenLinkCrawl>()
             .HasKey(blc => new { blc.Id });
 
-        builder.Entity<UptimeMonitor>()
-            .HasKey(um => new{ um.WebsiteUrl, um.UserId } );
+        builder.Entity<DownTimePing>()
+            .HasKey(ping => ping.Id);
 
         // Configure Identity entities to use GUID
         builder.Entity<IdentityUserLogin<Guid>>()

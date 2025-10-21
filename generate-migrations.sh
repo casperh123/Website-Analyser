@@ -1,11 +1,11 @@
 #!/bin/bash
 
 # Define paths
-DB_DIR="./WebsiteAnalyzer.Web/Data"  # or "./WebsiteAnalyzer.Infrastructure/Data"
+DB_DIR="./src/WebsiteAnalyzer.Web/Data"  # or "./WebsiteAnalyzer.Infrastructure/Data"
 DB_FILE="$DB_DIR/app.db"
 
 # Remove existing migrations and database
-rm -rf ./WebsiteAnalyzer.Infrastructure/Migrations
+rm -rf ./src/WebsiteAnalyzer.Infrastructure/Migrations
 rm -f "$DB_FILE"
 
 # Create empty database directory if it doesn't exist
@@ -33,10 +33,10 @@ dotnet tool restore
 # Generate and apply migrations
 echo "Generating new migration..."
 dotnet ef migrations add MigrationName \
-    --startup-project ./WebsiteAnalyzer.Web/WebsiteAnalyzer.Web.csproj \
-    --project ./WebsiteAnalyzer.Infrastructure/WebsiteAnalyzer.Infrastructure.csproj
+    --startup-project ./src/WebsiteAnalyzer.Web/WebsiteAnalyzer.Web.csproj \
+    --project ./src/WebsiteAnalyzer.Infrastructure/WebsiteAnalyzer.Infrastructure.csproj
 
 echo "Updating database..."
 dotnet ef database update \
-    --startup-project ./WebsiteAnalyzer.Web/WebsiteAnalyzer.Web.csproj \
-    --project ./WebsiteAnalyzer.Infrastructure/WebsiteAnalyzer.Infrastructure.csproj
+    --startup-project ./src/WebsiteAnalyzer.Web/WebsiteAnalyzer.Web.csproj \
+    --project ./src/WebsiteAnalyzer.Infrastructure/WebsiteAnalyzer.Infrastructure.csproj

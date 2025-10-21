@@ -12,7 +12,7 @@ public class CacheWarmBackgroundService : CrawlBackgroundServiceBase
     {
     }
 
-    protected override async Task ExecuteCrawlTaskAsync(
+    protected override async Task ExecuteTaskAsync(
         ScheduledAction action,
         IServiceScope scope,
         CancellationToken token)

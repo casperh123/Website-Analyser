@@ -68,5 +68,6 @@ public class WebsiteService : IWebsiteService
     
         await _scheduleService.ScheduleAction(website, CrawlAction.CacheWarm, Frequency.SixHourly);
         await _scheduleService.ScheduleAction(website, CrawlAction.BrokenLink, Frequency.Daily, brokenLinkOffset);
+        await _scheduleService.ScheduleAction(website, CrawlAction.Uptime, Frequency.Minutely);
     }
 }
