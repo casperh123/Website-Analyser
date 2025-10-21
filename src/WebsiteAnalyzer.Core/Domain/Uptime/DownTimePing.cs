@@ -4,9 +4,9 @@ namespace WebsiteAnalyzer.Core.Domain.Uptime;
 
 public record DownTimePing
 {
-    public Guid Id { get; }
-    public Guid WebsiteId { get; }
-    public DateTime TimeRecorded { get; }
+    public Guid Id { get; set;  }
+    public Guid WebsiteId { get; set;  }
+    public DateTime TimeRecorded { get; set; }
     public HttpStatusCode? StatusCode { get; set;  }
     public string? Reason { get; set;  }
 

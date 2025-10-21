@@ -24,19 +24,21 @@ public class UptimeService : IUptimeService
         {
             HttpResponseMessage response = await _httpClient.GetAsync(website.Url);
 
-            if (!response.IsSuccessStatusCode)
+            if (response.IsSuccessStatusCode)
             {
-                ping.StatusCode = response.StatusCode;
-                ping.Reason = response.ReasonPhrase;
+                return ping;
             }
+            
+            ping.StatusCode = response.StatusCode;
+            ping.Reason = response.ReasonPhrase;
+            
+            await _pingRepository.AddAsync(ping);
         }
         catch (HttpRequestException requestException)
         {
             ping.StatusCode = requestException.StatusCode;
             ping.Reason = requestException.Message;
-        }
-        finally
-        {
+         
             await _pingRepository.AddAsync(ping);
         }
 
