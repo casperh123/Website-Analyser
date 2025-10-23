@@ -27,24 +27,27 @@ public class UptimeService : IUptimeService
     {
         ICollection<DowntimePing> pings = await _pingRepository.GetByWebsiteIdAfterDate(websiteId, afterDate);
         DateTime currentTime = DateTime.UtcNow;
+        afterDate = TruncateToHour(afterDate);
     
         // Create a complete timeline of minute intervals
-        List<DateTime> timeline = Enumerable.Range(0, (int)(currentTime - afterDate).TotalMinutes + 1)
-            .Select(i => afterDate.AddMinutes(i))
+        List<DateTime> timeline = Enumerable.Range(0, (int)(currentTime - afterDate).TotalHours + 1)
+            .Select(i => afterDate.AddHours(i))
             .ToList();
     
         // Group pings by minute and merge with timeline
-        Dictionary<DateTime, List<DowntimePing>> pingsByMinute = pings.GroupBy(p => new DateTime(p.TimeRecorded.Year, p.TimeRecorded.Month, p.TimeRecorded.Day, p.TimeRecorded.Hour, p.TimeRecorded.Minute, 0))
+        Dictionary<DateTime, List<DowntimePing>> pingsByHour = pings.GroupBy(p => TruncateToHour(p.TimeRecorded))
             .ToDictionary(g => g.Key, g => g.ToList());
 
-        return timeline.Select(minute =>
+        return timeline.Select(hour =>
         {
-            pingsByMinute.TryGetValue(minute, out List<DowntimePing>? downtimePings);
+            pingsByHour.TryGetValue(hour, out List<DowntimePing>? downtimePings);
             DowntimePing? ping = downtimePings?.OrderByDescending(p => p.StatusCode).FirstOrDefault();
 
+            DateTime timeRecorded = ping?.TimeRecorded ?? hour;
+            
             return new UptimeStat(
-                ping is null,
-                ping?.TimeRecorded ?? minute,
+                ping is not null,
+                TruncateToHour(timeRecorded),
                 ping?.StatusCode,
                 ping?.Reason
             );
@@ -78,5 +81,17 @@ public class UptimeService : IUptimeService
         }
 
         return ping;
+    }
+
+    private DateTime TruncateToHour(DateTime time)
+    {
+        return new DateTime(
+            time.Year, 
+            time.Month, 
+            time.Day, 
+            time.Hour, 
+            0,
+            0
+        );
     }
 }
