@@ -1,0 +1,37 @@
+@page "/Website/{WebsiteId:guid}/uptime"
+
+@using WebsiteAnalyzer.Core.Domain.Uptime
+@using WebsiteAnalyzer.Core.Interfaces.Services
+@using WebsiteAnalyzer.Web.Components.Layout
+
+@inherits WebsiteAnalyzer.Web.Components.Templates.WebsiteComponent
+
+@inject IUptimeService UptimeService
+
+<WebsiteStatsLayout Website="Website" Websites="Websites">
+    <RadzenCard>
+        @foreach (DowntimePing downtime in _downtimePings)
+        {
+            <RadzenCard>
+                <RadzenText>@downtime.TimeRecorded.ToLocalTime()</RadzenText>
+            </RadzenCard>
+        }
+    </RadzenCard>
+</WebsiteStatsLayout>
+
+
+@code {
+    private ICollection<DowntimePing> _downtimePings = [];
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+
+        if (Website is null)
+        {
+            return;
+        }
+
+        _downtimePings = await UptimeService.GetDowntimePingsByWebsiteId(Website.Id);
+    }
+}

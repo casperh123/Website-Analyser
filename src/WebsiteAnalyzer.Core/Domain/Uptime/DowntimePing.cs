@@ -2,7 +2,7 @@ using System.Net;
 
 namespace WebsiteAnalyzer.Core.Domain.Uptime;
 
-public record DownTimePing
+public record DowntimePing
 {
     public Guid Id { get; set;  }
     public Guid WebsiteId { get; set;  }
@@ -10,9 +10,9 @@ public record DownTimePing
     public HttpStatusCode? StatusCode { get; set;  }
     public string? Reason { get; set;  }
 
-    public DownTimePing() {}
+    public DowntimePing() {}
     
-    public DownTimePing(
+    public DowntimePing(
         Guid websiteId
     )
     {

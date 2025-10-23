@@ -16,9 +16,14 @@ public class UptimeService : IUptimeService
         _httpClient = httpClient;
     }
 
-    public async Task<DownTimePing> Ping(Website website)
+    public async Task<ICollection<DowntimePing>> GetDowntimePingsByWebsiteId(Guid websiteId)
     {
-        DownTimePing ping = new DownTimePing(website.Id);
+        return await _pingRepository.GetByWebsiteId(websiteId);
+    }
+
+    public async Task<DowntimePing> Ping(Website website)
+    {
+        DowntimePing ping = new DowntimePing(website.Id);
 
         try
         {

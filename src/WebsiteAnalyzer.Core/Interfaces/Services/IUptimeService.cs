@@ -5,5 +5,6 @@ namespace WebsiteAnalyzer.Core.Interfaces.Services;
 
 public interface IUptimeService
 {
-    Task<DownTimePing> Ping(Website website);
+    Task<ICollection<DowntimePing>> GetDowntimePingsByWebsiteId(Guid websiteId);
+    Task<DowntimePing> Ping(Website website);
 }
