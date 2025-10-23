@@ -1,4 +1,6 @@
+using System.Runtime.InteropServices;
 using WebsiteAnalyzer.Core.Domain.Uptime;
+using WebsiteAnalyzer.Core.Contracts.Uptime;
 using WebsiteAnalyzer.Core.Domain.Website;
 using WebsiteAnalyzer.Core.Interfaces.Repositories;
 using WebsiteAnalyzer.Core.Interfaces.Services;
@@ -19,6 +21,34 @@ public class UptimeService : IUptimeService
     public async Task<ICollection<DowntimePing>> GetDowntimePingsByWebsiteId(Guid websiteId)
     {
         return await _pingRepository.GetByWebsiteId(websiteId);
+    }
+
+    public async Task<ICollection<UptimeStat>> GetByWebsiteAfterDate(Guid websiteId, DateTime afterDate)
+    {
+        ICollection<DowntimePing> pings = await _pingRepository.GetByWebsiteIdAfterDate(websiteId, afterDate);
+        DateTime currentTime = DateTime.UtcNow;
+    
+        // Create a complete timeline of minute intervals
+        List<DateTime> timeline = Enumerable.Range(0, (int)(currentTime - afterDate).TotalMinutes + 1)
+            .Select(i => afterDate.AddMinutes(i))
+            .ToList();
+    
+        // Group pings by minute and merge with timeline
+        Dictionary<DateTime, List<DowntimePing>> pingsByMinute = pings.GroupBy(p => new DateTime(p.TimeRecorded.Year, p.TimeRecorded.Month, p.TimeRecorded.Day, p.TimeRecorded.Hour, p.TimeRecorded.Minute, 0))
+            .ToDictionary(g => g.Key, g => g.ToList());
+
+        return timeline.Select(minute =>
+        {
+            pingsByMinute.TryGetValue(minute, out List<DowntimePing>? downtimePings);
+            DowntimePing? ping = downtimePings?.OrderByDescending(p => p.StatusCode).FirstOrDefault();
+
+            return new UptimeStat(
+                ping is null,
+                ping?.TimeRecorded ?? minute,
+                ping?.StatusCode,
+                ping?.Reason
+            );
+        }).ToList();
     }
 
     public async Task<DowntimePing> Ping(Website website)

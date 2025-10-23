@@ -3,7 +3,7 @@ using WebsiteAnalyzer.Core.Domain.Uptime;
 
 namespace WebsiteAnalyzer.Core.Contracts.Uptime;
 
-record class UptimeStat
+public record UptimeStat
 {
     public bool Outage { get; }
     public DateTime TimeRecorded { get; }

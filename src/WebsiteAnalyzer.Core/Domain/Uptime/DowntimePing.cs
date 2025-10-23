@@ -28,6 +28,6 @@ public record DowntimePing
     {
         Id = Guid.NewGuid();
         WebsiteId = websiteId;
-        TimeRecorded = DateTime.Now;
+        TimeRecorded = DateTime.UtcNow;
     }
 }

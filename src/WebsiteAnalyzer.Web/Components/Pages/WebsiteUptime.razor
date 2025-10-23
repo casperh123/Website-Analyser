@@ -1,5 +1,6 @@
 @page "/Website/{WebsiteId:guid}/uptime"
 
+@using WebsiteAnalyzer.Core.Contracts.Uptime
 @using WebsiteAnalyzer.Core.Domain.Uptime
 @using WebsiteAnalyzer.Core.Interfaces.Services
 @using WebsiteAnalyzer.Web.Components.Layout
@@ -10,7 +11,7 @@
 
 <WebsiteStatsLayout Website="Website" Websites="Websites">
     <RadzenCard>
-        @foreach (DowntimePing downtime in _downtimePings)
+        @foreach (UptimeStat downtime in _downtimePings)
         {
             <RadzenCard>
                 <RadzenText>@downtime.TimeRecorded.ToLocalTime()</RadzenText>
@@ -21,7 +22,8 @@
 
 
 @code {
-    private ICollection<DowntimePing> _downtimePings = [];
+    private IEnumerable<UptimeStat> _downtimePings => _uptimeStats.Where(stat => stat.Outage);
+    private IEnumerable<UptimeStat> _uptimeStats = [];
 
     protected override async Task OnInitializedAsync()
     {
@@ -32,6 +34,8 @@
             return;
         }
 
-        _downtimePings = await UptimeService.GetDowntimePingsByWebsiteId(Website.Id);
+        DateTime beforeDate = DateTime.UtcNow.Subtract(TimeSpan.FromDays(30));
+
+        _uptimeStats = await UptimeService.GetByWebsiteAfterDate(Website.Id, beforeDate);
     }
 }
