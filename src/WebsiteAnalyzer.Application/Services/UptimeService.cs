@@ -7,10 +7,10 @@ namespace WebsiteAnalyzer.Application.Services;
 
 public class UptimeService : IUptimeService
 {
-    private readonly IDownTimePingRepository _pingRepository;
+    private readonly IDowntimePingRepository _pingRepository;
     private readonly HttpClient _httpClient;
 
-    public UptimeService(IDownTimePingRepository pingRepository, HttpClient httpClient)
+    public UptimeService(IDowntimePingRepository pingRepository, HttpClient httpClient)
     {
         _pingRepository = pingRepository;
         _httpClient = httpClient;

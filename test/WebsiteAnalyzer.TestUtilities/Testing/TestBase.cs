@@ -10,10 +10,13 @@ public class TestBase(DatabaseFixture fixture) : IClassFixture<DatabaseFixture>
 
     private WebsiteScenarios? _websiteScenarios;
     private ScheduledActionScenarios? _scheduledActionScenarios;
+    private DowntimePingScenarios? _downtimePingScenarios;
 
     protected WebsiteScenarios WebsiteScenarios => _websiteScenarios ??= new WebsiteScenarios(Context);
     protected ScheduledActionScenarios ScheduledActionScenarios => _scheduledActionScenarios ??= new ScheduledActionScenarios(Context);
 
+    protected DowntimePingScenarios DowntimePingScenarios => _downtimePingScenarios ??= new DowntimePingScenarios(Context);
+    
     protected (Guid, Guid) TwoUserIds()
     {
         return (Guid.NewGuid(), Guid.NewGuid());

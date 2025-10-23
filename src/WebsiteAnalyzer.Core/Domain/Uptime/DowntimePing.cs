@@ -11,6 +11,16 @@ public record DowntimePing
     public string? Reason { get; set;  }
 
     public DowntimePing() {}
+
+    public DowntimePing(
+        Guid websiteId,
+        DateTime timeRecorded
+    )
+    {
+        Id = Guid.NewGuid();
+        WebsiteId = websiteId;
+        TimeRecorded = timeRecorded;
+    }
     
     public DowntimePing(
         Guid websiteId
