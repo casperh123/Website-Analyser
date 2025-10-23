@@ -1,7 +1,6 @@
 @page "/Website/{WebsiteId:guid}/uptime"
 
 @using WebsiteAnalyzer.Core.Contracts.Uptime
-@using WebsiteAnalyzer.Core.Domain.Uptime
 @using WebsiteAnalyzer.Core.Interfaces.Services
 @using WebsiteAnalyzer.Web.Components.Layout
 
@@ -10,19 +9,36 @@
 @inject IUptimeService UptimeService
 
 <WebsiteStatsLayout Website="Website" Websites="Websites">
-    <RadzenCard>
-        @foreach (UptimeStat downtime in _downtimePings)
-        {
-            <RadzenCard>
-                <RadzenText>@downtime.TimeRecorded.ToLocalTime()</RadzenText>
-            </RadzenCard>
-        }
-    </RadzenCard>
+    <RadzenStack>
+        <RadzenChart>
+            <RadzenLineSeries Data="@_uptimeStats" CategoryProperty="@nameof(UptimeStat.TimeRecorded)" Title="Outages" ValueProperty="@nameof(UptimeStat.Outages)">
+                <RadzenMarkers />
+                
+            </RadzenLineSeries>
+            <RadzenCategoryAxis Padding="20" />
+            <RadzenValueAxis>
+                <RadzenGridLines Visible="true" />
+                <RadzenAxisTitle Text="Outages" />
+            </RadzenValueAxis>
+            <RadzenCategoryAxis Formatter="@FormatTime">
+                <RadzenAxisTitle Text="Time" />
+            </RadzenCategoryAxis>
+        </RadzenChart>
+        
+        <RadzenCard>
+            @foreach (UptimeStat downtime in _downtimePings)
+            {
+                <RadzenCard>
+                    <RadzenText>@downtime.TimeRecorded.ToLocalTime()</RadzenText>
+                </RadzenCard>
+            }
+        </RadzenCard>
+    </RadzenStack>
 </WebsiteStatsLayout>
 
 
 @code {
-    private IEnumerable<UptimeStat> _downtimePings => _uptimeStats.Where(stat => stat.Outage);
+    private IEnumerable<UptimeStat> _downtimePings => _uptimeStats.Where(stat => stat.Outages > 0);
     private IEnumerable<UptimeStat> _uptimeStats = [];
 
     protected override async Task OnInitializedAsync()
@@ -34,9 +50,27 @@
             return;
         }
 
-        DateTime beforeDate = DateTime.UtcNow.Subtract(TimeSpan.FromDays(30));
+        DateTime beforeDate = DateTime.UtcNow.Subtract(TimeSpan.FromDays(3));
 
         _uptimeStats = await UptimeService.GetByWebsiteAfterDate(Website.Id, beforeDate);
         Console.WriteLine("");
+    }
+
+    private String FormatTime(object toFormat)
+    {
+        DateTime time = (DateTime)toFormat;
+        return time.ToString("dd/MM HH:mm");
+    }
+
+    private String FormatOutages(object fromFormat)
+    {
+        int outages = (int)fromFormat;
+
+        if (outages == 0)
+        {
+            return ""; 
+        }
+
+        return outages.ToString();
     }
 }

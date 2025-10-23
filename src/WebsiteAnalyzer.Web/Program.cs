@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Identity.UI.Services;
+using Radzen;
 using Sidio.Sitemap.AspNetCore;
 using Sidio.Sitemap.Blazor;
 using Sidio.Sitemap.Core.Services;
@@ -45,6 +46,11 @@ builder.Services.AddLogging(logging =>
     
     logging.SetMinimumLevel(LogLevel.Information);
 });
+
+builder.Services.AddRadzenComponents();
+
+builder.Services.AddScoped<Radzen.DialogService>();
+
 
 
 // Build and configure the application

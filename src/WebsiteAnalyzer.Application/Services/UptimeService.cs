@@ -46,7 +46,7 @@ public class UptimeService : IUptimeService
             DateTime timeRecorded = ping?.TimeRecorded ?? hour;
             
             return new UptimeStat(
-                ping is not null,
+                downtimePings?.Count ?? 0,
                 TruncateToHour(timeRecorded),
                 ping?.StatusCode,
                 ping?.Reason
