@@ -13,7 +13,7 @@
         <RadzenChart>
             <RadzenLineSeries Data="@_uptimeStats" CategoryProperty="@nameof(UptimeStat.TimeRecorded)" Title="Outages" ValueProperty="@nameof(UptimeStat.Outages)">
                 <ChildContent>
-                    <RadzenMarkers MarkerType="MarkerType.Circle" StrokeWidth="2" Size="6" />
+                    <RadzenMarkers MarkerType="MarkerType.Circle" StrokeWidth="2" Size="2" />
                 </ChildContent>                
                 <TooltipTemplate Context="uptimeStat">
                     <RadzenStack>
