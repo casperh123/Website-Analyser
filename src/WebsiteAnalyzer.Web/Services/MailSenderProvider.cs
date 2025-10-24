@@ -2,44 +2,21 @@ using MailKit.Net.Smtp;
 using MailKit.Security;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using MimeKit;
+using WebsiteAnalyzer.Application.Services;
 
 namespace WebsiteAnalyzer.Web.Services;
 
 public class MailSenderProvider : IEmailSender
 {
-    private readonly IConfiguration _configuration;
+    private readonly MailService _mailService;
 
-    public MailSenderProvider(IConfiguration configuration)
+    public MailSenderProvider(MailService mailService)
     {
-        _configuration = configuration;
+        _mailService = mailService;
     }
     
     public async Task SendEmailAsync(string email, string subject, string htmlMessage)
     {
-        string? smtpUsername = _configuration["MAILSENDER_USERNAME"];
-        string? smtpPassword = _configuration["MAILSENDER_PASSWORD"];
-        
-        if (smtpUsername is null || smtpPassword is null)
-        {
-            throw new AuthenticationException();
-        }
-        
-        MimeMessage message = new MimeMessage();
-        
-        message.From.Add(new MailboxAddress("Clypper's Website Analyzer", "noreply@clyppertechnology.com"));
-        message.To.Add(new MailboxAddress("", email));
-        message.Subject = subject;
-        message.Body = new TextPart("html")
-        {
-            Text = htmlMessage
-        };
-
-        using SmtpClient client = new SmtpClient();
-        
-        await client.ConnectAsync("smtp.mailersend.net", 587);
-        await client.AuthenticateAsync(smtpUsername, smtpPassword);
-            
-        await client.SendAsync(message);
-        await client.DisconnectAsync(true); 
+        await _mailService.SendEmailAsync(email, subject, htmlMessage);
     }
 }

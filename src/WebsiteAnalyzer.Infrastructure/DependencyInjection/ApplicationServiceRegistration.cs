@@ -14,6 +14,7 @@ public static class ApplicationServiceRegistration
         services.AddScoped<IScheduleService, ScheduleService>();
         services.AddScoped<IBrokenLinkService, BrokenLinkService>();
         services.AddScoped<IUptimeService, UptimeService>();
+        services.AddSingleton<MailService>();
 
         return services;
     }
