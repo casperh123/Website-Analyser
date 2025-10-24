@@ -12,8 +12,16 @@
     <RadzenStack>
         <RadzenChart>
             <RadzenLineSeries Data="@_uptimeStats" CategoryProperty="@nameof(UptimeStat.TimeRecorded)" Title="Outages" ValueProperty="@nameof(UptimeStat.Outages)">
-                <RadzenMarkers />
-                
+                <ChildContent>
+                    <RadzenMarkers MarkerType="MarkerType.Circle" StrokeWidth="2" Size="6" />
+                </ChildContent>                
+                <TooltipTemplate Context="uptimeStat">
+                    <RadzenStack>
+                        <RadzenText>Outages recorded: @uptimeStat.Outages</RadzenText>
+                        <RadzenText>Http status code: @((int)uptimeStat?.StatusCode)</RadzenText>
+                        <RadzenText>Reason: @uptimeStat.Reason</RadzenText>
+                    </RadzenStack> 
+                </TooltipTemplate>
             </RadzenLineSeries>
             <RadzenCategoryAxis Padding="20" />
             <RadzenValueAxis>
@@ -60,17 +68,5 @@
     {
         DateTime time = (DateTime)toFormat;
         return time.ToString("dd/MM HH:mm");
-    }
-
-    private String FormatOutages(object fromFormat)
-    {
-        int outages = (int)fromFormat;
-
-        if (outages == 0)
-        {
-            return ""; 
-        }
-
-        return outages.ToString();
     }
 }
