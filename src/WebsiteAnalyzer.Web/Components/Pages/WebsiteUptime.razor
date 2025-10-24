@@ -9,7 +9,7 @@
 @inject IUptimeService UptimeService
 
 <WebsiteStatsLayout Website="Website" Websites="Websites">
-    <RadzenStack>
+    <RadzenCard>
         <RadzenChart>
             <RadzenLineSeries Data="@_uptimeStats" CategoryProperty="@nameof(UptimeStat.TimeRecorded)" Title="Outages" ValueProperty="@nameof(UptimeStat.Outages)">
                 <ChildContent>
@@ -32,21 +32,11 @@
                 <RadzenAxisTitle Text="Time" />
             </RadzenCategoryAxis>
         </RadzenChart>
-        
-        <RadzenCard>
-            @foreach (UptimeStat downtime in _downtimePings)
-            {
-                <RadzenCard>
-                    <RadzenText>@downtime.TimeRecorded.ToLocalTime()</RadzenText>
-                </RadzenCard>
-            }
-        </RadzenCard>
-    </RadzenStack>
+    </RadzenCard>
 </WebsiteStatsLayout>
 
 
 @code {
-    private IEnumerable<UptimeStat> _downtimePings => _uptimeStats.Where(stat => stat.Outages > 0);
     private IEnumerable<UptimeStat> _uptimeStats = [];
 
     protected override async Task OnInitializedAsync()
