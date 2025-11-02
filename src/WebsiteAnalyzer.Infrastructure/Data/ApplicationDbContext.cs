@@ -23,6 +23,7 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser, IdentityR
     public DbSet<BrokenLinkCrawl> BrokenLinkCrawls { get; set; }
     public DbSet<BrokenLink> BrokenLinks { get; set; }
     public DbSet<DowntimePing> DownTimePings { get; set; }
+    public DbSet<EmailSubscription> EmailSubcriptions { get; set; }
     
     
     protected override void OnModelCreating(ModelBuilder builder)
@@ -47,6 +48,12 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser, IdentityR
 
         builder.Entity<DowntimePing>()
             .HasKey(ping => ping.Id);
+
+        builder.Entity<EmailSubscription>()
+            .HasKey(sub =>
+            new {
+                sub.WebsiteId, sub.ScheduleActionId, sub.Email
+            });
 
         // Configure Identity entities to use GUID
         builder.Entity<IdentityUserLogin<Guid>>()

@@ -12,7 +12,7 @@ public class WebsiteRepositoryTests : TestBase
 
     public WebsiteRepositoryTests(DatabaseFixture fixture) : base(fixture)
     {
-        _sut = new WebsiteRepository(Context);
+        _sut = new WebsiteRepository(DbContext);
     }
 
     [Theory]
@@ -24,7 +24,7 @@ public class WebsiteRepositoryTests : TestBase
     public async Task GetAllByUserId_ReturnsExpectedWebsitesForEachUser(int userWebsitesCount, int otherUserWebsitesCount)
     {
         // Arrange
-        (Guid userId, Guid otherUserId) = TwoUserIds();
+        (Guid userId, Guid otherUserId) = TwoIds();
 
         await WebsiteScenarios.CreateMultipleForUser(userId, userWebsitesCount);
         await WebsiteScenarios.CreateMultipleForUser(otherUserId, otherUserWebsitesCount);
@@ -46,7 +46,7 @@ public class WebsiteRepositoryTests : TestBase
     public async Task GetByIdAndUserId_ReturnsCorrectWebsite(int userWebsiteCount, int otherUserWebsiteCount)
     {
         // Arrange
-        (Guid userId, Guid otherUserId) = TwoUserIds();
+        (Guid userId, Guid otherUserId) = TwoIds();
 
         ICollection<Website> userWebsites = await WebsiteScenarios.CreateMultipleForUser(userId, userWebsiteCount);
         ICollection<Website> otherUserWebsites =
@@ -67,7 +67,7 @@ public class WebsiteRepositoryTests : TestBase
     public async Task GetByIdAndUserId_ReturnsNothing_WhenQueryingOtherUserWebsite()
     {
         // Arrange
-        (Guid userId, Guid otherUserId) = TwoUserIds();
+        (Guid userId, Guid otherUserId) = TwoIds();
         Website website = await WebsiteScenarios.CreateDefault(userId, "http://website.dk");
         Guid websiteId = website.Id;
 
@@ -132,7 +132,7 @@ public class WebsiteRepositoryTests : TestBase
     public async Task DeleteByUrlAndUserId_DeletesOnlyUserWebsite()
     {
         // Arrange
-        (Guid userId, Guid otherUserId) = TwoUserIds();
+        (Guid userId, Guid otherUserId) = TwoIds();
         string userWebsiteUrl = "http://website1.dk";
         string otherUserWebsiteUrl = "http://website2.dk";
 
@@ -154,7 +154,7 @@ public class WebsiteRepositoryTests : TestBase
     public async Task DeleteByUrlAndUserId_CanOnlyDeleteUserWebsites()
     {
         // Arrange
-        (Guid userId, Guid otherUserId) = TwoUserIds();
+        (Guid userId, Guid otherUserId) = TwoIds();
         string websiteUrl = "http://website1.dk";
 
         await WebsiteScenarios.CreateDefault(userId, websiteUrl);

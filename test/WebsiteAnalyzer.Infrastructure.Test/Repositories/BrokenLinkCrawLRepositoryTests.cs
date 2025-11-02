@@ -11,7 +11,7 @@ public class BrokenLinkCrawLRepositoryTests : TestBase
 
     public BrokenLinkCrawLRepositoryTests(DatabaseFixture fixture) : base(fixture)
     {
-        _sut = new BrokenLinkCrawlRepository(Context);
+        _sut = new BrokenLinkCrawlRepository(DbContext);
     }
     
     // TODO GetByUserIdAsync, Single Crawl, Multiple Crawls, Multiple crawls and users

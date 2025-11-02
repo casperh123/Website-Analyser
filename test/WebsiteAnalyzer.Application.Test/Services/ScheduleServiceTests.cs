@@ -16,7 +16,7 @@ public class ScheduleServiceTests : TestBase
     
     public ScheduleServiceTests(DatabaseFixture fixture) : base(fixture)
     {
-        IScheduledActionRepository scheduleRepository = new ScheduledActionRepository(Context);
+        IScheduledActionRepository scheduleRepository = new ScheduledActionRepository(DbContext);
         _sut = new ScheduleService(scheduleRepository);
     }
 

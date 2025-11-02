@@ -12,7 +12,7 @@ public class DowntimePingRepositoryTests : TestBase
 
     public DowntimePingRepositoryTests(DatabaseFixture fixture) : base(fixture)
     {
-        _sut = new DowntimePingRepository(Context);
+        _sut = new DowntimePingRepository(DbContext);
     }
 
     [Theory]
