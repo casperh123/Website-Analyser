@@ -19,9 +19,9 @@
         <RadzenText TextStyle="TextStyle.DisplayH4">Cache Warms</RadzenText>
         <RadzenCard>
             <RadzenRow AlignItems="AlignItems.Center" JustifyContent="JustifyContent.SpaceBetween">
-                <ScheduledActionStatus ScheduledAction="_scheduledAction"/>
+                <ScheduledActionStatus ScheduledAction="ScheduledAction"/>
 
-                @if (_scheduledAction.Status != Status.InProgress)
+                @if (ScheduledAction.Status != Status.InProgress)
                 {
                     <WebsiteInput 
                         IsProcessing="IsProcessing"
@@ -43,7 +43,7 @@
             PageSize="15"
             AllowPaging="true"
             ShowPagingSummary="true"
-            Data="@_cacheWarms"
+            Data="@CacheWarms"
             FilterMode="FilterMode.Simple">
             <Columns>
                 <RadzenDataGridColumn Property="@nameof(CacheWarm.TotalTime)" Title="Total Time" Width="100px" Filterable="false">
@@ -66,8 +66,11 @@
 
 @code {
 
-    private ICollection<CacheWarm> _cacheWarms = [];
-    private ScheduledAction _scheduledAction;
+    [PersistentState]
+    public ICollection<CacheWarm>? CacheWarms { get; set; }
+    
+    [PersistentState]
+    public ScheduledAction? ScheduledAction { get; set; }
 
     private int _linksChecked;
     private int _linksEnqueued;
@@ -82,8 +85,8 @@
             return;
         }
         
-        _cacheWarms = await CacheWarmingService.GetCacheWarmsByWebsiteId(Website.Id);
-        _scheduledAction = await ScheduleService.GetActionByWebsiteIdAndType(Website.Id, CrawlAction.CacheWarm);
+        CacheWarms = await CacheWarmingService.GetCacheWarmsByWebsiteId(Website.Id);
+        ScheduledAction = await ScheduleService.GetActionByWebsiteIdAndType(Website.Id, CrawlAction.CacheWarm);
         
         progress = new Progress<CrawlProgress<Link>>(p =>
             {
@@ -103,7 +106,7 @@
             await CacheWarmingService.WarmCache(Website, progress, token);
         });
         
-        _cacheWarms = await CacheWarmingService.GetCacheWarmsByWebsiteId(Website.Id);
+        CacheWarms = await CacheWarmingService.GetCacheWarmsByWebsiteId(Website.Id);
     }
     
 }

@@ -2,9 +2,7 @@ namespace WebsiteAnalyzer.Core.Domain;
 
 public record CacheWarm
 {
-    private CacheWarm()
-    {
-    }
+    public CacheWarm() { }
 
     public CacheWarm(Website.Website website)
     {

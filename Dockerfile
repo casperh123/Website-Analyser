@@ -1,5 +1,5 @@
 # SDK stage
-FROM mcr.microsoft.com/dotnet/sdk:9.0-noble AS build-env
+FROM mcr.microsoft.com/dotnet/sdk:10.0-noble AS build-env
 WORKDIR /src
 COPY ./src .
 
@@ -11,7 +11,7 @@ RUN dotnet restore "WebsiteAnalyzer.Web/WebsiteAnalyzer.Web.csproj" \
     /p:UseAppHost=false
 
 # Runtime stage
-FROM mcr.microsoft.com/dotnet/aspnet:9.0-noble
+FROM mcr.microsoft.com/dotnet/aspnet:10.0-noble
 
 WORKDIR /app
 

@@ -12,9 +12,14 @@
     [Parameter]
     public Guid WebsiteId { get; set; }
     
-    protected Website? Website { get; set; }
-    protected ApplicationUser? User { get; set; }
-    protected ICollection<Website> Websites { get; set; } = [];
+    [PersistentState]
+    public Website? Website { get; set; }
+    
+    [PersistentState]
+    public ApplicationUser? User { get; set; }
+    
+    [PersistentState]
+    public ICollection<Website>? Websites { get; set; }
     
     protected override async Task OnInitializedAsync()
     {

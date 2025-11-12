@@ -22,9 +22,9 @@
             <RadzenText TextStyle="TextStyle.DisplayH4">Broken Link Crawls</RadzenText>
             <RadzenCard>
                 <RadzenRow AlignItems="AlignItems.Center" JustifyContent="JustifyContent.SpaceBetween">
-                    <ScheduledActionStatus ScheduledAction="_scheduledAction"/>
+                    <ScheduledActionStatus ScheduledAction="ScheduledAction"/>
 
-                    @if (_scheduledAction.Status != Status.InProgress)
+                    @if (ScheduledAction.Status != Status.InProgress)
                     {
                         <WebsiteInput 
                             IsProcessing="IsProcessing"
@@ -40,10 +40,10 @@
                 </RadzenRow>
             </RadzenCard>
 
-            @if (_brokenLinkCrawls.Any())
+            @if (BrokenLinkCrawls.Any())
             {
                 <RadzenStack Gap="20px" Style="margin-top: 20px;">
-                    @foreach (BrokenLinkCrawlDTO brokenLink in _brokenLinkCrawls)
+                    @foreach (BrokenLinkCrawlDTO brokenLink in BrokenLinkCrawls)
                     {
                         <BrokenLinkCrawlCard Crawl="brokenLink"></BrokenLinkCrawlCard>
                     }
@@ -58,8 +58,12 @@
 </WebsiteStatsLayout>
 
 @code {
-    private ICollection<BrokenLinkCrawlDTO> _brokenLinkCrawls = [];
-    private ScheduledAction _scheduledAction;
+    [PersistentState]
+    public ICollection<BrokenLinkCrawlDTO>? BrokenLinkCrawls { get; set; }
+    
+    [PersistentState]
+    public ScheduledAction? ScheduledAction { get; set; }
+    
     private int _linksEnqueued;
     private int _linksChecked;
     private IProgress<Progress> _progress;
@@ -80,8 +84,8 @@
             InvokeAsync(StateHasChanged);
         });
 
-        _scheduledAction = await ScheduledActionService.GetActionByWebsiteIdAndType(Website.Id, CrawlAction.BrokenLink);
-        _brokenLinkCrawls = await BrokenLinkService.GetBrokenLinkCrawlsByUrlAndUserId(Website.Url, User.Id);
+        ScheduledAction = await ScheduledActionService.GetActionByWebsiteIdAndType(Website.Id, CrawlAction.BrokenLink);
+        BrokenLinkCrawls = await BrokenLinkService.GetBrokenLinkCrawlsByUrlAndUserId(Website.Url, User.Id);
     }
 
     public async Task FindBrokenLinks()
@@ -99,6 +103,6 @@
             }
         });
         
-        _brokenLinkCrawls = await BrokenLinkService.GetBrokenLinkCrawlsByUrlAndUserId(Website.Url, User.Id);
+        BrokenLinkCrawls = await BrokenLinkService.GetBrokenLinkCrawlsByUrlAndUserId(Website.Url, User.Id);
     }
 }

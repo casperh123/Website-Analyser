@@ -11,7 +11,7 @@
 <WebsiteStatsLayout Website="Website" Websites="Websites">
     <RadzenCard>
         <RadzenChart>
-            <RadzenLineSeries Data="@_uptimeStats" CategoryProperty="@nameof(UptimeStat.TimeRecorded)" Title="Outages" ValueProperty="@nameof(UptimeStat.Outages)">
+            <RadzenLineSeries Data="@UptimeStats" CategoryProperty="@nameof(UptimeStat.TimeRecorded)" Title="Outages" ValueProperty="@nameof(UptimeStat.Outages)">
                 <ChildContent>
                     <RadzenMarkers MarkerType="MarkerType.Circle" StrokeWidth="2" Size="4" />
                 </ChildContent>                
@@ -37,7 +37,8 @@
 
 
 @code {
-    private IEnumerable<UptimeStat> _uptimeStats = [];
+    [PersistentState]
+    public ICollection<UptimeStat>? UptimeStats { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
@@ -50,7 +51,7 @@
 
         DateTime beforeDate = DateTime.UtcNow.Subtract(TimeSpan.FromDays(3));
 
-        _uptimeStats = await UptimeService.GetByWebsiteAfterDate(Website.Id, beforeDate);
+        UptimeStats = await UptimeService.GetByWebsiteAfterDate(Website.Id, beforeDate);
         Console.WriteLine("");
     }
 

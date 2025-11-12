@@ -4,7 +4,7 @@ namespace WebsiteAnalyzer.Core.Domain;
 
 public record ScheduledAction
 {
-    private ScheduledAction() {}
+    public ScheduledAction() {}
 
     public ScheduledAction(
         Website.Website website,
