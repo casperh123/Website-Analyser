@@ -58,10 +58,8 @@
 </WebsiteStatsLayout>
 
 @code {
-    [PersistentState]
     public ICollection<BrokenLinkCrawlDTO>? BrokenLinkCrawls { get; set; }
     
-    [PersistentState]
     public ScheduledAction? ScheduledAction { get; set; }
     
     private int _linksEnqueued;

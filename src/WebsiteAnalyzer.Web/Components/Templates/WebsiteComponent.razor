@@ -12,13 +12,8 @@
     [Parameter]
     public Guid WebsiteId { get; set; }
     
-    [PersistentState]
     public Website? Website { get; set; }
-    
-    [PersistentState]
     public ApplicationUser? User { get; set; }
-    
-    [PersistentState]
     public ICollection<Website>? Websites { get; set; }
     
     protected override async Task OnInitializedAsync()
