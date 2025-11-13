@@ -3,9 +3,9 @@ using BrokenLinkChecker.DocumentParsing.LinkProcessors;
 using BrokenLinkChecker.Models.Links;
 using BrokenLinkChecker.Models.Result;
 
-namespace BrokenLinkChecker.Crawler.ExtendedCrawlers;
+namespace BrokenLinkChecker.Crawler.Crawl;
 
-public class ModularCrawler<T>(ILinkProcessor<T> linkProcessor)
+public class Crawler<T>(ILinkProcessor<T> linkProcessor)
     where T : Link
 {
     private const int DefaultQueueSize = 1000;

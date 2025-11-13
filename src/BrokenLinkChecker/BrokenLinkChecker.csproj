@@ -19,7 +19,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="DocumentParsing\ModularLinkExtraction\ZeroCopyParse\" />
+      <Folder Include="DocumentParsing\LinkExtractors\ZeroCopyParse\" />
     </ItemGroup>
 
 </Project>

@@ -1,6 +1,6 @@
 using System.Net;
 using System.Runtime.CompilerServices;
-using BrokenLinkChecker.Crawler.ExtendedCrawlers;
+using BrokenLinkChecker.Crawler.Crawl;
 using BrokenLinkChecker.DocumentParsing.LinkProcessors;
 using BrokenLinkChecker.Models.Links;
 using BrokenLinkChecker.Models.Result;
@@ -142,7 +142,7 @@ public class BrokenLinkService(
     private IAsyncEnumerable<CrawlProgress<IndexedLink>> StartCrawler(string url, CancellationToken cancellationToken)
     {
         BrokenLinkProcessor linkProcessor = new BrokenLinkProcessor(httpClient);
-        ModularCrawler<IndexedLink> crawler = new ModularCrawler<IndexedLink>(linkProcessor);
+        Crawler<IndexedLink> crawler = new Crawler<IndexedLink>(linkProcessor);
         IndexedLink startLink = new IndexedLink(url);
         
         return crawler.CrawlWebsiteAsync(startLink, cancellationToken);

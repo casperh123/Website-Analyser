@@ -1,4 +1,4 @@
-using BrokenLinkChecker.Crawler.ExtendedCrawlers;
+using BrokenLinkChecker.Crawler.Crawl;
 using BrokenLinkChecker.DocumentParsing.LinkProcessors;
 using BrokenLinkChecker.Models.Links;
 using BrokenLinkChecker.Models.Result;
@@ -14,7 +14,7 @@ namespace WebsiteAnalyzer.Application.Services;
 public class CacheWarmingService : ICacheWarmingService
 {
     private readonly ICacheWarmRepository _cacheWarmRepository;
-    private readonly ModularCrawler<Link> _linkCrawler;
+    private readonly Crawler<Link> _linkCrawler;
     
     public CacheWarmingService(
         ICacheWarmRepository cacheWarmRepository,
@@ -22,7 +22,7 @@ public class CacheWarmingService : ICacheWarmingService
     )
     {
         _cacheWarmRepository = cacheWarmRepository;
-        _linkCrawler = new ModularCrawler<Link>(new LinkProcessor(httpClient));
+        _linkCrawler = new Crawler<Link>(new LinkProcessor(httpClient));
     }
 
     public async Task<AnonymousCacheWarm> WarmCacheAnonymous(

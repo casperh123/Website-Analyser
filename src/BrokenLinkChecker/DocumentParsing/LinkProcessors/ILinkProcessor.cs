@@ -1,4 +1,3 @@
-using BrokenLinkChecker.Crawler.ExtendedCrawlers;
 using BrokenLinkChecker.Models.Links;
 
 namespace BrokenLinkChecker.DocumentParsing.LinkProcessors;
