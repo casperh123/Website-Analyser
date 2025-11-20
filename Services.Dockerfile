@@ -7,7 +7,7 @@ RUN dotnet restore "WebsiteAnalyzer.Services/WebsiteAnalyzer.Services.csproj" \
     && dotnet publish "WebsiteAnalyzer.Services/WebsiteAnalyzer.Services.csproj" \
     -c Release \
     -o /app/publish \
-    --no-restore \
+    --no-restore
 
 # Runtime stage
 FROM mcr.microsoft.com/dotnet/aspnet:10.0-noble
