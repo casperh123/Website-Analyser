@@ -20,7 +20,7 @@ public static class DatabaseConfiguration
         {
             if (environment == "Development")
             {
-                string sqliteConnection = connectionString ?? "Data Source=./Data/app.db";
+                string sqliteConnection = connectionString ?? "Data Source=../WebsiteAnalyzer.Web/Data/app.db";
                 options.UseSqlite(sqliteConnection);
             }
             else

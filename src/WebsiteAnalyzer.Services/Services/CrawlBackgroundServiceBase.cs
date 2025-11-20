@@ -4,9 +4,9 @@ using WebsiteAnalyzer.Core.Enums;
 using WebsiteAnalyzer.Core.Interfaces.Services;
 using WebsiteAnalyzer.Web.BackgroundJobs.Timers;
 
-namespace WebsiteAnalyzer.Web.BackgroundJobs;
+namespace WebsiteAnalyzer.Services.Services;
 
-public abstract class CrawlBackgroundServiceBase : IHostedService
+public abstract class CrawlBackgroundServiceBase : BackgroundService
 {
     private readonly IPeriodicTimer _timer;
     private readonly IServiceProvider _serviceProvider;
@@ -14,9 +14,6 @@ public abstract class CrawlBackgroundServiceBase : IHostedService
     private readonly ActionBlock<ScheduledAction> _crawlProcessor;
     
     protected readonly ILogger Logger;
-
-    private CancellationToken _cancellationToken;
-    private Task _executingTask;
 
     protected CrawlBackgroundServiceBase(
         ILogger logger,
@@ -36,46 +33,23 @@ public abstract class CrawlBackgroundServiceBase : IHostedService
                 EnsureOrdered = false,                
             });
     }
-
-    public Task StartAsync(CancellationToken cancellationToken)
+    
+    protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        Logger.LogInformation("{ServiceType} background service is starting", _crawlAction);
-
-        _cancellationToken = cancellationToken;
-        
-        // Start the processing loop as a background task and store it
-        // This allows the method to return immediately while processing continues
-        _executingTask = ProcessingLoop();
-
-        // Return immediately so other services can start
-        return Task.CompletedTask;
-    }
-
-    private async Task ProcessingLoop()
-    {
-        while (!_cancellationToken.IsCancellationRequested && 
-               await _timer.WaitForNextTickAsync(_cancellationToken))
+        while (!stoppingToken.IsCancellationRequested && await _timer.WaitForNextTickAsync(stoppingToken))
         {
-            await ProcessDueSchedulesAsync();
-        }
+            using IServiceScope scope = _serviceProvider.CreateScope();
+            IScheduleService scheduleService = scope.ServiceProvider.GetRequiredService<IScheduleService>();
         
-        _crawlProcessor.Complete();
-        await _crawlProcessor.Completion;
-    }
+            ICollection<ScheduledAction> dueScheduledActions = await scheduleService.GetDueSchedulesBy(_crawlAction);
 
-    private async Task ProcessDueSchedulesAsync()
-    {
-        using IServiceScope scope = _serviceProvider.CreateScope();
-        IScheduleService scheduleService = scope.ServiceProvider.GetRequiredService<IScheduleService>();
-        
-        ICollection<ScheduledAction> dueScheduledActions = await scheduleService.GetDueSchedulesBy(_crawlAction);
+            Logger.LogInformation("Processing {Count} due {Action} schedules", 
+                dueScheduledActions.Count, _crawlAction);
 
-        Logger.LogInformation("Processing {Count} due {Action} schedules", 
-            dueScheduledActions.Count, _crawlAction);
-
-        foreach (ScheduledAction action in dueScheduledActions)
-        {
-            await _crawlProcessor.SendAsync(action, _cancellationToken);
+            foreach (ScheduledAction action in dueScheduledActions)
+            {
+                await _crawlProcessor.SendAsync(action, stoppingToken);
+            }
         }
     }
     
@@ -122,12 +96,4 @@ public abstract class CrawlBackgroundServiceBase : IHostedService
         ScheduledAction schedule,
         IServiceScope scope, 
         CancellationToken token);
-
-    public async Task StopAsync(CancellationToken cancellationToken)
-    {
-        Logger.LogInformation("{ServiceType} background service is stopping", _crawlAction);
-    
-        _crawlProcessor.Complete();
-        await _crawlProcessor.Completion;
-    }
 }

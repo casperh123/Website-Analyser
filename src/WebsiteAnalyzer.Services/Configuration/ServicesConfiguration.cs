@@ -1,8 +1,9 @@
+using WebsiteAnalyzer.Services.Services;
 using WebsiteAnalyzer.Web.BackgroundJobs;
 
-namespace WebsiteAnalyzer.Web.Configuration;
+namespace WebsiteAnalyzer.Services.Configuration;
 
-public static class BackgroundServiceConfiguration
+public static class ServiceConfiguration
 {
     public static IServiceCollection AddBackgroundServices(this IServiceCollection services)
     {

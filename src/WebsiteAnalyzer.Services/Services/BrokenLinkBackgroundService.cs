@@ -1,10 +1,10 @@
-using WebsiteAnalyzer.Core.Contracts;
 using WebsiteAnalyzer.Core.Contracts.BrokenLink;
 using WebsiteAnalyzer.Core.Domain;
 using WebsiteAnalyzer.Core.Enums;
 using WebsiteAnalyzer.Core.Interfaces.Services;
+using WebsiteAnalyzer.Web.BackgroundJobs;
 
-namespace WebsiteAnalyzer.Web.BackgroundJobs;
+namespace WebsiteAnalyzer.Services.Services;
 
 public class BrokenLinkBackgroundService(
     ILogger<BrokenLinkBackgroundService> logger,

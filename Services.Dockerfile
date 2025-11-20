@@ -1,14 +1,13 @@
-# SDK stage
+﻿# SDK stage
 FROM mcr.microsoft.com/dotnet/sdk:10.0-noble AS build-env
 WORKDIR /src
 COPY ./src .
 
-RUN dotnet restore "WebsiteAnalyzer.Web/WebsiteAnalyzer.Web.csproj" \
-    && dotnet publish "WebsiteAnalyzer.Web/WebsiteAnalyzer.Web.csproj" \
+RUN dotnet restore "WebsiteAnalyzer.Services/WebsiteAnalyzer.Services.csproj" \
+    && dotnet publish "WebsiteAnalyzer.Services/WebsiteAnalyzer.Services.csproj" \
     -c Release \
     -o /app/publish \
     --no-restore \
-    /p:UseAppHost=false
 
 # Runtime stage
 FROM mcr.microsoft.com/dotnet/aspnet:10.0-noble
@@ -29,9 +28,7 @@ RUN apt-get update \
     && apt-get install -y --no-install-recommends libmsquic \
     && rm -rf /var/lib/apt/lists/*
 
-ENV DOTNET_gcServer=1 \
+ENV DOTNET_gcServer=0 \
     ASPNETCORE_ENVIRONMENT=Production
-    
-EXPOSE 8080
 
-ENTRYPOINT ["dotnet", "WebsiteAnalyzer.Web.dll"]
+ENTRYPOINT ["dotnet", "WebsiteAnalyzer.Services.dll"]

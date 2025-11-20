@@ -28,7 +28,6 @@ builder.Services
     .AddInfrastructureServices(builder.Configuration)
     .AddApplicationServices()
     .AddThemeServices()
-    .AddBackgroundServices()
     .AddHttpContextAccessor()
     .AddDefaultSitemapServices<HttpContextBaseUrlProvider>();
 
@@ -54,7 +53,7 @@ builder.Services.AddScoped<Radzen.DialogService>();
 
 
 // Build and configure the application
-var app = builder.Build();
+WebApplication app = builder.Build();
 
 // Run database migrations
 await DatabaseMigrator.MigrateDatabase(app);
