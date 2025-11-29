@@ -19,13 +19,7 @@ public class BrokenLinkBackgroundService(
         IBrokenLinkService brokenLinkService = 
             scope.ServiceProvider.GetRequiredService<IBrokenLinkService>();
 
-        IAsyncEnumerable<BrokenLinkDTO> linksFound =
-            brokenLinkService.FindBrokenLinks(scheduledAction.Website, null, token);
-
-        await foreach (BrokenLinkDTO unused in linksFound)
-        {
-            _ = unused;
-        }
+        await brokenLinkService.FindBrokenLinks(scheduledAction.Website, null, token);
         
         Logger.LogInformation(
             "Completed crawl of {Url}.",
