@@ -7,7 +7,9 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\BrokenLinkChecker\BrokenLinkChecker.csproj"/>
+      <Reference Include="Crawler">
+        <HintPath>..\..\..\..\.nuget\packages\clyppers.composable.crawler\0.1.0\lib\net10.0\Crawler.dll</HintPath>
+      </Reference>
     </ItemGroup>
 
 </Project>

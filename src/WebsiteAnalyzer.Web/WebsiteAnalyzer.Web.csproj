@@ -19,7 +19,6 @@
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\BrokenLinkChecker\BrokenLinkChecker.csproj"/>
         <ProjectReference Include="..\WebsiteAnalyzer.Infrastructure\WebsiteAnalyzer.Infrastructure.csproj"/>
         <ProjectReference Include="..\WebsiteAnalyzer.Application\WebsiteAnalyzer.Application.csproj"/>
     </ItemGroup>
@@ -27,6 +26,19 @@
     <ItemGroup>
         <Folder Include="Components\WebsiteStats\" />
         <Folder Include="Data\"/>
+    </ItemGroup>
+    
+    <ItemGroup>
+      <_ContentIncludedByDefault Remove="Components\WebsiteMetrics\BrokenLinksStats.razor" />
+      <_ContentIncludedByDefault Remove="Components\WebsiteMetrics\PageHeaders.razor" />
+      <_ContentIncludedByDefault Remove="Components\WebsiteMetrics\PerformanceStats.razor" />
+      <_ContentIncludedByDefault Remove="Components\WebsiteMetrics\StateButtons.razor" />
+      <_ContentIncludedByDefault Remove="Components\User\SignUp.razor" />
+      <_ContentIncludedByDefault Remove="Components\Search\SearchBar.razor" />
+      <_ContentIncludedByDefault Remove="Components\Schedule\Lists\ScheduledTaskDataGrid.razor" />
+      <_ContentIncludedByDefault Remove="Components\Schedule\WebsiteScheduler.razor" />
+      <_ContentIncludedByDefault Remove="Components\BrokenLink\Lists\BrokenLinkCrawlHistory.razor" />
+      <_ContentIncludedByDefault Remove="Components\BrokenLink\Lists\BrokenLinkCrawlLinkList.razor" />
     </ItemGroup>
 
 </Project>

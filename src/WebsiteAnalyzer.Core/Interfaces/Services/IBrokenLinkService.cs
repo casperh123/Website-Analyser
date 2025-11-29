@@ -1,4 +1,4 @@
-using WebsiteAnalyzer.Core.Contracts;
+using Crawler.Models;
 using WebsiteAnalyzer.Core.Contracts.BrokenLink;
 using WebsiteAnalyzer.Core.Domain.Website;
 
@@ -6,15 +6,9 @@ namespace WebsiteAnalyzer.Core.Interfaces.Services;
 
 public interface IBrokenLinkService
 {
-    IAsyncEnumerable<BrokenLinkDTO> FindBrokenLinks(
+    Task<ICollection<BrokenLinkDTO>> FindBrokenLinks(
         Website website,
-        IProgress<Progress>? progress = null,
-        CancellationToken cancellationToken = default
-    );
-
-    IAsyncEnumerable<BrokenLinkDTO> FindBrokenLinksAnonymus(
-        string url,
-        IProgress<Progress>? progress = null,
+        IProgress<CrawlProgress>? progress = null,
         CancellationToken cancellationToken = default
     );
 

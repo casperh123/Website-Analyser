@@ -1,7 +1,6 @@
-using BrokenLinkChecker.Crawler.Crawl;
-using BrokenLinkChecker.DocumentParsing.LinkProcessors;
-using BrokenLinkChecker.Models.Links;
-using BrokenLinkChecker.Models.Result;
+using Crawler.Core;
+using Crawler.Filters;
+using Crawler.Models;
 using WebsiteAnalyzer.Core.Contracts.CacheWarm;
 using WebsiteAnalyzer.Core.Contracts.Crawl;
 using WebsiteAnalyzer.Core.Domain;
@@ -14,7 +13,7 @@ namespace WebsiteAnalyzer.Application.Services;
 public class CacheWarmingService : ICacheWarmingService
 {
     private readonly ICacheWarmRepository _cacheWarmRepository;
-    private readonly Crawler<Link> _linkCrawler;
+    private readonly HttpClient _httpClient;
     
     public CacheWarmingService(
         ICacheWarmRepository cacheWarmRepository,
@@ -22,12 +21,12 @@ public class CacheWarmingService : ICacheWarmingService
     )
     {
         _cacheWarmRepository = cacheWarmRepository;
-        _linkCrawler = new Crawler<Link>(new LinkProcessor(httpClient));
+        _httpClient = httpClient;
     }
 
     public async Task<AnonymousCacheWarm> WarmCacheAnonymous(
         string url, 
-        IProgress<CrawlProgress<Link>>? progress = null, 
+        IProgress<CrawlProgress>? progress = null, 
         CancellationToken cancellationToken = default
         )
     {
@@ -48,7 +47,7 @@ public class CacheWarmingService : ICacheWarmingService
 
     public async Task WarmCache(
         Website website, 
-        IProgress<CrawlProgress<Link>>? progress = null, 
+        IProgress<CrawlProgress>? progress = null, 
         CancellationToken cancellationToken = default
         )
     {
@@ -67,17 +66,23 @@ public class CacheWarmingService : ICacheWarmingService
     
     private async Task<int> CrawlWebsiteCore(
         string url, 
-        IProgress<CrawlProgress<Link>>? progress, 
+        IProgress<CrawlProgress>? progress, 
         CancellationToken cancellationToken)
     {
         int linksChecked = 0;
-       
-        await foreach (CrawlProgress<Link> crawlProgress in _linkCrawler.CrawlWebsiteAsync(new Link(url), cancellationToken))
+
+        Progress<CrawlProgress> trackingProgress = new Progress<CrawlProgress>(p =>
         {
-            linksChecked = crawlProgress.LinksChecked;
-            progress?.Report(crawlProgress);
-        }
-       
+            linksChecked = p.TotalCrawled;
+            progress?.Report(p);
+        });
+
+        Crawler.Core.Crawler crawler = new CrawlerBuilder(_httpClient)
+            .WithFilter(new SameHostFilter())
+            .Build();
+
+        await crawler.CrawlWebsiteAsync(new Uri(url), trackingProgress, cancellationToken);
+    
         return linksChecked;
     }
 }

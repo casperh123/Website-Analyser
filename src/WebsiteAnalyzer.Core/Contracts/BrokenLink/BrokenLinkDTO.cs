@@ -1,5 +1,4 @@
 using System.Net;
-using BrokenLinkChecker.Models.Links;
 
 namespace WebsiteAnalyzer.Core.Contracts.BrokenLink;
 
@@ -36,11 +35,6 @@ public record BrokenLinkDTO
             Line = Line,
             StatusCode = StatusCode
         };
-    }
-
-    public static BrokenLinkDTO FromIndexedLink(IndexedLink link)
-    {
-        return new BrokenLinkDTO(link.Target, link.ReferringPage, link.AnchorText, link.Line, link.StatusCode);
     }
 
     public static BrokenLinkDTO FromBrokenLink(Domain.BrokenLink.BrokenLink link)

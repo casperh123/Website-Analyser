@@ -1,6 +1,6 @@
 @page "/Website/{WebsiteId:guid}/cachewarms"
-@using global::BrokenLinkChecker.Models.Links
-@using global::BrokenLinkChecker.Models.Result
+@using Crawler.Models
+@using Radzen.Blazor.Markdown
 @using WebsiteAnalyzer.Core.Domain
 @using WebsiteAnalyzer.Core.Enums
 @using WebsiteAnalyzer.Core.Interfaces.Services
@@ -71,7 +71,7 @@
 
     private int _linksChecked;
     private int _linksEnqueued;
-    private IProgress<CrawlProgress<Link>> progress;
+    private IProgress<CrawlProgress> progress;
 
     protected override async Task OnInitializedAsync()
     {
@@ -85,10 +85,10 @@
         CacheWarms = await CacheWarmingService.GetCacheWarmsByWebsiteId(Website.Id);
         ScheduledAction = await ScheduleService.GetActionByWebsiteIdAndType(Website.Id, CrawlAction.CacheWarm);
         
-        progress = new Progress<CrawlProgress<Link>>(p =>
+        progress = new Progress<CrawlProgress>(p =>
             {
-                _linksChecked = p.LinksChecked;
-                _linksEnqueued = p.LinksEnqueued;
+                _linksChecked = p.TotalCrawled;
+                _linksEnqueued = p.QueueSize;
                 InvokeAsync(StateHasChanged);
             }
         );    
