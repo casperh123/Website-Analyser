@@ -4,5 +4,6 @@ public enum CrawlAction
 {
     BrokenLink,
     CacheWarm,
-    Uptime
+    Uptime,
+    OrderCheck
 }

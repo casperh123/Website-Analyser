@@ -1,6 +1,6 @@
 @page "/Website/{WebsiteId:guid}/cachewarms"
-@using Crawler.Models
-@using Radzen.Blazor.Markdown
+
+@using global::Crawl.Models
 @using WebsiteAnalyzer.Core.Domain
 @using WebsiteAnalyzer.Core.Enums
 @using WebsiteAnalyzer.Core.Interfaces.Services
@@ -71,7 +71,7 @@
 
     private int _linksChecked;
     private int _linksEnqueued;
-    private IProgress<CrawlProgress> progress;
+    private IProgress<CrawlProgress>? progress;
 
     protected override async Task OnInitializedAsync()
     {

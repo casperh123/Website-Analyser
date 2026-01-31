@@ -1,0 +1,91 @@
+@page "/Website/{WebsiteId:guid}/order-check"
+
+@using Microsoft.EntityFrameworkCore
+@using WebsiteAnalyzer.Core.Domain
+@using WebsiteAnalyzer.Core.Domain.OrderChecks
+@using WebsiteAnalyzer.Core.Enums
+@using WebsiteAnalyzer.Core.Interfaces.Services
+@using WebsiteAnalyzer.Web.Components.Layout
+
+@inherits WebsiteAnalyzer.Web.Components.Templates.WebsiteComponent
+
+@inject IScheduleService ScheduleService
+@inject IOrderCheckService OrderCheckService
+
+<WebsiteStatsLayout Website="Website" Websites="Websites">
+    <RadzenCard>
+        <RadzenStack>
+        <RadzenText TextStyle="TextStyle.DisplayH4">Ordercheck</RadzenText>
+        <RadzenCard>
+            <RadzenRow AlignItems="AlignItems.Center" JustifyContent="JustifyContent.SpaceBetween">
+                @if (ScheduledAction is null)
+                {
+                    <RadzenButton Click="AddCheck">Add check</RadzenButton>
+                }
+                else
+                {
+                    <RadzenStack>
+                        <RadzenButton Click="DeleteCheck" ButtonStyle="ButtonStyle.Danger"> Remove Check</RadzenButton>
+                    
+                        <RadzenStack>
+                            <RadzenStack>
+                                <RadzenText>API Key</RadzenText>
+                                <RadzenTextBox Value="@_keys?.Key" ValueChanged="UpdateKey"/>
+                            </RadzenStack>
+                            <RadzenStack>
+                                <RadzenText>API Secret</RadzenText>
+                                <RadzenTextBox Value="@_keys?.Secret" ValueChanged="UpdateSecret"/>
+                            </RadzenStack>
+                        </RadzenStack>
+                    </RadzenStack>
+                }
+                
+            </RadzenRow>
+        </RadzenCard>
+
+        </RadzenStack>
+    </RadzenCard>
+</WebsiteStatsLayout>
+
+@code {
+    public ScheduledAction? ScheduledAction { get; set; }
+    private OrderCheckKeys? _keys;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+
+        if (Website is null)
+        {
+            return;
+        }
+        
+        ScheduledAction = await ScheduleService.GetActionByWebsiteIdAndType(Website.Id, CrawlAction.OrderCheck);
+        _keys = await OrderCheckService.GetKeysByWebsiteId(WebsiteId) ?? new OrderCheckKeys(WebsiteId, "", "");
+        
+        Console.Write(_keys);
+    }
+
+    public async Task AddCheck()
+    {
+        ScheduledAction = await ScheduleService.ScheduleAction(Website, CrawlAction.OrderCheck, Frequency.SixHourly);
+    }
+
+    public async Task DeleteCheck()
+    {
+        await ScheduleService.DeleteAction(ScheduledAction);
+        ScheduledAction = null;
+    }
+
+    public async Task UpdateKey(string? key)
+    {
+        _keys.Key = key;
+        await OrderCheckService.UpdateKeys(_keys);
+    }
+
+    public async Task UpdateSecret(string? secret)
+    {
+        _keys.Secret = secret;
+        await OrderCheckService.UpdateKeys(_keys);
+    }
+}

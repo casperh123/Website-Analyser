@@ -81,6 +81,45 @@ namespace WebsiteAnalyzer.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "EmailSubcriptions",
+                columns: table => new
+                {
+                    WebsiteId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    ScheduleActionId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    Email = table.Column<string>(type: "TEXT", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_EmailSubcriptions", x => new { x.WebsiteId, x.ScheduleActionId, x.Email });
+                });
+
+            migrationBuilder.CreateTable(
+                name: "OrderCheckKeys",
+                columns: table => new
+                {
+                    WebsiteId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    Key = table.Column<string>(type: "TEXT", nullable: false),
+                    Secret = table.Column<string>(type: "TEXT", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_OrderCheckKeys", x => x.WebsiteId);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "OrderChecks",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "TEXT", nullable: false),
+                    WebsiteId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    TimeSinceLastOrder = table.Column<TimeSpan>(type: "TEXT", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_OrderChecks", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Websites",
                 columns: table => new
                 {
@@ -347,6 +386,15 @@ namespace WebsiteAnalyzer.Infrastructure.Migrations
 
             migrationBuilder.DropTable(
                 name: "DownTimePings");
+
+            migrationBuilder.DropTable(
+                name: "EmailSubcriptions");
+
+            migrationBuilder.DropTable(
+                name: "OrderCheckKeys");
+
+            migrationBuilder.DropTable(
+                name: "OrderChecks");
 
             migrationBuilder.DropTable(
                 name: "ScheduledActions");
