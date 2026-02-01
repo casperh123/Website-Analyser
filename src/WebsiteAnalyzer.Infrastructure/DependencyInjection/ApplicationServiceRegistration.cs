@@ -13,6 +13,7 @@ public static class ApplicationServiceRegistration
         services.AddScoped<ICacheWarmingService, CacheWarmingService>();
         services.AddScoped<IScheduleService, ScheduleService>();
         services.AddScoped<IBrokenLinkService, BrokenLinkService>();
+        services.AddScoped<IOrderCheckService, OrderCheckService>();
         services.AddScoped<IUptimeService, UptimeService>();
         services.AddSingleton<MailService>();
 

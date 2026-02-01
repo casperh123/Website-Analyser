@@ -6,6 +6,7 @@ namespace WebsiteAnalyzer.Core.Enums;
 public enum Frequency
 {
     [Description("Every minute")] Minutely,
+    [Description("Every 3 Hours")] ThreeHourly,
     [Description("Every 6 Hours")] SixHourly,
     [Description("Every 12 Hours")] TwelveHourly,
     [Description("Daily")] Daily,
@@ -30,6 +31,7 @@ public static class FrequencyExtensions
         return frequency switch
         {
             Frequency.Minutely => TimeSpan.FromMinutes(1),
+            Frequency.ThreeHourly => TimeSpan.FromHours(3),
             Frequency.SixHourly => TimeSpan.FromHours(6),
             Frequency.TwelveHourly => TimeSpan.FromHours(12),
             Frequency.Daily => TimeSpan.FromDays(1),

@@ -15,7 +15,7 @@ namespace WebsiteAnalyzer.Infrastructure.Migrations
         protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
-            modelBuilder.HasAnnotation("ProductVersion", "9.0.7");
+            modelBuilder.HasAnnotation("ProductVersion", "10.0.2");
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole<System.Guid>", b =>
                 {
@@ -232,6 +232,58 @@ namespace WebsiteAnalyzer.Infrastructure.Migrations
                     b.ToTable("CacheWarms");
                 });
 
+            modelBuilder.Entity("WebsiteAnalyzer.Core.Domain.EmailSubscription", b =>
+                {
+                    b.Property<Guid>("WebsiteId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid>("ScheduleActionId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Email")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("WebsiteId", "ScheduleActionId", "Email");
+
+                    b.ToTable("EmailSubcriptions");
+                });
+
+            modelBuilder.Entity("WebsiteAnalyzer.Core.Domain.OrderChecks.OrderCheck", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT");
+
+                    b.Property<TimeSpan>("TimeSinceLastOrder")
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid>("WebsiteId")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("OrderChecks");
+                });
+
+            modelBuilder.Entity("WebsiteAnalyzer.Core.Domain.OrderChecks.OrderCheckKeys", b =>
+                {
+                    b.Property<Guid>("WebsiteId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Key")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Secret")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("WebsiteId");
+
+                    b.ToTable("OrderCheckKeys");
+                });
+
             modelBuilder.Entity("WebsiteAnalyzer.Core.Domain.ScheduledAction", b =>
                 {
                     b.Property<Guid>("Id")
@@ -267,7 +319,7 @@ namespace WebsiteAnalyzer.Infrastructure.Migrations
                     b.ToTable("ScheduledActions");
                 });
 
-            modelBuilder.Entity("WebsiteAnalyzer.Core.Domain.Uptime.DownTimePing", b =>
+            modelBuilder.Entity("WebsiteAnalyzer.Core.Domain.Uptime.DowntimePing", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()

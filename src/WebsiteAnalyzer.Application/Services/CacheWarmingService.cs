@@ -1,6 +1,8 @@
-using Crawler.Core;
-using Crawler.Filters;
-using Crawler.Models;
+using Crawl.Core;
+using Crawl.Core.Builders;
+using Crawl.Core.Crawlers;
+using Crawl.Filters;
+using Crawl.Models;
 using WebsiteAnalyzer.Core.Contracts.CacheWarm;
 using WebsiteAnalyzer.Core.Contracts.Crawl;
 using WebsiteAnalyzer.Core.Domain;
@@ -77,11 +79,11 @@ public class CacheWarmingService : ICacheWarmingService
             progress?.Report(p);
         });
 
-        Crawler.Core.Crawler crawler = new CrawlerBuilder(_httpClient)
+        Crawler crawler = new SequentialCrawlerBuilder(_httpClient)
             .WithFilter(new SameHostFilter())
             .Build();
 
-        await crawler.CrawlWebsiteAsync(new Uri(url), trackingProgress, cancellationToken);
+        await crawler.CrawlAsync(new Uri(url), trackingProgress, cancellationToken);
     
         return linksChecked;
     }

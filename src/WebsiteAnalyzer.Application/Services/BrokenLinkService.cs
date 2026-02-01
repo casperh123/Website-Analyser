@@ -1,7 +1,8 @@
-using Crawler.Core;
-using Crawler.Filters;
-using Crawler.Models;
-using Crawler.Visitors.BrokenLink;
+using Crawl.Core;
+using Crawl.Core.Builders;
+using Crawl.Filters;
+using Crawl.Models;
+using Crawl.Visitors.BrokenLink;
 using WebsiteAnalyzer.Core.Contracts.BrokenLink;
 using WebsiteAnalyzer.Core.Domain.BrokenLink;
 using WebsiteAnalyzer.Core.Domain.Website;
@@ -32,14 +33,14 @@ public class BrokenLinkService(
             progress?.Report(p);
         });
 
-        Crawler.Core.Crawler crawler = new CrawlerBuilder(httpClient)
+        Crawler crawler = new SequentialCrawlerBuilder(httpClient)
             .WithFilter(new SameHostFilter())
             .WithVisitor(brokenLinkVisitor)
             .Build();
 
         try
         {
-            await crawler.CrawlWebsiteAsync(new Uri(website.Url), trackingProgress, cancellationToken);
+            await crawler.CrawlAsync(new Uri(website.Url), trackingProgress, cancellationToken);
         
             foreach (BrokenLinkReport brokenLinkReport in brokenLinkVisitor.GetBrokenLinks())
             {

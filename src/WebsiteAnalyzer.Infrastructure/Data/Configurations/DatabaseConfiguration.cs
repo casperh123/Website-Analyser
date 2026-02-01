@@ -18,7 +18,8 @@ public static class DatabaseConfiguration
 
         services.AddDbContextPool<ApplicationDbContext>(options =>
         {
-            if (environment == "Development")
+            if (string.Equals(environment, "Development", StringComparison.OrdinalIgnoreCase) || 
+                string.IsNullOrEmpty(environment))
             {
                 string sqliteConnection = connectionString ?? "Data Source=../WebsiteAnalyzer.Web/Data/app.db";
                 options.UseSqlite(sqliteConnection);

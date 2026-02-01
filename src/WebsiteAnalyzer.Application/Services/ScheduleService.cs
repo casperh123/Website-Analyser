@@ -41,7 +41,7 @@ public class ScheduleService : IScheduleService
         return await _scheduleRepository.GetByIdAsync(id);
     }
 
-    public async Task<ScheduledAction> GetActionByWebsiteIdAndType(Guid websiteId, CrawlAction type)
+    public async Task<ScheduledAction?> GetActionByWebsiteIdAndType(Guid websiteId, CrawlAction type)
     {
         return await _scheduleRepository.GetByWebsiteIdAndType(websiteId, type);
     }

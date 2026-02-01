@@ -8,15 +8,15 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="clyppers.composable.crawler" Version="0.1.0" />
-        <PackageReference Include="Microsoft.AspNetCore.Components.QuickGrid" Version="10.0.0" />
-        <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="10.0.0" />
-        <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="10.0.0">
+        <PackageReference Include="clyppers.composable.crawler" Version="0.2.0" />
+        <PackageReference Include="Microsoft.AspNetCore.Components.QuickGrid" Version="10.0.2" />
+        <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="10.0.2" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="10.0.2">
           <PrivateAssets>all</PrivateAssets>
           <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
-        <PackageReference Include="Radzen.Blazor" Version="8.3.0" />
-        <PackageReference Include="Sidio.Sitemap.Blazor" Version="1.2.0" />
+        <PackageReference Include="Radzen.Blazor" Version="8.7.4" />
+        <PackageReference Include="Sidio.Sitemap.Blazor" Version="2.0.0-preview" />
     </ItemGroup>
 
     <ItemGroup>
@@ -40,6 +40,12 @@
       <_ContentIncludedByDefault Remove="Components\Schedule\WebsiteScheduler.razor" />
       <_ContentIncludedByDefault Remove="Components\BrokenLink\Lists\BrokenLinkCrawlHistory.razor" />
       <_ContentIncludedByDefault Remove="Components\BrokenLink\Lists\BrokenLinkCrawlLinkList.razor" />
+    </ItemGroup>
+    
+    <ItemGroup>
+      <Reference Include="Crawler">
+        <HintPath>..\..\..\..\.nuget\packages\clyppers.composable.crawler\0.1.0\lib\net10.0\Crawler.dll</HintPath>
+      </Reference>
     </ItemGroup>
 
 </Project>

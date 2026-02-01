@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using WebsiteAnalyzer.Core.Domain;
 using WebsiteAnalyzer.Core.Domain.BrokenLink;
+using WebsiteAnalyzer.Core.Domain.OrderChecks;
 using WebsiteAnalyzer.Core.Domain.Uptime;
 using WebsiteAnalyzer.Core.Domain.Website;
 
@@ -24,12 +25,16 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser, IdentityR
     public DbSet<BrokenLink> BrokenLinks { get; set; }
     public DbSet<DowntimePing> DownTimePings { get; set; }
     public DbSet<EmailSubscription> EmailSubcriptions { get; set; }
+    public DbSet<OrderCheck> OrderChecks { get; set; }
+    public DbSet<OrderCheckKeys> OrderCheckKeys { get; set; }
     
     
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);
 
+        builder.Entity<OrderCheckKeys>().HasKey(e => new { e.WebsiteId });
+        
         // Configure Website entity
         builder.Entity<Website>()
             .HasKey(w =>
