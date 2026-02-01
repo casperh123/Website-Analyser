@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Radzen;
+using Sidio.Sitemap.AspNetCore;
 using Sidio.Sitemap.Blazor;
 using Sidio.Sitemap.Core.Services;
 using WebsiteAnalyzer.Infrastructure.Data.Configurations;
