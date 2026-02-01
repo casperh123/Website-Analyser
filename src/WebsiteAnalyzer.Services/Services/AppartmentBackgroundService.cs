@@ -1,10 +1,5 @@
 using System.Net.Http.Json;
-using System.Threading.Tasks.Dataflow;
-using MailKit;
-using Microsoft.AspNetCore.Identity.UI.Services;
-using WebsiteAnalyzer.Core.Domain;
-using WebsiteAnalyzer.Core.Enums;
-using WebsiteAnalyzer.Core.Interfaces.Services;
+using WebsiteAnalyzer.Application.Services;
 using WebsiteAnalyzer.Web.BackgroundJobs.Timers;
 
 namespace WebsiteAnalyzer.Services.Services;
@@ -14,7 +9,7 @@ public class AppartmentBackgroundService : BackgroundService
     private readonly IPeriodicTimer _timer;
     private readonly HttpClient _client;
     private readonly IServiceProvider _serviceProvider;
-    private readonly IEmailSender _mailService;
+    private readonly MailService _mailService;
     protected readonly ILogger Logger;
     private DateTime lastCheck;
 
@@ -27,7 +22,7 @@ public class AppartmentBackgroundService : BackgroundService
         _timer = new MinuteTimer(1);
         Logger = logger;
         _client = _serviceProvider.GetRequiredService<HttpClient>();
-        _mailService = _serviceProvider.GetRequiredService<IEmailSender>();
+        _mailService = _serviceProvider.GetRequiredService<MailService>();
         lastCheck = DateTime.Now;
     }
     
