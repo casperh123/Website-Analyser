@@ -5,6 +5,8 @@
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
         <GenerateResourceFiles>false</GenerateResourceFiles>
+        <GenerateSatelliteAssemblies>false</GenerateSatelliteAssemblies>
+
     </PropertyGroup>
 
     <ItemGroup>
