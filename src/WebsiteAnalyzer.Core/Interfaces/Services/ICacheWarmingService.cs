@@ -1,4 +1,4 @@
-using Crawler.Models;
+using Crawl.Models;
 using WebsiteAnalyzer.Core.Contracts.CacheWarm;
 using WebsiteAnalyzer.Core.Domain;
 using WebsiteAnalyzer.Core.Domain.Website;

@@ -5,7 +5,7 @@ namespace WebsiteAnalyzer.TestUtilities.Builders;
 
 public class EmailSubscriptionBuilder : EntityBuilder<EmailSubscription>
 {
-    public EmailSubscriptionBuilder(IEmailSubcriptionRepository repository) : base(repository)
+    public EmailSubscriptionBuilder(IEmailSubscriptionRepository repository) : base(repository)
     {
         Entity = new EmailSubscription(Guid.NewGuid(), Guid.NewGuid(), "");
     }

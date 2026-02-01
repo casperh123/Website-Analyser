@@ -7,7 +7,7 @@ namespace WebsiteAnalyzer.Core.Interfaces.Services;
 public interface IScheduleService
 {
     Task<ScheduledAction> GetById(Guid id);
-    Task<ScheduledAction> GetActionByWebsiteIdAndType(Guid websiteId, CrawlAction type);
+    Task<ScheduledAction?> GetActionByWebsiteIdAndType(Guid websiteId, CrawlAction type);
 
     Task<ScheduledAction> ScheduleAction(
         Website website,
