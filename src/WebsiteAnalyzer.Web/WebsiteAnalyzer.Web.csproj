@@ -5,6 +5,7 @@
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
         <UserSecretsId>aspnet-WebsiteAnalyzer.Web-d38b3e82-a980-494f-bbd7-b9a81c06bef2</UserSecretsId>
+        <EnableDefaultEmbeddedResourceItems>false</EnableDefaultEmbeddedResourceItems>
     </PropertyGroup>
 
     <ItemGroup>
@@ -28,19 +29,4 @@
         <Folder Include="Components\WebsiteStats\" />
         <Folder Include="Data\"/>
     </ItemGroup>
-    
-    <ItemGroup>
-      <_ContentIncludedByDefault Remove="Components\WebsiteMetrics\BrokenLinksStats.razor" />
-      <_ContentIncludedByDefault Remove="Components\WebsiteMetrics\PageHeaders.razor" />
-      <_ContentIncludedByDefault Remove="Components\WebsiteMetrics\PerformanceStats.razor" />
-      <_ContentIncludedByDefault Remove="Components\WebsiteMetrics\StateButtons.razor" />
-      <_ContentIncludedByDefault Remove="Components\User\SignUp.razor" />
-      <_ContentIncludedByDefault Remove="Components\Search\SearchBar.razor" />
-      <_ContentIncludedByDefault Remove="Components\Schedule\Lists\ScheduledTaskDataGrid.razor" />
-      <_ContentIncludedByDefault Remove="Components\Schedule\WebsiteScheduler.razor" />
-      <_ContentIncludedByDefault Remove="Components\BrokenLink\Lists\BrokenLinkCrawlHistory.razor" />
-      <_ContentIncludedByDefault Remove="Components\BrokenLink\Lists\BrokenLinkCrawlLinkList.razor" />
-    </ItemGroup>
-    
-
 </Project>
