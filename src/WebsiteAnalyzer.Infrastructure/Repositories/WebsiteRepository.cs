@@ -28,6 +28,13 @@ public class WebsiteRepository : BaseRepository<Website>, IWebsiteRepository
             .ConfigureAwait(false);
     }
 
+    public async Task<Website> GetByWebsiteId(Guid websiteId)
+    {
+        return await DbContext.Websites
+            .Where(w => w.Id == websiteId)
+            .FirstAsync();
+    }
+
     public async Task<ICollection<Website>> GetAllByUserId(Guid userId)
     {
         return await DbContext.Websites

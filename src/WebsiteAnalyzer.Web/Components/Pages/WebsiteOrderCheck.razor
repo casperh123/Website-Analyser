@@ -1,6 +1,5 @@
 @page "/Website/{WebsiteId:guid}/order-check"
 
-@using Microsoft.EntityFrameworkCore
 @using WebsiteAnalyzer.Core.Domain
 @using WebsiteAnalyzer.Core.Domain.OrderChecks
 @using WebsiteAnalyzer.Core.Enums
@@ -30,16 +29,21 @@
                         <RadzenStack>
                             <RadzenStack>
                                 <RadzenText>API Key</RadzenText>
-                                <RadzenTextBox Value="@_keys?.Key" ValueChanged="UpdateKey"/>
+                                <RadzenTextBox Value="@Keys?.Key" ValueChanged="UpdateKey"/>
                             </RadzenStack>
                             <RadzenStack>
                                 <RadzenText>API Secret</RadzenText>
-                                <RadzenTextBox Value="@_keys?.Secret" ValueChanged="UpdateSecret"/>
+                                <RadzenTextBox Value="@Keys?.Secret" ValueChanged="UpdateSecret"/>
                             </RadzenStack>
                         </RadzenStack>
                     </RadzenStack>
                 }
                 
+                <RadzenStack>
+                    <RadzenText TextStyle="TextStyle.DisplayH3">Last Check</RadzenText>
+                    <RadzenText>Time since last order: @LatestCheck?.TimeSinceLastOrder.ToString(@"hh\:mm")</RadzenText>
+                    <RadzenButton Click="CheckNow">Check now</RadzenButton>
+                </RadzenStack>
             </RadzenRow>
         </RadzenCard>
 
@@ -49,7 +53,8 @@
 
 @code {
     public ScheduledAction? ScheduledAction { get; set; }
-    private OrderCheckKeys? _keys;
+    private OrderCheckKeys? Keys { get; set; }
+    private OrderCheck? LatestCheck { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
@@ -61,14 +66,13 @@
         }
         
         ScheduledAction = await ScheduleService.GetActionByWebsiteIdAndType(Website.Id, CrawlAction.OrderCheck);
-        _keys = await OrderCheckService.GetKeysByWebsiteId(WebsiteId) ?? new OrderCheckKeys(WebsiteId, "", "");
-        
-        Console.Write(_keys);
+        Keys = await OrderCheckService.GetKeysByWebsiteId(WebsiteId) ?? new OrderCheckKeys(WebsiteId, "", "");
+        LatestCheck = await OrderCheckService.GetLatestByWebsiteId(WebsiteId);
     }
 
     public async Task AddCheck()
     {
-        ScheduledAction = await ScheduleService.ScheduleAction(Website, CrawlAction.OrderCheck, Frequency.SixHourly);
+        ScheduledAction = await ScheduleService.ScheduleAction(Website, CrawlAction.OrderCheck, Frequency.ThreeHourly);
     }
 
     public async Task DeleteCheck()
@@ -79,13 +83,18 @@
 
     public async Task UpdateKey(string? key)
     {
-        _keys.Key = key;
-        await OrderCheckService.UpdateKeys(_keys);
+        Keys.Key = key;
+        await OrderCheckService.UpdateKeys(Keys);
     }
 
     public async Task UpdateSecret(string? secret)
     {
-        _keys.Secret = secret;
-        await OrderCheckService.UpdateKeys(_keys);
+        Keys.Secret = secret;
+        await OrderCheckService.UpdateKeys(Keys);
+    }
+
+    public async Task CheckNow()
+    {
+        LatestCheck = await OrderCheckService.CheckOrder(WebsiteId);
     }
 }
