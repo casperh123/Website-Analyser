@@ -4,7 +4,7 @@ namespace WebsiteAnalyzer.Core.Interfaces.Services;
 
 public interface IEmailSubcriptionService
 {
-    Task Subscribe(Guid websiteId, Guid scheduledActionId, string email);
-    Task Unsubscribe(Guid websiteId, Guid scheduledActionId);
+    Task<EmailSubscription> Subscribe(Guid websiteId, Guid scheduledActionId, string email);
+    Task Unsubscribe(Guid websiteId, Guid scheduledActionId, string email);
     Task<IEnumerable<EmailSubscription>> GetSubscriptionsByWebsite(Guid websiteId);
 }

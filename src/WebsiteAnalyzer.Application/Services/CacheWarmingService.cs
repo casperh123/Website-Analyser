@@ -1,6 +1,5 @@
 using Crawl.Core;
 using Crawl.Core.Builders;
-using Crawl.Core.Crawlers;
 using Crawl.Filters;
 using Crawl.Models;
 using WebsiteAnalyzer.Core.Contracts.CacheWarm;

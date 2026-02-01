@@ -19,6 +19,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IDowntimePingRepository, DowntimePingRepository>();
         services.AddScoped<IOrderCheckRepository, OrderCheckRepository>();
         services.AddScoped<IOrderCheckKeysRepository, OrderCheckKeysRepository>();
+        services.AddScoped<IEmailSubscriptionRepository, EmailSubscriptionRepository>();
         
         return services;
     }
