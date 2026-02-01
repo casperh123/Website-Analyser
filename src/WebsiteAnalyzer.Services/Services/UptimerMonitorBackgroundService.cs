@@ -2,9 +2,8 @@ using WebsiteAnalyzer.Core.Domain;
 using WebsiteAnalyzer.Core.Domain.Website;
 using WebsiteAnalyzer.Core.Enums;
 using WebsiteAnalyzer.Core.Interfaces.Services;
-using WebsiteAnalyzer.Services.Services;
 
-namespace WebsiteAnalyzer.Web.BackgroundJobs;
+namespace WebsiteAnalyzer.Services.Services;
 
 public class UptimeMonitorBackgroundService(
     ILogger<UptimeMonitorBackgroundService> logger,
