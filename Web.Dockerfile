@@ -1,5 +1,5 @@
 # SDK stage
-FROM mcr.microsoft.com/dotnet/sdk:10.0-noble AS build-env
+FROM mcr.microsoft.com/dotnet/sdk:10.0.101 AS build-env
 WORKDIR /src
 COPY ./src .
 
