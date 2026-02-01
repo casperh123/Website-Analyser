@@ -3,6 +3,13 @@ FROM mcr.microsoft.com/dotnet/sdk:10.0-noble AS build-env
 WORKDIR /src
 COPY ./src .
 
+# Debug: prove resx exists inside the container
+RUN echo "=== RESX FILES IN BUILD CONTEXT ===" \
+    && find /src -name "*.resx" -maxdepth 6 -print \
+    && echo "=== WEB PROJECT DIR LISTING ===" \
+    && ls -la /src/WebsiteAnalyzer.Web
+
+
 RUN dotnet restore "WebsiteAnalyzer.Web/WebsiteAnalyzer.Web.csproj" \
     && dotnet publish "WebsiteAnalyzer.Web/WebsiteAnalyzer.Web.csproj" \
     -c Release \
