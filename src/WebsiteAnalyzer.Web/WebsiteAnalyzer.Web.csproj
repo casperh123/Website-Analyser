@@ -19,11 +19,7 @@
         <PackageReference Include="Radzen.Blazor" Version="8.3.0" />
         <PackageReference Include="Sidio.Sitemap.Blazor" Version="1.2.0" />
     </ItemGroup>
-
-    <ItemGroup>
-        <EmbeddedResource Remove="**/*.resx" />
-    </ItemGroup>
-
+    
     <ItemGroup>
         <ProjectReference Include="..\WebsiteAnalyzer.Infrastructure\WebsiteAnalyzer.Infrastructure.csproj"/>
         <ProjectReference Include="..\WebsiteAnalyzer.Application\WebsiteAnalyzer.Application.csproj"/>
