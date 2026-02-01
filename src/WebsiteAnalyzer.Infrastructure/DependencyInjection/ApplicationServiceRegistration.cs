@@ -15,6 +15,7 @@ public static class ApplicationServiceRegistration
         services.AddScoped<IBrokenLinkService, BrokenLinkService>();
         services.AddScoped<IOrderCheckService, OrderCheckService>();
         services.AddScoped<IUptimeService, UptimeService>();
+        services.AddScoped<IEmailSubcriptionService, EmailSubscriptionService>();
         services.AddSingleton<MailService>();
 
         return services;

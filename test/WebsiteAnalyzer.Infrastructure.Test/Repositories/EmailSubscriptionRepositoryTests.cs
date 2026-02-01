@@ -8,7 +8,7 @@ namespace WebsiteAnalyzer.Infrastructure.Test.Repositories;
 
 public class EmailSubscriptionRepositoryTests : TestBase
 {
-    private readonly IEmailSubcriptionRepository _sut;
+    private readonly IEmailSubscriptionRepository _sut;
     
     public EmailSubscriptionRepositoryTests(DatabaseFixture fixture) : base(fixture)
     {

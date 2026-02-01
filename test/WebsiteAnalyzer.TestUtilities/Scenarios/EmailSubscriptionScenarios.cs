@@ -8,7 +8,7 @@ namespace WebsiteAnalyzer.TestUtilities.Scenarios;
 
 public class EmailSubscriptionScenarios
 {
-    private readonly IEmailSubcriptionRepository _repository;
+    private readonly IEmailSubscriptionRepository _repository;
 
     public EmailSubscriptionScenarios(ApplicationDbContext dbContext)
     {
