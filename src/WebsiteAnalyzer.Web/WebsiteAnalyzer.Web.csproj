@@ -6,8 +6,6 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <UserSecretsId>aspnet-WebsiteAnalyzer.Web-d38b3e82-a980-494f-bbd7-b9a81c06bef2</UserSecretsId>
         <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
-        <EnableDefaultEmbeddedResourceItems>false</EnableDefaultEmbeddedResourceItems>
-
     </PropertyGroup>
 
     <ItemGroup>
