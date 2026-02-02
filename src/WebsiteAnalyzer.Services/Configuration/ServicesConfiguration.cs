@@ -18,7 +18,6 @@ public static class ServiceConfiguration
         services.AddHostedService<BrokenLinkBackgroundService>();
         services.AddHostedService<UptimeMonitorBackgroundService>();
         services.AddHostedService<OrderCheckBackgroundService>();
-        services.AddHostedService<AppartmentBackgroundService>();
 
         return services;
     }

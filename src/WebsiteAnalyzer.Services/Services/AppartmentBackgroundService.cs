@@ -30,15 +30,21 @@ public class AppartmentBackgroundService : BackgroundService
     {
         while (!stoppingToken.IsCancellationRequested && await _timer.WaitForNextTickAsync(stoppingToken))
         {
-            JoratoResponse? response = await _client.GetFromJsonAsync<JoratoResponse>("https://api.jorato.com/tenancies?visibility=public&showAll=true&key=2gXoBtKvFMMgKJ1VBJ5G5pNr2GD", cancellationToken: stoppingToken);
-
-            IEnumerable<TenancyDto> urls = response.items
-                .Where(s => s.available);
-
-            if (urls.Any())
+            try
             {
-                await _mailService.SendEmailAsync("clypper.tech@protonmail.com", "Kereby Lejlighed Tilgængelig", "Der er kommet nye boliger");
-                await _mailService.SendEmailAsync("ie@live.dk", "Kereby Lejlighed Tilgængelig", "Der er kommet nye boliger");
+                JoratoResponse? response = await _client.GetFromJsonAsync<JoratoResponse>("https://api.jorato.com/tenancies?visibility=public&showAll=true&key=2gXoBtKvFMMgKJ1VBJ5G5pNr2GD", cancellationToken: stoppingToken);
+
+                IEnumerable<TenancyDto> urls = response.items
+                    .Where(s => s.available);
+
+                if (urls.Any())
+                {
+                    await _mailService.SendEmailAsync("clypper.tech@protonmail.com", "Kereby Lejlighed Tilgængelig", "Der er kommet nye boliger");
+                    await _mailService.SendEmailAsync("ie@live.dk", "Kereby Lejlighed Tilgængelig", "Der er kommet nye boliger");
+                }   
+            }
+            catch
+            {
             }
         }
     }
