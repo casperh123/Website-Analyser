@@ -3,11 +3,6 @@
 
 <RadzenCard Style="max-width: 600px" Variant="Variant">
     <RadzenStack>
-        @if (ShowUrl)
-        {
-            <RadzenLabel Component="url-input">Select Url</RadzenLabel>
-            <RadzenTextBox Value="@Url" Change="ChangeUrl" AutoCompleteType="AutoCompleteType.Url" />
-        }
         <RadzenButton Click="@OnChanged" Disabled="@IsProcessing">@ButtonText</RadzenButton>
 
         @if (IsProcessing)
@@ -44,20 +39,12 @@
     public int LinksEnqueued { get; set; }
 
     [Parameter] 
-    public bool ShowUrl { get; set; } = true;
-
-    [Parameter] 
     public string ButtonText { get; set; } = "Start";
 
     [Parameter] 
     public Variant Variant { get; set; } = Variant.Filled;
     
     private string _errorMessage = "";
-
-    private void ChangeUrl(string url)
-    {
-        Url = url;
-    }
 
     private async Task OnChanged()
     {

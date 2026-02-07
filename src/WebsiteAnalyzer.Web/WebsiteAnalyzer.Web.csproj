@@ -23,4 +23,19 @@
         <ProjectReference Include="..\WebsiteAnalyzer.Application\WebsiteAnalyzer.Application.csproj"/>
     </ItemGroup>
 
+    <ItemGroup>
+      <_ContentIncludedByDefault Remove="Components\Toggles\ToggleButtonChevron.razor" />
+      <_ContentIncludedByDefault Remove="Components\Templates\UITemplates\CTACard.razor" />
+      <_ContentIncludedByDefault Remove="Components\Templates\UITemplates\HeroSection.razor" />
+      <_ContentIncludedByDefault Remove="Components\CacheWarm\Seo\CacheWarmIntroText.razor" />
+      <_ContentIncludedByDefault Remove="Components\CacheWarm\Seo\CacheWarmSeoText.razor" />
+      <_ContentIncludedByDefault Remove="Components\CacheWarm\Lists\CacheWarmList.razor" />
+      <_ContentIncludedByDefault Remove="Components\CacheWarm\Cards\CacheWarmCard.razor" />
+      <_ContentIncludedByDefault Remove="Components\CacheWarm\Badges\CacheWarmCompletion.razor" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <AdditionalFiles Include="Components\Website\Cards\WebsiteCard.razor" />
+    </ItemGroup>
+
 </Project>

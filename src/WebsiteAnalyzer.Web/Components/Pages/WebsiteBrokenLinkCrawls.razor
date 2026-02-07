@@ -6,6 +6,7 @@
 @using WebsiteAnalyzer.Core.Enums
 @using WebsiteAnalyzer.Core.Interfaces.Services
 @using WebsiteAnalyzer.Web.Components.BrokenLink.Cards
+@using WebsiteAnalyzer.Web.Components.General.Lists
 @using WebsiteAnalyzer.Web.Components.Layout
 @using WebsiteAnalyzer.Web.Components.ScheduledAction
 @using WebsiteAnalyzer.Web.Components.WebsiteInputs
@@ -32,7 +33,6 @@
                             LinksEnqueued="_linksEnqueued"
                             OnCancel="CancelProcessing"
                             Variant="Variant.Text"
-                            ShowUrl="false"
                             Url="@Website?.Url"
                             WebsiteActionStarted="FindBrokenLinks"
                             ButtonText="Find broken links"/>
@@ -43,10 +43,11 @@
             @if (BrokenLinkCrawls.Any())
             {
                 <RadzenStack Gap="20px" Style="margin-top: 20px;">
-                    @foreach (BrokenLinkCrawlDTO brokenLink in BrokenLinkCrawls)
-                    {
-                        <BrokenLinkCrawlCard Crawl="brokenLink"></BrokenLinkCrawlCard>
-                    }
+                    <PaginatedList Items="BrokenLinkCrawls" Context="brokenLink">
+                        <ItemTemplate Context="brokenLink">
+                            <BrokenLinkCrawlCard Crawl="brokenLink"></BrokenLinkCrawlCard>
+                        </ItemTemplate>
+                    </PaginatedList>
                 </RadzenStack>
             }
             else
@@ -64,7 +65,7 @@
     
     private int _linksEnqueued;
     private int _linksChecked;
-    private IProgress<CrawlProgress> _progress;
+    private IProgress<CrawlProgress> _progress ;
 
     protected override async Task OnInitializedAsync()
     {
