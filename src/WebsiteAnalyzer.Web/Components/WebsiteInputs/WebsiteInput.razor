@@ -1,6 +1,9 @@
 @using WebsiteAnalyzer.Web.Components.ErrorHandling
 @using WebsiteAnalyzer.Web.Components.Crawl.CrawlMetrics
 
+@inject DialogService DialogService
+@inject IJSRuntime JSRuntime
+
 <RadzenCard Style="max-width: 600px" Variant="Variant">
     <RadzenStack>
         <RadzenButton Click="@OnChanged" Disabled="@IsProcessing">@ButtonText</RadzenButton>
@@ -60,4 +63,6 @@
             _errorMessage = e.Message;
         }
     }
+    
+    
 }

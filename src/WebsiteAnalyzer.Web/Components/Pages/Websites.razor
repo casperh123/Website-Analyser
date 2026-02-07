@@ -2,6 +2,7 @@
 @using WebsiteAnalyzer.Core.Domain.Website
 @using WebsiteAnalyzer.Core.Interfaces.Services
 @using WebsiteAnalyzer.Infrastructure
+@using WebsiteAnalyzer.Web.Components.General.Authentication
 @using WebsiteAnalyzer.Web.Components.Website.Cards
 @using WebsiteAnalyzer.Web.Services
 @using WebsiteAnalyzer.Web.Components.Website.Toggles
@@ -31,7 +32,11 @@
         </RadzenStack>
     </Authorized>
     <NotAuthorized>
-        <RadzenText>You need to be logged in to view Websites.</RadzenText>
+        <RadzenStack Gap="20">
+            <RadzenText TextStyle="TextStyle.DisplayH2">You are not logged in</RadzenText>
+            <RadzenText>It seems like you don't have a user yet. Would you like to login, or sign up?</RadzenText>
+            <GoToLogin/>
+        </RadzenStack>
     </NotAuthorized>
 </AuthorizeView>
 
