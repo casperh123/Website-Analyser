@@ -7,7 +7,10 @@
     }
 </RadzenStack>
 
-<RadzenPager PageSize="PageSize" Count="Count" PageNumbersCount="5" PageChanged="OnPageChanged"/>
+@if (Items.Count > PageSize)
+{
+    <RadzenPager PageSize="PageSize" Count="Count" PageNumbersCount="5" PageChanged="OnPageChanged"/>   
+}
 
 @code {
     [Parameter, EditorRequired]
@@ -15,9 +18,9 @@
     
     [Parameter]
     public required ICollection<TItem> Items { get; set; }
-    
-    [Parameter]
-    public int PageSize { get; set; }
+
+    [Parameter] 
+    public int PageSize { get; set; } = 10;
 
     private ICollection<TItem> FilteredItems { get; set; } = [];
     private int Count => Items.Count;

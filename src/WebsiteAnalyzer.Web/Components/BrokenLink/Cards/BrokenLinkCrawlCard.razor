@@ -1,8 +1,5 @@
 @using WebsiteAnalyzer.Core.Contracts.BrokenLink
-@using WebsiteAnalyzer.Core.Interfaces.Services
-@using WebsiteAnalyzer.Web.Components.Toggles
-
-@inject IBrokenLinkService BrokenLinkService
+@using WebsiteAnalyzer.Web.Components.General.Toggles
 
 <RadzenCard Variant="Variant.Outlined">
     <RadzenRow JustifyContent="JustifyContent.SpaceBetween">
@@ -25,9 +22,7 @@
             </RadzenStack>
         </RadzenRow>
         <RadzenRow JustifyContent="JustifyContent.Center" AlignItems="AlignItems.Center">
-            <RadzenButton Disabled="IsProcessing" Size="ButtonSize.Small"
-                          Click="@(() => Rerun(Crawl.Url))" Icon="restart_alt"/>
-            <ToggleButtonChevron @bind-Open="_open"/>
+            <ToggleChevron @bind-Open="_open"/>
         </RadzenRow>
     </RadzenRow>
     
@@ -41,19 +36,5 @@
     [Parameter] 
     public required BrokenLinkCrawlDTO Crawl { get; set; }
 
-    [Parameter] 
-    public required bool IsProcessing { get; set; }
-
-    [Parameter] 
-    public EventCallback<string> OnRerun { get; set; }
-
     private bool _open = false;
-
-    public async Task Rerun(string url)
-    {
-        if (OnRerun.HasDelegate)
-        {
-            await OnRerun.InvokeAsync(url);
-        }
-    }
 }

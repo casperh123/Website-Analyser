@@ -6,10 +6,11 @@ public abstract class ProcessingComponentBase : ComponentBase, IDisposable
 {
     private CancellationTokenSource? _currentOperation;
 
-    protected CancellationToken CurrentToken => _currentOperation?.Token ?? CancellationToken.None;
+    private CancellationToken CurrentToken => _currentOperation?.Token ?? CancellationToken.None;
+    
     protected bool IsProcessing { get; private set; }
 
-    protected virtual async Task StartProcessingAsync(Func<CancellationToken, Task> processingTask)
+    protected async Task StartProcessingAsync(Func<CancellationToken, Task> processingTask)
     {
         try
         {

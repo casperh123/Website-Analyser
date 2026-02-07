@@ -2,7 +2,7 @@
 @inject NavigationManager NavigationManager
 
 <RadzenRow>
-    <RadzenLink Path="/websites" >
+    <RadzenLink Path="/" >
         <RadzenButton Icon="keyboard_arrow_left" Size="ButtonSize.Medium" Style="margin-bottom: 40px;"/>
     </RadzenLink>
     <RadzenDropDown Data="Websites" Value="Website" TValue="Website" TextProperty="@nameof(Website.Name)" ValueChanged="@((website) => NavigateToWebsite(website))"/>
@@ -29,7 +29,8 @@
 }
 else
 {
-    <RadzenText>Could not find website</RadzenText>
+    <RadzenText TextStyle="TextStyle.DisplayH1">Could not find website</RadzenText>
+    <RadzenLink Path="/"><RadzenButton>Go back to websites</RadzenButton></RadzenLink>
 }
 
 @code {
@@ -44,7 +45,7 @@ else
 
     public void NavigateToWebsite(Website? website)
     {
-        string newUrl = NavigationManager.Uri.Replace($"/website/{Website?.Id}", $"/website/{website?.Id}");
+        string newUrl = NavigationManager.Uri.Replace($"/{Website?.Id}", $"/{website?.Id}");
         NavigationManager.NavigateTo(newUrl, forceLoad: true);
     }
 }
