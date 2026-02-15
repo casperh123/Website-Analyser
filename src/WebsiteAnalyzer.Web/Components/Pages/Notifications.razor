@@ -1,0 +1,31 @@
+@page "/Notifications"
+@using WebsiteAnalyzer.Core.Domain.Website
+@using WebsiteAnalyzer.Core.Interfaces.Services
+@using WebsiteAnalyzer.Infrastructure
+@using WebsiteAnalyzer.Web.Components.Notifications
+@using WebsiteAnalyzer.Web.Services
+
+@inject IWebsiteService WebsiteService;
+@inject IUserService UserService;
+
+<RadzenStack Gap="20">
+    <RadzenText TextStyle="TextStyle.DisplayH1">Notification Settings</RadzenText>
+
+    <RadzenStack>
+        @foreach (Website website in Websites)
+        {
+            <NotificationCard Website="website"/>
+        }
+    </RadzenStack>
+</RadzenStack>
+
+@code {
+    ICollection<Website> Websites { get; set; } = [];
+    ApplicationUser? User { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        User = await UserService.GetCurrentUserAsync();
+        Websites = await WebsiteService.GetWebsitesByUserId(User?.Id);
+    }
+}

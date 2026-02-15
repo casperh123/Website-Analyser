@@ -51,7 +51,7 @@ public class AppartmentBackgroundService : BackgroundService
                         await _mailService.SendEmailAsync("clypper.tech@protonmail.com", "Kereby Lejlighed Tilgængelig",
                             "Der er kommet nye boliger. <a href=\\\"https://kerebyudlejning.dk/\\\">Se dem her</a>");
                         await _mailService.SendEmailAsync("ie@live.dk", "Kereby Lejlighed Tilgængelig",
-                            "Der er kommet nye boliger. <a href=\\\"https://kerebyudlejning.dk/\\\">Se dem her</a>");
+                            "Der er kommet nye boliger. <a href=\\\"https://kerebyudlejning.dk/\\\">Se dem her</a>c");
                     }
                     catch
                     {

@@ -24,13 +24,18 @@ public class EmailSubscriptionService : IEmailSubcriptionService
 
     public async Task Unsubscribe(Guid websiteId, Guid scheduledActionId, string email)
     {
-        EmailSubscription subscription = await _emailRepository.GetBy(websiteId, scheduledActionId, email);
+        EmailSubscription? subscription = await _emailRepository.GetBy(websiteId, scheduledActionId, email);
+
+        if (subscription is null)
+        {
+            return;
+        }
 
         await _emailRepository.DeleteAsync(subscription);
     }
 
-    public async Task<IEnumerable<EmailSubscription>> GetSubscriptionsByWebsite(Guid websiteId)
+    public async Task<ICollection<EmailSubscription>> GetSubscriptionsByWebsite(Guid websiteId)
     {
-        throw new NotImplementedException();
+        return await _emailRepository.GetByWebsiteId(websiteId);
     }
 }

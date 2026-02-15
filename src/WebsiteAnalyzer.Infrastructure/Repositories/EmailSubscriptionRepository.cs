@@ -17,14 +17,15 @@ public class EmailSubscriptionRepository(ApplicationDbContext dbContext)
             .FirstOrDefaultAsync();
     }
 
-    public async Task<IEnumerable<EmailSubscription>> GetByWebsiteId(Guid websiteId)
+    public async Task<ICollection<EmailSubscription>> GetByWebsiteId(Guid websiteId)
     {
         return await DbContext.EmailSubcriptions
             .Where(sub => sub.WebsiteId == websiteId)
+            .OrderBy(sub => sub.Email)
             .ToListAsync();
     }
 
-    public async Task<IEnumerable<EmailSubscription>> GetByWebsiteAndActionId(Guid websiteId, Guid actionId)
+    public async Task<ICollection<EmailSubscription>> GetByWebsiteAndActionId(Guid websiteId, Guid actionId)
     {
         return await DbContext.EmailSubcriptions
             .Where(s => s.WebsiteId == websiteId)
