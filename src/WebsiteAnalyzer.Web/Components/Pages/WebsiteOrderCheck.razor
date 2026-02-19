@@ -6,7 +6,6 @@
 @using WebsiteAnalyzer.Core.Interfaces.Services
 @using WebsiteAnalyzer.Web.Components.General.Lists
 @using WebsiteAnalyzer.Web.Components.Layout
-@using WooCommerceNET.WooCommerce.v3
 
 @inherits WebsiteAnalyzer.Web.Components.Templates.WebsiteComponent
 
@@ -52,7 +51,7 @@
         </RadzenStack>
     </RadzenCard>
     
-    <PaginatedList Items="AllChecks" Context="orderCheck">
+    <PaginatedList Items="@AllChecks" Context="orderCheck">
         <ItemTemplate Context="orderCheck">
             <RadzenCard>
                 <RadzenStack>
@@ -111,7 +110,6 @@
     public async Task CheckNow()
     {
         LatestCheck = await OrderCheckService.CheckOrder(WebsiteId);
-        AllChecks = await OrderCheckService.GetByWebsiteId(WebsiteId);
-        await InvokeAsync(StateHasChanged);
+        AllChecks.Add(LatestCheck);
     }
 }
