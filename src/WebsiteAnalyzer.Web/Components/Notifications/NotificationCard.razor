@@ -12,7 +12,7 @@
         <RadzenRow JustifyContent="JustifyContent.SpaceBetween" AlignItems="AlignItems.Center">
             <RadzenText TextStyle="TextStyle.H4">@Website.Name</RadzenText>
             <RadzenStack>
-                <ToggleChevron @bind-Open="_open"/>
+                <ToggleChevron  Open="_open" OpenChanged="ToggleOpen"/>
             </RadzenStack>
         </RadzenRow>
 
@@ -64,6 +64,7 @@
     private string _email { get; set; } = "";
     private ScheduledAction _selectedAction { get; set; }
     private bool _open;
+    private bool _loaded;
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -96,6 +97,20 @@
         );
 
         _subscriptions.Remove(subscription);
+    }
+    
+    private async Task ToggleOpen()
+    {
+        _open = !_open;
+    
+        if (_open && !_loaded)
+        {
+            _subscriptions = await EmailService.GetSubscriptionsByWebsite(Website.Id);
+            _actions = await ScheduleService.GetByWebsiteId(Website.Id);
+            _selectedAction = _actions.FirstOrDefault();
+            _loaded = true;
+            StateHasChanged();
+        }
     }
 
     private CrawlAction GetScheduledAction(Guid actionId)
