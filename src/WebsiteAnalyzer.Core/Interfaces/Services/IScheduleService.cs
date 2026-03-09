@@ -8,6 +8,7 @@ public interface IScheduleService
 {
     Task<ScheduledAction> GetById(Guid id);
     Task<ICollection<ScheduledAction>> GetByWebsiteId(Guid websiteId);
+    Task<ICollection<ScheduledAction>> GetByWebsiteIds(ICollection<Guid> websiteIds);
     Task<ScheduledAction?> GetActionByWebsiteIdAndType(Guid websiteId, CrawlAction type);
 
     Task<ScheduledAction> ScheduleAction(
@@ -17,11 +18,7 @@ public interface IScheduleService
         TimeSpan negativeOffset = default);
 
     Task DeleteAction(ScheduledAction scheduledTask);
-    Task<ICollection<ScheduledAction>> GetScheduledTasksByUserIdAndTypeAsync(Guid? userId, CrawlAction action);
     Task DeleteTasksByUrlAndUserId(string url, Guid userId);
-
-    Task UpdateStatus(ScheduledAction action, Status status);
-
     Task ResetActionStatus(ScheduledAction action);
 
     Task<ICollection<ScheduledAction>> GetDueSchedulesBy(CrawlAction action);

@@ -21,7 +21,7 @@
             <RadzenStack>
                 <RadzenSelectBar @bind-Value="_selectedAction">
                     <Items>
-                        @foreach (ScheduledAction action in _actions)
+                        @foreach (ScheduledAction action in Actions)
                         {
                             <RadzenSelectBarItem Text="@action.Action.ToDisplayString()" Value="action"></RadzenSelectBarItem>
                         }
@@ -33,7 +33,7 @@
                 </RadzenRow>
             </RadzenStack>
 
-            @foreach (EmailSubscription subscription in _subscriptions)
+            @foreach (EmailSubscription subscription in Subscriptions)
             {
                 <RadzenCard>
                     <RadzenRow Gap="20" JustifyContent="JustifyContent.SpaceBetween">
@@ -59,21 +59,28 @@
     [Parameter, EditorRequired]
     public Website Website { get; set; }
 
-    private ICollection<EmailSubscription> _subscriptions = [];
-    private ICollection<ScheduledAction> _actions = [];
+    [Parameter, EditorRequired]
+    public IEnumerable<EmailSubscription> Subscriptions { get; set; }= [];
+    
+    [Parameter, EditorRequired]
+    public IEnumerable<ScheduledAction> Actions { get; set; }= [];
+
+    [Parameter, EditorRequired]
+    public EventCallback<EmailSubscription> OnSubscribed { get; set; }
+    
+    [Parameter, EditorRequired]
+    public EventCallback<EmailSubscription> OnUnsubscribe { get; set; }
+    
     private string _email { get; set; } = "";
     private ScheduledAction _selectedAction { get; set; }
     private bool _open;
     private bool _loaded;
 
-    protected override async Task OnAfterRenderAsync(bool firstRender)
+    protected override async Task OnInitializedAsync()
     {
-        if (firstRender)
-        {
-            _subscriptions = await EmailService.GetSubscriptionsByWebsite(Website.Id);
-            _actions = await ScheduleService.GetByWebsiteId(Website.Id);
-            _selectedAction = _actions.FirstOrDefault();
-        }
+        Subscriptions = await EmailService.GetSubscriptionsByWebsite(Website.Id);
+        Actions = await ScheduleService.GetByWebsiteId(Website.Id);
+        _selectedAction = Actions.FirstOrDefault();
     }
 
     private async Task Subscribe()
@@ -83,39 +90,37 @@
             _selectedAction.Id,
             _email
         );
+
+        if (OnSubscribed.HasDelegate)
+        {
+            await OnSubscribed.InvokeAsync(subscription);
+        }
         
-        _subscriptions.Add(subscription);
         _email = "";
     }
 
     private async Task Unsubscribe(EmailSubscription subscription)
     {
-        await EmailService.Unsubscribe(
-            subscription.WebsiteId, 
-            subscription.ScheduleActionId, 
-            subscription.Email
-        );
-
-        _subscriptions.Remove(subscription);
+        if (OnUnsubscribe.HasDelegate)
+        {
+            await OnUnsubscribe.InvokeAsync(subscription);
+        }
     }
     
     private async Task ToggleOpen()
     {
         _open = !_open;
     
-        if (_open && !_loaded)
+        if (_open)
         {
-            _subscriptions = await EmailService.GetSubscriptionsByWebsite(Website.Id);
-            _actions = await ScheduleService.GetByWebsiteId(Website.Id);
-            _selectedAction = _actions.FirstOrDefault();
-            _loaded = true;
+            _selectedAction = Actions.FirstOrDefault();
             StateHasChanged();
         }
     }
 
     private CrawlAction GetScheduledAction(Guid actionId)
     {
-        return _actions
+        return Actions
             .Where(a => a.WebsiteId == Website.Id)
             .First(a => a.Id == actionId)
             .Action;

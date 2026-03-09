@@ -9,5 +9,6 @@ public interface IScheduledActionRepository : IBaseRepository<ScheduledAction>
     Task<ICollection<ScheduledAction>> GetCrawlSchedulesByUserIdAndTypeAsync(Guid userId, CrawlAction action);
     Task<ICollection<ScheduledAction>> GetByAction(CrawlAction action);
     Task<ICollection<ScheduledAction>> GetByWebsiteId(Guid websiteId);
+    Task<ICollection<ScheduledAction>> GetByWebsiteIds(ICollection<Guid> websiteIds);
     Task DeleteByUrlAndUserId(string url, Guid userId);
 }

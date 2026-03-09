@@ -25,6 +25,13 @@ public class EmailSubscriptionRepository(ApplicationDbContext dbContext)
             .ToListAsync();
     }
 
+    public async Task<ICollection<EmailSubscription>> GetSubscriptionByWebsites(ICollection<Guid> websiteIds)
+    {
+        return await DbContext.EmailSubcriptions
+            .Where(s => websiteIds.Contains(s.WebsiteId))
+            .ToListAsync();
+    }
+
     public async Task<ICollection<EmailSubscription>> GetByWebsiteAndActionId(Guid websiteId, Guid actionId)
     {
         return await DbContext.EmailSubcriptions

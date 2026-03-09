@@ -38,4 +38,9 @@ public class EmailSubscriptionService : IEmailSubcriptionService
     {
         return await _emailRepository.GetByWebsiteId(websiteId);
     }
+
+    public async Task<ICollection<EmailSubscription>> GetSubscriptionByWebsites(ICollection<Guid> websiteIds)
+    {
+        return await _emailRepository.GetSubscriptionByWebsites(websiteIds);
+    }
 }

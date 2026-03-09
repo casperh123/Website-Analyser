@@ -6,5 +6,5 @@ public interface IEmailSubscriptionRepository : IBaseRepository<EmailSubscriptio
 {
     Task<EmailSubscription?> GetBy(Guid websiteId, Guid actionId, string email);
     Task<ICollection<EmailSubscription>> GetByWebsiteId(Guid websiteId);
-    Task<ICollection<EmailSubscription>> GetByWebsiteAndActionId(Guid websiteId, Guid actionId);
+    Task<ICollection<EmailSubscription>> GetSubscriptionByWebsites(ICollection<Guid> websiteIds);
 }

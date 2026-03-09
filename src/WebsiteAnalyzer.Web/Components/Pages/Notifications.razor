@@ -1,12 +1,20 @@
 @page "/Notifications"
+@using Microsoft.AspNetCore.Authorization
+@using WebsiteAnalyzer.Core.Domain
 @using WebsiteAnalyzer.Core.Domain.Website
 @using WebsiteAnalyzer.Core.Interfaces.Services
 @using WebsiteAnalyzer.Infrastructure
+@using WebsiteAnalyzer.Web.Components.Account.Pages.Manage
 @using WebsiteAnalyzer.Web.Components.Notifications
+@using WebsiteAnalyzer.Web.Models
 @using WebsiteAnalyzer.Web.Services
 
 @inject IWebsiteService WebsiteService;
 @inject IUserService UserService;
+@inject IEmailSubcriptionService EmailService;
+@inject IScheduleService ScheduleService;
+
+@attribute [Authorize]
 
 <RadzenStack Gap="20">
     <RadzenText TextStyle="TextStyle.DisplayH1">Notification Settings</RadzenText>
@@ -14,18 +22,48 @@
     <RadzenStack>
         @foreach (Website website in Websites)
         {
-            <NotificationCard Website="website"/>
+            <NotificationCard 
+                Website="website" 
+                Subscriptions="@(Subscriptions.Where(s => s.WebsiteId == website.Id))" 
+                Actions="@(Actions.Where(s => s.WebsiteId == website.Id))"
+                OnUnsubscribe="@RemoveSubscription"
+                OnSubscribed="@AddSubscription"/>
         }
     </RadzenStack>
 </RadzenStack>
 
 @code {
     ICollection<Website> Websites { get; set; } = [];
+    ICollection<EmailSubscription> Subscriptions { get; set; } = [];
+    ICollection<ScheduledAction> Actions { get; set; } = [];
     ApplicationUser? User { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
         User = await UserService.GetCurrentUserAsync();
         Websites = await WebsiteService.GetWebsitesByUserId(User?.Id);
+        ICollection<Guid> websiteIds = Websites.Select(w => w.Id).ToList();
+        Subscriptions = await EmailService.GetSubscriptionByWebsites(websiteIds);
+        Actions = await ScheduleService.GetByWebsiteIds(websiteIds);
+    }
+
+    public async Task RemoveSubscription(EmailSubscription subscription)
+    {
+        await EmailService.Unsubscribe(
+            subscription.WebsiteId, 
+            subscription.ScheduleActionId, 
+            subscription.Email
+        );
+
+        Subscriptions.Remove(subscription);
+    }
+
+    public async Task AddSubscription(AddSubscription addSubscription)
+    {
+        EmailSubscription subscription = await EmailService.Subscribe(
+            addSubscription.websiteId,
+                addSubscription.
+            );
+        Subscriptions.Add(subscription);
     }
 }
