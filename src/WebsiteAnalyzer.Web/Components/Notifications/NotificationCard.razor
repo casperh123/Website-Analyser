@@ -78,8 +78,6 @@
 
     protected override async Task OnInitializedAsync()
     {
-        Subscriptions = await EmailService.GetSubscriptionsByWebsite(Website.Id);
-        Actions = await ScheduleService.GetByWebsiteId(Website.Id);
         _selectedAction = Actions.FirstOrDefault();
     }
 
