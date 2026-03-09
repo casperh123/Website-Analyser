@@ -3,6 +3,7 @@
 @using WebsiteAnalyzer.Core.Enums
 @using WebsiteAnalyzer.Core.Interfaces.Services
 @using WebsiteAnalyzer.Web.Components.General.Toggles
+@using WebsiteAnalyzer.Web.Models
 
 @inject IEmailSubcriptionService EmailService;
 @inject IScheduleService ScheduleService;
@@ -66,7 +67,7 @@
     public IEnumerable<ScheduledAction> Actions { get; set; }= [];
 
     [Parameter, EditorRequired]
-    public EventCallback<EmailSubscription> OnSubscribed { get; set; }
+    public EventCallback<AddSubscription> OnSubscribed { get; set; }
     
     [Parameter, EditorRequired]
     public EventCallback<EmailSubscription> OnUnsubscribe { get; set; }
@@ -74,7 +75,6 @@
     private string _email { get; set; } = "";
     private ScheduledAction _selectedAction { get; set; }
     private bool _open;
-    private bool _loaded;
 
     protected override async Task OnInitializedAsync()
     {
@@ -85,7 +85,7 @@
 
     private async Task Subscribe()
     {
-        EmailSubscription subscription = await EmailService.Subscribe(
+        AddSubscription subscription = new(
             Website.Id,
             _selectedAction.Id,
             _email

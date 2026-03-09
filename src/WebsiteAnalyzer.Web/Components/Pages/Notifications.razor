@@ -62,8 +62,10 @@
     {
         EmailSubscription subscription = await EmailService.Subscribe(
             addSubscription.websiteId,
-                addSubscription.
-            );
+                addSubscription.scheduledActionId,
+                addSubscription.email
+        );
+        
         Subscriptions.Add(subscription);
     }
 }
