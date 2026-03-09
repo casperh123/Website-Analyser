@@ -22,18 +22,13 @@
     [Parameter] 
     public int PageSize { get; set; } = 10;
 
-    private ICollection<TItem> FilteredItems { get; set; } = [];
+    private int CurrentSkip { get; set; } = 0;
+    
+    private ICollection<TItem> FilteredItems => Items.Skip(CurrentSkip).Take(PageSize).ToList();
     private int Count => Items.Count;
-
-    protected override async Task OnInitializedAsync()
-    {
-        await base.OnInitializedAsync();
-
-        FilteredItems = Items.Take(PageSize).ToList();
-    }
 
     private void OnPageChanged(PagerEventArgs args)
     {
-        FilteredItems = Items.Skip(args.Skip).Take(args.Top).ToList();
+        CurrentSkip = args.Skip;
     }
 }

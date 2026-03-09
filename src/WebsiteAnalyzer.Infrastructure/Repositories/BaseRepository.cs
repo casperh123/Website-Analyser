@@ -37,7 +37,7 @@ public class BaseRepository<T> : IBaseRepository<T> where T : class
             await DbSet.AddAsync(entity);
             await DbContext.SaveChangesAsync();
         }
-        catch (DbUpdateException ex)
+        catch (DbUpdateException _)
         {
             throw new AlreadyExistsException($"Entity already exists");
         }

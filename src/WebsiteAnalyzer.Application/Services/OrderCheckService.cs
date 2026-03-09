@@ -39,6 +39,7 @@ public class OrderCheckService : IOrderCheckService
         Order latest = orders.First();
 
         check.TimeSinceLastOrder = DateTime.Now.Subtract(latest.date_created.Value);
+        check.WebsiteId = websiteId;
 
         await _orderCheckRepository.AddAsync(check);
 
@@ -54,6 +55,12 @@ public class OrderCheckService : IOrderCheckService
     public async Task<OrderCheck?> GetLatestByWebsiteId(Guid websiteId)
     {
         return await _orderCheckRepository.GetLatestByWebsiteId(websiteId);
+    }
+
+    public async Task<ICollection<OrderCheck>> GetByWebsiteId(Guid websiteId)
+    {
+        return await _orderCheckRepository
+            .GetByWebsiteId(websiteId);
     }
 
     public async Task<OrderCheckKeys?> GetKeysByWebsiteId(Guid websiteId)

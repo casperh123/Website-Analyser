@@ -17,4 +17,11 @@ public class OrderCheckRepository : BaseRepository<OrderCheck>, IOrderCheckRepos
             .Where(o => o.WebsiteId == websiteId)
             .FirstOrDefaultAsync();
     }
+
+    public async Task<ICollection<OrderCheck>> GetByWebsiteId(Guid websiteId)
+    {
+        return await DbContext.OrderChecks
+            .Where(w => w.WebsiteId == websiteId)
+            .ToListAsync();
+    }
 }

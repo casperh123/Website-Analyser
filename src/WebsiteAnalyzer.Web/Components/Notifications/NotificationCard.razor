@@ -1,0 +1,108 @@
+@using WebsiteAnalyzer.Core.Domain
+@using WebsiteAnalyzer.Core.Domain.Website
+@using WebsiteAnalyzer.Core.Enums
+@using WebsiteAnalyzer.Core.Interfaces.Services
+@using WebsiteAnalyzer.Web.Components.General.Toggles
+
+@inject IEmailSubcriptionService EmailService;
+@inject IScheduleService ScheduleService;
+
+<RadzenCard>
+    <RadzenStack>
+        <RadzenRow JustifyContent="JustifyContent.SpaceBetween" AlignItems="AlignItems.Center">
+            <RadzenText TextStyle="TextStyle.H4">@Website.Name</RadzenText>
+            <RadzenStack>
+                <ToggleChevron @bind-Open="_open"/>
+            </RadzenStack>
+        </RadzenRow>
+
+        @if (_open)
+        {
+            <RadzenStack>
+                <RadzenSelectBar @bind-Value="_selectedAction">
+                    <Items>
+                        @foreach (ScheduledAction action in _actions)
+                        {
+                            <RadzenSelectBarItem Text="@action.Action.ToDisplayString()" Value="action"></RadzenSelectBarItem>
+                        }
+                    </Items>
+                </RadzenSelectBar>
+                <RadzenRow JustifyContent="JustifyContent.Stretch">
+                    <RadzenTextBox @bind-Value="@_email" Placeholder="Email" Immediate="true" AutoCompleteType="AutoCompleteType.Email"/>
+                    <RadzenButton Click="Subscribe">Add</RadzenButton>
+                </RadzenRow>
+            </RadzenStack>
+
+            @foreach (EmailSubscription subscription in _subscriptions)
+            {
+                <RadzenCard>
+                    <RadzenRow Gap="20" JustifyContent="JustifyContent.SpaceBetween">
+                        <RadzenStack>
+                            <RadzenText TextStyle="TextStyle.Subtitle1">Email:</RadzenText>
+                            <RadzenText>@subscription.Email</RadzenText>
+                        </RadzenStack>
+                        <RadzenStack>
+                            <RadzenText TextStyle="TextStyle.Subtitle1">Action:</RadzenText>
+                            <RadzenText>@GetScheduledAction(subscription.ScheduleActionId).ToDisplayString()</RadzenText>
+                        </RadzenStack>
+                        <RadzenStack JustifyContent="JustifyContent.Center">
+                            <RadzenButton ButtonStyle="ButtonStyle.Danger" Click="@(async () => await Unsubscribe(subscription))">Unsubscribe</RadzenButton>
+                        </RadzenStack>
+                    </RadzenRow>
+                </RadzenCard>
+            }
+        }
+    </RadzenStack>
+</RadzenCard>
+
+@code {
+    [Parameter, EditorRequired]
+    public Website Website { get; set; }
+
+    private ICollection<EmailSubscription> _subscriptions = [];
+    private ICollection<ScheduledAction> _actions = [];
+    private string _email { get; set; } = "";
+    private ScheduledAction _selectedAction { get; set; }
+    private bool _open;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            _subscriptions = await EmailService.GetSubscriptionsByWebsite(Website.Id);
+            _actions = await ScheduleService.GetByWebsiteId(Website.Id);
+            _selectedAction = _actions.FirstOrDefault();
+        }
+    }
+
+    private async Task Subscribe()
+    {
+        EmailSubscription subscription = await EmailService.Subscribe(
+            Website.Id,
+            _selectedAction.Id,
+            _email
+        );
+        
+        _subscriptions.Add(subscription);
+        _email = "";
+    }
+
+    private async Task Unsubscribe(EmailSubscription subscription)
+    {
+        await EmailService.Unsubscribe(
+            subscription.WebsiteId, 
+            subscription.ScheduleActionId, 
+            subscription.Email
+        );
+
+        _subscriptions.Remove(subscription);
+    }
+
+    private CrawlAction GetScheduledAction(Guid actionId)
+    {
+        return _actions
+            .Where(a => a.WebsiteId == Website.Id)
+            .First(a => a.Id == actionId)
+            .Action;
+    }
+}

@@ -36,6 +36,13 @@ public class ScheduledActionRepository : BaseRepository<ScheduledAction>, ISched
             .ToListAsync();
     }
 
+    public async Task<ICollection<ScheduledAction>> GetByWebsiteId(Guid websiteId)
+    {
+        return await DbContext.ScheduledActions
+            .Where(w => w.WebsiteId == websiteId)
+            .ToListAsync();
+    }
+
     public async Task DeleteByUrlAndUserId(string url, Guid userId)
     {
         await DbContext.ScheduledActions
