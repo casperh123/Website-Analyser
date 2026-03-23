@@ -28,6 +28,7 @@
       <ProjectReference Include="..\..\src\WebsiteAnalyzer.Application\WebsiteAnalyzer.Application.csproj" />
       <ProjectReference Include="..\..\src\WebsiteAnalyzer.Core\WebsiteAnalyzer.Core.csproj" />
       <ProjectReference Include="..\..\src\WebsiteAnalyzer.Infrastructure\WebsiteAnalyzer.Infrastructure.csproj" />
+      <ProjectReference Include="..\..\src\WebsiteAnalyzer.Services\WebsiteAnalyzer.Services.csproj" />
       <ProjectReference Include="..\WebsiteAnalyzer.TestUtilities\WebsiteAnalyzer.TestUtilities.csproj" />
     </ItemGroup>
 
