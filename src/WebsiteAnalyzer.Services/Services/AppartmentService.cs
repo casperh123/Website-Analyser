@@ -31,7 +31,8 @@ public class AppartmentService(HttpClient client, MailService mailService)
         var tenancies = items.Select(item => new TenancyDto
         {
             Id = item.GetProperty("id").GetString()!,
-            Url = $"https://udlejning.cej.dk/boliger/{item.GetProperty("id").GetString()}"
+            Url = $"https://udlejning.cej.dk/boliger/{item.GetProperty("id").GetString()}",
+            Name = item.GetProperty("name").GetString()!
         });
 
         var unseen = tenancies
@@ -44,13 +45,13 @@ public class AppartmentService(HttpClient client, MailService mailService)
             
             var body = $"""
                 Der er kommet {unseen.Count} nye boliger:<br/><br/>
-                {string.Join("<br/>", unseen.Select(t => $"<a href=\"{t.Url}\">{t.Id}</a>"))}
+                {string.Join("<br/>", unseen.Select(t => $"<a href=\"{t.Url}\">{t.Name}</a></br>"))}
                 """;
 
             try
             {
-                await mailService.SendEmailAsync("clypper.tech@protonmail.com", "Kereby Lejlighed Tilgængelig", body);
-                await mailService.SendEmailAsync("ie@live.dk", "Kereby Lejlighed Tilgængelig", body);
+                await mailService.SendEmailAsync("clypper.tech@protonmail.com", "CEJ Lejlighed Tilgængelig", body);
+                await mailService.SendEmailAsync("ie@live.dk", "CEJ Lejlighed Tilgængelig", body);
             }
             catch
             {
@@ -66,4 +67,5 @@ public class TenancyDto
 {
     public string Id { get; set; }
     public string Url { get; set; }
+    public string Name { get; set; }
 }
