@@ -61,7 +61,6 @@ public class AppartmentService(HttpClient client, MailService mailService)
             try
             {
                 await mailService.SendEmailAsync("casperholten@protonmail.com", "Nye lejligheder Tilgængelige", body);
-                await mailService.SendEmailAsync("ie@live.dk", "Nye lejligheder Tilgængelige", body);
             }
             catch
             {
