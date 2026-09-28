@@ -3,6 +3,7 @@ using WebsiteAnalyzer.Core.Enums;
 using WebsiteAnalyzer.Core.Exceptions;
 using WebsiteAnalyzer.Core.Interfaces.Repositories;
 using WebsiteAnalyzer.Core.Interfaces.Services;
+using WebsiteAnalyzer.Core.Interfaces.Services.DTOs.Website;
 
 namespace WebsiteAnalyzer.Application.Services;
 
@@ -19,7 +20,7 @@ public class WebsiteService : IWebsiteService
         _httpClient = httpClient;
     }
 
-    public async Task<Website> AddWebsite(string url, Guid userId, string? name)
+    public async Task<WebsiteDTO> AddWebsite(string url, Guid userId, string? name)
     {
         await VerifyWebsite(url);
         
@@ -28,20 +29,24 @@ public class WebsiteService : IWebsiteService
         await _websiteRepository.AddAsync(website);
         await AddScheduledTasks(website);
 
-        return website;
+        return WebsiteDTO.From(website);
     }
 
-    public async Task<ICollection<Website>> GetWebsitesByUserId(Guid? userId)
+    public async Task<ICollection<WebsiteDTO>> GetWebsitesByUserId(Guid? userId)
     {
         if (userId is null) return [];
+
+        ICollection<Website> websites = await _websiteRepository.GetAllByUserId(userId.Value);
         
-        return await _websiteRepository.GetAllByUserId(userId.Value);
+        return [.. websites.Select(WebsiteDTO.From)];
     }
 
-    public async Task<Website> GetWebsiteByIdAndUserId(Guid id, Guid userId)
+    public async Task<WebsiteDTO> GetWebsiteByIdAndUserId(Guid id, Guid userId)
     {
-        return await _websiteRepository.GetByIdAndUserId(id, userId) 
-                ?? throw new NotFoundException($"Website with ID: {id} not found.");
+        Website website = await _websiteRepository.GetByIdAndUserId(id, userId)
+                          ?? throw new NotFoundException($"Website with ID: {id} not found.");
+        
+        return WebsiteDTO.From(website);
     }
 
     public async Task DeleteWebsite(string url, Guid userId)

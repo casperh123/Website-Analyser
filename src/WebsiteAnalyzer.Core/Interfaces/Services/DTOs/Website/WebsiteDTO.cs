@@ -4,13 +4,13 @@ namespace WebsiteAnalyzer.Core.Interfaces.Services.DTOs.Website;
 
 public record WebsiteDTO
 {
-    public Guid Id { get; private set; }
-    public string Url { get; set; }
-    public string? Name { get; set; }
-    public Guid UserId { get; set; }
-    public ICollection<BrokenLinkCrawl> BrokenLinkCrawls { get; set; }
+    public required Guid Id { get; private set; }
+    public required string Url { get; set; }
+    public required string? Name { get; set; }
+    public required Guid UserId { get; set; }
+    public required ICollection<BrokenLinkCrawl> BrokenLinkCrawls { get; set; }
 
-    public WebsiteDTO From(Domain.Website.Website website)
+    public static WebsiteDTO From(Domain.Website.Website website)
     {
         return new WebsiteDTO
         {
