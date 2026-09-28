@@ -10,7 +10,7 @@ public record WebsiteDTO
     public required Guid UserId { get; set; }
     public required ICollection<BrokenLinkCrawl> BrokenLinkCrawls { get; set; }
 
-    public static WebsiteDTO From(Domain.Website.Website website)
+    public static WebsiteDTO From(Domain.Website website)
     {
         return new WebsiteDTO
         {

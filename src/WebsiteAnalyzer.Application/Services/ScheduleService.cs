@@ -1,8 +1,8 @@
 using WebsiteAnalyzer.Core.Domain;
-using WebsiteAnalyzer.Core.Domain.Website;
 using WebsiteAnalyzer.Core.Enums;
 using WebsiteAnalyzer.Core.Interfaces.Repositories;
 using WebsiteAnalyzer.Core.Interfaces.Services;
+using WebsiteAnalyzer.Core.Interfaces.Services.DTOs.ScheduledAction;
 
 namespace WebsiteAnalyzer.Application.Services;
 
@@ -10,20 +10,24 @@ namespace WebsiteAnalyzer.Application.Services;
 public class ScheduleService : IScheduleService
 {
     private readonly IScheduledActionRepository _scheduleRepository;
+    private readonly IWebsiteRepository _websiteRepository;
 
     public ScheduleService(
-        IScheduledActionRepository scheduleRepository 
+        IScheduledActionRepository scheduleRepository,
+        IWebsiteRepository websiteRepository
         )
     {
         _scheduleRepository = scheduleRepository;
+        _websiteRepository = websiteRepository;
     }
 
-    public async Task<ScheduledAction> ScheduleAction(
-        Website website,
+    public async Task<ScheduledActionDTO> ScheduleAction(
+        Guid websiteId,
         CrawlAction action,
         Frequency frequency,
         TimeSpan negativeOffset = default)
     {
+        Website website = await _websiteRepository.GetByWebsiteId(websiteId);
         ScheduledAction scheduledAction = new ScheduledAction(
             website,
             frequency,
@@ -33,42 +37,63 @@ public class ScheduleService : IScheduleService
 
         await _scheduleRepository.AddAsync(scheduledAction);
 
-        return scheduledAction;
+        return ScheduledActionDTO.From(scheduledAction);
     }
 
-    public async Task<ScheduledAction> GetById(Guid id)
+    public async Task DeleteAction(Guid actionId)
     {
-        return await _scheduleRepository.GetByIdAsync(id);
+        ScheduledAction? action = await _scheduleRepository.GetByIdAsync(actionId);
+
+        if (action is null)
+        {
+            //TODO return a not found error of sorts
+            return;
+        }
+        
+        await _scheduleRepository.DeleteAsync(action);
     }
 
-    public async Task<ICollection<ScheduledAction>> GetByWebsiteId(Guid websiteId)
+    public async Task<ScheduledActionDTO> GetById(Guid id)
     {
-        return await _scheduleRepository.GetByWebsiteId(websiteId);
+        //TODO change to proper not found exception
+        ScheduledAction action = await _scheduleRepository.GetByIdAsync(id) ?? throw new InvalidOperationException();
+        return ScheduledActionDTO.From(action);
     }
 
-    public async Task<ICollection<ScheduledAction>> GetByWebsiteIds(ICollection<Guid> websiteIds)
+    public async Task<ICollection<ScheduledActionDTO>> GetByWebsiteId(Guid websiteId)
     {
-        return await _scheduleRepository.GetByWebsiteIds(websiteIds);
+        var actions = await _scheduleRepository.GetByWebsiteId(websiteId);
+        return [.. actions.Select(ScheduledActionDTO.From)];
     }
 
-    public async Task<ScheduledAction?> GetActionByWebsiteIdAndType(Guid websiteId, CrawlAction type)
+    public async Task<ICollection<ScheduledActionDTO>> GetByWebsiteIds(ICollection<Guid> websiteIds)
     {
-        return await _scheduleRepository.GetByWebsiteIdAndType(websiteId, type);
+        var actions = await _scheduleRepository.GetByWebsiteIds(websiteIds);
+        return [.. actions.Select(ScheduledActionDTO.From)];
     }
 
-    public async Task DeleteAction(ScheduledAction scheduledTask)
+    public async Task<ScheduledActionDTO?> GetActionByWebsiteIdAndType(
+        Guid websiteId,
+        CrawlAction type)
     {
-        await _scheduleRepository.DeleteAsync(scheduledTask).ConfigureAwait(false);
+        var action = await _scheduleRepository.GetByWebsiteIdAndType(websiteId, type);
+
+        return action is null
+            ? null
+            : ScheduledActionDTO.From(action);
     }
 
-    public async Task<ICollection<ScheduledAction>> GetScheduledTasksByUserIdAndTypeAsync(Guid? userId, CrawlAction action)
+    public async Task<ICollection<ScheduledActionDTO>> GetScheduledTasksByUserIdAndTypeAsync(Guid? userId, CrawlAction action)
     {
         if (!userId.HasValue)
         {
             return [];
         }
+
+        ICollection<ScheduledAction> actions =
+            await _scheduleRepository.GetCrawlSchedulesByUserIdAndTypeAsync(userId.Value, action);
         
-        return await _scheduleRepository.GetCrawlSchedulesByUserIdAndTypeAsync(userId.Value, action);
+        return [..actions.Select(ScheduledActionDTO.From)];
     }
 
     public async Task DeleteTasksByUrlAndUserId(string url, Guid userId)
@@ -76,52 +101,80 @@ public class ScheduleService : IScheduleService
         await _scheduleRepository.DeleteByUrlAndUserId(url, userId);
     }
 
-    public async Task UpdateStatus(ScheduledAction action, Status status)
+    public async Task UpdateStatus(Guid actionId, Status status)
     {
+        ScheduledAction? action = await _scheduleRepository.GetByIdAsync(actionId);
+
+        if (action is null)
+        {
+            return;
+        }
+        
         action.Status = status;
 
         await _scheduleRepository.UpdateAsync(action);
     }
 
-    public async Task ResetActionStatus(ScheduledAction action)
+    public async Task ResetActionStatus(Guid actionId)
     {
+        ScheduledAction? action = await _scheduleRepository.GetByIdAsync(actionId);
+
+        if (action is null)
+        {
+            return;
+        }
+        
         action.ResetStatus();
 
         await _scheduleRepository.UpdateAsync(action);
     }
 
-    public async Task<ICollection<ScheduledAction>> GetDueSchedulesBy(CrawlAction action)
+    public async Task<ICollection<ScheduledActionDTO>> GetDueSchedulesBy(CrawlAction action)
     {
         ICollection<ScheduledAction> schedules = await _scheduleRepository.GetByAction(action);
 
-        return schedules
-            .Where(cs => cs.IsDueForExecution)
-            .ToList();;
+        return
+        [
+            .. schedules
+                .Where(cs => cs.IsDueForExecution)
+                .Select(ScheduledActionDTO.From)
+        ];
     }
 
-    public async Task StartAction(ScheduledAction action)
+    public async Task StartAction(Guid actionId)
     {
-        action.StartAction();
+        ScheduledAction? action = await _scheduleRepository.GetByIdAsync(actionId);
+        
+        action?.StartAction();
 
         await UpdateAction(action);
     }
 
-    public async Task CompleteAction(ScheduledAction action)
+    public async Task CompleteAction(Guid actionId)
     {
-        action.CompleteAction();
+        ScheduledAction? action = await _scheduleRepository.GetByIdAsync(actionId);
+        
+        action?.CompleteAction();
 
         await UpdateAction(action);
     }
 
-    public async Task FailAction(ScheduledAction action)
+    public async Task FailAction(Guid actionId)
     {
-        action.FailAction();
+        ScheduledAction? action = await _scheduleRepository.GetByIdAsync(actionId);
+        
+        action?.FailAction();
 
         await UpdateAction(action);
     }
 
-    private async Task UpdateAction(ScheduledAction action)
+    private async Task UpdateAction(ScheduledAction? action)
     {
+        if (action is null)
+        {
+            return;
+        }
+        
         await _scheduleRepository.UpdateAsync(action);
     }
 }

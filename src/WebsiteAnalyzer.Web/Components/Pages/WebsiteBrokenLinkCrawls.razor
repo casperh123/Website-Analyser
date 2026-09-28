@@ -2,9 +2,9 @@
 
 @using global::Crawl.Models
 @using WebsiteAnalyzer.Core.Contracts.BrokenLink
-@using WebsiteAnalyzer.Core.Domain
 @using WebsiteAnalyzer.Core.Enums
 @using WebsiteAnalyzer.Core.Interfaces.Services
+@using WebsiteAnalyzer.Core.Interfaces.Services.DTOs.ScheduledAction
 @using WebsiteAnalyzer.Web.Components.BrokenLink.Cards
 @using WebsiteAnalyzer.Web.Components.General.Lists
 @using WebsiteAnalyzer.Web.Components.Layout
@@ -61,7 +61,7 @@
 @code {
     public ICollection<BrokenLinkCrawlDTO>? BrokenLinkCrawls { get; set; }
     
-    public ScheduledAction? ScheduledAction { get; set; }
+    public ScheduledActionDTO? ScheduledAction { get; set; }
     
     private int _linksEnqueued;
     private int _linksChecked;

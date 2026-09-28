@@ -1,7 +1,8 @@
 @using WebsiteAnalyzer.Core.Domain
-@using WebsiteAnalyzer.Core.Domain.Website
 @using WebsiteAnalyzer.Core.Enums
 @using WebsiteAnalyzer.Core.Interfaces.Services
+@using WebsiteAnalyzer.Core.Interfaces.Services.DTOs.ScheduledAction
+@using WebsiteAnalyzer.Core.Interfaces.Services.DTOs.Website
 @using WebsiteAnalyzer.Web.Components.General.Toggles
 @using WebsiteAnalyzer.Web.Models
 
@@ -22,7 +23,7 @@
             <RadzenStack>
                 <RadzenSelectBar @bind-Value="_selectedAction">
                     <Items>
-                        @foreach (ScheduledAction action in Actions)
+                        @foreach (ScheduledActionDTO action in Actions)
                         {
                             <RadzenSelectBarItem Text="@action.Action.ToDisplayString()" Value="action"></RadzenSelectBarItem>
                         }
@@ -58,13 +59,13 @@
 
 @code {
     [Parameter, EditorRequired]
-    public Website Website { get; set; }
+    public WebsiteDTO Website { get; set; }
 
     [Parameter, EditorRequired]
     public IEnumerable<EmailSubscription> Subscriptions { get; set; }= [];
     
     [Parameter, EditorRequired]
-    public IEnumerable<ScheduledAction> Actions { get; set; }= [];
+    public IEnumerable<ScheduledActionDTO> Actions { get; set; }= [];
 
     [Parameter, EditorRequired]
     public EventCallback<AddSubscription> OnSubscribed { get; set; }
@@ -73,7 +74,7 @@
     public EventCallback<EmailSubscription> OnUnsubscribe { get; set; }
     
     private string _email { get; set; } = "";
-    private ScheduledAction _selectedAction { get; set; }
+    private ScheduledActionDTO _selectedAction { get; set; }
     private bool _open;
 
     protected override async Task OnInitializedAsync()

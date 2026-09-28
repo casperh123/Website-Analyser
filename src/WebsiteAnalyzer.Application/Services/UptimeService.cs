@@ -1,5 +1,5 @@
+using WebsiteAnalyzer.Core.Domain;
 using WebsiteAnalyzer.Core.Domain.Uptime;
-using WebsiteAnalyzer.Core.Domain.Website;
 using WebsiteAnalyzer.Core.Interfaces.Repositories;
 using WebsiteAnalyzer.Core.Interfaces.Services;
 using WebsiteAnalyzer.Core.Interfaces.Services.DTOs.Uptime;

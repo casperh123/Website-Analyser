@@ -1,11 +1,12 @@
-@using WebsiteAnalyzer.Core.Domain.Website
+@using WebsiteAnalyzer.Core.Domain
+@using WebsiteAnalyzer.Core.Interfaces.Services.DTOs.Website
 @inject NavigationManager NavigationManager
 
 <RadzenRow>
     <RadzenLink Path="/" >
         <RadzenButton Icon="keyboard_arrow_left" Size="ButtonSize.Medium" Style="margin-bottom: 40px;"/>
     </RadzenLink>
-    <RadzenDropDown Data="Websites" Value="Website" TValue="Website" TextProperty="@nameof(Website.Name)" ValueChanged="@((website) => NavigateToWebsite(website))"/>
+    <RadzenDropDown Data="Websites" Value="Website" TValue="WebsiteDTO" TextProperty="@nameof(Website.Name)" ValueChanged="@((website) => NavigateToWebsite(website))"/>
 </RadzenRow>
 
 @if (Website is not null)
@@ -35,15 +36,15 @@ else
 
 @code {
     [Parameter, EditorRequired]
-    public required Website? Website { get; set; }
+    public required WebsiteDTO? Website { get; set; }
 
     [Parameter, EditorRequired]
-    public required IEnumerable<Website> Websites { get; set; }
+    public required IEnumerable<WebsiteDTO> Websites { get; set; }
     
     [Parameter]
     public RenderFragment ChildContent { get; set; }
 
-    public void NavigateToWebsite(Website? website)
+    public void NavigateToWebsite(WebsiteDTO? website)
     {
         string newUrl = NavigationManager.Uri.Replace($"/{Website?.Id}", $"/{website?.Id}");
         NavigationManager.NavigateTo(newUrl, forceLoad: true);

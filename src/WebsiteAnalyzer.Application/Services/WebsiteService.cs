@@ -1,4 +1,4 @@
-using WebsiteAnalyzer.Core.Domain.Website;
+using WebsiteAnalyzer.Core.Domain;
 using WebsiteAnalyzer.Core.Enums;
 using WebsiteAnalyzer.Core.Exceptions;
 using WebsiteAnalyzer.Core.Interfaces.Repositories;
@@ -71,8 +71,8 @@ public class WebsiteService : IWebsiteService
     {
         TimeSpan brokenLinkOffset = TimeSpan.FromMinutes(15);
     
-        await _scheduleService.ScheduleAction(website, CrawlAction.CacheWarm, Frequency.SixHourly);
-        await _scheduleService.ScheduleAction(website, CrawlAction.BrokenLink, Frequency.Daily, brokenLinkOffset);
-        await _scheduleService.ScheduleAction(website, CrawlAction.Uptime, Frequency.Minutely);
+        await _scheduleService.ScheduleAction(website.Id, CrawlAction.CacheWarm, Frequency.SixHourly);
+        await _scheduleService.ScheduleAction(website.Id, CrawlAction.BrokenLink, Frequency.Daily, brokenLinkOffset);
+        await _scheduleService.ScheduleAction(website.Id, CrawlAction.Uptime, Frequency.Minutely);
     }
 }

@@ -4,14 +4,14 @@ public record CacheWarm
 {
     public CacheWarm() { }
 
-    public CacheWarm(Website.Website website)
+    public CacheWarm(Website website)
     {
         Id = Guid.NewGuid();
         WebsiteId = website.Id;
     }
 
     public CacheWarm(
-        Website.Website website,
+        Website website,
         int linksChecked,
         DateTime startTime,
         DateTime endTime

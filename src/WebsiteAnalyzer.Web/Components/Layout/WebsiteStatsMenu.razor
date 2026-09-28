@@ -1,4 +1,4 @@
-@using WebsiteAnalyzer.Core.Domain.Website
+@using WebsiteAnalyzer.Core.Interfaces.Services.DTOs.Website
 <RadzenCard>
     <RadzenPanelMenu >
         <RadzenPanelMenuItem Text="General" Path="@($"/website/{Website.Id}")" Match="NavLinkMatch.All"/>
@@ -11,5 +11,5 @@
 
 @code {
     [Parameter, EditorRequired]
-    public required Website Website { get; set; }
+    public required WebsiteDTO Website { get; set; }
 }

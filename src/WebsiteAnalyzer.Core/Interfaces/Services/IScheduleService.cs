@@ -1,29 +1,28 @@
 using WebsiteAnalyzer.Core.Domain;
-using WebsiteAnalyzer.Core.Domain.Website;
 using WebsiteAnalyzer.Core.Enums;
+using WebsiteAnalyzer.Core.Interfaces.Services.DTOs.ScheduledAction;
 
 namespace WebsiteAnalyzer.Core.Interfaces.Services;
 
 public interface IScheduleService
 {
-    Task<ScheduledAction> GetById(Guid id);
-    Task<ICollection<ScheduledAction>> GetByWebsiteId(Guid websiteId);
-    Task<ICollection<ScheduledAction>> GetByWebsiteIds(ICollection<Guid> websiteIds);
-    Task<ScheduledAction?> GetActionByWebsiteIdAndType(Guid websiteId, CrawlAction type);
+    Task<ScheduledActionDTO> GetById(Guid id);
+    Task<ICollection<ScheduledActionDTO>> GetByWebsiteIds(ICollection<Guid> websiteIds);
+    Task<ScheduledActionDTO?> GetActionByWebsiteIdAndType(Guid websiteId, CrawlAction type);
 
-    Task<ScheduledAction> ScheduleAction(
-        Website website,
+    Task<ScheduledActionDTO> ScheduleAction(
+        Guid websiteId,
         CrawlAction action,
         Frequency frequency,
         TimeSpan negativeOffset = default);
 
-    Task DeleteAction(ScheduledAction scheduledTask);
+    Task DeleteAction(Guid actionId);
     Task DeleteTasksByUrlAndUserId(string url, Guid userId);
-    Task ResetActionStatus(ScheduledAction action);
+    Task ResetActionStatus(Guid actionId);
 
-    Task<ICollection<ScheduledAction>> GetDueSchedulesBy(CrawlAction action);
+    Task<ICollection<ScheduledActionDTO>> GetDueSchedulesBy(CrawlAction action);
 
-    Task StartAction(ScheduledAction action);
-    Task CompleteAction(ScheduledAction action);
-    Task FailAction(ScheduledAction action);
+    Task StartAction(Guid actionId);
+    Task CompleteAction(Guid actionId);
+    Task FailAction(Guid actionId);
 }

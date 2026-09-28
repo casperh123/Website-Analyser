@@ -5,6 +5,7 @@
 @using WebsiteAnalyzer.Core.Enums
 @using WebsiteAnalyzer.Core.Interfaces.Services
 @using WebsiteAnalyzer.Core.Interfaces.Services.DTOs.CacheWarm
+@using WebsiteAnalyzer.Core.Interfaces.Services.DTOs.ScheduledAction
 @using WebsiteAnalyzer.Web.Components.Layout
 @using WebsiteAnalyzer.Web.Components.ScheduledAction
 @using WebsiteAnalyzer.Web.Components.WebsiteInputs
@@ -67,7 +68,7 @@
 @code {
 
     public ICollection<CacheWarmDTO>? CacheWarms { get; set; }
-    public ScheduledAction? ScheduledAction { get; set; }
+    public ScheduledActionDTO? ScheduledAction { get; set; }
 
     private int _linksChecked;
     private int _linksEnqueued;

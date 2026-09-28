@@ -1,10 +1,10 @@
 @page "/Notifications"
 @using Microsoft.AspNetCore.Authorization
 @using WebsiteAnalyzer.Core.Domain
-@using WebsiteAnalyzer.Core.Domain.Website
 @using WebsiteAnalyzer.Core.Interfaces.Services
+@using WebsiteAnalyzer.Core.Interfaces.Services.DTOs.ScheduledAction
+@using WebsiteAnalyzer.Core.Interfaces.Services.DTOs.Website
 @using WebsiteAnalyzer.Infrastructure
-@using WebsiteAnalyzer.Web.Components.Account.Pages.Manage
 @using WebsiteAnalyzer.Web.Components.Notifications
 @using WebsiteAnalyzer.Web.Models
 @using WebsiteAnalyzer.Web.Services
@@ -20,7 +20,7 @@
     <RadzenText TextStyle="TextStyle.DisplayH1">Notification Settings</RadzenText>
 
     <RadzenStack>
-        @foreach (Website website in Websites)
+        @foreach (WebsiteDTO website in Websites)
         {
             <NotificationCard 
                 Website="website" 
@@ -33,9 +33,9 @@
 </RadzenStack>
 
 @code {
-    ICollection<Website> Websites { get; set; } = [];
+    ICollection<WebsiteDTO> Websites { get; set; } = [];
     ICollection<EmailSubscription> Subscriptions { get; set; } = [];
-    ICollection<ScheduledAction> Actions { get; set; } = [];
+    ICollection<ScheduledActionDTO> Actions { get; set; } = [];
     ApplicationUser? User { get; set; }
 
     protected override async Task OnInitializedAsync()

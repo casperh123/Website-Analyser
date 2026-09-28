@@ -1,6 +1,6 @@
-@using WebsiteAnalyzer.Core.Domain
 @using WebsiteAnalyzer.Core.Enums
 @using WebsiteAnalyzer.Core.Interfaces.Services
+@using WebsiteAnalyzer.Core.Interfaces.Services.DTOs.ScheduledAction
 @using WebsiteAnalyzer.Web.Components.Status
 
 @inject IScheduleService ScheduleService
@@ -28,10 +28,10 @@
 
 @code {
     [Parameter, EditorRequired]
-    public required ScheduledAction ScheduledAction { get; set; }
+    public required ScheduledActionDTO ScheduledAction { get; set; }
     
     public async Task ResetActionStatus()
     {
-        await ScheduleService.ResetActionStatus(ScheduledAction);
+        await ScheduleService.ResetActionStatus(ScheduledAction.Id);
     }
 }
