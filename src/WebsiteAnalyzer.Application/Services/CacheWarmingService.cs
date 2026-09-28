@@ -2,26 +2,29 @@ using Crawl.Core;
 using Crawl.Core.Builders;
 using Crawl.Filters;
 using Crawl.Models;
-using WebsiteAnalyzer.Core.Contracts.CacheWarm;
 using WebsiteAnalyzer.Core.Contracts.Crawl;
 using WebsiteAnalyzer.Core.Domain;
 using WebsiteAnalyzer.Core.Domain.Website;
 using WebsiteAnalyzer.Core.Interfaces.Repositories;
 using WebsiteAnalyzer.Core.Interfaces.Services;
+using WebsiteAnalyzer.Core.Interfaces.Services.DTOs.CacheWarm;
 
 namespace WebsiteAnalyzer.Application.Services;
 
 public class CacheWarmingService : ICacheWarmingService
 {
     private readonly ICacheWarmRepository _cacheWarmRepository;
+    private readonly IWebsiteRepository _websiteRepository;
     private readonly HttpClient _httpClient;
     
     public CacheWarmingService(
         ICacheWarmRepository cacheWarmRepository,
+        IWebsiteRepository websiteRepository,
         HttpClient httpClient
     )
     {
         _cacheWarmRepository = cacheWarmRepository;
+        _websiteRepository = websiteRepository;
         _httpClient = httpClient;
     }
 
@@ -39,19 +42,20 @@ public class CacheWarmingService : ICacheWarmingService
     }
 
     public async Task WarmCache(
-        Website website,
+        Guid websiteId,
         CancellationToken cancellationToken = default
     )
     {
-        await WarmCache(website, null, cancellationToken);
+        await WarmCache(websiteId, null, cancellationToken);
     }
 
     public async Task WarmCache(
-        Website website, 
+        Guid websiteId, 
         IProgress<CrawlProgress>? progress = null, 
         CancellationToken cancellationToken = default
         )
     {
+        Website website = await _websiteRepository.GetByWebsiteId(websiteId);
         CrawlTimer timer = new CrawlTimer();
         int linksChecked = await CrawlWebsiteCore(website.Url, progress, cancellationToken);
         CrawlTimerResult time = timer.Complete();
@@ -60,9 +64,11 @@ public class CacheWarmingService : ICacheWarmingService
         await _cacheWarmRepository.AddAsync(cacheWarm);
     }
 
-    public async Task<ICollection<CacheWarm>> GetCacheWarmsByWebsiteId(Guid websiteId)
+    public async Task<ICollection<CacheWarmDTO>> GetCacheWarmsByWebsiteId(Guid websiteId)
     {
-        return await _cacheWarmRepository.GetByWebsiteId(websiteId);
+        ICollection<CacheWarm> cacheWarms = await _cacheWarmRepository.GetByWebsiteId(websiteId);
+        
+        return [.. cacheWarms.Select(CacheWarmDTO.From)];
     }
     
     private async Task<int> CrawlWebsiteCore(

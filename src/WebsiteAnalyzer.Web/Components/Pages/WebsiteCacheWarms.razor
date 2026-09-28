@@ -4,6 +4,7 @@
 @using WebsiteAnalyzer.Core.Domain
 @using WebsiteAnalyzer.Core.Enums
 @using WebsiteAnalyzer.Core.Interfaces.Services
+@using WebsiteAnalyzer.Core.Interfaces.Services.DTOs.CacheWarm
 @using WebsiteAnalyzer.Web.Components.Layout
 @using WebsiteAnalyzer.Web.Components.ScheduledAction
 @using WebsiteAnalyzer.Web.Components.WebsiteInputs
@@ -65,7 +66,7 @@
 
 @code {
 
-    public ICollection<CacheWarm>? CacheWarms { get; set; }
+    public ICollection<CacheWarmDTO>? CacheWarms { get; set; }
     public ScheduledAction? ScheduledAction { get; set; }
 
     private int _linksChecked;
@@ -99,7 +100,7 @@
         {
             _linksChecked = 0;
             _linksEnqueued = 0;
-            await CacheWarmingService.WarmCache(Website, progress, token);
+            await CacheWarmingService.WarmCache(Website.Id, progress, token);
         });
         
         CacheWarms = await CacheWarmingService.GetCacheWarmsByWebsiteId(Website.Id);

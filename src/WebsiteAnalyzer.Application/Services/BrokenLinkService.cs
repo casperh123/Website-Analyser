@@ -14,14 +14,16 @@ namespace WebsiteAnalyzer.Application.Services;
 public class BrokenLinkService(
     HttpClient httpClient,
     IBrokenLinkCrawlRepository crawlRepository,
-    IBrokenLinkRepository brokenLinkRepository)
+    IBrokenLinkRepository brokenLinkRepository,
+    IWebsiteRepository websiteRepository)
     : IBrokenLinkService
 {
     public async Task<ICollection<BrokenLinkDTO>> FindBrokenLinks(
-        Website website, 
+        Guid websiteId, 
         IProgress<CrawlProgress>? progress = null,
         CancellationToken cancellationToken = default)
     {
+        Website website = await websiteRepository.GetByWebsiteId(websiteId);
         BrokenLinkCrawl crawl = await CreateCrawlEntity(website.Url, website.UserId);
         ICollection<BrokenLinkDTO> brokenLinks = [];
         BrokenLinkVisitor brokenLinkVisitor = new BrokenLinkVisitor();

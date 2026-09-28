@@ -94,7 +94,7 @@
             _linksChecked = 0;
             _linksEnqueued = 0;
             
-            await BrokenLinkService.FindBrokenLinks(Website, _progress, token);
+            await BrokenLinkService.FindBrokenLinks(Website.Id, _progress, token);
         });
         
         BrokenLinkCrawls = await BrokenLinkService.GetBrokenLinkCrawlsByUrlAndUserId(Website.Url, User.Id);
