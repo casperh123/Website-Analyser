@@ -2,7 +2,6 @@ using Crawl.Core;
 using Crawl.Core.Builders;
 using Crawl.Filters;
 using Crawl.Models;
-using WebsiteAnalyzer.Core.Contracts.Crawl;
 using WebsiteAnalyzer.Core.Domain;
 using WebsiteAnalyzer.Core.Domain.Website;
 using WebsiteAnalyzer.Core.Interfaces.Repositories;

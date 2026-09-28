@@ -1,29 +1,25 @@
-using System.Runtime.InteropServices;
 using WebsiteAnalyzer.Core.Domain.Uptime;
-using WebsiteAnalyzer.Core.Contracts.Uptime;
 using WebsiteAnalyzer.Core.Domain.Website;
 using WebsiteAnalyzer.Core.Interfaces.Repositories;
 using WebsiteAnalyzer.Core.Interfaces.Services;
+using WebsiteAnalyzer.Core.Interfaces.Services.DTOs.Uptime;
 
 namespace WebsiteAnalyzer.Application.Services;
 
 public class UptimeService : IUptimeService
 {
     private readonly IDowntimePingRepository _pingRepository;
+    private readonly IWebsiteRepository _websiteRepository;
     private readonly HttpClient _httpClient;
 
-    public UptimeService(IDowntimePingRepository pingRepository, HttpClient httpClient)
+    public UptimeService(IDowntimePingRepository pingRepository, IWebsiteRepository websiteRepository, HttpClient httpClient)
     {
         _pingRepository = pingRepository;
+        _websiteRepository = websiteRepository;
         _httpClient = httpClient;
     }
 
-    public async Task<ICollection<DowntimePing>> GetDowntimePingsByWebsiteId(Guid websiteId)
-    {
-        return await _pingRepository.GetByWebsiteId(websiteId);
-    }
-
-    public async Task<ICollection<UptimeStat>> GetByWebsiteAfterDate(Guid websiteId, DateTime afterDate)
+    public async Task<ICollection<UptimeStatusDTO>> GetByWebsiteAfterDate(Guid websiteId, DateTime afterDate)
     {
         ICollection<DowntimePing> pings = await _pingRepository.GetByWebsiteIdAfterDate(websiteId, afterDate);
         DateTime currentTime = DateTime.UtcNow;
@@ -45,7 +41,7 @@ public class UptimeService : IUptimeService
 
             DateTime timeRecorded = ping?.TimeRecorded ?? hour;
             
-            return new UptimeStat(
+            return new UptimeStatusDTO(
                 downtimePings?.Count ?? 0,
                 TruncateToHour(timeRecorded),
                 ping?.StatusCode,
@@ -54,8 +50,9 @@ public class UptimeService : IUptimeService
         }).ToList();
     }
 
-    public async Task<DowntimePing> Ping(Website website)
+    public async Task<DowntimePing> Ping(Guid websiteId)
     {
+        Website website = await _websiteRepository.GetByWebsiteId(websiteId);
         DowntimePing ping = new DowntimePing(website.Id);
 
         try

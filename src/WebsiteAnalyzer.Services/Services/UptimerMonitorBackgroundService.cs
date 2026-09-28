@@ -20,7 +20,7 @@ public class UptimeMonitorBackgroundService(
 
         Website website = scheduledAction.Website;
 
-        await uptimeService.Ping(website);
+        await uptimeService.Ping(website.Id);
         
         Logger.LogInformation(
             $"Pinged: {website.Url}",

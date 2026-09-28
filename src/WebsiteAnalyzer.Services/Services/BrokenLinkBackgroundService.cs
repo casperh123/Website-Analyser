@@ -19,7 +19,7 @@ public class BrokenLinkBackgroundService(
         IBrokenLinkService brokenLinkService = 
             scope.ServiceProvider.GetRequiredService<IBrokenLinkService>();
 
-        await brokenLinkService.FindBrokenLinks(scheduledAction.Website, null, token);
+        await brokenLinkService.FindBrokenLinks(scheduledAction.Website.Id, null, token);
         
         Logger.LogInformation(
             "Completed crawl of {Url}.",

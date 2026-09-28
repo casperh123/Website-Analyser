@@ -1,16 +1,15 @@
 using System.Net;
-using WebsiteAnalyzer.Core.Domain.Uptime;
 
-namespace WebsiteAnalyzer.Core.Contracts.Uptime;
+namespace WebsiteAnalyzer.Core.Interfaces.Services.DTOs.Uptime;
 
-public record UptimeStat
+public record UptimeStatusDTO
 {
     public int Outages { get; }
     public DateTime TimeRecorded { get; }
     public HttpStatusCode? StatusCode { get;  }
     public string? Reason { get; }
 
-    public UptimeStat(
+    public UptimeStatusDTO(
         int outages,
         DateTime timeRecorded, 
         HttpStatusCode? statusCode, 

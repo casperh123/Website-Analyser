@@ -4,7 +4,7 @@ namespace WebsiteAnalyzer.Core.Interfaces.Services.DTOs.Website;
 
 public record WebsiteDTO
 {
-    public required Guid Id { get; private set; }
+    public required Guid Id { get; set; }
     public required string Url { get; set; }
     public required string? Name { get; set; }
     public required Guid UserId { get; set; }
