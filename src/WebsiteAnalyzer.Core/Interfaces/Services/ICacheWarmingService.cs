@@ -1,7 +1,5 @@
 using Crawl.Models;
-using WebsiteAnalyzer.Core.Contracts.CacheWarm;
-using WebsiteAnalyzer.Core.Domain;
-using WebsiteAnalyzer.Core.Domain.Website;
+using WebsiteAnalyzer.Core.Interfaces.Services.DTOs.CacheWarm;
 
 namespace WebsiteAnalyzer.Core.Interfaces.Services;
 
@@ -11,9 +9,9 @@ public interface ICacheWarmingService
         IProgress<CrawlProgress>? progress = null,
         CancellationToken cancellationToken = default);
 
-    Task WarmCache(Website website, IProgress<CrawlProgress>? progress = null,
+    Task WarmCache(Guid websiteId, IProgress<CrawlProgress>? progress = null,
         CancellationToken cancellationToken = default);
 
-    Task WarmCache(Website website, CancellationToken cancellationToken = default);
-    Task<ICollection<CacheWarm>> GetCacheWarmsByWebsiteId(Guid websiteId);
+    Task WarmCache(Guid websiteId, CancellationToken cancellationToken = default);
+    Task<ICollection<CacheWarmDTO>> GetCacheWarmsByWebsiteId(Guid websiteId);
 }

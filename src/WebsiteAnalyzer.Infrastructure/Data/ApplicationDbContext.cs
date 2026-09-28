@@ -5,7 +5,6 @@ using WebsiteAnalyzer.Core.Domain;
 using WebsiteAnalyzer.Core.Domain.BrokenLink;
 using WebsiteAnalyzer.Core.Domain.OrderChecks;
 using WebsiteAnalyzer.Core.Domain.Uptime;
-using WebsiteAnalyzer.Core.Domain.Website;
 
 namespace WebsiteAnalyzer.Infrastructure.Data;
 

@@ -1,4 +1,4 @@
-@using WebsiteAnalyzer.Core.Domain.Website
+@using WebsiteAnalyzer.Core.Interfaces.Services.DTOs.Website
 <RadzenCard>
     <RadzenRow AlignItems="AlignItems.Center" JustifyContent="JustifyContent.SpaceBetween">
         <RadzenStack>
@@ -18,10 +18,10 @@
 
 @code {
     [EditorRequired, Parameter]
-    public required Website Website { get; set; }
+    public required WebsiteDTO Website { get; set; }
     
     [Parameter]
-    public EventCallback<Website> WebsiteDeleted { get; set; }
+    public EventCallback<WebsiteDTO> WebsiteDeleted { get; set; }
 
     private async Task DeleteWebsite()
     {

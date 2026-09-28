@@ -1,4 +1,4 @@
-namespace WebsiteAnalyzer.Core.Domain.Website;
+namespace WebsiteAnalyzer.Core.Domain;
 
 public class GeneralStats
 {

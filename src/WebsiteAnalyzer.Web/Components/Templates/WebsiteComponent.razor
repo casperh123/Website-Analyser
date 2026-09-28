@@ -1,5 +1,5 @@
-@using WebsiteAnalyzer.Core.Domain.Website
 @using WebsiteAnalyzer.Core.Interfaces.Services
+@using WebsiteAnalyzer.Core.Interfaces.Services.DTOs.Website
 @using WebsiteAnalyzer.Infrastructure
 @using WebsiteAnalyzer.Web.Services
 
@@ -12,9 +12,9 @@
     [Parameter]
     public Guid WebsiteId { get; set; }
     
-    public Website? Website { get; set; }
+    public WebsiteDTO? Website { get; set; }
     public ApplicationUser? User { get; set; }
-    public ICollection<Website>? Websites { get; set; }
+    public ICollection<WebsiteDTO>? Websites { get; set; }
     
     protected override async Task OnInitializedAsync()
     {

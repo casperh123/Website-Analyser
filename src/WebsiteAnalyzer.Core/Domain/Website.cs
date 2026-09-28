@@ -1,6 +1,7 @@
+
 using WebsiteAnalyzer.Core.Domain.BrokenLink;
 
-namespace WebsiteAnalyzer.Core.Domain.Website;
+namespace WebsiteAnalyzer.Core.Domain;
 
 public record Website
 {

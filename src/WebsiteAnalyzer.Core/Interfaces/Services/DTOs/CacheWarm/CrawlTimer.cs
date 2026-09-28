@@ -1,6 +1,6 @@
 using System.Diagnostics;
 
-namespace WebsiteAnalyzer.Core.Contracts.Crawl;
+namespace WebsiteAnalyzer.Core.Interfaces.Services.DTOs.CacheWarm;
 
 public class CrawlTimer
 {

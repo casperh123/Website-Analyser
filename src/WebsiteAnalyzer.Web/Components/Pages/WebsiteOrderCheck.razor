@@ -4,6 +4,7 @@
 @using WebsiteAnalyzer.Core.Domain.OrderChecks
 @using WebsiteAnalyzer.Core.Enums
 @using WebsiteAnalyzer.Core.Interfaces.Services
+@using WebsiteAnalyzer.Core.Interfaces.Services.DTOs.ScheduledAction
 @using WebsiteAnalyzer.Web.Components.General.Lists
 @using WebsiteAnalyzer.Web.Components.Layout
 
@@ -64,7 +65,7 @@
 </WebsiteStatsLayout>
 
 @code {
-    public ScheduledAction? ScheduledAction { get; set; }
+    public ScheduledActionDTO? ScheduledAction { get; set; }
     private OrderCheckKeys? Keys { get; set; }
     private OrderCheck? LatestCheck { get; set; }
     private ICollection<OrderCheck> AllChecks { get; set; }
@@ -86,12 +87,12 @@
 
     public async Task AddCheck()
     {
-        ScheduledAction = await ScheduleService.ScheduleAction(Website, CrawlAction.OrderCheck, Frequency.ThreeHourly);
+        ScheduledAction = await ScheduleService.ScheduleAction(Website.Id, CrawlAction.OrderCheck, Frequency.ThreeHourly);
     }
 
     public async Task DeleteCheck()
     {
-        await ScheduleService.DeleteAction(ScheduledAction);
+        await ScheduleService.DeleteAction(ScheduledAction.Id);
         ScheduledAction = null;
     }
 

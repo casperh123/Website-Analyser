@@ -1,3 +1,4 @@
+using WebsiteAnalyzer.Core.Domain;
 using WebsiteAnalyzer.Core.Domain.Website;
 using WebsiteAnalyzer.Core.Interfaces.Repositories;
 using WebsiteAnalyzer.Infrastructure.Repositories;

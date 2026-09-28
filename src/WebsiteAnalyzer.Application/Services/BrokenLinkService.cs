@@ -4,8 +4,8 @@ using Crawl.Filters;
 using Crawl.Models;
 using Crawl.Visitors.BrokenLink;
 using WebsiteAnalyzer.Core.Contracts.BrokenLink;
+using WebsiteAnalyzer.Core.Domain;
 using WebsiteAnalyzer.Core.Domain.BrokenLink;
-using WebsiteAnalyzer.Core.Domain.Website;
 using WebsiteAnalyzer.Core.Interfaces.Repositories;
 using WebsiteAnalyzer.Core.Interfaces.Services;
 
@@ -14,14 +14,16 @@ namespace WebsiteAnalyzer.Application.Services;
 public class BrokenLinkService(
     HttpClient httpClient,
     IBrokenLinkCrawlRepository crawlRepository,
-    IBrokenLinkRepository brokenLinkRepository)
+    IBrokenLinkRepository brokenLinkRepository,
+    IWebsiteRepository websiteRepository)
     : IBrokenLinkService
 {
     public async Task<ICollection<BrokenLinkDTO>> FindBrokenLinks(
-        Website website, 
+        Guid websiteId, 
         IProgress<CrawlProgress>? progress = null,
         CancellationToken cancellationToken = default)
     {
+        Website website = await websiteRepository.GetByWebsiteId(websiteId);
         BrokenLinkCrawl crawl = await CreateCrawlEntity(website.Url, website.UserId);
         ICollection<BrokenLinkDTO> brokenLinks = [];
         BrokenLinkVisitor brokenLinkVisitor = new BrokenLinkVisitor();

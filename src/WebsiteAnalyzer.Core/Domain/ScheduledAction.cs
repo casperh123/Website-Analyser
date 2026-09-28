@@ -7,7 +7,7 @@ public record ScheduledAction
     public ScheduledAction() {}
 
     public ScheduledAction(
-        Website.Website website,
+        Website website,
         Frequency frequency,
         CrawlAction action,
         TimeSpan offset
@@ -24,7 +24,7 @@ public record ScheduledAction
 
     public Guid Id { get; init; }
     public Guid WebsiteId { get; init; }
-    public Website.Website Website { get; init; }
+    public Website Website { get; init; }
     public Frequency Frequency { get; set; }
     public CrawlAction Action { get; init; }
 

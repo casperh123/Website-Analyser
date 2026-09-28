@@ -1,7 +1,6 @@
 @page "/Website/{WebsiteId:guid}/uptime"
-
-@using WebsiteAnalyzer.Core.Contracts.Uptime
 @using WebsiteAnalyzer.Core.Interfaces.Services
+@using WebsiteAnalyzer.Core.Interfaces.Services.DTOs.Uptime
 @using WebsiteAnalyzer.Web.Components.Layout
 
 @inherits WebsiteAnalyzer.Web.Components.Templates.WebsiteComponent
@@ -11,7 +10,7 @@
 <WebsiteStatsLayout Website="Website" Websites="Websites">
     <RadzenCard>
         <RadzenChart>
-            <RadzenLineSeries Data="@UptimeStats" CategoryProperty="@nameof(UptimeStat.TimeRecorded)" Title="Outages" ValueProperty="@nameof(UptimeStat.Outages)">
+            <RadzenLineSeries Data="@UptimeStats" CategoryProperty="@nameof(UptimeStatusDTO.TimeRecorded)" Title="Outages" ValueProperty="@nameof(UptimeStatusDTO.Outages)">
                 <ChildContent>
                     <RadzenMarkers MarkerType="MarkerType.Circle" StrokeWidth="2" Size="4" />
                 </ChildContent>                
@@ -37,7 +36,7 @@
 
 
 @code {
-    public ICollection<UptimeStat>? UptimeStats { get; set; }
+    public ICollection<UptimeStatusDTO>? UptimeStats { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
