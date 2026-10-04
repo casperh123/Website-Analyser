@@ -1,6 +1,7 @@
 @using WebsiteAnalyzer.Core.Domain
 @using WebsiteAnalyzer.Core.Enums
 @using WebsiteAnalyzer.Core.Interfaces.Services
+@using WebsiteAnalyzer.Core.Interfaces.Services.DTOs.Email
 @using WebsiteAnalyzer.Core.Interfaces.Services.DTOs.ScheduledAction
 @using WebsiteAnalyzer.Core.Interfaces.Services.DTOs.Website
 @using WebsiteAnalyzer.Web.Components.General.Toggles
@@ -35,7 +36,7 @@
                 </RadzenRow>
             </RadzenStack>
 
-            @foreach (EmailSubscription subscription in Subscriptions)
+            @foreach (EmailSubscriptionDTO subscription in Subscriptions)
             {
                 <RadzenCard>
                     <RadzenRow Gap="20" JustifyContent="JustifyContent.SpaceBetween">
@@ -45,7 +46,7 @@
                         </RadzenStack>
                         <RadzenStack>
                             <RadzenText TextStyle="TextStyle.Subtitle1">Action:</RadzenText>
-                            <RadzenText>@GetScheduledAction(subscription.ScheduleActionId).ToDisplayString()</RadzenText>
+                            <RadzenText>@GetScheduledAction(subscription.ScheduledActionId).ToDisplayString()</RadzenText>
                         </RadzenStack>
                         <RadzenStack JustifyContent="JustifyContent.Center">
                             <RadzenButton ButtonStyle="ButtonStyle.Danger" Click="@(async () => await Unsubscribe(subscription))">Unsubscribe</RadzenButton>
@@ -62,7 +63,7 @@
     public WebsiteDTO Website { get; set; }
 
     [Parameter, EditorRequired]
-    public IEnumerable<EmailSubscription> Subscriptions { get; set; }= [];
+    public IEnumerable<EmailSubscriptionDTO> Subscriptions { get; set; }= [];
     
     [Parameter, EditorRequired]
     public IEnumerable<ScheduledActionDTO> Actions { get; set; }= [];
@@ -71,7 +72,7 @@
     public EventCallback<AddSubscription> OnSubscribed { get; set; }
     
     [Parameter, EditorRequired]
-    public EventCallback<EmailSubscription> OnUnsubscribe { get; set; }
+    public EventCallback<EmailSubscriptionDTO> OnUnsubscribe { get; set; }
     
     private string _email { get; set; } = "";
     private ScheduledActionDTO _selectedAction { get; set; }
@@ -98,7 +99,7 @@
         _email = "";
     }
 
-    private async Task Unsubscribe(EmailSubscription subscription)
+    private async Task Unsubscribe(EmailSubscriptionDTO subscription)
     {
         if (OnUnsubscribe.HasDelegate)
         {

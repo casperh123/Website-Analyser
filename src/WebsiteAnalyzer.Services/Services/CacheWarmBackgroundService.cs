@@ -1,8 +1,6 @@
-using WebsiteAnalyzer.Core.Domain;
 using WebsiteAnalyzer.Core.Enums;
 using WebsiteAnalyzer.Core.Interfaces.Services;
 using WebsiteAnalyzer.Core.Interfaces.Services.DTOs.ScheduledAction;
-using WebsiteAnalyzer.Web.BackgroundJobs;
 
 namespace WebsiteAnalyzer.Services.Services;
 

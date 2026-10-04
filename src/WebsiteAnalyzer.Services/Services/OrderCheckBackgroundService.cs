@@ -1,4 +1,3 @@
-using WebsiteAnalyzer.Core.Domain;
 using WebsiteAnalyzer.Core.Enums;
 using WebsiteAnalyzer.Core.Interfaces.Services;
 using WebsiteAnalyzer.Core.Interfaces.Services.DTOs.ScheduledAction;
