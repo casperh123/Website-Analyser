@@ -1,5 +1,6 @@
-
 using WebsiteAnalyzer.Core.Domain;
+
+namespace WebsiteAnalyzer.Core.Interfaces.Services.DTOs.Email;
 
 public record EmailSubscriptionDTO {
     public Guid WebsiteID { get; set; }

@@ -1,6 +1,7 @@
 using WebsiteAnalyzer.Core.Domain;
 using WebsiteAnalyzer.Core.Enums;
 using WebsiteAnalyzer.Core.Interfaces.Services;
+using WebsiteAnalyzer.Core.Interfaces.Services.DTOs.ScheduledAction;
 
 namespace WebsiteAnalyzer.Services.Services;
 
@@ -10,7 +11,7 @@ public class UptimeMonitorBackgroundService(
     : CrawlBackgroundServiceBase(logger, serviceProvider, CrawlAction.Uptime)
 {
     protected override async Task ExecuteTaskAsync(
-        ScheduledAction scheduledAction, 
+        ScheduledActionDTO scheduledAction, 
         IServiceScope scope, 
         CancellationToken token)
     {

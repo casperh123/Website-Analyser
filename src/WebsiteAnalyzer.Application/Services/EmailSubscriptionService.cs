@@ -1,6 +1,7 @@
 using WebsiteAnalyzer.Core.Domain;
 using WebsiteAnalyzer.Core.Interfaces.Repositories;
 using WebsiteAnalyzer.Core.Interfaces.Services;
+using WebsiteAnalyzer.Core.Interfaces.Services.DTOs.Email;
 
 namespace WebsiteAnalyzer.Application.Services;
 
@@ -13,13 +14,13 @@ public class EmailSubscriptionService : IEmailSubcriptionService
         _emailRepository = emailRepository;
     }
 
-    public async Task<EmailSubscription> Subscribe(Guid websiteId, Guid scheduledActionId, string email)
+    public async Task<EmailSubscriptionDTO> Subscribe(Guid websiteId, Guid scheduledActionId, string email)
     {
         EmailSubscription subscription = new EmailSubscription(websiteId, scheduledActionId, email);
 
         await _emailRepository.AddAsync(subscription);
 
-        return subscription;
+        return EmailSubscriptionDTO.From(subscription);
     }
 
     public async Task Unsubscribe(Guid websiteId, Guid scheduledActionId, string email)
@@ -34,13 +35,17 @@ public class EmailSubscriptionService : IEmailSubcriptionService
         await _emailRepository.DeleteAsync(subscription);
     }
 
-    public async Task<ICollection<EmailSubscription>> GetSubscriptionsByWebsite(Guid websiteId)
+    public async Task<ICollection<EmailSubscriptionDTO>> GetSubscriptionsByWebsite(Guid websiteId)
     {
-        return await _emailRepository.GetByWebsiteId(websiteId);
+        ICollection<EmailSubscription> subscriptions = await _emailRepository.GetByWebsiteId(websiteId);
+
+        return [.. subscriptions.Select(EmailSubscriptionDTO.From)];
     }
 
-    public async Task<ICollection<EmailSubscription>> GetSubscriptionByWebsites(ICollection<Guid> websiteIds)
+    public async Task<ICollection<EmailSubscriptionDTO>> GetSubscriptionByWebsites(ICollection<Guid> websiteIds)
     {
-        return await _emailRepository.GetSubscriptionByWebsites(websiteIds);
+        ICollection<EmailSubscription> subscriptions = await _emailRepository.GetSubscriptionByWebsites(websiteIds);
+
+        return [.. subscriptions.Select(EmailSubscriptionDTO.From)];
     }
 }

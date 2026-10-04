@@ -1,6 +1,4 @@
-using System.Net.Http.Json;
 using WebsiteAnalyzer.Application.Services;
-using WebsiteAnalyzer.Services.Cache;
 using WebsiteAnalyzer.Web.BackgroundJobs.Timers;
 
 namespace WebsiteAnalyzer.Services.Services;
@@ -12,7 +10,6 @@ public class AppartmentBackgroundService : BackgroundService
     private readonly AppartmentService _appartmentService;
     protected readonly ILogger Logger;
     private DateTime lastCheck;
-    
     
 
     public AppartmentBackgroundService(

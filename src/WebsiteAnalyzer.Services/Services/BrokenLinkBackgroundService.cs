@@ -1,8 +1,6 @@
-using WebsiteAnalyzer.Core.Contracts.BrokenLink;
-using WebsiteAnalyzer.Core.Domain;
 using WebsiteAnalyzer.Core.Enums;
 using WebsiteAnalyzer.Core.Interfaces.Services;
-using WebsiteAnalyzer.Web.BackgroundJobs;
+using WebsiteAnalyzer.Core.Interfaces.Services.DTOs.ScheduledAction;
 
 namespace WebsiteAnalyzer.Services.Services;
 
@@ -12,7 +10,7 @@ public class BrokenLinkBackgroundService(
     : CrawlBackgroundServiceBase(logger, serviceProvider, CrawlAction.BrokenLink)
 {
     protected override async Task ExecuteTaskAsync(
-        ScheduledAction scheduledAction, 
+        ScheduledActionDTO scheduledAction, 
         IServiceScope scope, 
         CancellationToken token)
     {
