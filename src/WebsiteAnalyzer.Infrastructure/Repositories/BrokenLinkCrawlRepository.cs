@@ -12,7 +12,7 @@ public class BrokenLinkCrawlRepository : BaseRepository<BrokenLinkCrawl>, IBroke
         
     }
 
-    public async Task<ICollection<BrokenLinkCrawl>?> GetByUserAsync(Guid? userId)
+    public async Task<ICollection<BrokenLinkCrawl>> GetByUserAsync(Guid userId)
     {
         return await DbContext.BrokenLinkCrawls
             .Where(crawl => crawl.UserId == userId)
@@ -20,16 +20,7 @@ public class BrokenLinkCrawlRepository : BaseRepository<BrokenLinkCrawl>, IBroke
             .ToListAsync();
     }
 
-    public async Task<BrokenLinkCrawl> GetByIdUrlUserId(Guid id, string url, Guid userId)
-    {
-        return await DbContext.BrokenLinkCrawls
-            .Where(crawl => crawl.Id == id)
-            .Where(crawl => crawl.UserId == userId)
-            .Where(crawl => crawl.Url == url)
-            .FirstAsync();
-    }
-
-    public async Task<ICollection<BrokenLinkCrawl>> GetByUrlUserId(string url, Guid userId)
+   public async Task<ICollection<BrokenLinkCrawl>> GetByUrlUserId(string url, Guid userId)
     {
         return await DbContext.BrokenLinkCrawls
             .Where(crawl => crawl.Url == url)

@@ -11,7 +11,7 @@ public interface IBrokenLinkService
         CancellationToken cancellationToken = default
     );
 
-    Task<ICollection<BrokenLinkCrawlDTO>> GetCrawlsByUserAsync(Guid? userId);
+    Task<ICollection<BrokenLinkCrawlDTO>> GetCrawlsByUserAsync(Guid userId);
     Task<ICollection<BrokenLinkDTO>> GetBrokenLinksByCrawlIdAsync(Guid crawlId);
     Task<ICollection<BrokenLinkCrawlDTO>> GetBrokenLinkCrawlsByUrlAndUserId(string url, Guid userId);
 }
