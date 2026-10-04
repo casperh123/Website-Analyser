@@ -1,7 +1,6 @@
-using WebsiteAnalyzer.Core.Domain;
 using WebsiteAnalyzer.Core.Enums;
 using WebsiteAnalyzer.Core.Interfaces.Services;
-using WebsiteAnalyzer.Web.BackgroundJobs;
+using WebsiteAnalyzer.Core.Interfaces.Services.DTOs.ScheduledAction;
 
 namespace WebsiteAnalyzer.Services.Services;
 
@@ -14,7 +13,7 @@ public class OrderCheckBackgroundService : CrawlBackgroundServiceBase
     }
 
     protected override async Task ExecuteTaskAsync(
-        ScheduledAction action,
+        ScheduledActionDTO action,
         IServiceScope scope,
         CancellationToken token)
     {

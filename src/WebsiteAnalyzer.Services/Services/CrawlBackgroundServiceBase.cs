@@ -1,7 +1,7 @@
 using System.Threading.Tasks.Dataflow;
-using WebsiteAnalyzer.Core.Domain;
 using WebsiteAnalyzer.Core.Enums;
 using WebsiteAnalyzer.Core.Interfaces.Services;
+using WebsiteAnalyzer.Core.Interfaces.Services.DTOs.ScheduledAction;
 using WebsiteAnalyzer.Web.BackgroundJobs.Timers;
 
 namespace WebsiteAnalyzer.Services.Services;
@@ -11,7 +11,7 @@ public abstract class CrawlBackgroundServiceBase : BackgroundService
     private readonly IPeriodicTimer _timer;
     private readonly IServiceProvider _serviceProvider;
     private readonly CrawlAction _crawlAction;
-    private readonly ActionBlock<ScheduledAction> _crawlProcessor;
+    private readonly ActionBlock<ScheduledActionDTO> _crawlProcessor;
     
     protected readonly ILogger Logger;
 
@@ -25,8 +25,7 @@ public abstract class CrawlBackgroundServiceBase : BackgroundService
         _serviceProvider = serviceprovider;
         _crawlAction = crawlAction;
 
-        _crawlProcessor = new ActionBlock<ScheduledAction>(async scheduledAction =>
-            await ProcessScheduleWithTimeoutAsync(scheduledAction),
+        _crawlProcessor = new ActionBlock<ScheduledActionDTO>(ProcessScheduleWithTimeoutAsync,
             
             new ExecutionDataflowBlockOptions {
                 MaxDegreeOfParallelism = 10,
@@ -41,19 +40,19 @@ public abstract class CrawlBackgroundServiceBase : BackgroundService
             using IServiceScope scope = _serviceProvider.CreateScope();
             IScheduleService scheduleService = scope.ServiceProvider.GetRequiredService<IScheduleService>();
         
-            ICollection<ScheduledAction> dueScheduledActions = await scheduleService.GetDueSchedulesBy(_crawlAction);
+            ICollection<ScheduledActionDTO> dueScheduledActions = await scheduleService.GetDueSchedulesBy(_crawlAction);
 
             Logger.LogInformation("Processing {Count} due {Action} schedules", 
                 dueScheduledActions.Count, _crawlAction);
 
-            foreach (ScheduledAction action in dueScheduledActions)
+            foreach (ScheduledActionDTO action in dueScheduledActions)
             {
                 await _crawlProcessor.SendAsync(action, stoppingToken);
             }
         }
     }
     
-    private async Task ProcessScheduleWithTimeoutAsync(ScheduledAction scheduledAction)
+    private async Task ProcessScheduleWithTimeoutAsync(ScheduledActionDTO scheduledAction)
     {
         using CancellationTokenSource timeoutCts = new CancellationTokenSource(TimeSpan.FromMinutes(120));
         using IServiceScope scope = _serviceProvider.CreateScope();
@@ -70,7 +69,7 @@ public abstract class CrawlBackgroundServiceBase : BackgroundService
     }
 
     private async ValueTask ProcessScheduleAsync(
-        ScheduledAction scheduledAction, 
+        ScheduledActionDTO scheduledAction, 
         IServiceScope scope, 
         CancellationToken token)
     {
@@ -78,22 +77,22 @@ public abstract class CrawlBackgroundServiceBase : BackgroundService
 
         try
         {
-            await scheduleService.StartAction(scheduledAction);
+            await scheduleService.StartAction(scheduledAction.Id);
 
             await ExecuteTaskAsync(scheduledAction, scope, token);
 
-            await scheduleService.CompleteAction(scheduledAction);
+            await scheduleService.CompleteAction(scheduledAction.Id);
         }
         catch (Exception ex)
         {
             Logger.LogError(ex, "Failed {Action} for {Url}", _crawlAction, scheduledAction.Website.Url);
 
-            await scheduleService.FailAction(scheduledAction);
+            await scheduleService.FailAction(scheduledAction.Id);
         }
     }
 
     protected abstract Task ExecuteTaskAsync(
-        ScheduledAction schedule,
+        ScheduledActionDTO schedule,
         IServiceScope scope, 
         CancellationToken token);
 }

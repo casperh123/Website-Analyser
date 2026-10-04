@@ -2,6 +2,7 @@
 @using Microsoft.AspNetCore.Authorization
 @using WebsiteAnalyzer.Core.Domain
 @using WebsiteAnalyzer.Core.Interfaces.Services
+@using WebsiteAnalyzer.Core.Interfaces.Services.DTOs.Email
 @using WebsiteAnalyzer.Core.Interfaces.Services.DTOs.ScheduledAction
 @using WebsiteAnalyzer.Core.Interfaces.Services.DTOs.Website
 @using WebsiteAnalyzer.Infrastructure
@@ -34,7 +35,7 @@
 
 @code {
     ICollection<WebsiteDTO> Websites { get; set; } = [];
-    ICollection<EmailSubscription> Subscriptions { get; set; } = [];
+    ICollection<EmailSubscriptionDTO> Subscriptions { get; set; } = [];
     ICollection<ScheduledActionDTO> Actions { get; set; } = [];
     ApplicationUser? User { get; set; }
 
@@ -47,11 +48,11 @@
         Actions = await ScheduleService.GetByWebsiteIds(websiteIds);
     }
 
-    public async Task RemoveSubscription(EmailSubscription subscription)
+    public async Task RemoveSubscription(EmailSubscriptionDTO subscription)
     {
         await EmailService.Unsubscribe(
             subscription.WebsiteId, 
-            subscription.ScheduleActionId, 
+            subscription.ScheduledActionId, 
             subscription.Email
         );
 
@@ -60,7 +61,7 @@
 
     public async Task AddSubscription(AddSubscription addSubscription)
     {
-        EmailSubscription subscription = await EmailService.Subscribe(
+        EmailSubscriptionDTO subscription = await EmailService.Subscribe(
             addSubscription.websiteId,
                 addSubscription.scheduledActionId,
                 addSubscription.email
