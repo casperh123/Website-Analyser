@@ -6,6 +6,7 @@ using Crawl.Visitors.BrokenLink;
 using WebsiteAnalyzer.Core.Contracts.BrokenLink;
 using WebsiteAnalyzer.Core.Domain;
 using WebsiteAnalyzer.Core.Domain.BrokenLink;
+using WebsiteAnalyzer.Core.Exceptions;
 using WebsiteAnalyzer.Core.Interfaces.Repositories;
 using WebsiteAnalyzer.Core.Interfaces.Services;
 
@@ -23,7 +24,8 @@ public class BrokenLinkService(
         IProgress<CrawlProgress>? progress = null,
         CancellationToken cancellationToken = default)
     {
-        Website website = await websiteRepository.GetByWebsiteId(websiteId);
+        Website website = await websiteRepository.GetByWebsiteId(websiteId)
+            ?? throw new NotFoundException($"Website Id: {websiteId}");
         BrokenLinkCrawl crawl = await CreateCrawlEntity(website.Url, website.UserId);
         ICollection<BrokenLinkDTO> brokenLinks = [];
         BrokenLinkVisitor brokenLinkVisitor = new BrokenLinkVisitor();
@@ -62,34 +64,25 @@ public class BrokenLinkService(
         return brokenLinks;
     }
 
-    public async Task<ICollection<BrokenLinkCrawlDTO>> GetCrawlsByUserAsync(Guid? userId)
+    public async Task<ICollection<BrokenLinkCrawlDTO>> GetCrawlsByUserAsync(Guid userId)
     {
-        if (!userId.HasValue)
-        {
-            return [];
-        }
-        
         ICollection<BrokenLinkCrawl> brokenLinkCrawls = await crawlRepository.GetByUserAsync(userId) ?? [];
 
-        return brokenLinkCrawls.Select(BrokenLinkCrawlDTO.From).ToList();
+        return [.. brokenLinkCrawls.Select(BrokenLinkCrawlDTO.From)];
     }
 
     public async Task<ICollection<BrokenLinkDTO>> GetBrokenLinksByCrawlIdAsync(Guid crawlId)
     {
         IEnumerable<BrokenLink> brokenLinks = await brokenLinkRepository.GetBrokenLinksByCrawlAsync(crawlId);
         
-        return brokenLinks
-            .Select(BrokenLinkDTO.FromBrokenLink)
-            .ToList();
+        return [.. brokenLinks.Select(BrokenLinkDTO.FromBrokenLink)];
     }
 
     public async Task<ICollection<BrokenLinkCrawlDTO>> GetBrokenLinkCrawlsByUrlAndUserId(string url, Guid userId)
     {
         IEnumerable<BrokenLinkCrawl> crawls = await crawlRepository.GetByUrlUserId(url, userId);
 
-        return crawls
-            .Select(BrokenLinkCrawlDTO.From)
-            .ToList();
+        return [.. crawls.Select(BrokenLinkCrawlDTO.From)];
     }
 
     private async Task<BrokenLink> SaveBrokenLinkAsync(BrokenLinkCrawl? crawl, BrokenLinkReport report, LinkReference reference)
