@@ -1,4 +1,11 @@
 $kind: http-request
-url: ""
-method: GET
+url: "{{url}}/websites"
+method: POST
+body:
+  type: json
+  content: |-
+    {
+        "url": "https://example.com",
+        "name": "Example"
+    }
 order: 4246765243990072

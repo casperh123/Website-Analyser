@@ -32,7 +32,7 @@ public class WebsiteRepository : BaseRepository<Website>, IWebsiteRepository
     {
         return await DbContext.Websites
             .Where(w => w.Id == websiteId)
-            .FirstAsync();
+            .FirstOrDefaultAsync();
     }
 
     public async Task<ICollection<Website>> GetAllByUserId(Guid userId)
