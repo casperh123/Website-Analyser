@@ -1,4 +1,3 @@
-using System.Runtime.CompilerServices;
 using WebsiteAnalyser.Api.ClaimsPrincipal;
 using WebsiteAnalyzer.Core.Interfaces.Services;
 

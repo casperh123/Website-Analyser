@@ -1,0 +1,5 @@
+workspace:
+  id: 6fe04ec6-ebe0-4505-83db-0aa6f5f72ff8
+cloudResources:
+  collections:
+    ../postman/collections/WebsiteAnalyser: 33614606-2b4c152c-949b-466d-af29-b223b383474d

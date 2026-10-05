@@ -1,9 +1,9 @@
 using WebsiteAnalyzer.Application.Services;
 using WebsiteAnalyzer.Core.Domain;
-using WebsiteAnalyzer.Core.Domain.Website;
 using WebsiteAnalyzer.Core.Enums;
 using WebsiteAnalyzer.Core.Interfaces.Repositories;
 using WebsiteAnalyzer.Core.Interfaces.Services;
+using WebsiteAnalyzer.Core.Interfaces.Services.DTOs.ScheduledAction;
 using WebsiteAnalyzer.Infrastructure.Repositories;
 using WebsiteAnalyzer.TestUtilities.Database;
 using WebsiteAnalyzer.TestUtilities.Testing;
@@ -17,7 +17,8 @@ public class ScheduleServiceTests : TestBase
     public ScheduleServiceTests(DatabaseFixture fixture) : base(fixture)
     {
         IScheduledActionRepository scheduleRepository = new ScheduledActionRepository(DbContext);
-        _sut = new ScheduleService(scheduleRepository);
+        IWebsiteRepository websiteRepository = new WebsiteRepository(DbContext);
+        _sut = new ScheduleService(scheduleRepository, websiteRepository);
     }
 
     [Fact]
@@ -27,7 +28,7 @@ public class ScheduleServiceTests : TestBase
         Website website = await WebsiteScenarios.CreateDefault(Guid.NewGuid(), "https://testwebsite.dk");
 
         //Act
-        ScheduledAction scheduledAction = await _sut.ScheduleAction(website, CrawlAction.CacheWarm, Frequency.SixHourly);
+        ScheduledActionDTO scheduledAction = await _sut.ScheduleAction(website.Id, CrawlAction.CacheWarm, Frequency.SixHourly);
 
         //Assert
         Assert.True(scheduledAction.IsDueForExecution);
@@ -40,7 +41,7 @@ public class ScheduleServiceTests : TestBase
         Website website = await WebsiteScenarios.CreateDefault(Guid.NewGuid(), "https://testwebsite.dk");
 
         //Act
-        ScheduledAction scheduledAction = await _sut.ScheduleAction(website, CrawlAction.CacheWarm, Frequency.SixHourly, TimeSpan.FromHours(1));
+        ScheduledActionDTO scheduledAction = await _sut.ScheduleAction(website.Id, CrawlAction.CacheWarm, Frequency.SixHourly, TimeSpan.FromHours(1));
         
         //Assert
         Assert.False(scheduledAction.IsDueForExecution);
@@ -56,7 +57,7 @@ public class ScheduleServiceTests : TestBase
         ICollection<ScheduledAction> scheduledActions = await ScheduledActionScenarios.CreateActionCombinations(website);
         
         // Act
-        ICollection<ScheduledAction> dueActions = await _sut.GetDueSchedulesBy(CrawlAction.BrokenLink);
+        ICollection<ScheduledActionDTO> dueActions = await _sut.GetDueSchedulesBy(CrawlAction.BrokenLink);
 
         // Assert
         Assert.Single(dueActions);
@@ -69,8 +70,8 @@ public class ScheduleServiceTests : TestBase
         ScheduledAction scheduledAction = await ScheduledActionScenarios.CreateWithStatus(Status.InProgress);
         
         // Act
-        await _sut.ResetActionStatus(scheduledAction);
-        ScheduledAction retrievedAction = await _sut.GetById(scheduledAction.Id);
+        await _sut.ResetActionStatus(scheduledAction.Id);
+        ScheduledActionDTO retrievedAction = await _sut.GetById(scheduledAction.Id);
 
         // Assert
         Assert.Equal(Status.Scheduled, scheduledAction.Status);

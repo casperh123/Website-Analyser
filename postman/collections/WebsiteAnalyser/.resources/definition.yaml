@@ -1,0 +1,13 @@
+$kind: collection
+description: ""
+variables:
+  - key: url
+    value: ""
+    disabled: false
+  - key: bearer_token
+    secret: true
+    disabled: false
+auth:
+  type: bearer
+  credentials:
+    token: "{{bearer_token}}"

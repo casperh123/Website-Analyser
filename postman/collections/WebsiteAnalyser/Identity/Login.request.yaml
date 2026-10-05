@@ -1,0 +1,12 @@
+$kind: http-request
+url: "{{url}}/account/login"
+method: POST
+body:
+  type: json
+  content: |-
+    {
+        "email": "example@example.com",
+        "password": "SomePassword123!"
+    }
+settings: {}
+order: 1000

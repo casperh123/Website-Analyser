@@ -10,7 +10,7 @@ public class ScheduledActionBuilder : EntityBuilder<ScheduledAction>
 
     public ScheduledActionBuilder(
         IScheduledActionRepository repository,
-        Core.Domain.Website.Website website,
+        Core.Domain.Website website,
         Frequency frequency,
         CrawlAction action,
         TimeSpan offset = default

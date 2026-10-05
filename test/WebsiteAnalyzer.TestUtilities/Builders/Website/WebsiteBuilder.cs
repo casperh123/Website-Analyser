@@ -1,17 +1,15 @@
-using System;
-using System.Collections.Generic;
+
 using WebsiteAnalyzer.Core.Domain.BrokenLink;
 using WebsiteAnalyzer.Core.Interfaces.Repositories;
-using WebsiteAnalyzer.Infrastructure.Data;
 using WebsiteAnalyzer.TestUtilities.Utilities;
 
 namespace WebsiteAnalyzer.TestUtilities.Builders.Website;
 
-public class WebsiteBuilder : EntityBuilder<Core.Domain.Website.Website>
+public class WebsiteBuilder : EntityBuilder<Core.Domain.Website>
 {
     public WebsiteBuilder(IWebsiteRepository websiteRepository) : base(websiteRepository)
     {
-        Entity = new Core.Domain.Website.Website(
+        Entity = new Core.Domain.Website(
             url: $"http://{StringGenerator.Generate(7)}.dk",
             userId: Guid.NewGuid(),
             name: $"{StringGenerator.Generate(7)}"
