@@ -6,6 +6,6 @@ public interface IWebsiteService
 {
     Task<WebsiteDTO> AddWebsite(string url, Guid userId, string? name);
     Task<ICollection<WebsiteDTO>> GetWebsitesByUserId(Guid? userId);
-    Task<WebsiteDTO> GetWebsiteByIdAndUserId(Guid id, Guid userId);
+    Task<WebsiteDTO?> GetById(Guid id);
     Task DeleteWebsite(string url, Guid userId);
 }

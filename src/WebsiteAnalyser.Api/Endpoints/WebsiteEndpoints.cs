@@ -15,6 +15,7 @@ public static class WebsiteEndpoints
                                         .RequireAuthorization();
 
         group.MapGet("/", GetAll);
+        group.MapGet("/{id}", GetById);
         group.MapPost("/", Create);
         
         return group;
@@ -25,6 +26,16 @@ public static class WebsiteEndpoints
         ICollection<WebsiteDTO> websites = await websiteService.GetWebsitesByUserId(userId);
     
         return TypedResults.Ok(websites);
+    }
+
+    public static async Task<Results<Ok<WebsiteDTO>, NotFound>> GetById(ClaimsPrincipal user, Guid id, IWebsiteService websiteService) {
+        WebsiteDTO? website = await websiteService.GetById(id);
+        
+        if(website is null) {
+            return TypedResults.NotFound();
+        }
+
+        return TypedResults.Ok(website);
     }
 
     public static async Task<Created<WebsiteDTO>> Create(
