@@ -41,12 +41,16 @@ public class WebsiteService : IWebsiteService
         return [.. websites.Select(WebsiteDTO.From)];
     }
 
-    public async Task<WebsiteDTO> GetWebsiteByIdAndUserId(Guid id, Guid userId)
+    public async Task<WebsiteDTO?> GetById(Guid id)
     {
-        Website website = await _websiteRepository.GetByIdAndUserId(id, userId)
-                          ?? throw new NotFoundException($"Website with ID: {id} not found.");
+        Website? website = await _websiteRepository.GetByWebsiteId(id);
+
+        if (website is not null)
+        {
+            return WebsiteDTO.From(website);
+        }
         
-        return WebsiteDTO.From(website);
+        return null;
     }
 
     public async Task DeleteWebsite(string url, Guid userId)

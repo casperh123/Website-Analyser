@@ -24,7 +24,7 @@
         
         if (User != null)
         {
-            Website = await WebsiteService.GetWebsiteByIdAndUserId(WebsiteId, User.Id);
+            Website = await WebsiteService.GetById(WebsiteId);
             Websites = await WebsiteService.GetWebsitesByUserId(User.Id);
         }
     }

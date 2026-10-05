@@ -1,0 +1,4 @@
+$kind: http-request
+url: "{{url}}/websites/92a9eefd-3cd9-408a-b5f4-77b4b1c9a4b0"
+method: GET
+order: 4403085411047638
