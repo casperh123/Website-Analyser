@@ -7,5 +7,5 @@ public interface IUptimeService
 {
     Task<DowntimePing> Ping(Guid websiteId);
     Task<ICollection<UptimeStatusDTO>> GetByWebsiteAfterDate(Guid websiteId, DateTime afterDate);
-
+    
 }
