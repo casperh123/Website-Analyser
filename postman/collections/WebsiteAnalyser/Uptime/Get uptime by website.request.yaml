@@ -1,0 +1,4 @@
+$kind: http-request
+url: "{{url}}/uptime/website/"
+method: GET
+order: 1791360130502
