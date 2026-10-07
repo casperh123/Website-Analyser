@@ -1,0 +1,4 @@
+$kind: http-request
+url: "{{url}}/cacheWarms/website/6f8726fc-01c9-4673-8e50-1207bbd89896"
+method: GET
+order: 1791357891271

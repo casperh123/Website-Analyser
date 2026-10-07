@@ -9,6 +9,8 @@ public static class CacheWarmingEndpoints {
         RouteGroupBuilder route = app.MapGroup("/cacheWarms")
                                         .RequireAuthorization();
 
+        route.MapGet("/website/{id}", GetAllByWebsite);
+
         return route;
     }
 
