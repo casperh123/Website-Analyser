@@ -15,7 +15,7 @@ public static class WebsiteEndpoints
                                         .RequireAuthorization();
 
         group.MapGet("/", GetAll);
-        group.MapGet("/{id}", GetById);
+        group.MapGet("/{id}", GetById); 
         group.MapDelete("/{id}", DeleteById);
         group.MapPost("/", Create);
         
