@@ -1,4 +1,4 @@
 $kind: http-request
-url: ""
+url: "{{url}}/brokenLinks"
 method: GET
 order: 1791356949530

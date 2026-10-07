@@ -41,5 +41,6 @@
 
     app.MapWebsiteEndpoints();
     app.MapBrokenLinkEndpoints();
+    app.MapCacheWarmingEndpoints();
 
     app.Run();
