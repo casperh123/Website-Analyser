@@ -43,5 +43,6 @@
     app.MapBrokenLinkEndpoints();
     app.MapCacheWarmingEndpoints();
     app.MapUptimeEndpoints();
+    app.MapEmailSubscriptionEndpoints();
 
     app.Run();
