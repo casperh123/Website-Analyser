@@ -5,7 +5,7 @@ using WebsiteAnalyzer.Core.Interfaces.Services.DTOs.Email;
 
 namespace WebsiteAnalyzer.Application.Services;
 
-public class EmailSubscriptionService : IEmailSubcriptionService
+public class EmailSubscriptionService : IEmailSubscriptionService
 {
     private readonly IEmailSubscriptionRepository _emailRepository;
 
@@ -23,9 +23,9 @@ public class EmailSubscriptionService : IEmailSubcriptionService
         return EmailSubscriptionDTO.From(subscription);
     }
 
-    public async Task Unsubscribe(Guid websiteId, Guid scheduledActionId, string email)
+    public async Task Unsubscribe(Guid websiteId)
     {
-        EmailSubscription? subscription = await _emailRepository.GetBy(websiteId, scheduledActionId, email);
+        EmailSubscription? subscription = await _emailRepository.GetBy(websiteId);
 
         if (subscription is null)
         {

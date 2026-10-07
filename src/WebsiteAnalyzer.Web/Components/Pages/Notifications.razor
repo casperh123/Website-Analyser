@@ -1,6 +1,5 @@
 @page "/Notifications"
 @using Microsoft.AspNetCore.Authorization
-@using WebsiteAnalyzer.Core.Domain
 @using WebsiteAnalyzer.Core.Interfaces.Services
 @using WebsiteAnalyzer.Core.Interfaces.Services.DTOs.Email
 @using WebsiteAnalyzer.Core.Interfaces.Services.DTOs.ScheduledAction
@@ -12,7 +11,7 @@
 
 @inject IWebsiteService WebsiteService;
 @inject IUserService UserService;
-@inject IEmailSubcriptionService EmailService;
+@inject IEmailSubscriptionService EmailService;
 @inject IScheduleService ScheduleService;
 
 @attribute [Authorize]
@@ -51,9 +50,7 @@
     public async Task RemoveSubscription(EmailSubscriptionDTO subscription)
     {
         await EmailService.Unsubscribe(
-            subscription.WebsiteId, 
-            subscription.ScheduledActionId, 
-            subscription.Email
+            subscription.Id
         );
 
         Subscriptions.Remove(subscription);

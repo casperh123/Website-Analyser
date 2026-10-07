@@ -8,12 +8,10 @@ namespace WebsiteAnalyzer.Infrastructure.Repositories;
 public class EmailSubscriptionRepository(ApplicationDbContext dbContext)
     : BaseRepository<EmailSubscription>(dbContext), IEmailSubscriptionRepository
 {
-    public async Task<EmailSubscription?> GetBy(Guid websiteId, Guid actionId, string email)
+    public async Task<EmailSubscription?> GetBy(Guid id)
     {
         return await DbContext.EmailSubcriptions
-            .Where(e => e.WebsiteId == websiteId)
-            .Where(e => e.ScheduleActionId == actionId)
-            .Where(e => e.Email == email)
+            .Where(e => e.Id == id)
             .FirstOrDefaultAsync();
     }
 
