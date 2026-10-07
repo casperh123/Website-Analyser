@@ -1,5 +1,3 @@
-    using System.Text.Json.Serialization;
-    using Microsoft.AspNetCore.Http.HttpResults;
     using WebsiteAnalyser.Api.Configuration;
     using WebsiteAnalyser.Api.Endpoints;
     using WebsiteAnalyzer.Infrastructure.Data.Configurations;
@@ -42,5 +40,6 @@
     }
 
     app.MapWebsiteEndpoints();
+    app.MapBrokenLinkEndpoints();
 
     app.Run();
