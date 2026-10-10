@@ -10,6 +10,7 @@
     builder.Configuration.AddEnvironmentVariables();
 
     builder.Services
+        .AddOpenApi()
         .AddHttpClients()
         .AddDatabaseServices(builder.Configuration)
         .AddAuthenticationServices()
