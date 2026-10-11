@@ -64,11 +64,11 @@ public class BrokenLinkService(
         return brokenLinks;
     }
 
-    public async Task<ICollection<BrokenLinkCrawlDTO>> GetCrawlsByUserAsync(Guid userId)
+    public async Task<PagedResponse<BrokenLinkCrawlDTO>> GetCrawlsByUserAsync(Guid userId, int page = 1, int perPage = 20)
     {
-        ICollection<BrokenLinkCrawl> brokenLinkCrawls = await crawlRepository.GetByUserAsync(userId) ?? [];
+        PagedResponse<BrokenLinkCrawl> brokenLinkCrawls = await crawlRepository.GetByUserAsync(userId, page, perPage);
 
-        return [.. brokenLinkCrawls.Select(BrokenLinkCrawlDTO.From)];
+        return brokenLinkCrawls.Map(BrokenLinkCrawlDTO.From);
     }
 
     public async Task<ICollection<BrokenLinkDTO>> GetBrokenLinksByCrawlIdAsync(Guid crawlId)

@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Http.HttpResults;
+using WebsiteAnalyzer.Core.Domain;
 using WebsiteAnalyzer.Core.Interfaces.Services;
 using WebsiteAnalyzer.Core.Interfaces.Services.DTOs.CacheWarm;
 
@@ -14,8 +15,8 @@ public static class CacheWarmingEndpoints {
         return route;
     }
 
-    public static async Task<Ok<ICollection<CacheWarmDTO>>> GetByWebsiteId(Guid id, ICacheWarmingService cacheWarmingService) {
-        ICollection<CacheWarmDTO> cacheWarms = await cacheWarmingService.GetCacheWarmsByWebsiteId(id);
+    public static async Task<Ok<PagedResponse<CacheWarmDTO>>> GetByWebsiteId(Guid id, ICacheWarmingService cacheWarmingService, int page = 1, int perPage = 20) {
+        PagedResponse<CacheWarmDTO> cacheWarms = await cacheWarmingService.GetCacheWarmsByWebsiteId(id, page, perPage);
 
         return TypedResults.Ok(cacheWarms);
     }

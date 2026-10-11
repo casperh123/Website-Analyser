@@ -3,6 +3,7 @@ using System.Security.Claims;
 using Microsoft.AspNetCore.Http.HttpResults;
 using WebsiteAnalyser.Api.User;
 using WebsiteAnalyzer.Core.Contracts.BrokenLink;
+using WebsiteAnalyzer.Core.Domain;
 using WebsiteAnalyzer.Core.Interfaces.Services;
 
 namespace WebsiteAnalyser.Api.Endpoints;
@@ -17,10 +18,10 @@ public static class BrokenLinkEndpoints {
         return route;
     }
 
-    public static async Task<Ok<ICollection<BrokenLinkCrawlDTO>>> Get(ClaimsPrincipal user, IBrokenLinkService brokenLinkService) {
+    public static async Task<Ok<PagedResponse<BrokenLinkCrawlDTO>>> Get(ClaimsPrincipal user, IBrokenLinkService brokenLinkService, int page = 1, int perPage = 20) {
         Guid userId = user.GetUserId();
-        ICollection<BrokenLinkCrawlDTO> brokenLinks = await brokenLinkService.GetCrawlsByUserAsync(userId);
+        PagedResponse<BrokenLinkCrawlDTO> brokenLinkCrawls = await brokenLinkService.GetCrawlsByUserAsync(userId, page, perPage);
 
-        return TypedResults.Ok(brokenLinks);
+        return TypedResults.Ok(brokenLinkCrawls);
     }
 }

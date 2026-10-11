@@ -25,4 +25,23 @@ public class CacheWarmRepository : BaseRepository<CacheWarm>, ICacheWarmReposito
             .OrderByDescending(cw => cw.EndTime)
             .ToListAsync();
     }
+
+    public async Task<PagedResponse<CacheWarm>> GetByWebsiteId(Guid id, int page = 1, int perPage = 20) {
+        IEnumerable<CacheWarm> items = await DbContext.CacheWarms
+            .Where(cw => cw.WebsiteId == id)
+            .OrderByDescending(cw => cw.EndTime)
+            .Skip((page - 1) * perPage)
+            .Take(perPage)
+            .ToListAsync();
+
+        int count = await DbContext.CacheWarms.CountAsync();
+
+        return new PagedResponse<CacheWarm>(
+            items,
+            page,
+            perPage,
+            count
+        );
+    }
+
 }
