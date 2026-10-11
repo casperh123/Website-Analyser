@@ -460,16 +460,41 @@
         "tags": [
           "BrokenLinkEndpoints"
         ],
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "type": [
+                "integer",
+                "string"
+              ],
+              "format": "int32",
+              "default": 1
+            }
+          },
+          {
+            "name": "perPage",
+            "in": "query",
+            "schema": {
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "type": [
+                "integer",
+                "string"
+              ],
+              "format": "int32",
+              "default": 20
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/BrokenLinkCrawlDTO"
-                  }
+                  "$ref": "#/components/schemas/PagedResponseOfBrokenLinkCrawlDTO"
                 }
               }
             }
@@ -477,7 +502,7 @@
         }
       }
     },
-    "/cacheWarms/website/{id}": {
+    "/websites/{id}/cachewarms": {
       "get": {
         "tags": [
           "CacheWarmingEndpoints"
@@ -510,7 +535,7 @@
         }
       }
     },
-    "/uptime/website/{id}": {
+    "/websites/{id}/uptime": {
       "get": {
         "tags": [
           "UptimeEndpoints"
@@ -543,7 +568,7 @@
         }
       }
     },
-    "/subscriptions/website/{id}": {
+    "/website/{id}/subscriptions": {
       "get": {
         "tags": [
           "EmailSubscriptionEndpoints"
@@ -1032,6 +1057,49 @@
               "null",
               "string"
             ]
+          }
+        }
+      },
+      "PagedResponseOfBrokenLinkCrawlDTO": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/BrokenLinkCrawlDTO"
+            }
+          },
+          "perPage": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "totalItems": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "page": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "totalPages": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
           }
         }
       },
