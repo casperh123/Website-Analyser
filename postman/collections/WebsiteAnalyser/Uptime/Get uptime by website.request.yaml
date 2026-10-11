@@ -1,4 +1,4 @@
 $kind: http-request
-url: "{{url}}/uptime/website/"
+url: "{{url}}//websites/6f8726fc-01c9-4673-8e50-1207bbd89896/uptime"
 method: GET
 order: 1791360130502

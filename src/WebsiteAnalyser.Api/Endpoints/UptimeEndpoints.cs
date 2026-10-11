@@ -6,10 +6,10 @@ namespace WebsiteAnalyser.Api.Endpoints;
 
 public static class UptimeEndpoints {
     public static RouteGroupBuilder MapUptimeEndpoints(this IEndpointRouteBuilder app) {
-        RouteGroupBuilder route = app.MapGroup("/uptime")
+        RouteGroupBuilder route = app.MapGroup("/")
                                         .RequireAuthorization();
 
-        route.MapGet("/website/{id}", GetByWebsiteId);
+        route.MapGet("/websites/{id}/uptime", GetByWebsiteId);
     
         return route;
     }
