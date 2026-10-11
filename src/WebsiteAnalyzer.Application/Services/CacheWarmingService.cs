@@ -68,6 +68,12 @@ public class CacheWarmingService : ICacheWarmingService
         
         return [.. cacheWarms.Select(CacheWarmDTO.From)];
     }
+
+    public async Task<PagedResponse<CacheWarmDTO>> GetCacheWarmsByWebsiteId(Guid websiteId, int page = 1, int perPage = 20) {
+        PagedResponse<CacheWarm> cacheWarms = await _cacheWarmRepository.GetByWebsiteId(websiteId, page, perPage);
+
+        return cacheWarms.Map(CacheWarmDTO.From);
+    }
     
     private async Task<int> CrawlWebsiteCore(
         string url, 
