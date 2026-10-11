@@ -12,12 +12,12 @@ public static class BrokenLinkEndpoints {
         RouteGroupBuilder route = app.MapGroup("/brokenLinks")
                                         .RequireAuthorization();
 
-        route.MapGet("/", GetAll);
+        route.MapGet("/", Get);
 
         return route;
     }
 
-    public static async Task<Ok<ICollection<BrokenLinkCrawlDTO>>> GetAll(ClaimsPrincipal user, IBrokenLinkService brokenLinkService) {
+    public static async Task<Ok<ICollection<BrokenLinkCrawlDTO>>> Get(ClaimsPrincipal user, IBrokenLinkService brokenLinkService) {
         Guid userId = user.GetUserId();
         ICollection<BrokenLinkCrawlDTO> brokenLinks = await brokenLinkService.GetCrawlsByUserAsync(userId);
 
