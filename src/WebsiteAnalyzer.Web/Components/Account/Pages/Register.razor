@@ -71,6 +71,8 @@
 
     public async Task RegisterUser(EditContext editContext)
     {
+        // TODO remove when captcha has been implemented
+        return;
         var user = CreateUser();
 
         await UserStore.SetUserNameAsync(user, Input.Email, CancellationToken.None);
