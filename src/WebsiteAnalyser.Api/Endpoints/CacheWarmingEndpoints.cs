@@ -6,15 +6,15 @@ namespace WebsiteAnalyser.Api.Endpoints;
 
 public static class CacheWarmingEndpoints {
     public static RouteGroupBuilder MapCacheWarmingEndpoints(this IEndpointRouteBuilder app) {
-        RouteGroupBuilder route = app.MapGroup("/cacheWarms")
+        RouteGroupBuilder route = app.MapGroup("/")
                                         .RequireAuthorization();
 
-        route.MapGet("/website/{id}", GetAllByWebsite);
+        route.MapGet("/websites/{id}/cachewarms", GetByWebsiteId);
 
         return route;
     }
 
-    public static async Task<Ok<ICollection<CacheWarmDTO>>> GetAllByWebsite(Guid id, ICacheWarmingService cacheWarmingService) {
+    public static async Task<Ok<ICollection<CacheWarmDTO>>> GetByWebsiteId(Guid id, ICacheWarmingService cacheWarmingService) {
         ICollection<CacheWarmDTO> cacheWarms = await cacheWarmingService.GetCacheWarmsByWebsiteId(id);
 
         return TypedResults.Ok(cacheWarms);

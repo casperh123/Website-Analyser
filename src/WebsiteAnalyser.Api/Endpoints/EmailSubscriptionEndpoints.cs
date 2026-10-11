@@ -7,12 +7,12 @@ namespace WebsiteAnalyser.Api.Endpoints;
 
 public static class EmailSubscriptionEndpoints {
     public static RouteGroupBuilder MapEmailSubscriptionEndpoints(this IEndpointRouteBuilder app) {
-        RouteGroupBuilder route = app.MapGroup("/subscriptions")
+        RouteGroupBuilder route = app.MapGroup("/")
                                         .RequireAuthorization();
 
-        route.MapGet("/website/{id}", GetByWebsite);
-        route.MapPost("/", Create);
-        route.MapDelete("/", Delete);
+        route.MapGet("/website/{id}/subscriptions", GetByWebsite);
+        route.MapPost("/subscriptions", Create);
+        route.MapDelete("/subscriptions", Delete);
 
         return route;
     }

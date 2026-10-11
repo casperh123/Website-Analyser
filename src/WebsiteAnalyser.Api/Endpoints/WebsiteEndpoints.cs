@@ -15,8 +15,8 @@ public static class WebsiteEndpoints
                                         .RequireAuthorization();
 
         group.MapGet("/", GetAll);
-        group.MapGet("/{id}", GetById); 
-        group.MapDelete("/{id}", DeleteById);
+        group.MapGet("/{id}", Get); 
+        group.MapDelete("/{id}", Delete);
         group.MapPost("/", Create);
         
         return group;
@@ -29,7 +29,7 @@ public static class WebsiteEndpoints
         return TypedResults.Ok(websites);
     }
 
-    public static async Task<Results<Ok<WebsiteDTO>, NotFound>> GetById(
+    public static async Task<Results<Ok<WebsiteDTO>, NotFound>> Get(
             ClaimsPrincipal user, 
             Guid id, 
             IWebsiteService websiteService
@@ -43,7 +43,7 @@ public static class WebsiteEndpoints
         return TypedResults.Ok(website);
     }
 
-    public static async Task<Results<NoContent, NotFound, UnauthorizedHttpResult>> DeleteById(ClaimsPrincipal user, Guid id, IWebsiteService websiteService) {
+    public static async Task<Results<NoContent, NotFound, UnauthorizedHttpResult>> Delete(ClaimsPrincipal user, Guid id, IWebsiteService websiteService) {
         WebsiteDTO? website = await websiteService.GetById(id);
         Guid userId = user.GetUserId();
 
