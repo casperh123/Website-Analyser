@@ -1,3 +1,4 @@
+using System.Runtime.CompilerServices;
 using System.Threading.Channels;
 
 namespace WebsiteAnalyser.Api.Streaming;
@@ -8,7 +9,9 @@ public class ThrottledProgress<T> : IProgress<T> {
 
     public ThrottledProgress(TimeSpan interval)  {
         _interval = interval;
-        _channel = Channel.CreateBounded<T>(1);
+        _channel = Channel.CreateBounded<T>(new BoundedChannelOptions(1){
+                FullMode = BoundedChannelFullMode.DropOldest
+        });
     }
 
     public void Report(T value) {
@@ -27,8 +30,8 @@ public class ThrottledProgress<T> : IProgress<T> {
         }
     }
 
-    public async IAsyncEnumerable<T> ReadAllAsync(CancellationToken cancellationToken) {
-        using PeriodicTimer timer = new PeriodicTimer(_interval);
+    public async IAsyncEnumerable<T> ReadAllAsync([EnumeratorCancellation] CancellationToken cancellationToken) {
+        using PeriodicTimer timer = new(_interval);
         ChannelReader<T> reader = _channel.Reader;
 
         while(!reader.Completion.IsCompleted && 
