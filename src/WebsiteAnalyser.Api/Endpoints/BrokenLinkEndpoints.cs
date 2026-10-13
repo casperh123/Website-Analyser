@@ -1,4 +1,3 @@
-
 using System.Security.Claims;
 using Crawl.Models;
 using Microsoft.AspNetCore.Http.HttpResults;
@@ -13,10 +12,11 @@ namespace WebsiteAnalyser.Api.Endpoints;
 
 public static class BrokenLinkEndpoints {
     public static RouteGroupBuilder MapBrokenLinkEndpoints(this IEndpointRouteBuilder app) {
-        RouteGroupBuilder route = app.MapGroup("/brokenLinks")
+        RouteGroupBuilder route = app.MapGroup("/")
                                         .RequireAuthorization();
 
-        route.MapGet("/", Get);
+        route.MapGet("/brokenlinks", Get);
+        route.MapPost("/websites/{id}/broken-links", StartCrawl);
 
         return route;
     }
@@ -36,7 +36,7 @@ public static class BrokenLinkEndpoints {
     }
 
     private static async IAsyncEnumerable<ProgressReport> StreamCrawl(Guid id, IBrokenLinkService brokenLinkService, CancellationToken cancellationToken) {
-        ThrottledProgress<CrawlProgress> progress = new(TimeSpan.FromSeconds(5));
+        ThrottledProgress<CrawlProgress> progress = new(TimeSpan.FromSeconds(3));
 
         Task crawlTask = progress.RunAsync(async () => {
             await brokenLinkService.FindBrokenLinks(id, progress, cancellationToken);
@@ -51,6 +51,5 @@ public static class BrokenLinkEndpoints {
         }
 
         await crawlTask;
-
     }
 }

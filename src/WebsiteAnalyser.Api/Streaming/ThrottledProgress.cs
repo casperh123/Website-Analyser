@@ -31,7 +31,9 @@ public class ThrottledProgress<T> : IProgress<T> {
         using PeriodicTimer timer = new PeriodicTimer(_interval);
         ChannelReader<T> reader = _channel.Reader;
 
-        while(await timer.WaitForNextTickAsync()) {
+        while(!reader.Completion.IsCompleted && 
+                !cancellationToken.IsCancellationRequested && 
+                await timer.WaitForNextTickAsync()) {
             T? latest = default;
 
             while(reader.TryRead(out T? item)) {
