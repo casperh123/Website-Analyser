@@ -13,6 +13,7 @@ public interface IBrokenLinkService
     );
 
     Task<PagedResponse<BrokenLinkCrawlDTO>> GetCrawlsByUserAsync(Guid userId, int page = 1, int perPage = 20);
+    Task<PagedResponse<BrokenLinkCrawlDTO>> GetCrawlsByWebsiteId(Guid id, int page = 1, int perPage = 20);
     Task<ICollection<BrokenLinkDTO>> GetBrokenLinksByCrawlIdAsync(Guid crawlId);
     Task<ICollection<BrokenLinkCrawlDTO>> GetBrokenLinkCrawlsByUrlAndUserId(string url, Guid userId);
 }

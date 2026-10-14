@@ -6,7 +6,9 @@ using WebsiteAnalyser.Api.Streaming;
 using WebsiteAnalyser.Api.User;
 using WebsiteAnalyzer.Core.Contracts.BrokenLink;
 using WebsiteAnalyzer.Core.Domain;
+using WebsiteAnalyzer.Core.Domain.BrokenLink;
 using WebsiteAnalyzer.Core.Interfaces.Services;
+using WebsiteAnalyzer.Core.Interfaces.Services.DTOs.Website;
 
 namespace WebsiteAnalyser.Api.Endpoints;
 
@@ -15,17 +17,30 @@ public static class BrokenLinkEndpoints {
         RouteGroupBuilder route = app.MapGroup("/")
                                         .RequireAuthorization();
 
-        route.MapGet("/brokenlinks", Get);
+        route.MapGet("/websites/{id}/broken-links", Get);
         route.MapPost("/websites/{id}/broken-links", StartCrawl);
 
         return route;
     }
 
-    public static async Task<Ok<PagedResponse<BrokenLinkCrawlDTO>>> Get(ClaimsPrincipal user, IBrokenLinkService brokenLinkService, int page = 1, int perPage = 20) {
+    public static async Task<Ok<PagedResponse<BrokenLinkCrawlDTO>>> Get(
+            ClaimsPrincipal user, 
+            Guid id, 
+            IBrokenLinkService brokenLinkService, 
+            IWebsiteService websiteService,
+            int page = 1, 
+            int perPage = 20) {
         Guid userId = user.GetUserId();
-        PagedResponse<BrokenLinkCrawlDTO> brokenLinkCrawls = await brokenLinkService.GetCrawlsByUserAsync(userId, page, perPage);
+        WebsiteDTO? website = await websiteService.GetById(id);
 
-        return TypedResults.Ok(brokenLinkCrawls);
+        IEnumerable<BrokenLinkCrawlDTO> crawls = await brokenLinkService.GetBrokenLinkCrawlsByUrlAndUserId(website?.Url, userId);
+        IEnumerable<BrokenLinkCrawlDTO> crawlPage = crawls
+                                                .Skip((page - 1) * perPage)
+                                                .Take(perPage);
+
+        PagedResponse<BrokenLinkCrawlDTO> pagedCrawls = new(crawlPage, page, perPage, crawls.Count());
+
+        return TypedResults.Ok(pagedCrawls);
     }
 
     public static async Task<ServerSentEventsResult<ProgressReport>> StartCrawl(IBrokenLinkService brokenLinkService, Guid id, CancellationToken cancellationToken) {

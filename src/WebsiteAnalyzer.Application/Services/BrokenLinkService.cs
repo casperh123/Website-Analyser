@@ -84,6 +84,17 @@ public class BrokenLinkService(
 
         return [.. crawls.Select(BrokenLinkCrawlDTO.From)];
     }
+    
+    public async Task<PagedResponse<BrokenLinkCrawlDTO>> GetCrawlsByWebsiteId(Guid id, int page = 1, int perPage = 20) {
+        Website? website = await websiteRepository.GetByWebsiteId(id);
+        IEnumerable<BrokenLinkCrawl> crawls = website?.BrokenLinkCrawls
+                                                    .Skip((page - 1) * perPage)
+                                                    .Take(perPage) ?? [];
+
+        PagedResponse<BrokenLinkCrawl> pagedCrawls = new(crawls, page, perPage, website?.BrokenLinkCrawls.Count ?? 0);
+
+        return pagedCrawls.Map(BrokenLinkCrawlDTO.From);
+    }
 
     private async Task<BrokenLink> SaveBrokenLinkAsync(BrokenLinkCrawl? crawl, BrokenLinkReport report, LinkReference reference)
     {

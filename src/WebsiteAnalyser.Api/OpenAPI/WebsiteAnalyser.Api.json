@@ -455,12 +455,21 @@
         }
       }
     },
-    "/brokenlinks": {
+    "/websites/{id}/broken-links": {
       "get": {
         "tags": [
           "BrokenLinkEndpoints"
         ],
         "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
           {
             "name": "page",
             "in": "query",
@@ -500,9 +509,7 @@
             }
           }
         }
-      }
-    },
-    "/websites/{id}/broken-links": {
+      },
       "post": {
         "tags": [
           "BrokenLinkEndpoints"
