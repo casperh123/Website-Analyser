@@ -1,9 +1,9 @@
 $kind: http-request
-url: "{{url}}/brokenLinks?page=1&perPage=20"
+url: "{{url}}/websites/ea4818e8-a41a-4048-b4c7-9fec1073227a/broken-links?page=2&perPage=20"
 method: GET
 queryParams:
   - key: page
-    value: "1"
+    value: "2"
     disabled: false
     description: ""
   - key: perPage
