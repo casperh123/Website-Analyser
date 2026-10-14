@@ -36,7 +36,7 @@ public class ThrottledProgress<T> : IProgress<T> {
 
         while(!reader.Completion.IsCompleted && 
                 !cancellationToken.IsCancellationRequested && 
-                await timer.WaitForNextTickAsync()) {
+                await timer.WaitForNextTickAsync(cancellationToken)) {
             T? latest = default;
 
             while(reader.TryRead(out T? item)) {
