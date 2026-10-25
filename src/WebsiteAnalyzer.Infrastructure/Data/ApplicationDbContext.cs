@@ -32,16 +32,18 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser, IdentityR
     {
         base.OnModelCreating(builder);
 
-        builder.Entity<OrderCheckKeys>().HasKey(e => new { e.WebsiteId });
+        builder.Entity<OrderCheckKeys>()
+            .HasKey(e => new { e.WebsiteId });
         
         // Configure Website entity
         builder.Entity<Website>()
-            .HasKey(w =>
-                new
-                {
-                    w.Url,
-                    w.UserId
-                });
+            .HasIndex(w => new { w.Url, w.UserId })
+            .IsUnique();
+
+        builder.Entity<Website>()
+            .HasOne(w => w.OrderCheckKeys)
+            .WithOne(k => k.Website)
+            .HasForeignKey<OrderCheckKeys>(k => k.WebsiteId);
 
         // Configure CacheWarm and Website relationship
         builder.Entity<CacheWarm>()

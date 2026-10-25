@@ -13,34 +13,28 @@ public class BrokenLinkCrawlRepository : BaseRepository<BrokenLinkCrawl>, IBroke
         
     }
 
-    public async Task<ICollection<BrokenLinkCrawl>> GetByUserAsync(Guid userId)
+    public async Task<ICollection<BrokenLinkCrawl>> GetByWebsiteId(Guid websiteId)
     {
         return await DbContext.BrokenLinkCrawls
-            .Where(crawl => crawl.UserId == userId)
-            .Include(crawl => crawl.BrokenLinks)
-            .ToListAsync();
-    }
-
-    public async Task<PagedResponse<BrokenLinkCrawl>> GetByUserAsync(Guid userId, int page = 1, int perPage = 20) {
-        IEnumerable<BrokenLinkCrawl> items = await DbContext.BrokenLinkCrawls
-            .Where(crawl => crawl.UserId == userId)
-            .Skip((page - 1) * perPage)
-            .Take(perPage)
-            .Include(crawl => crawl.BrokenLinks)
-            .ToListAsync();
-
-        int count = await DbContext.BrokenLinkCrawls.CountAsync();
-
-        return new PagedResponse<BrokenLinkCrawl>(items, page, perPage, count);
-    }
-
-   public async Task<ICollection<BrokenLinkCrawl>> GetByUrlUserId(string url, Guid userId)
-    {
-        return await DbContext.BrokenLinkCrawls
-            .Where(crawl => crawl.Url == url)
-            .Where(crawl => crawl.UserId == userId)
+            .Where(crawl => crawl.WebsiteId == websiteId)
             .Include(crawl => crawl.BrokenLinks)
             .OrderByDescending(crawl => crawl.Date)
             .ToListAsync();
+    }
+
+    public async Task<PagedResponse<BrokenLinkCrawl>> GetByWebsiteId(Guid websiteId, int page = 1, int perPage = 20) {
+        IEnumerable<BrokenLinkCrawl> crawls = await DbContext.BrokenLinkCrawls
+            .Where(crawl => crawl.WebsiteId == websiteId)
+            .OrderByDescending(crawl => crawl.Date)
+            .Skip((page - 1) * perPage)
+            .Take(perPage)
+            .Include(crawl => crawl.BrokenLinks)
+            .ToListAsync();    
+
+        int count = await DbContext.BrokenLinkCrawls
+            .Where(crawl => crawl.WebsiteId == websiteId)
+            .CountAsync();
+    
+        return new PagedResponse<BrokenLinkCrawl>(crawls, page, perPage, count);
     }
 }

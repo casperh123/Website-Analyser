@@ -6,18 +6,18 @@ public record BrokenLinkCrawl
     {
     }
 
-    public BrokenLinkCrawl(Guid userId, string url)
+    public BrokenLinkCrawl(Website website)
     {
         Id = Guid.NewGuid();
-        UserId = userId;
-        Url = url;
+        WebsiteId = website.Id;
+        Website = website;
         BrokenLinks = [];
         Date = DateTime.UtcNow;
     }
 
     public Guid Id { get; set; }
-    public Guid UserId { get; set; }
-    public string Url { get; set; }
+    public Guid WebsiteId { get; set; }
+    public Website Website { get; set; }
     public ICollection<BrokenLink> BrokenLinks { get; set; } = [];
     public int LinksChecked { get; set; }
     public DateTime Date { get; set; }

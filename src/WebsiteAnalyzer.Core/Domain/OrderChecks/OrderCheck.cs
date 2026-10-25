@@ -4,6 +4,7 @@ public record OrderCheck
 {
     public Guid Id { get; set; } = Guid.NewGuid();
     public Guid WebsiteId { get; set; }
+    public Website Website { get; set; }
     public TimeSpan TimeSinceLastOrder { get; set; }
     
     public OrderCheck() {}

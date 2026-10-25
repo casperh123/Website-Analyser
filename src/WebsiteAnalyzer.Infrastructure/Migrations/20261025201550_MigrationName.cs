@@ -51,87 +51,17 @@ namespace WebsiteAnalyzer.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "CacheWarms",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "TEXT", nullable: false),
-                    WebsiteId = table.Column<Guid>(type: "TEXT", nullable: false),
-                    VisitedPages = table.Column<int>(type: "INTEGER", nullable: false),
-                    StartTimeUtc = table.Column<DateTime>(type: "TEXT", nullable: false),
-                    EndTime = table.Column<DateTime>(type: "TEXT", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_CacheWarms", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "DownTimePings",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "TEXT", nullable: false),
-                    WebsiteId = table.Column<Guid>(type: "TEXT", nullable: false),
-                    TimeRecorded = table.Column<DateTime>(type: "TEXT", nullable: false),
-                    StatusCode = table.Column<int>(type: "INTEGER", nullable: true),
-                    Reason = table.Column<string>(type: "TEXT", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_DownTimePings", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "EmailSubcriptions",
-                columns: table => new
-                {
-                    WebsiteId = table.Column<Guid>(type: "TEXT", nullable: false),
-                    SubscripedAction = table.Column<int>(type: "INTEGER", nullable: false),
-                    Email = table.Column<string>(type: "TEXT", nullable: false),
-                    Id = table.Column<Guid>(type: "TEXT", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_EmailSubcriptions", x => new { x.WebsiteId, x.SubscripedAction, x.Email });
-                });
-
-            migrationBuilder.CreateTable(
-                name: "OrderCheckKeys",
-                columns: table => new
-                {
-                    WebsiteId = table.Column<Guid>(type: "TEXT", nullable: false),
-                    Key = table.Column<string>(type: "TEXT", nullable: false),
-                    Secret = table.Column<string>(type: "TEXT", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_OrderCheckKeys", x => x.WebsiteId);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "OrderChecks",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "TEXT", nullable: false),
-                    WebsiteId = table.Column<Guid>(type: "TEXT", nullable: false),
-                    TimeSinceLastOrder = table.Column<TimeSpan>(type: "TEXT", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_OrderChecks", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "Websites",
                 columns: table => new
                 {
-                    Url = table.Column<string>(type: "TEXT", nullable: false),
-                    UserId = table.Column<Guid>(type: "TEXT", nullable: false),
                     Id = table.Column<Guid>(type: "TEXT", nullable: false),
-                    Name = table.Column<string>(type: "TEXT", nullable: true)
+                    Url = table.Column<string>(type: "TEXT", nullable: false),
+                    Name = table.Column<string>(type: "TEXT", nullable: true),
+                    UserId = table.Column<Guid>(type: "TEXT", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Websites", x => new { x.Url, x.UserId });
+                    table.PrimaryKey("PK_Websites", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -245,21 +175,119 @@ namespace WebsiteAnalyzer.Infrastructure.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "TEXT", nullable: false),
-                    UserId = table.Column<Guid>(type: "TEXT", nullable: false),
-                    Url = table.Column<string>(type: "TEXT", nullable: false),
+                    WebsiteId = table.Column<Guid>(type: "TEXT", nullable: false),
                     LinksChecked = table.Column<int>(type: "INTEGER", nullable: false),
-                    Date = table.Column<DateTime>(type: "TEXT", nullable: false),
-                    WebsiteUrl = table.Column<string>(type: "TEXT", nullable: true),
-                    WebsiteUserId = table.Column<Guid>(type: "TEXT", nullable: true)
+                    Date = table.Column<DateTime>(type: "TEXT", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_BrokenLinkCrawls", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_BrokenLinkCrawls_Websites_WebsiteUrl_WebsiteUserId",
-                        columns: x => new { x.WebsiteUrl, x.WebsiteUserId },
+                        name: "FK_BrokenLinkCrawls_Websites_WebsiteId",
+                        column: x => x.WebsiteId,
                         principalTable: "Websites",
-                        principalColumns: new[] { "Url", "UserId" });
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "CacheWarms",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "TEXT", nullable: false),
+                    WebsiteId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    VisitedPages = table.Column<int>(type: "INTEGER", nullable: false),
+                    StartTimeUtc = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    EndTime = table.Column<DateTime>(type: "TEXT", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_CacheWarms", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_CacheWarms_Websites_WebsiteId",
+                        column: x => x.WebsiteId,
+                        principalTable: "Websites",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "DownTimePings",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "TEXT", nullable: false),
+                    WebsiteId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    TimeRecorded = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    StatusCode = table.Column<int>(type: "INTEGER", nullable: true),
+                    Reason = table.Column<string>(type: "TEXT", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_DownTimePings", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_DownTimePings_Websites_WebsiteId",
+                        column: x => x.WebsiteId,
+                        principalTable: "Websites",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "EmailSubcriptions",
+                columns: table => new
+                {
+                    WebsiteId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    SubscripedAction = table.Column<int>(type: "INTEGER", nullable: false),
+                    Email = table.Column<string>(type: "TEXT", nullable: false),
+                    Id = table.Column<Guid>(type: "TEXT", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_EmailSubcriptions", x => new { x.WebsiteId, x.SubscripedAction, x.Email });
+                    table.ForeignKey(
+                        name: "FK_EmailSubcriptions_Websites_WebsiteId",
+                        column: x => x.WebsiteId,
+                        principalTable: "Websites",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "OrderCheckKeys",
+                columns: table => new
+                {
+                    WebsiteId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    Key = table.Column<string>(type: "TEXT", nullable: false),
+                    Secret = table.Column<string>(type: "TEXT", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_OrderCheckKeys", x => x.WebsiteId);
+                    table.ForeignKey(
+                        name: "FK_OrderCheckKeys_Websites_WebsiteId",
+                        column: x => x.WebsiteId,
+                        principalTable: "Websites",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "OrderChecks",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "TEXT", nullable: false),
+                    WebsiteId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    TimeSinceLastOrder = table.Column<TimeSpan>(type: "TEXT", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_OrderChecks", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_OrderChecks_Websites_WebsiteId",
+                        column: x => x.WebsiteId,
+                        principalTable: "Websites",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -268,8 +296,6 @@ namespace WebsiteAnalyzer.Infrastructure.Migrations
                 {
                     Id = table.Column<Guid>(type: "TEXT", nullable: false),
                     WebsiteId = table.Column<Guid>(type: "TEXT", nullable: false),
-                    WebsiteUrl = table.Column<string>(type: "TEXT", nullable: false),
-                    WebsiteUserId = table.Column<Guid>(type: "TEXT", nullable: false),
                     Frequency = table.Column<int>(type: "INTEGER", nullable: false),
                     Action = table.Column<int>(type: "INTEGER", nullable: false),
                     LastCrawlDateUtc = table.Column<DateTime>(type: "TEXT", nullable: false),
@@ -279,10 +305,10 @@ namespace WebsiteAnalyzer.Infrastructure.Migrations
                 {
                     table.PrimaryKey("PK_ScheduledActions", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_ScheduledActions_Websites_WebsiteUrl_WebsiteUserId",
-                        columns: x => new { x.WebsiteUrl, x.WebsiteUserId },
+                        name: "FK_ScheduledActions_Websites_WebsiteId",
+                        column: x => x.WebsiteId,
                         principalTable: "Websites",
-                        principalColumns: new[] { "Url", "UserId" },
+                        principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
@@ -346,9 +372,9 @@ namespace WebsiteAnalyzer.Infrastructure.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_BrokenLinkCrawls_WebsiteUrl_WebsiteUserId",
+                name: "IX_BrokenLinkCrawls_WebsiteId",
                 table: "BrokenLinkCrawls",
-                columns: new[] { "WebsiteUrl", "WebsiteUserId" });
+                column: "WebsiteId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_BrokenLinks_BrokenLinkCrawlId",
@@ -356,9 +382,30 @@ namespace WebsiteAnalyzer.Infrastructure.Migrations
                 column: "BrokenLinkCrawlId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ScheduledActions_WebsiteUrl_WebsiteUserId",
+                name: "IX_CacheWarms_WebsiteId",
+                table: "CacheWarms",
+                column: "WebsiteId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_DownTimePings_WebsiteId",
+                table: "DownTimePings",
+                column: "WebsiteId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_OrderChecks_WebsiteId",
+                table: "OrderChecks",
+                column: "WebsiteId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ScheduledActions_WebsiteId",
                 table: "ScheduledActions",
-                columns: new[] { "WebsiteUrl", "WebsiteUserId" });
+                column: "WebsiteId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Websites_Url_UserId",
+                table: "Websites",
+                columns: new[] { "Url", "UserId" },
+                unique: true);
         }
 
         /// <inheritdoc />
