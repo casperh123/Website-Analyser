@@ -4,9 +4,9 @@ using Microsoft.AspNetCore.Http.HttpResults;
 using WebsiteAnalyser.Api.DTOs;
 using WebsiteAnalyser.Api.Streaming;
 using WebsiteAnalyser.Api.User;
-using WebsiteAnalyzer.Core.Contracts.BrokenLink;
 using WebsiteAnalyzer.Core.Domain;
 using WebsiteAnalyzer.Core.Interfaces.Services;
+using WebsiteAnalyzer.Core.Interfaces.Services.DTOs.BrokenLink;
 using WebsiteAnalyzer.Core.Interfaces.Services.DTOs.Websites;
 
 namespace WebsiteAnalyser.Api.Endpoints;
@@ -29,15 +29,7 @@ public static class BrokenLinkEndpoints {
             IWebsiteService websiteService,
             int page = 1, 
             int perPage = 20) {
-        Guid userId = user.GetUserId();
-        WebsiteDTO? website = await websiteService.GetById(id);
-
-        IEnumerable<BrokenLinkCrawlDTO> crawls = await brokenLinkService.GetBrokenLinkCrawlsByUrlAndUserId(website?.Url, userId);
-        IEnumerable<BrokenLinkCrawlDTO> crawlPage = crawls
-                                                .Skip((page - 1) * perPage)
-                                                .Take(perPage);
-
-        PagedResponse<BrokenLinkCrawlDTO> pagedCrawls = new(crawlPage, page, perPage, crawls.Count());
+        PagedResponse<BrokenLinkCrawlDTO> pagedCrawls = await brokenLinkService.GetCrawlsByWebsiteId(id, page, perPage);
 
         return TypedResults.Ok(pagedCrawls);
     }

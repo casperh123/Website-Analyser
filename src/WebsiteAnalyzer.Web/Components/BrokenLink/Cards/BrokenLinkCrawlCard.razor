@@ -1,6 +1,8 @@
 @using System.Text
 @using Radzen.Documents.Spreadsheet
 @using WebsiteAnalyzer.Core.Contracts.BrokenLink
+@using WebsiteAnalyzer.Core.Interfaces.Services.DTOs.BrokenLink
+@using WebsiteAnalyzer.Core.Interfaces.Services.DTOs.Websites
 @using WebsiteAnalyzer.Web.Components.General.Toggles
 
 @inject IJSRuntime JSRuntime
@@ -10,7 +12,7 @@
         <RadzenRow>
             <RadzenStack>
                 <RadzenText TextStyle="TextStyle.Body1">Url</RadzenText>
-                <RadzenText TextStyle="TextStyle.Body2">@Crawl.Url</RadzenText>
+                <RadzenText TextStyle="TextStyle.Body2">@Website.Url</RadzenText>
             </RadzenStack>
             <RadzenStack>
                 <RadzenText TextStyle="TextStyle.Body1">Links Checked</RadzenText>
@@ -40,12 +42,14 @@
     [Parameter] 
     public required BrokenLinkCrawlDTO Crawl { get; set; }
 
+    [Parameter, EditorRequired]
+    public required WebsiteDTO Website { get; set; }
+
     private bool _open = false;
 
     public async Task DownloadCVS()
     {
-        ICollection<BrokenLinkDTO> brokenLinks = Crawl.BrokenLinks;
-        string websiteName = Crawl.Url;
+        ICollection<BrokenLinkDTO> brokenLinks = Crawl.BrokenLinks;;
 
         Workbook workbook = InitializeWorkBook();
         
@@ -53,7 +57,7 @@
         workbook.SaveAsCsv(ms, BuildExportOptions());
         ms.Position = 0;
         using var streamRef = new DotNetStreamReference(ms);
-        await JSRuntime.InvokeVoidAsync("Radzen.downloadFile", $"${Uri.EscapeDataString(websiteName)}.csv", streamRef);
+        await JSRuntime.InvokeVoidAsync("Radzen.downloadFile", $"${Uri.EscapeDataString(Website.Url)}.csv", streamRef);
     }
 
     private Workbook InitializeWorkBook()

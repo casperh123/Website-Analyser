@@ -835,12 +835,12 @@
             "type": "string",
             "format": "uuid"
           },
-          "userId": {
+          "websiteId": {
             "type": "string",
             "format": "uuid"
           },
-          "url": {
-            "type": "string"
+          "website": {
+            "$ref": "#/components/schemas/Website"
           },
           "brokenLinks": {
             "type": "array",
@@ -871,9 +871,6 @@
               "string"
             ],
             "format": "uuid"
-          },
-          "url": {
-            "type": "string"
           },
           "localTime": {
             "type": "string",
@@ -924,6 +921,57 @@
           },
           "statusCode": {
             "$ref": "#/components/schemas/HttpStatusCode"
+          }
+        }
+      },
+      "CacheWarm": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "websiteId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "website": {
+            "$ref": "#/components/schemas/Website"
+          },
+          "visitedPages": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "startTimeUtc": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "endTime": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "averagePageTime": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "isCompleted": {
+            "type": "boolean"
+          },
+          "totalTime": {
+            "pattern": "^-?(\\d+\\.)?\\d{2}:\\d{2}:\\d{2}(\\.\\d{1,7})?$",
+            "type": "string"
+          },
+          "startTimeLocal": {
+            "type": "string",
+            "format": "date-time"
           }
         }
       },
@@ -1012,6 +1060,39 @@
           }
         }
       },
+      "DowntimePing": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "websiteId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "timeRecorded": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "statusCode": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/HttpStatusCode"
+              }
+            ]
+          },
+          "reason": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
       "EmailSubscriptionDTO": {
         "required": [
           "email"
@@ -1044,6 +1125,9 @@
             "type": "string"
           }
         }
+      },
+      "Frequency": {
+        "type": "integer"
       },
       "HttpStatusCode": {
         "type": "integer"
@@ -1157,6 +1241,44 @@
               "null",
               "string"
             ]
+          }
+        }
+      },
+      "OrderCheck": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "websiteId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "website": {
+            "$ref": "#/components/schemas/Website"
+          },
+          "timeSinceLastOrder": {
+            "pattern": "^-?(\\d+\\.)?\\d{2}:\\d{2}:\\d{2}(\\.\\d{1,7})?$",
+            "type": "string"
+          }
+        }
+      },
+      "OrderCheckKeys": {
+        "type": "object",
+        "properties": {
+          "websiteId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "website": {
+            "$ref": "#/components/schemas/Website"
+          },
+          "key": {
+            "type": "string"
+          },
+          "secret": {
+            "type": "string"
           }
         }
       },
@@ -1327,6 +1449,50 @@
           }
         }
       },
+      "ScheduledAction": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "websiteId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "website": {
+            "$ref": "#/components/schemas/Website"
+          },
+          "frequency": {
+            "$ref": "#/components/schemas/Frequency"
+          },
+          "action": {
+            "$ref": "#/components/schemas/CrawlAction"
+          },
+          "lastCrawlDateUtc": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "status": {
+            "$ref": "#/components/schemas/Status"
+          },
+          "nextCrawlUtc": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "nextCrawlLocal": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "lastCrawlLocal": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "isDueForExecution": {
+            "type": "boolean"
+          }
+        }
+      },
       "SseItemOfProgressReport": {
         "type": "object",
         "properties": {
@@ -1353,6 +1519,9 @@
             ]
           }
         }
+      },
+      "Status": {
+        "type": "integer"
       },
       "TwoFactorRequest": {
         "type": "object",
@@ -1446,6 +1615,61 @@
               "null",
               "string"
             ]
+          }
+        }
+      },
+      "Website": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "url": {
+            "type": "string"
+          },
+          "name": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "userId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "orderCheckKeys": {
+            "$ref": "#/components/schemas/OrderCheckKeys"
+          },
+          "brokenLinkCrawls": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/BrokenLinkCrawl"
+            }
+          },
+          "cacheWarms": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CacheWarm"
+            }
+          },
+          "scheduledActions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ScheduledAction"
+            }
+          },
+          "downtimePings": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DowntimePing"
+            }
+          },
+          "orderChecks": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/OrderCheck"
+            }
           }
         }
       },

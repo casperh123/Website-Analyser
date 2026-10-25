@@ -11,7 +11,7 @@ using WebsiteAnalyzer.Infrastructure.Data;
 namespace WebsiteAnalyzer.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20261025191450_MigrationName")]
+    [Migration("20261025201550_MigrationName")]
     partial class MigrationName
     {
         /// <inheritdoc />
@@ -192,22 +192,12 @@ namespace WebsiteAnalyzer.Infrastructure.Migrations
                     b.Property<int>("LinksChecked")
                         .HasColumnType("INTEGER");
 
-                    b.Property<string>("Url")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("WebsiteUrl")
-                        .HasColumnType("TEXT");
-
-                    b.Property<Guid?>("WebsiteUserId")
+                    b.Property<Guid>("WebsiteId")
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("WebsiteUrl", "WebsiteUserId");
+                    b.HasIndex("WebsiteId");
 
                     b.ToTable("BrokenLinkCrawls");
                 });
@@ -231,6 +221,8 @@ namespace WebsiteAnalyzer.Infrastructure.Migrations
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("WebsiteId");
 
                     b.ToTable("CacheWarms");
                 });
@@ -268,13 +260,14 @@ namespace WebsiteAnalyzer.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("WebsiteId");
+
                     b.ToTable("OrderChecks");
                 });
 
             modelBuilder.Entity("WebsiteAnalyzer.Core.Domain.OrderChecks.OrderCheckKeys", b =>
                 {
                     b.Property<Guid>("WebsiteId")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Key")
@@ -311,16 +304,9 @@ namespace WebsiteAnalyzer.Infrastructure.Migrations
                     b.Property<Guid>("WebsiteId")
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("WebsiteUrl")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<Guid>("WebsiteUserId")
-                        .HasColumnType("TEXT");
-
                     b.HasKey("Id");
 
-                    b.HasIndex("WebsiteUrl", "WebsiteUserId");
+                    b.HasIndex("WebsiteId");
 
                     b.ToTable("ScheduledActions");
                 });
@@ -345,24 +331,31 @@ namespace WebsiteAnalyzer.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("WebsiteId");
+
                     b.ToTable("DownTimePings");
                 });
 
             modelBuilder.Entity("WebsiteAnalyzer.Core.Domain.Website", b =>
                 {
-                    b.Property<string>("Url")
-                        .HasColumnType("TEXT");
-
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("TEXT");
-
                     b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Name")
                         .HasColumnType("TEXT");
 
-                    b.HasKey("Url", "UserId");
+                    b.Property<string>("Url")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Url", "UserId")
+                        .IsUnique();
 
                     b.ToTable("Websites");
                 });
@@ -494,20 +487,77 @@ namespace WebsiteAnalyzer.Infrastructure.Migrations
 
             modelBuilder.Entity("WebsiteAnalyzer.Core.Domain.BrokenLink.BrokenLinkCrawl", b =>
                 {
-                    b.HasOne("WebsiteAnalyzer.Core.Domain.Website", null)
+                    b.HasOne("WebsiteAnalyzer.Core.Domain.Website", "Website")
                         .WithMany("BrokenLinkCrawls")
-                        .HasForeignKey("WebsiteUrl", "WebsiteUserId");
+                        .HasForeignKey("WebsiteId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Website");
+                });
+
+            modelBuilder.Entity("WebsiteAnalyzer.Core.Domain.CacheWarm", b =>
+                {
+                    b.HasOne("WebsiteAnalyzer.Core.Domain.Website", "Website")
+                        .WithMany("CacheWarms")
+                        .HasForeignKey("WebsiteId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Website");
+                });
+
+            modelBuilder.Entity("WebsiteAnalyzer.Core.Domain.EmailSubscription", b =>
+                {
+                    b.HasOne("WebsiteAnalyzer.Core.Domain.Website", "Website")
+                        .WithMany()
+                        .HasForeignKey("WebsiteId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Website");
+                });
+
+            modelBuilder.Entity("WebsiteAnalyzer.Core.Domain.OrderChecks.OrderCheck", b =>
+                {
+                    b.HasOne("WebsiteAnalyzer.Core.Domain.Website", "Website")
+                        .WithMany("OrderChecks")
+                        .HasForeignKey("WebsiteId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Website");
+                });
+
+            modelBuilder.Entity("WebsiteAnalyzer.Core.Domain.OrderChecks.OrderCheckKeys", b =>
+                {
+                    b.HasOne("WebsiteAnalyzer.Core.Domain.Website", "Website")
+                        .WithOne("OrderCheckKeys")
+                        .HasForeignKey("WebsiteAnalyzer.Core.Domain.OrderChecks.OrderCheckKeys", "WebsiteId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Website");
                 });
 
             modelBuilder.Entity("WebsiteAnalyzer.Core.Domain.ScheduledAction", b =>
                 {
                     b.HasOne("WebsiteAnalyzer.Core.Domain.Website", "Website")
-                        .WithMany()
-                        .HasForeignKey("WebsiteUrl", "WebsiteUserId")
+                        .WithMany("ScheduledActions")
+                        .HasForeignKey("WebsiteId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Website");
+                });
+
+            modelBuilder.Entity("WebsiteAnalyzer.Core.Domain.Uptime.DowntimePing", b =>
+                {
+                    b.HasOne("WebsiteAnalyzer.Core.Domain.Website", null)
+                        .WithMany("DowntimePings")
+                        .HasForeignKey("WebsiteId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("WebsiteAnalyzer.Core.Domain.BrokenLink.BrokenLinkCrawl", b =>
@@ -518,6 +568,17 @@ namespace WebsiteAnalyzer.Infrastructure.Migrations
             modelBuilder.Entity("WebsiteAnalyzer.Core.Domain.Website", b =>
                 {
                     b.Navigation("BrokenLinkCrawls");
+
+                    b.Navigation("CacheWarms");
+
+                    b.Navigation("DowntimePings");
+
+                    b.Navigation("OrderCheckKeys")
+                        .IsRequired();
+
+                    b.Navigation("OrderChecks");
+
+                    b.Navigation("ScheduledActions");
                 });
 #pragma warning restore 612, 618
         }

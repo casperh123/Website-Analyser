@@ -1,15 +1,16 @@
 @page "/Website/{WebsiteId:guid}/brokenlinks"
 
-@using global::Crawl.Models
-@using WebsiteAnalyzer.Core.Contracts.BrokenLink
+@using WebsiteAnalyzer.Core.Domain
 @using WebsiteAnalyzer.Core.Enums
 @using WebsiteAnalyzer.Core.Interfaces.Services
+@using WebsiteAnalyzer.Core.Interfaces.Services.DTOs.BrokenLink
 @using WebsiteAnalyzer.Core.Interfaces.Services.DTOs.ScheduledAction
 @using WebsiteAnalyzer.Web.Components.BrokenLink.Cards
 @using WebsiteAnalyzer.Web.Components.General.Lists
 @using WebsiteAnalyzer.Web.Components.Layout
 @using WebsiteAnalyzer.Web.Components.ScheduledAction
 @using WebsiteAnalyzer.Web.Components.WebsiteInputs
+@using global::Crawl.Models
 
 @inherits WebsiteAnalyzer.Web.Components.Templates.WebsiteComponent
 
@@ -83,8 +84,10 @@
             InvokeAsync(StateHasChanged);
         });
 
+        PagedResponse<BrokenLinkCrawlDTO> brokenLink = await BrokenLinkService.GetCrawlsByWebsiteId(Website.Id);
+
         ScheduledAction = await ScheduledActionService.GetActionByWebsiteIdAndType(Website.Id, CrawlAction.BrokenLink);
-        BrokenLinkCrawls = await BrokenLinkService.GetBrokenLinkCrawlsByUrlAndUserId(Website.Url, User.Id);
+        BrokenLinkCrawls = brokenLink.Items.ToList();
     }
 
     public async Task FindBrokenLinks()
@@ -96,7 +99,10 @@
             
             await BrokenLinkService.FindBrokenLinks(Website.Id, _progress, token);
         });
+
+
+        PagedResponse<BrokenLinkCrawlDTO> brokenLink = await BrokenLinkService.GetCrawlsByWebsiteId(Website.Id);
         
-        BrokenLinkCrawls = await BrokenLinkService.GetBrokenLinkCrawlsByUrlAndUserId(Website.Url, User.Id);
+        BrokenLinkCrawls = brokenLink.Items.ToList();
     }
 }
