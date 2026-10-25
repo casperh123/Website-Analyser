@@ -54,9 +54,9 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser, IdentityR
             .HasKey(ping => ping.Id);
 
         builder.Entity<EmailSubscription>()
-            .HasKey(sub =>
+            .HasKey(s =>
             new {
-                sub.WebsiteId, sub.ScheduleActionId, sub.Email
+                s.WebsiteId, s.SubscripedAction, s.Email
             });
 
         // Configure Identity entities to use GUID

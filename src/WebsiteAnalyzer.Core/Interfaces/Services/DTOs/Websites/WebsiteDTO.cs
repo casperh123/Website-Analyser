@@ -1,6 +1,6 @@
 using WebsiteAnalyzer.Core.Domain.BrokenLink;
 
-namespace WebsiteAnalyzer.Core.Interfaces.Services.DTOs.Website;
+namespace WebsiteAnalyzer.Core.Interfaces.Services.DTOs.Websites;
 
 public record WebsiteDTO
 {

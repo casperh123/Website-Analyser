@@ -15,7 +15,7 @@ namespace WebsiteAnalyzer.Infrastructure.Migrations
         protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
-            modelBuilder.HasAnnotation("ProductVersion", "10.0.11");
+            modelBuilder.HasAnnotation("ProductVersion", "10.0.12");
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole<System.Guid>", b =>
                 {
@@ -237,13 +237,16 @@ namespace WebsiteAnalyzer.Infrastructure.Migrations
                     b.Property<Guid>("WebsiteId")
                         .HasColumnType("TEXT");
 
-                    b.Property<Guid>("ScheduleActionId")
-                        .HasColumnType("TEXT");
+                    b.Property<int>("SubscripedAction")
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("Email")
                         .HasColumnType("TEXT");
 
-                    b.HasKey("WebsiteId", "ScheduleActionId", "Email");
+                    b.Property<Guid>("Id")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("WebsiteId", "SubscripedAction", "Email");
 
                     b.ToTable("EmailSubcriptions");
                 });
@@ -342,7 +345,7 @@ namespace WebsiteAnalyzer.Infrastructure.Migrations
                     b.ToTable("DownTimePings");
                 });
 
-            modelBuilder.Entity("WebsiteAnalyzer.Core.Domain.Website.Website", b =>
+            modelBuilder.Entity("WebsiteAnalyzer.Core.Domain.Website", b =>
                 {
                     b.Property<string>("Url")
                         .HasColumnType("TEXT");
@@ -488,14 +491,14 @@ namespace WebsiteAnalyzer.Infrastructure.Migrations
 
             modelBuilder.Entity("WebsiteAnalyzer.Core.Domain.BrokenLink.BrokenLinkCrawl", b =>
                 {
-                    b.HasOne("WebsiteAnalyzer.Core.Domain.Website.Website", null)
+                    b.HasOne("WebsiteAnalyzer.Core.Domain.Website", null)
                         .WithMany("BrokenLinkCrawls")
                         .HasForeignKey("WebsiteUrl", "WebsiteUserId");
                 });
 
             modelBuilder.Entity("WebsiteAnalyzer.Core.Domain.ScheduledAction", b =>
                 {
-                    b.HasOne("WebsiteAnalyzer.Core.Domain.Website.Website", "Website")
+                    b.HasOne("WebsiteAnalyzer.Core.Domain.Website", "Website")
                         .WithMany()
                         .HasForeignKey("WebsiteUrl", "WebsiteUserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -509,7 +512,7 @@ namespace WebsiteAnalyzer.Infrastructure.Migrations
                     b.Navigation("BrokenLinks");
                 });
 
-            modelBuilder.Entity("WebsiteAnalyzer.Core.Domain.Website.Website", b =>
+            modelBuilder.Entity("WebsiteAnalyzer.Core.Domain.Website", b =>
                 {
                     b.Navigation("BrokenLinkCrawls");
                 });

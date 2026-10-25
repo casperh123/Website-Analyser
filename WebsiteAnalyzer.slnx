@@ -1,0 +1,16 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/WebsiteAnalyser.Api/WebsiteAnalyser.Api.csproj" />
+    <Project Path="src/WebsiteAnalyzer.Application/WebsiteAnalyzer.Application.csproj" />
+    <Project Path="src/WebsiteAnalyzer.Core/WebsiteAnalyzer.Core.csproj" />
+    <Project Path="src/WebsiteAnalyzer.Infrastructure/WebsiteAnalyzer.Infrastructure.csproj" />
+    <Project Path="src/WebsiteAnalyzer.Services/WebsiteAnalyzer.Services.csproj" />
+    <Project Path="src/WebsiteAnalyzer.Web/WebsiteAnalyzer.Web.csproj" />
+  </Folder>
+  <Folder Name="/test/">
+    <Project Path="test/WebsiteAnalyzer.Api.Test/WebsiteAnalyzer.Api.Test.csproj" />
+    <Project Path="test/WebsiteAnalyzer.Application.Test/WebsiteAnalyzer.Application.Test.csproj" />
+    <Project Path="test/WebsiteAnalyzer.Infrastructure.Test/WebsiteAnalyzer.Infrastructure.Test.csproj" />
+    <Project Path="test/WebsiteAnalyzer.TestUtilities/WebsiteAnalyzer.TestUtilities.csproj" />
+  </Folder>
+</Solution>

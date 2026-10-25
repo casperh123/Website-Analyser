@@ -2,7 +2,7 @@
 @using WebsiteAnalyzer.Core.Interfaces.Services
 @using WebsiteAnalyzer.Core.Interfaces.Services.DTOs.Email
 @using WebsiteAnalyzer.Core.Interfaces.Services.DTOs.ScheduledAction
-@using WebsiteAnalyzer.Core.Interfaces.Services.DTOs.Website
+@using WebsiteAnalyzer.Core.Interfaces.Services.DTOs.Websites
 @using WebsiteAnalyzer.Web.Components.General.Toggles
 @using WebsiteAnalyzer.Web.Models
 
@@ -45,7 +45,7 @@
                         </RadzenStack>
                         <RadzenStack>
                             <RadzenText TextStyle="TextStyle.Subtitle1">Action:</RadzenText>
-                            <RadzenText>@GetScheduledAction(subscription.ScheduledActionId).ToDisplayString()</RadzenText>
+                            <RadzenText>@GetScheduledAction(subscription.SubscripedAction).ToDisplayString()</RadzenText>
                         </RadzenStack>
                         <RadzenStack JustifyContent="JustifyContent.Center">
                             <RadzenButton ButtonStyle="ButtonStyle.Danger" Click="@(async () => await Unsubscribe(subscription))">Unsubscribe</RadzenButton>
@@ -117,11 +117,11 @@
         }
     }
 
-    private CrawlAction GetScheduledAction(Guid actionId)
+    private CrawlAction GetScheduledAction(CrawlAction action)
     {
         return Actions
             .Where(a => a.WebsiteId == Website.Id)
-            .First(a => a.Id == actionId)
+            .First(a => a.Action == action)
             .Action;
     }
 }

@@ -167,6 +167,16 @@
         "responses": {
           "200": {
             "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
           }
         }
       }
@@ -965,6 +975,9 @@
           }
         }
       },
+      "CrawlAction": {
+        "type": "integer"
+      },
       "CreateEmailSubscription": {
         "required": [
           "email"
@@ -1013,9 +1026,8 @@
             "type": "string",
             "format": "uuid"
           },
-          "scheduledActionId": {
-            "type": "string",
-            "format": "uuid"
+          "subscripedAction": {
+            "$ref": "#/components/schemas/CrawlAction"
           },
           "email": {
             "type": "string"

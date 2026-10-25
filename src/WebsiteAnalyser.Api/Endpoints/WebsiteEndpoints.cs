@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Http.HttpResults;
 using WebsiteAnalyser.Api.DTOs.Website;
 using WebsiteAnalyser.Api.User;
 using WebsiteAnalyzer.Core.Interfaces.Services;
-using WebsiteAnalyzer.Core.Interfaces.Services.DTOs.Website;
+using WebsiteAnalyzer.Core.Interfaces.Services.DTOs.Websites;
 
 namespace WebsiteAnalyser.Api.Endpoints;
 

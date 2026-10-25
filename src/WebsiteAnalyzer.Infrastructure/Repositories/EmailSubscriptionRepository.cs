@@ -29,12 +29,4 @@ public class EmailSubscriptionRepository(ApplicationDbContext dbContext)
             .Where(s => websiteIds.Contains(s.WebsiteId))
             .ToListAsync();
     }
-
-    public async Task<ICollection<EmailSubscription>> GetByWebsiteAndActionId(Guid websiteId, Guid actionId)
-    {
-        return await DbContext.EmailSubcriptions
-            .Where(s => s.WebsiteId == websiteId)
-            .Where(s => s.ScheduleActionId == actionId)
-            .ToListAsync();
-    }
 }
