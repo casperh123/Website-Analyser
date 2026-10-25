@@ -1,8 +1,4 @@
 $kind: http-request
-<<<<<<< Updated upstream
-url: "{{url}}//websites/6f8726fc-01c9-4673-8e50-1207bbd89896/uptime"
-=======
 url: "{{url}}/websites/6f8726fc-01c9-4673-8e50-1207bbd89896/uptime"
->>>>>>> Stashed changes
 method: GET
 order: 1791360130502
