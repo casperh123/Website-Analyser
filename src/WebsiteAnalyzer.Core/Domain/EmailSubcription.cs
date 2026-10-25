@@ -6,6 +6,7 @@ public record EmailSubscription
 {
     public Guid Id { get; set; }
     public Guid WebsiteId { get; set; }
+    public Website Website { get; set; }
     public CrawlAction SubscripedAction { get; set; }
     public string Email { get; set; }
 

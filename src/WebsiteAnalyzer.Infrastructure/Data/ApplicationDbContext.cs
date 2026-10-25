@@ -32,7 +32,8 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser, IdentityR
     {
         base.OnModelCreating(builder);
 
-        builder.Entity<OrderCheckKeys>().HasKey(e => new { e.WebsiteId });
+        builder.Entity<OrderCheckKeys>()
+            .HasKey(e => new { e.WebsiteId });
         
         // Configure Website entity
         builder.Entity<Website>()
@@ -42,6 +43,12 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser, IdentityR
                     w.Url,
                     w.UserId
                 });
+
+        builder.Entity<OrderCheck>()
+            .HasOne(oc => oc.Website)
+            .WithMany(w => w.OrderChecks)
+            .HasForeignKey(s => s.WebsiteId);
+
 
         // Configure CacheWarm and Website relationship
         builder.Entity<CacheWarm>()

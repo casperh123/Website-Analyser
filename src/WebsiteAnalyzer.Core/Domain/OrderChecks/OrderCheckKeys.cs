@@ -1,3 +1,5 @@
+using System.ComponentModel.DataAnnotations;
+
 namespace WebsiteAnalyzer.Core.Domain.OrderChecks;
 
 public record OrderCheckKeys

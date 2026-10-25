@@ -19,6 +19,7 @@ public record CacheWarm
     {
         Id = Guid.NewGuid();
         WebsiteId = website.Id;
+        Website = website;
         VisitedPages = linksChecked;
         StartTimeUtc = startTime;
         EndTime = endTime;
@@ -26,6 +27,7 @@ public record CacheWarm
 
     public Guid Id { get; set; }
     public Guid WebsiteId { get; set; }
+    public Website Website { get; set; }
     public int VisitedPages { get; set; }
     public DateTime StartTimeUtc { get; private set; }
     public DateTime EndTime { get; private set; }
