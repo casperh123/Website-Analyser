@@ -1,4 +1,4 @@
-using WebsiteAnalyzer.Core.Interfaces.Services.DTOs.Website;
+using WebsiteAnalyzer.Core.Interfaces.Services.DTOs.Websites;
 
 namespace WebsiteAnalyzer.Core.Interfaces.Services;
 

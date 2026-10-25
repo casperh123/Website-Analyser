@@ -1,3 +1,4 @@
+using WebsiteAnalyzer.Core.Domain;
 using WebsiteAnalyzer.Core.Enums;
 
 namespace WebsiteAnalyzer.Core.Interfaces.Services.DTOs.ScheduledAction;
@@ -6,7 +7,7 @@ public record ScheduledActionDTO
 {
     public Guid Id { get; init; }
     public Guid WebsiteId { get; init; }
-    public Domain.Website Website { get; init; }
+    public Website Website { get; init; }
     public Frequency Frequency { get; set; }
     public CrawlAction Action { get; init; }
     public DateTime LastCrawlDateUtc { get; set; }

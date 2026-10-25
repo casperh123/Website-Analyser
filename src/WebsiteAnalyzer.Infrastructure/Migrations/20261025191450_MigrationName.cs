@@ -85,12 +85,13 @@ namespace WebsiteAnalyzer.Infrastructure.Migrations
                 columns: table => new
                 {
                     WebsiteId = table.Column<Guid>(type: "TEXT", nullable: false),
-                    ScheduleActionId = table.Column<Guid>(type: "TEXT", nullable: false),
-                    Email = table.Column<string>(type: "TEXT", nullable: false)
+                    SubscripedAction = table.Column<int>(type: "INTEGER", nullable: false),
+                    Email = table.Column<string>(type: "TEXT", nullable: false),
+                    Id = table.Column<Guid>(type: "TEXT", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_EmailSubcriptions", x => new { x.WebsiteId, x.ScheduleActionId, x.Email });
+                    table.PrimaryKey("PK_EmailSubcriptions", x => new { x.WebsiteId, x.SubscripedAction, x.Email });
                 });
 
             migrationBuilder.CreateTable(

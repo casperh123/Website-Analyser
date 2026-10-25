@@ -6,9 +6,8 @@ using WebsiteAnalyser.Api.Streaming;
 using WebsiteAnalyser.Api.User;
 using WebsiteAnalyzer.Core.Contracts.BrokenLink;
 using WebsiteAnalyzer.Core.Domain;
-using WebsiteAnalyzer.Core.Domain.BrokenLink;
 using WebsiteAnalyzer.Core.Interfaces.Services;
-using WebsiteAnalyzer.Core.Interfaces.Services.DTOs.Website;
+using WebsiteAnalyzer.Core.Interfaces.Services.DTOs.Websites;
 
 namespace WebsiteAnalyser.Api.Endpoints;
 

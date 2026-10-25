@@ -3,7 +3,7 @@ using WebsiteAnalyzer.Core.Enums;
 using WebsiteAnalyzer.Core.Exceptions;
 using WebsiteAnalyzer.Core.Interfaces.Repositories;
 using WebsiteAnalyzer.Core.Interfaces.Services;
-using WebsiteAnalyzer.Core.Interfaces.Services.DTOs.Website;
+using WebsiteAnalyzer.Core.Interfaces.Services.DTOs.Websites;
 
 namespace WebsiteAnalyzer.Application.Services;
 
