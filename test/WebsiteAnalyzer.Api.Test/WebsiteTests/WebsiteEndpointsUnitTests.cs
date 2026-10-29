@@ -5,7 +5,7 @@ using WebsiteAnalyzer.Application.Services;
 using WebsiteAnalyzer.Core.Domain;
 using WebsiteAnalyzer.Core.Interfaces.Repositories;
 using WebsiteAnalyzer.Core.Interfaces.Services;
-using WebsiteAnalyzer.Core.Interfaces.Services.DTOs.Website;
+using WebsiteAnalyzer.Core.Interfaces.Services.DTOs.Websites;
 using WebsiteAnalyzer.Infrastructure.Repositories;
 using WebsiteAnalyzer.TestUtilities.Builders;
 using WebsiteAnalyzer.TestUtilities.Database;
@@ -35,10 +35,10 @@ public class WebsiteEndpointsUnitTests : TestBase
         (ClaimsPrincipal user, Guid userId) = new ClaimsBuilder().Default();
         string websiteUrl = "https://example.com";
         Website website = await WebsiteScenarios.CreateDefault(userId, websiteUrl);
-        
+
         // Act
-        Results<Ok<WebsiteDTO>, NotFound> result = 
-            await WebsiteEndpoints.GetById(
+        Results<Ok<WebsiteDTO>, NotFound> result =
+            await WebsiteEndpoints.Get(
                 user,
                 website.Id,
                 _websiteService
@@ -47,17 +47,17 @@ public class WebsiteEndpointsUnitTests : TestBase
         // Assert
         Assert.IsType<Ok<WebsiteDTO>>(result.Result);
     }
-    
+
     [Fact]
     public async Task GetById_Returns_NotFound()
     {
         // Arrange
         (ClaimsPrincipal user, Guid userId) = new ClaimsBuilder().Default();
         Guid websiteId = Guid.NewGuid();
-        
+
         // Act
-        Results<Ok<WebsiteDTO>, NotFound> result = 
-            await WebsiteEndpoints.GetById(
+        Results<Ok<WebsiteDTO>, NotFound> result =
+            await WebsiteEndpoints.Get(
                 user,
                 websiteId,
                 _websiteService

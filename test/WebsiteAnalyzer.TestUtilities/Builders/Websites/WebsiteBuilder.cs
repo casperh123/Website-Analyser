@@ -1,9 +1,8 @@
-
 using WebsiteAnalyzer.Core.Domain.BrokenLink;
 using WebsiteAnalyzer.Core.Interfaces.Repositories;
 using WebsiteAnalyzer.TestUtilities.Utilities;
 
-namespace WebsiteAnalyzer.TestUtilities.Builders.Website;
+namespace WebsiteAnalyzer.TestUtilities.Builders.Websites;
 
 public class WebsiteBuilder : EntityBuilder<Core.Domain.Website>
 {

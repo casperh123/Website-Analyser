@@ -1,3 +1,4 @@
+using WebsiteAnalyzer.Core.Domain;
 using WebsiteAnalyzer.Core.Domain.BrokenLink;
 using WebsiteAnalyzer.Core.Interfaces.Repositories;
 using WebsiteAnalyzer.Infrastructure.Data;
@@ -15,9 +16,9 @@ public class BrokenLinkCrawlScenarios
         _crawlRepository = new BrokenLinkCrawlRepository(dbContext);
     }
 
-    public async Task<BrokenLinkCrawl> CreateDefault(Guid userId, string url)
+    public async Task<BrokenLinkCrawl> CreateDefault(Website website)
     {
-        return await new BrokenLinkCrawlBuilder(_crawlRepository, userId, url)
+        return await new BrokenLinkCrawlBuilder(_crawlRepository, website)
             .BuildAndSave();
     }
 }

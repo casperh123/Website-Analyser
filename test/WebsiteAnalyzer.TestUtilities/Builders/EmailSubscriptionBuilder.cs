@@ -1,4 +1,5 @@
 using WebsiteAnalyzer.Core.Domain;
+using WebsiteAnalyzer.Core.Enums;
 using WebsiteAnalyzer.Core.Interfaces.Repositories;
 
 namespace WebsiteAnalyzer.TestUtilities.Builders;
@@ -7,7 +8,7 @@ public class EmailSubscriptionBuilder : EntityBuilder<EmailSubscription>
 {
     public EmailSubscriptionBuilder(IEmailSubscriptionRepository repository) : base(repository)
     {
-        Entity = new EmailSubscription(Guid.NewGuid(), Guid.NewGuid(), "");
+        Entity = new EmailSubscription(Guid.NewGuid(), CrawlAction.CacheWarm, "some_email@email.com");
     }
 
     public EmailSubscriptionBuilder WithWebsiteId(Guid websiteId)
@@ -17,9 +18,9 @@ public class EmailSubscriptionBuilder : EntityBuilder<EmailSubscription>
         return this;
     }
 
-    public EmailSubscriptionBuilder WithScheduledActionId(Guid actionId)
+    public EmailSubscriptionBuilder WithScheduledActionId(CrawlAction action)
     {
-        Entity.ScheduleActionId = actionId;
+        Entity.SubscripedAction = action;
 
         return this;
     }

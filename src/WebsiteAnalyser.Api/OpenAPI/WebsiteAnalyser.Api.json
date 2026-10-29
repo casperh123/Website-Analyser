@@ -1071,6 +1071,9 @@
             "type": "string",
             "format": "uuid"
           },
+          "website": {
+            "$ref": "#/components/schemas/Website"
+          },
           "timeRecorded": {
             "type": "string",
             "format": "date-time"

@@ -2,7 +2,7 @@ using WebsiteAnalyzer.Core.Domain;
 using WebsiteAnalyzer.Core.Interfaces.Repositories;
 using WebsiteAnalyzer.Infrastructure.Data;
 using WebsiteAnalyzer.Infrastructure.Repositories;
-using WebsiteAnalyzer.TestUtilities.Builders.Website;
+using WebsiteAnalyzer.TestUtilities.Builders.Websites;
 
 namespace WebsiteAnalyzer.TestUtilities.Scenarios;
 

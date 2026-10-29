@@ -4,7 +4,7 @@ using WebsiteAnalyzer.Core.Interfaces.Repositories;
 using WebsiteAnalyzer.Infrastructure.Data;
 using WebsiteAnalyzer.Infrastructure.Repositories;
 using WebsiteAnalyzer.TestUtilities.Builders;
-using WebsiteAnalyzer.TestUtilities.Builders.Website;
+using WebsiteAnalyzer.TestUtilities.Builders.Websites;
 
 namespace WebsiteAnalyzer.TestUtilities.Scenarios;
 
@@ -26,14 +26,17 @@ public class ScheduledActionScenarios
 
     public async Task<ICollection<ScheduledAction>> CreateActionCombinations(Website website, Frequency frequency = Frequency.SixHourly, TimeSpan offset = default)
     {
-        ScheduledAction brokenLinkAction = 
+        ScheduledAction brokenLinkAction =
             await new ScheduledActionBuilder(_scheduledActionRepository, website, frequency, CrawlAction.BrokenLink, offset)
                 .BuildAndSave();
         ScheduledAction cacheWarmAction =
             await new ScheduledActionBuilder(_scheduledActionRepository, website, frequency, CrawlAction.CacheWarm, offset)
                 .BuildAndSave();
+        ScheduledAction uptimePing =
+            await new ScheduledActionBuilder(_scheduledActionRepository, website, frequency, CrawlAction.Uptime, offset)
+                .BuildAndSave();
 
-        return [brokenLinkAction, cacheWarmAction];
+        return [brokenLinkAction, cacheWarmAction, uptimePing];
     }
 
     public async Task<ScheduledAction> CreateWithStatus(Status status)

@@ -1,3 +1,4 @@
+using WebsiteAnalyzer.Core.Domain;
 using WebsiteAnalyzer.Core.Domain.BrokenLink;
 using WebsiteAnalyzer.Core.Interfaces.Repositories;
 
@@ -7,13 +8,11 @@ public class BrokenLinkCrawlBuilder : EntityBuilder<BrokenLinkCrawl>
 {
     public BrokenLinkCrawlBuilder(
         IBrokenLinkCrawlRepository repository,
-        Guid userId,
-        string url
+        Website website
         ) : base(repository)
     {
         Entity = new BrokenLinkCrawl(
-            userId,
-            url
+            website
         );
     }
 }

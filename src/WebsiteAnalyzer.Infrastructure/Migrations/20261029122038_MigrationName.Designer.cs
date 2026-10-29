@@ -11,7 +11,7 @@ using WebsiteAnalyzer.Infrastructure.Data;
 namespace WebsiteAnalyzer.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20261025201550_MigrationName")]
+    [Migration("20261029122038_MigrationName")]
     partial class MigrationName
     {
         /// <inheritdoc />
@@ -553,11 +553,13 @@ namespace WebsiteAnalyzer.Infrastructure.Migrations
 
             modelBuilder.Entity("WebsiteAnalyzer.Core.Domain.Uptime.DowntimePing", b =>
                 {
-                    b.HasOne("WebsiteAnalyzer.Core.Domain.Website", null)
+                    b.HasOne("WebsiteAnalyzer.Core.Domain.Website", "Website")
                         .WithMany("DowntimePings")
                         .HasForeignKey("WebsiteId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Website");
                 });
 
             modelBuilder.Entity("WebsiteAnalyzer.Core.Domain.BrokenLink.BrokenLinkCrawl", b =>
