@@ -3,11 +3,9 @@ using Crawl.Models;
 using Microsoft.AspNetCore.Http.HttpResults;
 using WebsiteAnalyser.Api.DTOs;
 using WebsiteAnalyser.Api.Streaming;
-using WebsiteAnalyser.Api.User;
 using WebsiteAnalyzer.Core.Domain;
 using WebsiteAnalyzer.Core.Interfaces.Services;
 using WebsiteAnalyzer.Core.Interfaces.Services.DTOs.BrokenLink;
-using WebsiteAnalyzer.Core.Interfaces.Services.DTOs.Websites;
 
 namespace WebsiteAnalyser.Api.Endpoints;
 
